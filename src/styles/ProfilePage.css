@@ -1,0 +1,89 @@
+/* ---------------- базовый лэйаут ---------------- */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #F5F6FA;
+}
+
+/* ---------------- заголовок ---------------- */
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #202224;
+  margin: 24px 0;
+}
+
+/* --------------- контейнер формы --------------- */
+.profile-page {
+  flex: 1;
+  padding: 0 40px 40px;
+}
+
+.profile-form {
+  background: #FFFFFF;
+  border: 0.3px solid #B9B9B9;
+  border-radius: 14px;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+/* --------------- аватар + username --------------- */
+.avatar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.avatar-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #ECECEE;
+}
+
+.username {
+  margin-top: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #202224;
+}
+
+/* ---------------- сетка полей ---------------- */
+.fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #606060;
+  margin-bottom: 8px;
+}
+
+.input {
+  background: #F5F6FA;
+  border: 0.6px solid #D5D5D5;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.input.read-only {
+  cursor: default;
+  user-select: text;
+}

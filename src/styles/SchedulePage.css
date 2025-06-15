@@ -1,0 +1,150 @@
+/* src/styles/SchedulePage.css */
+
+/* ---------- Общий layout (как на главной) ---------- */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  font-family: 'Nunito Sans', sans-serif;
+  background: #F5F6FA;
+}
+
+/* Основная область справа от Sidebar */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Контент под Topbar (с отступом 24px) */
+.content-area {
+  flex: 1;
+  padding: 24px;
+  background-color: #F7F8FC;
+  overflow-y: auto;
+}
+
+/* ---------- Loading ---------- */
+.loading {
+  font-size: 18px;
+  color: #666;
+  text-align: center;
+  margin-top: 50px;
+}
+
+/* ---------- Выпадашка уведомлений ---------- */
+.notif-dropdown {
+  position: absolute;
+  top: 70px; /* сразу под Topbar (Topbar == 70px) */
+  right: 40px;
+  width: 260px;
+  background: #FFFFFF;
+  border: 1px solid #4880FF;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  z-index: 10;
+}
+
+.notif-dropdown h4 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.notif-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.notif-dropdown li {
+  margin-bottom: 12px;
+}
+
+.notif-dropdown .time {
+  font-size: 12px;
+  color: #919191;
+}
+
+/* ---------- Заголовок страницы ---------- */
+.page-title {
+  font-size: 24px;
+  color: #1e1e2f;
+  margin-bottom: 24px;
+}
+
+/* ---------- Сетка: виджет слева + календарь справа ---------- */
+.schedule-grid {
+  display: flex;
+  gap: 24px;
+}
+
+/* Левая колонка (виджет) */
+.left-column {
+  flex: 1;
+  max-width: 320px;
+}
+
+/* Правая колонка (календарь) */
+.right-column {
+  flex: 3;
+}
+
+/* ---------- Заголовок виджета ближайшего дня ---------- */
+.widget-header {
+  background-color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid #e5e7eb;
+  border-bottom: none;
+}
+
+.widget-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #1e1e2f;
+}
+
+/* ---------- Стили FullCalendar ---------- */
+.fc-toolbar-title {
+  font-size: 20px;
+  color: #1e1e2f;
+}
+
+.fc .fc-button {
+  background-color: #3b82f6;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 14px;
+}
+
+.fc .fc-button:hover {
+  background-color: #2563eb;
+}
+
+.fc .fc-timegrid-slot-label {
+  font-size: 12px;
+  color: #4a4a4a;
+}
+
+.fc .fc-scrollgrid {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.fc-event {
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Если FullCalendar тулбар попадёт в виджет, скроем его там */
+.left-column .fc-toolbar,
+.left-column .fc-button {
+  display: none;
+}

@@ -1,0 +1,91 @@
+/* ---------- Общий layout (как на главной) ---------- */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  font-family: 'Nunito Sans', sans-serif;
+  background: #F5F6FA;
+}
+
+/* Основная область справа от Sidebar */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Убираем возможный внешний отступ у Topbar, чтобы он прилегал к верху */
+.topbar {
+  margin-top: 0;
+}
+
+/* Сетка карточек */
+.cards {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 24px;
+}
+
+/* Общие стили для всех карточек */
+.card {
+  background: #FFFFFF;
+  border-radius: 24px;
+  box-shadow: 6px 6px 54px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+}
+
+.card h3 {
+  margin-top: 0;
+  font-size: 20px;
+  color: #202224;
+  margin-bottom: 16px;
+}
+
+/* Дополнительный класс для карточки с расписанием (опционально) */
+.card.schedule {
+  display: flex;
+  flex-direction: column;
+}
+
+.card.schedule h3 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+/* Стили для выпадашки уведомлений, если понадобится */
+.notif-dropdown {
+  position: absolute;
+  top: 70px; /* сразу под Topbar (Topbar = 70px) */
+  right: 40px;
+  width: 260px;
+  background: #FFFFFF;
+  border: 1px solid #4880FF;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  z-index: 10;
+}
+
+.notif-dropdown h4 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.notif-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.notif-dropdown li {
+  margin-bottom: 12px;
+}
+
+.notif-dropdown .time {
+  font-size: 12px;
+  color: #919191;
+}

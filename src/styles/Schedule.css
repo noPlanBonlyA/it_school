@@ -1,0 +1,62 @@
+/* src/styles/Schedule.css */
+
+/* Контейнер списка */
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Карточка одной пары */
+.schedule-item {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden; /* чтобы color-bar сливался без лишних скруглений */
+}
+
+/* Если пустой список */
+.schedule-item.empty {
+  justify-content: center;
+  padding: 12px;
+  color: #646464;
+  font-size: 14px;
+}
+
+/* Цветная вертикальная полоса слева */
+.color-bar {
+  width: 6px;
+  height: 100%;
+}
+
+/* Контент (название + время) */
+.schedule-content {
+  flex: 1;
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Название пары */
+.schedule-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: #202224;
+}
+
+/* Время пары */
+.schedule-time {
+  font-size: 13px;
+  color: #646464;
+}
+
+/* Аудитория справа */
+.schedule-audience {
+  padding: 0 16px;
+  font-size: 13px;
+  color: #3b82f6; /* синий цвет для акцента */
+  font-weight: 500;
+}

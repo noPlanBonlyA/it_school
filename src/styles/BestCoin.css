@@ -1,0 +1,21 @@
+/* Компонент BestCoins расширяет базовый .card из HomePage.css */
+.card.bestcoins {
+    /* выравниваем содержимое по центру */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  
+    /* если нужно — можно подправить отступы */
+    padding: 32px 24px;
+  }
+  
+  /* Само значение */
+  .card.bestcoins .amount {
+    margin-top: 16px;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    color: #202224;
+  }
+  

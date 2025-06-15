@@ -1,0 +1,155 @@
+/* src/styles/CoursesPage.css */
+
+.courses-page {
+  display: flex;
+}
+
+/* Основная область (рядом с Sidebar) */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #f7f8fc;
+  min-height: 100vh;
+}
+
+.courses-header {
+  margin-bottom: 20px;
+}
+
+.courses-header h1 {
+  font-size: 24px;
+  color: #1e1e2f;
+  margin: 0;
+}
+
+/* Сетка курсов */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+/* Карточка курса */
+.course-card {
+  position: relative;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Когда заблокировано, понижаем непрозрачность и убираем hover */
+.course-card.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.course-image-wrapper {
+  width: 100%;
+  height: 160px;
+  background-color: #f0f0f0;
+  overflow: hidden;
+}
+
+.course-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.course-image.placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #d8d8d8;
+}
+
+/* Тело карточки */
+.course-body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.course-title {
+  font-size: 18px;
+  color: #1e1e2f;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.course-progress-info {
+  font-size: 14px;
+  color: #4a4a4a;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress-text {
+  color: #1e1e2f;
+}
+
+.points-text {
+  color: #1e1e2f;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.progress-filled {
+  height: 100%;
+  background-color: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+.course-button {
+  align-self: flex-end;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.course-button:hover {
+  background-color: #2563eb;
+}
+
+/* Перекрытие замком */
+.lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lock-icon {
+  font-size: 32px;
+  color: #4a4a4a;
+}

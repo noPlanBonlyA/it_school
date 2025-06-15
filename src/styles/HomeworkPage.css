@@ -1,0 +1,203 @@
+/* src/styles/HomeworkPage.css */
+
+/* Общий layout: Sidebar + Main */
+.homework-page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .homework-page h1 {
+    font-size: 24px;
+    color: #1e1e2f;
+    margin-bottom: 16px;
+  }
+  
+  /* Сетка трёх колонок */
+  .homework-grid {
+    display: flex;
+    gap: 16px;
+    height: calc(100vh - 70px - 32px); /* 70px Topbar + 32px отступы сверху/снизу */
+  }
+  
+  /* Колонка общие стили */
+  .column {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 16px;
+    overflow-y: auto;
+  }
+  
+  /* Колонка 1: группы */
+  .groups-col {
+    flex: 1;
+    min-width: 180px;
+  }
+  .groups-col h2 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #202224;
+    margin-bottom: 12px;
+  }
+  
+  .groups-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .groups-list li {
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #202224;
+    margin-bottom: 4px;
+  }
+  .groups-list li:hover {
+    background: #F5F6FA;
+  }
+  .groups-list li.selected {
+    background: #4880FF;
+    color: #fff;
+  }
+  
+  /* Колонка 2: темы */
+  .topics-col {
+    flex: 2;
+    min-width: 220px;
+  }
+  .topics-col h2 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #202224;
+    margin-bottom: 12px;
+  }
+  
+  .topics-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .topics-list li {
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #202224;
+    margin-bottom: 4px;
+  }
+  .topics-list li:hover {
+    background: #F5F6FA;
+  }
+  .topics-list li.selected {
+    background: #4880FF;
+    color: #fff;
+  }
+  
+  /* Колонка 3: домашки */
+  .submissions-col {
+    flex: 3;
+    min-width: 300px;
+  }
+  .submissions-col h2 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #202224;
+    margin-bottom: 12px;
+  }
+  
+  .submission-item {
+    border: 1px solid #E0E0E0;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  
+  .submission-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #f7f7f7;
+    cursor: pointer;
+  }
+  .submission-header:hover {
+    background: #ececec;
+  }
+  
+  .student-name {
+    font-weight: 600;
+    color: #202224;
+    font-size: 14px;
+  }
+  .file-name {
+    font-size: 13px;
+    color: #646464;
+  }
+  
+  /* Детали после клика */
+  .submission-details {
+    padding: 12px;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .submission-details textarea {
+    width: 100%;
+    height: 80px;
+    resize: vertical;
+    padding: 8px;
+    border: 1px solid #CCC;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .submission-details input[type="text"] {
+    width: 100px;
+    padding: 8px;
+    border: 1px solid #CCC;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .details-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  
+  .btn-primary {
+    background: #4880FF;
+    color: #FFF;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .btn-primary:hover {
+    background: #3a6fd3;
+  }
+  
+  .btn-secondary {
+    background: #CCCCCC;
+    color: #333333;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .btn-secondary:hover {
+    background: #BBBBBB;
+  }
+  
+  /* Плейсхолдер при отсутствии выбора */
+  .placeholder {
+    font-size: 14px;
+    color: #919191;
+    padding: 12px;
+  }
+  

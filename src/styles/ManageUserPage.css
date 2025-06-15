@@ -1,0 +1,178 @@
+/* src/styles/ManageUserPage.css */
+
+/* Убираем padding у контейнера, чтобы Topbar прилегал к самому верху */
+.manage-users {
+  font-family: 'Nunito Sans', sans-serif;
+  display: flex;
+  height: 100vh;
+}
+
+/* Основная область справа от Sidebar */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Topbar без лишних отступов сверху */
+.topbar {
+  margin-top: 0;
+}
+
+/* Контент под Topbar с отступом */
+.content-area {
+  flex: 1;
+  padding: 24px;
+  background: #F7F8FC;
+  overflow-y: auto;
+}
+
+/* Общие блоки */
+.block {
+  background: #fff;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.block h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 20px;
+  color: #202224;
+}
+
+/* Сетки форм */
+.user-form.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+/* Поля формы */
+.field {
+  display: flex;
+  flex-direction: column;
+}
+.field label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: #202224;
+}
+.field input,
+.field select {
+  padding: 8px;
+  border: 1px solid #CCC;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Блок поиска */
+.search-block {
+  position: relative;
+  margin-bottom: 16px;
+}
+.search-block input {
+  width: 100%;
+  max-width: 300px;
+  padding: 8px;
+  border: 1px solid #CCC;
+  border-radius: 4px;
+}
+.suggestions {
+  position: absolute;
+  top: 36px;
+  left: 0;
+  width: 100%;
+  max-width: 300px;
+  background: #fff;
+  border: 1px solid #CCC;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+.suggestions li {
+  list-style: none;
+  padding: 8px;
+  cursor: pointer;
+}
+.suggestions li:hover {
+  background: #F5F6FA;
+}
+
+/* Кнопки */
+.buttons {
+  display: flex;
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+.btn-primary {
+  background: #4880FF;
+  color: #FFF;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn-danger {
+  background: #E9515A;
+  color: #FFF;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Текст ошибок */
+.error-text {
+  color: #E9515A;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Модальное окно подтверждения */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+.btn-secondary {
+  background-color: #cccccc;
+  color: #333333;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  background-color: #bbbbbb;
+}
