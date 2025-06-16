@@ -1,7 +1,5 @@
 /*  src/pages/ManageGroupPage.jsx  */
-import React, {
-  useState, useEffect, useMemo, useCallback
-} from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Sidebar from '../components/Sidebar';
@@ -12,7 +10,7 @@ import {
   getAllGroups, createGroup, updateGroup, deleteGroup,
   addStudentsToGroup, removeStudentFromGroup,
   addTeacherToGroup, removeTeacherFromGroup,
-  attachCourseToGroup           // ← привязывает все уроки курса к группе
+  attachCourseToGroup // привязывает все уроки курса к группе
 } from '../services/groupService';
 
 import { getAllUsers }       from '../services/userService';
@@ -23,7 +21,7 @@ import { getAllCourses }     from '../services/courseService';
 import api from '../api/axiosInstance';
 import '../styles/ManageGroupPage.css';
 
-/*──────────────────────── helpers ────────────────────────*/
+/* ─────────────────── helpers ────────────────────────*/
 const hi = (txt, q) => {
   if (!q) return txt;
   const i = txt.toLowerCase().indexOf(q.toLowerCase());
@@ -39,8 +37,8 @@ const hi = (txt, q) => {
 const mapUserObj = o => {
   const u = o.user || o;
   return {
-    profileId : o.id,                 // id teacher/student-профиля
-    userId    : o.user_id || o.id,    // id User
+    profileId : o.id,                 // teacher/student-профиля
+    userId    : o.user_id || o.id,    // user
     first_name: u.first_name || '',
     surname   : u.surname    || '',
     username  : u.username   || ''
@@ -65,12 +63,12 @@ const normalizeGroup = g => ({
   } : null
 });
 
-/*──────────────────────── component ────────────────────────*/
+/* ─────────────────── component ────────────────────────*/
 export default function ManageGroupPage() {
   const { user } = useAuth();
   const nav      = useNavigate();
 
-  /* ---------- state ---------- */
+  /* ------ state ---------- */
   const [groups,   setGroups]   = useState([]);
   const [students, setStudents] = useState([]); const [stuLoaded, setSL] = useState(false);
   const [teachers, setTeachers] = useState([]); const [teaLoaded, setTL] = useState(false);
@@ -95,35 +93,75 @@ export default function ManageGroupPage() {
   const [tFil, setTFil] = useState('');
   const [cFil, setCFil] = useState('');
 
-  /*──────── initial groups load ────────*/
-  useEffect(() => { (async () => {
-    const brief = (await getAllGroups(100, 0)).objects || [];
-    const full  = await Promise.all(
-      brief.map(async g => normalizeGroup((await api.get(`/groups/${g.id}`)).data))
-    );
-    setGroups(full);
-  })(); }, []);
+  /* ─── initial groups load ────────*/
+  useEffect(() => { 
+    (async () => {
+      try {
+        const brief = (await getAllGroups(100, 0)).objects || [];
+        const full  = await Promise.all(
+          brief.map(async g => {
+            try {
+              const fullGroup = (await api.get(`/groups/${g.id}`)).data;
+              return normalizeGroup(fullGroup);
+            } catch (error) {
+              console.error(`Error loading group ${g.id}:`, error);
+              return normalizeGroup(g); // fallback to brief data
+            }
+          })
+        );
+        setGroups(full);
+      } catch (error) {
+        console.error('Error loading groups:', error);
+      }
+    })(); 
+  }, []);
 
-  /*──────── lazy lists ────────*/
-  const loadStu = async () => { if (stuLoaded) return;
-    const list = await getAllUsers({ role:'student', limit:100, offset:0 });
-    setStudents(list.map(mapUserObj)); setSL(true);
+  /* ─── lazy lists ────────*/
+  const loadStu = async () => { 
+    if (stuLoaded) return;
+    try {
+      const list = await getAllUsers({ role:'student', limit:100, offset:0 });
+      setStudents(list.map(mapUserObj)); 
+      setSL(true);
+    } catch (error) {
+      console.error('Error loading students:', error);
+    }
   };
-  const loadTea = async () => { if (teaLoaded) return;
-    const list = await getAllUsers({ role:'teacher', limit:100, offset:0 });
-    setTeachers(list.map(mapUserObj)); setTL(true);
+  
+  const loadTea = async () => { 
+    if (teaLoaded) return;
+    try {
+      const list = await getAllUsers({ role:'teacher', limit:100, offset:0 });
+      setTeachers(list.map(mapUserObj)); 
+      setTL(true);
+    } catch (error) {
+      console.error('Error loading teachers:', error);
+    }
   };
-  const loadCou = async () => { if (couLoaded) return;
-    const data = await getAllCourses(100, 0);
-    setCourses(data.objects || []); setCL(true);
+  
+  const loadCou = async () => { 
+    if (couLoaded) return;
+    try {
+      const data = await getAllCourses(100, 0);
+      setCourses(data.objects || []); 
+      setCL(true);
+    } catch (error) {
+      console.error('Error loading courses:', error);
+    }
   };
 
-  /*──────── refresh one group ────────*/
-  const refresh = useCallback(async id =>
-    normalizeGroup((await api.get(`/groups/${id}`)).data)
-  , []);
+  /* ─── refresh one group ────────*/
+  const refresh = useCallback(async id => {
+    try {
+      const fullGroup = (await api.get(`/groups/${id}`)).data;
+      return normalizeGroup(fullGroup);
+    } catch (error) {
+      console.error(`Error refreshing group ${id}:`, error);
+      return null;
+    }
+  }, []);
 
-  /*──────────────── CREATE / UPDATE / DELETE GROUP ────────────────*/
+  /* ────────── CREATE GROUP ────────────────*/
   const createGrp = async () => {
     if (!newF.name.trim()) { setErrs({ name:'Название обязательно' }); return; }
     try {
@@ -133,16 +171,27 @@ export default function ManageGroupPage() {
         end_date  : newF.end_date   || null
       });
       const obj = await refresh(g.id);
-      setGroups(gs => [...gs, obj]);
+      if (obj) {
+        setGroups(gs => [...gs, obj]);
+      }
       setNewF({ name:'', description:'', start_date:'', end_date:'' });
       setErrs({});
-    } catch { alert('Ошибка создания группы'); }
+    } catch (error) { 
+      console.error('Error creating group:', error);
+      alert('Ошибка создания группы'); 
+    }
   };
 
   const delGrp = async id => {
     if (!window.confirm('Удалить группу?')) return;
-    try { await deleteGroup(id); setGroups(gs => gs.filter(g => g.id !== id)); }
-    catch { alert('Не удалось удалить группу'); }
+    try { 
+      await deleteGroup(id); 
+      setGroups(gs => gs.filter(g => g.id !== id)); 
+    }
+    catch (error) { 
+      console.error('Error deleting group:', error);
+      alert('Не удалось удалить группу'); 
+    }
   };
 
   const open = g => {
@@ -156,6 +205,7 @@ export default function ManageGroupPage() {
     setAddStu(false); setAddTea(false); setAddCou(false);
     setShow(true);
   };
+  
   const close = () => { setShow(false); setSel(null); };
 
   const save = async () => {
@@ -169,19 +219,29 @@ export default function ManageGroupPage() {
       await updateGroup(sel.id, body);
       let fr = await refresh(sel.id);
 
-      /* после PUT teacher может обнулиться; вернём обратно, если был */
+      /* PUT teacher может обнулиться; вернём обратно, если был */
       if (!fr.teacher && sel.teacher) {
         await addTeacherToGroup(sel.id, sel.teacher.id);
         fr = await refresh(sel.id);
       }
-      setSel(fr); setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
-    } catch { alert('Не удалось сохранить'); }
+      if (fr) {
+        setSel(fr); 
+        setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
+      }
+    } catch (error) { 
+      console.error('Error saving group:', error);
+      alert('Не удалось сохранить'); 
+    }
   };
+  
   const changed = sel && ['name','description','start_date','end_date']
     .some(f => (sel[f]||'') !== (edit[f]||''));
 
-  /*──────────────────── filters ───────────────────*/
-  const filterArr = (arr,q,fn)=>{ const s=q.trim().toLowerCase(); return s?arr.filter(a=>fn(a).includes(s)):arr.slice(0,100); };
+  /* ────────────── filters ───────────────────*/
+  const filterArr = (arr,q,fn)=>{ 
+    const s=q.trim().toLowerCase(); 
+    return s?arr.filter(a=>fn(a).includes(s)):arr.slice(0,100); 
+  };
 
   const fStu = useMemo(()=>sel?filterArr(students,sFil,
     s=>`${s.first_name} ${s.surname} ${s.username}`.toLowerCase())
@@ -193,21 +253,28 @@ export default function ManageGroupPage() {
   const fCou = useMemo(()=>sel?filterArr(courses,cFil,c=>c.name.toLowerCase())
     .map(c=>({...c,already:new Set(sel.courses.map(cc=>cc.id)).has(c.id)})):[],[courses,sel,cFil]);
 
-  /*──────────────────── STUDENTS ───────────────────*/
+  /* ────────────── STUDENTS ───────────────────*/
   const addStudents = async () => {
     if (!chk.size) return;
     const ids = [];
-    for (const uid of chk) {
-      const profile = await findStudentByUser(uid);
-      if (!profile){ alert(`У пользователя ${uid} нет Student-профиля`); return; }
-      ids.push(profile.id);
-    }
     try {
+      for (const uid of chk) {
+        const profile = await findStudentByUser(uid);
+        if (!profile){ alert(`У пользователя ${uid} нет Student-профиля`); return; }
+        ids.push(profile.id);
+      }
+      
       await addStudentsToGroup(sel.id, { students_id: ids });
       const fr = await refresh(sel.id);
-      setSel(fr); setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
+      if (fr) {
+        setSel(fr); 
+        setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
+      }
       setChk(new Set()); setSFil(''); setAddStu(false);
-    } catch { alert('Не удалось добавить студентов'); }
+    } catch (error) { 
+      console.error('Error adding students:', error);
+      alert('Не удалось добавить студентов'); 
+    }
   };
 
   const rmStudent = async sid => {
@@ -215,21 +282,32 @@ export default function ManageGroupPage() {
     try {
       await removeStudentFromGroup(sel.id, sid);
       const fr = await refresh(sel.id);
-      setSel(fr); setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
-    } catch { alert('Не удалось удалить студента'); }
+      if (fr) {
+        setSel(fr); 
+        setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
+      }
+    } catch (error) { 
+      console.error('Error removing student:', error);
+      alert('Не удалось удалить студента'); 
+    }
   };
 
-  /*──────────────────── TEACHER ───────────────────*/
+  /* ────────────── TEACHER ───────────────────*/
   const assignTeacher = async () => {
     if (!chosenT) return;
-    const profile = await findTeacherByUser(chosenT);
-    if (!profile){ alert('У выбранного пользователя нет Teacher-профиля'); return; }
     try {
+      const profile = await findTeacherByUser(chosenT);
+      if (!profile){ alert('У выбранного пользователя нет Teacher-профиля'); return; }
+      
       await addTeacherToGroup(sel.id, profile.id);
       const fr = await refresh(sel.id);
-      setSel(fr); setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
+      if (fr) {
+        setSel(fr); 
+        setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
+      }
       setChosenT(null); setAddTea(false); setTFil('');
     } catch(e){
+      console.error('Error assigning teacher:', e);
       if (e.response?.status === 409) alert('Этот преподаватель уже закреплён за другой группой');
       else                            alert('Не удалось привязать преподавателя');
       setChosenT(null); setAddTea(false); setTFil('');
@@ -241,131 +319,176 @@ export default function ManageGroupPage() {
     try {
       await removeTeacherFromGroup(sel.id, tid);
       const fr = await refresh(sel.id);
-      setSel(fr); setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
-    } catch { alert('Не удалось удалить преподавателя'); }
+      if (fr) {
+        setSel(fr); 
+        setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
+      }
+    } catch (error) { 
+      console.error('Error removing teacher:', error);
+      alert('Не удалось удалить преподавателя'); 
+    }
   };
 
-  /*──────────────────── COURSES ───────────────────*/
+  /* ────────────── COURSES ───────────────────*/
   const addCourse = async () => {
     if (!chosenC) return;
     try {
       await attachCourseToGroup(chosenC, sel.id);   // backend создаёт lesson-groups
-      const fr = await refresh(sel.id);             // ← курсы придут от API
-      setSel(fr); setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
+      const fr = await refresh(sel.id);             // курсы придут от API
+      if (fr) {
+        setSel(fr); 
+        setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
+      }
       setChosenC(null); setAddCou(false); setCFil('');
+      alert('Курс успешно добавлен к группе');
     } catch(e){
+      console.error('Error adding course:', e);
       if(e.message==='NO_LESSONS')      alert('У курса нет уроков – добавьте хотя бы один.');
       else if(e.response?.status===409) alert('Часть уроков уже привязана к группе');
       else                              alert('Не удалось привязать курс');
     }
   };
 
-  /*──────────────────── UI helpers ───────────────────*/
+  /* ────────────── UI helpers ───────────────────*/
   const fio = [user.first_name,user.surname,user.patronymic].filter(Boolean).join(' ');
 
-  /*──────────────────── RENDER ───────────────────*/
+  /* ────────────── RENDER ───────────────────*/
   return (
-    <div className="groups-page app-layout">
+    <div className="groups-page app-layout manage-users">
       <Sidebar activeItem="manage-groups" userRole={user.role}/>
       <div className="main-content">
         <Topbar
           userName={fio}
           userRole={user.role}
-          notifications={0}
           onBellClick={()=>{}}
           onProfileClick={()=>nav('/profile')}
         />
 
-        {/*–— header –—*/}
-        <h1>Управление группами</h1>
+        <div className="content-area">
+          {/*— header —*/}
+          <h1>Управление группами</h1>
 
-        {/*–— create group –—*/}
-        <div className="create-group-block">
-          <h2>Создать группу</h2>
-          <div className="create-group-form">
-            {['name','description','start_date','end_date'].map(f=>(
-              <div className="field" key={f}>
-                <label>{f.replace('_',' ')}</label>
-                {f==='description'
-                  ? <textarea value={newF[f]}
-                              onChange={e=>setNewF(s=>({...s,[f]:e.target.value}))}/>
-                  : <input type={f.includes('date')?'date':'text'}
-                           className={f.includes('date')?'date-small':''}
-                           value={newF[f]}
-                           onChange={e=>setNewF(s=>({...s,[f]:e.target.value}))}/>}
-                {f==='name' && errs.name && <div className="error-text">{errs.name}</div>}
+          {/*— create group —*/}
+          <div className="block">
+            <h2>Создать группу</h2>
+            <div className="user-form form-grid">
+              {['name','description','start_date','end_date'].map(f=>(
+                <div className="field" key={f}>
+                  <label>{f.replace('_',' ')}</label>
+                  {f==='description'
+                    ? <textarea value={newF[f]}
+                                onChange={e=>setNewF(s=>({...s,[f]:e.target.value}))}/>
+                    : <input type={f.includes('date')?'date':'text'}
+                             value={newF[f]}
+                             onChange={e=>setNewF(s=>({...s,[f]:e.target.value}))}/>}
+                  {f==='name' && errs.name && <div className="error-text">{errs.name}</div>}
+                </div>
+              ))}
+              <div className="buttons">
+                <button className="btn-primary" onClick={createGrp}>Создать группу</button>
               </div>
-            ))}
-            <button className="btn-primary" onClick={createGrp}>Создать</button>
+            </div>
+          </div>
+
+          {/*— list of groups —*/}
+          <div className="block">
+            <h2>Список групп</h2>
+            <div className="groups-list">
+              {groups.map(g=>(
+                <div className="group-card" key={g.id} style={{
+                  background: 'white',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '16px',
+                  marginBottom: '12px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div className="group-info">
+                    <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', color: '#1e1e2f' }}>
+                      {g.name}
+                    </h3>
+                    <p style={{ margin: '0 0 4px 0', color: '#6b7280', fontSize: '14px' }}>
+                      {g.description||'—'}
+                    </p>
+                    <p style={{ margin: '0', color: '#6b7280', fontSize: '14px' }}>
+                      Преподаватель:&nbsp;
+                      {g.teacher ? `${g.teacher.first_name} ${g.teacher.surname}` : '—'}
+                      {' • '}Студентов: {g.students.length}
+                      {' • '}Курсов: {g.courses?.length || 0}
+                    </p>
+                  </div>
+                  <div className="group-actions" style={{ display: 'flex', gap: '8px' }}>
+                    <button className="btn-primary" onClick={() => open(g)}>Управлять</button>
+                    <button className="btn-danger"    onClick={() => delGrp(g.id)}>Удалить</button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/*–— list of groups –—*/}
-        <div className="groups-list-block">
-          <h2>Список групп</h2>
-          <div className="groups-list">
-            {groups.map(g=>(
-              <div className="group-card" key={g.id}>
-                <div className="group-info">
-                  <h3 className="group-name">{g.name}</h3>
-                  <p  className="group-desc">{g.description||'—'}</p>
-                  <p  className="group-meta">
-                    Преподаватель:&nbsp;
-                    {g.teacher ? `${g.teacher.first_name} ${g.teacher.surname}` : '—'}
-                    {' • '}Студентов: {g.students.length}
-                  </p>
-                </div>
-                <div className="group-actions">
-                  <button className="btn-secondary" onClick={() => open(g)}>Управлять</button>
-                  <button className="btn-danger"    onClick={() => delGrp(g.id)}>Удалить</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/*–— modal –—*/}
+        {/*— modal —*/}
         {show && sel && (
           <div className="modal-overlay">
-            <div className="modal-content large">
+            <div className="modal-content" style={{ maxWidth: '900px' }}>
 
               {/* header */}
               <div className="modal-header">
                 <h2>{sel.name}</h2>
-                <button className="close-modal" onClick={close}>×</button>
+                <button className="close-modal" onClick={close} style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#6b7280'
+                }}>×</button>
               </div>
 
               {/* body */}
-              <div className="modal-body grid">
+              <div className="modal-body" style={{ 
+                padding: '24px', 
+                display: 'grid', 
+                gridTemplateColumns: '1fr 2fr', 
+                gap: '24px',
+                maxHeight: '70vh',
+                overflow: 'auto'
+              }}>
 
                 {/* panel: parameters */}
-                <div className="panel parameters">
-                  <h3>Параметры</h3>
-                  {['name','description','start_date','end_date'].map(f=>(
-                    <div className="field" key={f}>
-                      <label>{f.replace('_',' ')}</label>
-                      {f==='description'
-                        ? <textarea value={edit[f]}
-                                    onChange={e=>setEdit(s=>({...s,[f]:e.target.value}))}/>
-                        : <input type={f.includes('date')?'date':'text'}
-                                 className={f.includes('date')?'date-small':''}
-                                 value={edit[f]}
-                                 onChange={e=>setEdit(s=>({...s,[f]:e.target.value}))}/>}
-                    </div>
-                  ))}
-                  <button className="btn-primary" disabled={!changed}
-                          style={{opacity:changed?1:0.55}} onClick={save}>Сохранить</button>
+                <div className="panel">
+                  <h3 style={{ marginTop: 0 }}>Параметры</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {['name','description','start_date','end_date'].map(f=>(
+                      <div className="field" key={f}>
+                        <label>{f.replace('_',' ')}</label>
+                        {f==='description'
+                          ? <textarea value={edit[f]}
+                                      onChange={e=>setEdit(s=>({...s,[f]:e.target.value}))}
+                                      style={{ minHeight: '60px', resize: 'vertical' }}/>
+                          : <input type={f.includes('date')?'date':'text'}
+                                   value={edit[f]}
+                                   onChange={e=>setEdit(s=>({...s,[f]:e.target.value}))}/>}
+                      </div>
+                    ))}
+                    <button className="btn-primary" disabled={!changed}
+                            style={{opacity:changed?1:0.55}} onClick={save}>
+                      Сохранить изменения
+                    </button>
+                  </div>
                 </div>
 
                 {/* panel: members */}
-                <div className="panel members">
+                <div className="panel">
+                  <h3 style={{ marginTop: 0 }}>Участники</h3>
 
                   {/*─ teacher ─*/}
-                  <div className="section">
-                    <div className="section-header">
-                      <h3>Преподаватель</h3>
+                  <div className="section" style={{ marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <h4 style={{ margin: 0 }}>Преподаватель</h4>
                       {!sel.teacher && (
-                        <button className="btn-mini" onClick={async()=>{
+                        <button className="btn-primary" style={{ fontSize: '12px', padding: '4px 8px' }} onClick={async()=>{
                           const n=!addTea; setAddTea(n); setAddStu(false); setAddCou(false);
                           if(n) await loadTea();
                         }}>
@@ -375,38 +498,53 @@ export default function ManageGroupPage() {
                     </div>
 
                     {sel.teacher ? (
-                      <div className="member-item">
+                      <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center', 
+                        padding: '8px 12px', 
+                        background: '#f8f9fa', 
+                        borderRadius: '6px' 
+                      }}>
                         <span>{sel.teacher.first_name} {sel.teacher.surname} ({sel.teacher.username})</span>
-                        <button className="remove-btn" onClick={()=>rmTeacher(sel.teacher.id)}>×</button>
+                        <button className="btn-danger" style={{ fontSize: '12px', padding: '2px 6px' }} onClick={()=>rmTeacher(sel.teacher.id)}>×</button>
                       </div>
                     ) : addTea && (
-                      <div className="add-panel">
-                        <input placeholder="Фильтр…" value={tFil} onChange={e=>setTFil(e.target.value)}/>
-                        <div className="scroll-list">
+                      <div style={{ border: '1px solid #e5e7eb', borderRadius: '6px', padding: '12px' }}>
+                        <input placeholder="Поиск преподавателя..." value={tFil} onChange={e=>setTFil(e.target.value)}
+                               style={{ width: '100%', marginBottom: '8px' }}/>
+                        <div style={{ maxHeight: '120px', overflowY: 'auto', marginBottom: '8px' }}>
                           {teaLoaded
                             ? fTea.length ? fTea.map(t=>(
                                 <label key={t.profileId}
-                                       className={`row-select ${chosenT===t.userId?'selected':''}`}>
+                                       style={{ 
+                                         display: 'block', 
+                                         padding: '4px 0', 
+                                         cursor: 'pointer',
+                                         background: chosenT===t.userId ? '#e3f2fd' : 'transparent'
+                                       }}>
                                   <input type="radio" name="teacher"
                                          checked={chosenT===t.userId}
-                                         onChange={()=>setChosenT(t.userId)}/>
+                                         onChange={()=>setChosenT(t.userId)}
+                                         style={{ marginRight: '8px' }}/>
                                   {hi(`${t.first_name} ${t.surname}`,tFil)} ({hi(t.username,tFil)})
                                 </label>
-                              )) : <div className="empty-text">Список пуст</div>
-                            : <div className="empty-text">Загрузка…</div>}
+                              )) : <div style={{ color: '#6b7280', textAlign: 'center' }}>Список пуст</div>
+                            : <div style={{ color: '#6b7280', textAlign: 'center' }}>Загрузка…</div>}
                         </div>
-                        <button className="btn-primary" disabled={!chosenT} onClick={assignTeacher}>
-                          Назначить
+                        <button className="btn-primary" disabled={!chosenT} onClick={assignTeacher}
+                                style={{ width: '100%' }}>
+                          Назначить преподавателя
                         </button>
                       </div>
                     )}
                   </div>
 
                   {/*─ students ─*/}
-                  <div className="section">
-                    <div className="section-header">
-                      <h3>Студенты</h3>
-                      <button className="btn-mini" onClick={async()=>{
+                  <div className="section" style={{ marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <h4 style={{ margin: 0 }}>Студенты ({sel.students.length})</h4>
+                      <button className="btn-primary" style={{ fontSize: '12px', padding: '4px 8px' }} onClick={async()=>{
                         const n=!addStu; setAddStu(n); setAddTea(false); setAddCou(false);
                         if(n) await loadStu();
                       }}>
@@ -415,16 +553,21 @@ export default function ManageGroupPage() {
                     </div>
 
                     {addStu && (
-                      <div className="add-panel">
-                        <input placeholder="Фильтр…" value={sFil} onChange={e=>setSFil(e.target.value)}/>
-                        <div className="scroll-list">
+                      <div style={{ border: '1px solid #e5e7eb', borderRadius: '6px', padding: '12px', marginBottom: '12px' }}>
+                        <input placeholder="Поиск студентов..." value={sFil} onChange={e=>setSFil(e.target.value)}
+                               style={{ width: '100%', marginBottom: '8px' }}/>
+                        <div style={{ maxHeight: '120px', overflowY: 'auto', marginBottom: '8px' }}>
                           {stuLoaded
                             ? fStu.length ? fStu.map(s=>(
                                 (s.username||s.first_name||s.surname) && (
                                   <label key={s.profileId}
-                                         className={`row-select ${
-                                           s.already?'disabled':chk.has(s.userId)?'selected':''
-                                         }`}>
+                                         style={{ 
+                                           display: 'block', 
+                                           padding: '4px 0', 
+                                           cursor: s.already ? 'not-allowed' : 'pointer',
+                                           opacity: s.already ? 0.5 : 1,
+                                           background: chk.has(s.userId) ? '#e3f2fd' : 'transparent'
+                                         }}>
                                     <input type="checkbox" disabled={s.already}
                                            checked={chk.has(s.userId)}
                                            onChange={e=>{
@@ -433,35 +576,45 @@ export default function ManageGroupPage() {
                                                e.target.checked?out.add(s.userId):out.delete(s.userId);
                                                return out;
                                              });
-                                           }}/>
+                                           }}
+                                           style={{ marginRight: '8px' }}/>
                                     {hi(`${s.first_name} ${s.surname}`.trim(),sFil)} ({hi(s.username,sFil)})
                                     {s.already && ' — уже в группе'}
                                   </label>
                                 )
-                              )) : <div className="empty-text">Список пуст</div>
-                            : <div className="empty-text">Загрузка…</div>}
+                              )) : <div style={{ color: '#6b7280', textAlign: 'center' }}>Список пуст</div>
+                            : <div style={{ color: '#6b7280', textAlign: 'center' }}>Загрузка…</div>}
                         </div>
-                        <button className="btn-primary" disabled={chk.size===0} onClick={addStudents}>
-                          Добавить {chk.size?`(${chk.size})`:''}
+                        <button className="btn-primary" disabled={chk.size===0} onClick={addStudents}
+                                style={{ width: '100%' }}>
+                          Добавить студентов {chk.size?`(${chk.size})`:''}
                         </button>
                       </div>
                     )}
 
-                    <div className="members-list">
+                    <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
                       {sel.students.length ? sel.students.map(st=>(
-                        <div className="member-item" key={st.id}>
+                        <div key={st.id} style={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center', 
+                          padding: '6px 12px', 
+                          marginBottom: '4px',
+                          background: '#f8f9fa', 
+                          borderRadius: '4px' 
+                        }}>
                           <span>{st.first_name} {st.surname} ({st.username})</span>
-                          <button className="remove-btn" onClick={()=>rmStudent(st.id)}>×</button>
+                          <button className="btn-danger" style={{ fontSize: '12px', padding: '2px 6px' }} onClick={()=>rmStudent(st.id)}>×</button>
                         </div>
-                      )) : <p className="empty-text">Студентов нет</p>}
+                      )) : <p style={{ color: '#6b7280', textAlign: 'center' }}>Студентов нет</p>}
                     </div>
                   </div>
 
                   {/*─ courses ─*/}
                   <div className="section">
-                    <div className="section-header">
-                      <h3>Курсы</h3>
-                      <button className="btn-mini" onClick={async()=>{
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <h4 style={{ margin: 0 }}>Курсы ({sel.courses?.length || 0})</h4>
+                      <button className="btn-primary" style={{ fontSize: '12px', padding: '4px 8px' }} onClick={async()=>{
                         const n=!addCou; setAddCou(n); setAddStu(false); setAddTea(false);
                         if(n) await loadCou();
                       }}>
@@ -470,36 +623,51 @@ export default function ManageGroupPage() {
                     </div>
 
                     {/* уже привязанные */}
-                    <div className="members-list">
-                      {sel.courses.length ? sel.courses.map(c=>(
-                        <div className="member-item course" key={c.id}>
+                    <div style={{ maxHeight: '120px', overflowY: 'auto', marginBottom: '12px' }}>
+                      {sel.courses?.length ? sel.courses.map(c=>(
+                        <div key={c.id} style={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center', 
+                          padding: '8px 12px', 
+                          marginBottom: '4px',
+                          background: '#f8f9fa', 
+                          borderRadius: '4px' 
+                        }}>
                           <span>{c.name}</span>
                         </div>
-                      )) : <p className="empty-text">Курсы не добавлены</p>}
+                      )) : <p style={{ color: '#6b7280', textAlign: 'center' }}>Курсы не добавлены</p>}
                     </div>
 
                     {/* выбор нового */}
                     {addCou && (
-                      <div className="add-panel">
-                        <input placeholder="Фильтр…" value={cFil} onChange={e=>setCFil(e.target.value)}/>
-                        <div className="scroll-list">
+                      <div style={{ border: '1px solid #e5e7eb', borderRadius: '6px', padding: '12px' }}>
+                        <input placeholder="Поиск курсов..." value={cFil} onChange={e=>setCFil(e.target.value)}
+                               style={{ width: '100%', marginBottom: '8px' }}/>
+                        <div style={{ maxHeight: '120px', overflowY: 'auto', marginBottom: '8px' }}>
                           {couLoaded
                             ? fCou.length ? fCou.map(c=>(
                                 <label key={c.id}
-                                       className={`row-select ${
-                                         c.already?'disabled':chosenC===c.id?'selected':''
-                                       }`}>
+                                       style={{ 
+                                         display: 'block', 
+                                         padding: '4px 0', 
+                                         cursor: c.already ? 'not-allowed' : 'pointer',
+                                         opacity: c.already ? 0.5 : 1,
+                                         background: chosenC===c.id ? '#e3f2fd' : 'transparent'
+                                       }}>
                                   <input type="radio" disabled={c.already}
                                          checked={chosenC===c.id}
-                                         onChange={()=>setChosenC(c.id)}/>
+                                         onChange={()=>setChosenC(c.id)}
+                                         style={{ marginRight: '8px' }}/>
                                   {hi(c.name,cFil)}
                                   {c.already && ' — уже привязан'}
                                 </label>
-                              )) : <div className="empty-text">Список пуст</div>
-                            : <div className="empty-text">Загрузка…</div>}
+                              )) : <div style={{ color: '#6b7280', textAlign: 'center' }}>Список пуст</div>
+                            : <div style={{ color: '#6b7280', textAlign: 'center' }}>Загрузка…</div>}
                         </div>
-                        <button className="btn-primary" disabled={!chosenC} onClick={addCourse}>
-                          Добавить
+                        <button className="btn-primary" disabled={!chosenC} onClick={addCourse}
+                                style={{ width: '100%' }}>
+                          Добавить курс
                         </button>
                       </div>
                     )}

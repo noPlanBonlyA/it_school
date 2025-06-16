@@ -1,92 +1,127 @@
+// src/services/lessonService.js
 import api from '../api/axiosInstance';
 
-/*───────────────── курс ─────────────────*/
-export async function getCourse(courseId) {
-  const { data } = await api.get(`/courses/${courseId}`);
-  return data;
-}
+// Функция для преобразования относительного URL в абсолютный
+const absUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  return `http://localhost:8080${url}`;
+};
 
-/*───────────────── список уроков ─────────────────*/
-export async function listLessons(courseId, limit = 100, offset = 0) {
-  const { data } = await api.get(
-    `/courses/${courseId}/lessons`,
-    { params: { limit, offset } }
-  );
-  return data;                 // { objects, count }
-}
+// ─────────── Курс ───────────
+export const getCourse = async (courseId) => {
+  const response = await api.get(`/courses/${courseId}`);
+  return response.data;
+};
 
-/*───────────────── один урок ─────────────────*/
-export async function getLesson(courseId, lessonId) {
-  const { data } = await api.get(`/courses/${courseId}/lessons/${lessonId}`);
-  return data;
-}
+// ─────────── Список уроков ───────────
+export const listLessons = async (courseId, limit = 10, offset = 0) => {
+  const response = await api.get(`/courses/${courseId}/lessons`, {
+    params: { limit, offset }
+  });
+  return response.data;
+};
 
-/*───────────────── CRUD teacher-уроков ─────────────────*/
-export async function createLesson(courseId, payload) {
-  const { data } = await api.post(`/courses/${courseId}/lessons`, payload);
-  return data;
-}
-export async function createLessonWithMaterials(courseId, payload) {
-  const { data } = await api.post(
-    `/courses/${courseId}/lessons-with-materials`,
-    payload
-  );
-  return data;
-}
+// ─────────── Обычный урок ───────────
+export const getLesson = async (courseId, lessonId) => {
+  const response = await api.get(`/courses/${courseId}/lessons/${lessonId}`);
+  return response.data;
+};
 
-/*───────────────── материал для студента ─────────────────*/
-function absUrl(u) {
-  return /^https?:\/\//i.test(u)
-    ? u
-    : `${window.location.protocol}//${window.location.hostname}:8080${u}`;
-}
+// ─────────── CRUD для преподавателя ───────────
+export const createLesson = async (courseId, data) => {
+  const response = await api.post(`/courses/${courseId}/lessons-with-materials`, data);
+  return response.data;
+};
 
-/**
- * Возвращает:
- *  • { type:'html', html, name } ─ если бек шлёт HTML-текст;
- *  • { type:'file', url,  name } ─ если бек шлёт ссылку на файл.
- *  Если материала нет или формат неизвестен → null.
- */
+export const deleteLesson = async (courseId, lessonId) => {
+  const response = await api.delete(`/courses/${courseId}/lessons/${lessonId}`);
+  return response.data;
+};
+
+export const updateLesson = async (courseId, lessonId, data) => {
+  const response = await api.put(`/courses/${courseId}/lessons/${lessonId}`, data);
+  return response.data;
+};
+
+// ─────────── Материал студента ───────────
 export async function getStudentLessonMaterial(courseId, lessonId) {
   try {
-    /* единственный нужный запрос */
     const { data: mat } = await api.get(
       `/courses/${courseId}/lessons/${lessonId}/student-materials`
     );
     if (!mat) return null;
 
-    /* бек нового формата всегда отдаёт одно из двух полей */
     if (mat.url) {
       return { type: 'file', url: absUrl(mat.url), name: mat.name || 'material' };
     }
     if (mat.html || mat.html_text) {
-      return { type: 'html', html: mat.html || mat.html_text, name: mat.name || 'material' };
+      return {
+        type: 'html',
+        html: mat.html || mat.html_text,
+        name: mat.name || 'material'
+      };
     }
-
-    /* неизвестный формат, но дополнительных запросов не делаем */
     return null;
   } catch (err) {
     console.error('Не удалось получить материал студента:', err);
     return null;
   }
 }
+
+// ─────────── Полный урок для студента ───────────
 export async function getLessonWithMaterials(courseId, lessonId) {
-    const { data } = await api.get(
-      `/courses/${courseId}/lessons-with-materials/${lessonId}`
+  try {
+    // 1) базовая информация об уроке
+    const lesson = await getLesson(courseId, lessonId);
+
+    // 2) материал преподавателя
+    const teacherResponse = await api.get(
+      `/courses/${courseId}/lessons/${lessonId}/teacher-materials`
     );
-    return data;
+    const teacherMat = teacherResponse.data;
+
+    // 3) материал(ы) студента
+    const studentResponse = await api.get(
+      `/courses/${courseId}/lessons/${lessonId}/student-materials`
+    );
+    const studentMat = studentResponse.data;
+
+    // 4) подробности домашки (если есть homework_id)
+    let homeworkMat = null;
+    if (lesson.homework_id) {
+      const homeworkResponse = await api.get(
+        `/courses/material/${lesson.homework_id}`
+      );
+      homeworkMat = homeworkResponse.data;
+    }
+
+    return {
+      ...lesson,
+      teacher_material: teacherMat,
+      student_material: studentMat,
+      homework: homeworkMat
+    };
+  } catch (error) {
+    console.error('Error loading lesson with materials:', error);
+    throw error;
   }
-  export async function getLessonInfoForTeacher(courseId, lessonId) {
+}
+
+// ─────────── Инфо для преподавателя ───────────
+export async function getLessonInfoForTeacher(courseId, lessonId) {
+  try {
     const { data } = await api.get(
       `/courses/${courseId}/lessons/${lessonId}/teacher-info`
     );
-    /* бек отдаёт:
-       { id,name, …, teacher_material:{url}, homework:{url}, … }
-    */
     return {
-      id   : data.id,
-      name : data.name,
-      teacher_material_url : data.teacher_material?.url || '',
-      homework_material_url: data.homework?.url        || ''
+      id: data.id,
+      name: data.name,
+      teacher_material_url : data.teacher_material?.url ? absUrl(data.teacher_material.url) : '',
+      homework_material_url: data.homework?.url ? absUrl(data.homework.url) : ''
     };
+  } catch (error) {
+    console.error('Error loading lesson info for teacher:', error);
+    throw error;
   }
+}

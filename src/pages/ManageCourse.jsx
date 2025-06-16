@@ -149,7 +149,6 @@ export default function ManageCoursesPage() {
         <Topbar
           userName={fullName}
           userRole={user.role}
-          notifications={0}
           onBellClick={() => {}}
           onProfileClick={() => navigate('/profile')}
         />

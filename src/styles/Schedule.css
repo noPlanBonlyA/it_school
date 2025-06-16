@@ -1,62 +1,62 @@
-/* src/styles/Schedule.css */
-
-/* Контейнер списка */
-.schedule-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+/* общий список занятий (и на главной, и на странице расписания) */
+.schedule-list{
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+.schedule-list li{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  transition:background .2s;
+}
+.schedule-list li:hover{
+  background:#f5f7fa;
+}
+.schedule-list .time{
+  width:60px;
+  font-weight:600;
+}
+.schedule-list .title{
+  flex:1 1 auto;
+}
+.schedule-list .meta{
+  font-size:12px;
+  color:#7d7d7d;
 }
 
-/* Карточка одной пары */
-.schedule-item {
-  display: flex;
-  align-items: center;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  overflow: hidden; /* чтобы color-bar сливался без лишних скруглений */
+/* мини-виджет с деталями урока */
+.event-details{
+  position:fixed;              /* “прилипает” справа */
+  top:80px;                    /* ниже Topbar’а */
+  right:24px;
+  width:280px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 6px 24px rgba(0,0,0,.1);
+  padding:18px 22px 22px;
+  z-index:999;                 /* поверх всего */
 }
-
-/* Если пустой список */
-.schedule-item.empty {
-  justify-content: center;
-  padding: 12px;
-  color: #646464;
-  font-size: 14px;
+.event-details h2{
+  margin:0 0 8px;
+  font-size:20px;
 }
-
-/* Цветная вертикальная полоса слева */
-.color-bar {
-  width: 6px;
-  height: 100%;
+.event-details p{
+  margin:4px 0;
+  font-size:14px;
+  line-height:1.35;
 }
-
-/* Контент (название + время) */
-.schedule-content {
-  flex: 1;
-  padding: 10px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.close-btn{
+  position:absolute;
+  top:6px;
+  right:10px;
+  background:transparent;
+  border:none;
+  font-size:20px;
+  line-height:1;
+  cursor:pointer;
 }
-
-/* Название пары */
-.schedule-title {
-  font-weight: 600;
-  font-size: 15px;
-  color: #202224;
-}
-
-/* Время пары */
-.schedule-time {
-  font-size: 13px;
-  color: #646464;
-}
-
-/* Аудитория справа */
-.schedule-audience {
-  padding: 0 16px;
-  font-size: 13px;
-  color: #3b82f6; /* синий цвет для акцента */
-  font-weight: 500;
-}
+.close-btn:hover{ color:#e00; }

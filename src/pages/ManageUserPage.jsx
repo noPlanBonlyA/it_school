@@ -192,7 +192,6 @@ export default function ManageUserPage() {
         <Topbar
           userName={fullName}
           userRole={user.role}
-          notifications={0}
           onBellClick={() => {}}
           onProfileClick={() => navigate('/profile')}
         />

@@ -47,8 +47,31 @@ export const listTeachers = (limit=100, offset=0)=>
   api.get('/teachers',{params:{limit,offset}}).then(r=>r.data);
 
 export async function findTeacherByUser(user_id) {
-  const { data } = await api.get('/teachers', {
-    params: { user_id, limit: 1, offset: 0 }
-  });
-  return data.objects?.[0] ?? null;
+  try {
+    // Получаем всех преподавателей и ищем по user_id
+    const { data } = await api.get('/teachers', {
+      params: { user_id, limit: 100, offset: 0 } // Увеличиваем лимит и добавляем фильтр
+    });
+    
+    const teachers = data.objects || data;
+    
+    // Если API не поддерживает фильтрацию, делаем это вручную
+    if (Array.isArray(teachers)) {
+      const teacher = teachers.find(t => t.user_id === user_id);
+      console.log(`[findTeacherByUser] Found teacher for userId ${user_id}:`, teacher);
+      return teacher;
+    }
+    
+    // Если возвращается один объект, проверяем что это нужный преподаватель
+    if (teachers && teachers.user_id === user_id) {
+      console.log(`[findTeacherByUser] Found teacher for userId ${user_id}:`, teachers);
+      return teachers;
+    }
+    
+    console.log(`[findTeacherByUser] No teacher found for userId ${user_id}`);
+    return null;
+  } catch (error) {
+    console.error(`[findTeacherByUser] Error finding teacher for userId ${user_id}:`, error);
+    return null;
+  }
 }

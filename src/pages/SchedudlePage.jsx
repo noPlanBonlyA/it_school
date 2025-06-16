@@ -1,5 +1,5 @@
-// src/pages/SchedulePage.jsx
-import React, { useEffect, useState, useContext } from 'react';
+/*  src/pages/SchedulePage.jsx  */
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Sidebar      from '../components/Sidebar';
@@ -8,275 +8,301 @@ import ScheduleList from '../components/ScheduleList';
 
 import FullCalendar      from '@fullcalendar/react';
 import timeGridPlugin    from '@fullcalendar/timegrid';
+import dayGridPlugin     from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
-import { AuthContext } from '../contexts/AuthContext';
-import userService     from '../services/userService';
+import { useAuth }         from '../contexts/AuthContext';
+import { getUserSchedule } from '../services/scheduleService';
 
 import '../styles/SchedulePage.css';
 
 export default function SchedulePage() {
-  const navigate    = useNavigate();
-  const { user }    = useContext(AuthContext);
-  const [fullUser,  setFullUser]  = useState(null);
-  const [notifOpen, setNotifOpen] = useState(false);
+  const navigate                   = useNavigate();
+  const { user }                   = useAuth();
+  const [events, setEvents]        = useState([]);           
+  const [selectedEvent, setSelectedEvent] = useState(null); 
+  const [loading, setLoading]      = useState(true);
 
-  // Пример уведомлений
-  const [notifications] = useState([
-    { id: 1, title: 'Лекция по React',             time: '05 июня 2025, 09:00' },
-    { id: 2, title: 'Практика по Node.js',          time: '05 июня 2025, 11:00' },
-    { id: 3, title: 'Домашнее задание ML проверка',  time: '06 июня 2025, 14:00' },
-  ]);
-
-  // Исходный массив событий
-  const [events] = useState([
-    // Понедельник, 2 июня 2025
-    {
-      id: '1',
-      baseTitle: 'Лекция: React',
-      start: '2025-06-02T09:00:00',
-      end:   '2025-06-02T10:30:00',
-      color: '#FFCEF8',
-      audience: '101',
-      teacher: 'Иванов И.И.',
-      group: 'A'
-    },
-    {
-      id: '2',
-      baseTitle: 'Практика: React',
-      start: '2025-06-02T11:00:00',
-      end:   '2025-06-02T12:30:00',
-      color: '#CECEFF',
-      audience: '102',
-      teacher: 'Иванов И.И.',
-      group: 'A'
-    },
-    // Вторник, 3 июня 2025
-    {
-      id: '3',
-      baseTitle: 'Лекция: Node.js',
-      start: '2025-06-03T10:00:00',
-      end:   '2025-06-03T11:30:00',
-      color: '#FFCEF8',
-      audience: '103',
-      teacher: 'Петров П.П.',
-      group: 'B'
-    },
-    {
-      id: '4',
-      baseTitle: 'Практика: Node.js',
-      start: '2025-06-03T12:00:00',
-      end:   '2025-06-03T13:30:00',
-      color: '#CECEFF',
-      audience: '103',
-      teacher: 'Петров П.П.',
-      group: 'B'
-    },
-    // Среда, 4 июня 2025
-    {
-      id: '5',
-      baseTitle: 'Лекция: Docker',
-      start: '2025-06-04T14:00:00',
-      end:   '2025-06-04T15:30:00',
-      color: '#FFCEF8',
-      audience: '201',
-      teacher: 'Сидоров С.С.',
-      group: 'C'
-    },
-    {
-      id: '6',
-      baseTitle: 'Практика: Docker',
-      start: '2025-06-04T16:00:00',
-      end:   '2025-06-04T17:30:00',
-      color: '#CECEFF',
-      audience: '201',
-      teacher: 'Сидоров С.С.',
-      group: 'C'
-    },
-    // Четверг, 5 июня 2025
-    {
-      id: '7',
-      baseTitle: 'Лекция: ML',
-      start: '2025-06-05T11:00:00',
-      end:   '2025-06-05T12:30:00',
-      color: '#FFCEF8',
-      audience: '202',
-      teacher: 'Новиков Н.Н.',
-      group: 'D'
-    },
-    {
-      id: '8',
-      baseTitle: 'Практика: ML',
-      start: '2025-06-05T13:00:00',
-      end:   '2025-06-05T14:30:00',
-      color: '#CECEFF',
-      audience: '202',
-      teacher: 'Новиков Н.Н.',
-      group: 'D'
-    },
-    // Пятница, 6 июня 2025
-    {
-      id: '9',
-      baseTitle: 'Лекция: Python',
-      start: '2025-06-06T09:00:00',
-      end:   '2025-06-06T10:30:00',
-      color: '#FFCEF8',
-      audience: '301',
-      teacher: 'Кузнецов К.К.',
-      group: 'E'
-    },
-    {
-      id: '10',
-      baseTitle: 'Практика: Python',
-      start: '2025-06-06T11:00:00',
-      end:   '2025-06-06T12:30:00',
-      color: '#CECEFF',
-      audience: '301',
-      teacher: 'Кузнецов К.К.',
-      group: 'E'
-    },
-    // Суббота, 7 июня 2025
-    {
-      id: '11',
-      baseTitle: 'Лекция: DevOps',
-      start: '2025-06-07T10:00:00',
-      end:   '2025-06-07T11:30:00',
-      color: '#FFCEF8',
-      audience: '302',
-      teacher: 'Фролов Ф.Ф.',
-      group: 'F'
-    },
-    {
-      id: '12',
-      baseTitle: 'Практика: DevOps',
-      start: '2025-06-07T12:00:00',
-      end:   '2025-06-07T13:30:00',
-      color: '#CECEFF',
-      audience: '302',
-      teacher: 'Фролов Ф.Ф.',
-      group: 'F'
-    },
-  ]);
-
+  // ───── загрузка расписания ─────
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    userService.getById(user.id)
-      .then(setFullUser)
-      .catch(() => alert('Не удалось загрузить профиль'));
+    if (!user) { navigate('/login'); return; }
+    (async () => {
+      try {
+        setLoading(true);
+        const schedule = await getUserSchedule(user);
+        console.log('[Schedule] Loaded events:', schedule);
+        setEvents(schedule || []);
+      } catch (error) {
+        console.error('[Schedule] Error loading schedule:', error);
+        alert('Не удалось загрузить расписание');
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [user, navigate]);
 
-  if (!fullUser) return <div className="loading">Загрузка...</div>;
-
-  // Сформируем события для календаря
-  const calendarEvents = events.map(e => {
-    const extraInfo = fullUser.role === 'student'
-      ? `(Преп: ${e.teacher})`
-      : `(Группа: ${e.group})`;
-
+  // ───── подготовка событий для FullCalendar ─────
+  const calendarEvents = useMemo(() => events.map(e => {
+    const startDate = new Date(e.holding_date || e.start);
+    const endDate = new Date(startDate.getTime() + (90 * 60 * 1000)); // +90 минут
+    
+    // Определяем цвет в зависимости от статуса
+    let backgroundColor = '#6c757d'; // серый по умолчанию
+    if (e.is_opened) {
+      backgroundColor = '#28a745'; // зеленый для открытых
+    } else if (new Date() < startDate) {
+      backgroundColor = '#ffc107'; // желтый для будущих
+    }
+    
     return {
-      id: e.id,
-      title: `${e.baseTitle} [Ауд: ${e.audience}] ${extraInfo}`,
-      start: e.start,
-      end:   e.end,
-      color: e.color
+      id             : e.id,
+      start          : startDate.toISOString(),
+      end            : endDate.toISOString(),
+      title          : user.role === 'student'
+        ? e.lesson_name
+        : `${e.lesson_name} (${e.group_name || 'группа'})`,
+      backgroundColor: backgroundColor,
+      borderColor    : 'transparent',
+      textColor      : '#ffffff',
+      extendedProps  : {
+        course_name: e.course_name,
+        group_name: e.group_name,
+        teacher_name: e.teacher_name,
+        is_opened: e.is_opened,
+        description: e.description
+      }
     };
-  });
+  }), [events, user.role]);
 
-  // Определяем ближайший день с занятиями (сегодня или следующий)
-  const today = new Date();
-  const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+  // ───── ближайший день ─────
+  const nearestDayISO = useMemo(() => {
+    if (!events.length) return null;
+    const todayMid = new Date().setHours(0,0,0,0);
+    const days = Array.from(new Set(
+      events.map(e => new Date(e.holding_date || e.start).setHours(0,0,0,0))
+    )).filter(d => d >= todayMid).sort();
+    
+    return days.length ? new Date(days[0]) : null;
+  }, [events]);
 
-  const eventDates = Array.from(new Set(
-    events.map(e => {
-      const d = new Date(e.start);
-      return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-    })
-  ));
+  const nearestDayEvents = useMemo(() => {
+    if (!nearestDayISO) return [];
+    return events.filter(ev => {
+      const eventDate = new Date(ev.holding_date || ev.start);
+      return eventDate.setHours(0,0,0,0) === nearestDayISO.getTime();
+    }).sort((a, b) => {
+      const timeA = new Date(a.holding_date || a.start);
+      const timeB = new Date(b.holding_date || b.start);
+      return timeA - timeB;
+    });
+  }, [events, nearestDayISO]);
 
-  const futureDates = eventDates.filter(dt => dt >= todayMid);
-  const nearestDateTime = futureDates.length > 0
-    ? Math.min(...futureDates)
-    : null;
+  const widgetLabel = nearestDayISO
+    ? nearestDayISO.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})
+    : 'Нет занятий';
 
-  // События на ближайший день
-  const nearestDayEvents = nearestDateTime !== null
-    ? calendarEvents.filter(e => {
-        const d = new Date(e.start);
-        const dMid = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-        return dMid === nearestDateTime;
-      })
-    : [];
+  // ───── при клике на событие открываем мини-виджет ─────
+  const handleEventClick = ({ event }) => {
+    const found = events.find(e => e.id === event.id);
+    setSelectedEvent(found || null);
+  };
 
-  // Метка даты для виджета
-  let widgetDateLabel = 'Нет занятий';
-  if (nearestDateTime !== null) {
-    const dateObj = new Date(nearestDateTime);
-    widgetDateLabel = new Intl.DateTimeFormat('ru-RU', {
-      day: 'numeric', month: 'long', year: 'numeric'
-    }).format(dateObj);
+  // ───── отрисовка ─────
+  const fio = [ user?.first_name, user?.surname, user?.patronymic ]
+              .filter(Boolean).join(' ');
+
+  if (loading) {
+    return (
+      <div className="app-layout schedule-page">
+        <Sidebar activeItem="schedule" userRole={user?.role} />
+        <div className="main-content">
+          <Topbar
+            userName={fio}
+            userRole={user?.role}
+            onProfileClick={() => navigate('/profile')}
+          />
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Загрузка расписания...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="app-layout schedule-page">
-      <Sidebar activeItem="schedule" userRole={fullUser.role} />
+      <Sidebar activeItem="schedule" userRole={user?.role} />
 
       <div className="main-content">
-        {/* Topbar без отступов */}
         <Topbar
-          userName={`${fullUser.first_name} ${fullUser.surname}`}
-          userRole={fullUser.role}
-          notifications={notifications.length}
-          onBellClick={() => setNotifOpen(o => !o)}
+          userName={fio}
+          userRole={user?.role}
           onProfileClick={() => navigate('/profile')}
         />
 
-        {/* Весь остальной контент с отступами */}
-        <div className="content-area">
-          {notifOpen && (
-            <div className="notif-dropdown">
-              <h4>Уведомления</h4>
-              <ul>
-                {notifications.map(n => (
-                  <li key={n.id}>
-                    <strong>{n.title}</strong>
-                    <div className="time">{n.time}</div>
-                  </li>
-                ))}
-              </ul>
+        <div className="schedule-header">
+          <h1 className="page-title">Расписание</h1>
+          <div className="schedule-stats">
+            <div className="stat-item">
+              <span className="stat-number">{events.length}</span>
+              <span className="stat-label">Всего занятий</span>
             </div>
-          )}
+            <div className="stat-item">
+              <span className="stat-number">{events.filter(e => e.is_opened).length}</span>
+              <span className="stat-label">Открыто</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-number">{nearestDayEvents.length}</span>
+              <span className="stat-label">Сегодня</span>
+            </div>
+          </div>
+        </div>
 
-          <h2 className="page-title">Расписание на неделю</h2>
-
-          <div className="schedule-grid">
-            <div className="left-column">
+        <div className="schedule-layout">
+          {/* левая колонка — список ближайшего дня */}
+          <div className="schedule-sidebar">
+            <div className="widget-card">
               <div className="widget-header">
-                <h3>Пары на {widgetDateLabel}</h3>
+                <h3>Занятия на {widgetLabel}</h3>
+                <span className="widget-count">{nearestDayEvents.length}</span>
               </div>
-              <ScheduleList events={nearestDayEvents} />
+              <div className="widget-content">
+                <ScheduleList events={nearestDayEvents} />
+              </div>
             </div>
 
-            <div className="right-column">
+            {/* Легенда */}
+            <div className="legend-card">
+              <h4>Статусы занятий</h4>
+              <div className="legend-items">
+                <div className="legend-item">
+                  <div className="legend-color opened"></div>
+                  <span>Открыто для изучения</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-color scheduled"></div>
+                  <span>Запланировано</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-color closed"></div>
+                  <span>Закрыто</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* правая колонка — календарь */}
+          <div className="schedule-main">
+            <div className="calendar-container">
               <FullCalendar
-                plugins={[ timeGridPlugin, interactionPlugin ]}
+                plugins={[timeGridPlugin, dayGridPlugin, interactionPlugin]}
                 initialView="timeGridWeek"
                 headerToolbar={{
-                  left:   'prev,today,next',
+                  left: 'prev,today,next',
                   center: 'title',
-                  right:  ''
+                  right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                }}
+                /* ОБНОВЛЕНО: расширили время с 7:00 до 23:00 */
+                slotMinTime="07:00:00"
+                slotMaxTime="23:00:00"
+                slotDuration="00:30:00"
+                /* ДОБАВЛЕНО: больше интервалов на час для удобства */
+                slotLabelInterval="01:00:00"
+                /* ДОБАВЛЕНО: формат времени 24-часовой */
+                slotLabelFormat={{
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false
                 }}
                 allDaySlot={false}
-                slotMinTime="08:00:00"
-                slotMaxTime="20:00:00"
                 events={calendarEvents}
+                eventClick={handleEventClick}
                 height="auto"
+                locale="ru"
+                firstDay={1}
+                weekends={true}
+                eventDisplay="block"
+                dayMaxEvents={3}
+                moreLinkClick="popover"
+                /* ДОБАВЛЕНО: настройки для улучшения отображения */
+                nowIndicator={true}
+                scrollTime="07:00:00"
+                expandRows={true}
+                eventDidMount={(info) => {
+                  // Добавляем тултип
+                  info.el.setAttribute('title', 
+                    `${info.event.title}\n${info.event.extendedProps.course_name || ''}`
+                  );
+                }}
               />
             </div>
           </div>
         </div>
+
+        {/* мини-виджет с деталями выбранного урока */}
+        {selectedEvent && (
+          <div className="event-details-overlay" onClick={() => setSelectedEvent(null)}>
+            <div className="event-details" onClick={e => e.stopPropagation()}>
+              <button
+                className="close-btn"
+                onClick={() => setSelectedEvent(null)}
+              >×</button>
+
+              <div className="event-header">
+                <h2>{selectedEvent.lesson_name}</h2>
+                <div className={`status-badge ${selectedEvent.is_opened ? 'opened' : 'closed'}`}>
+                  {selectedEvent.is_opened ? '🟢 Открыт' : '🔴 Закрыт'}
+                </div>
+              </div>
+
+              <div className="event-info">
+                <div className="info-item">
+                  <strong>Курс:</strong> 
+                  <span>{selectedEvent.course_name}</span>
+                </div>
+                <div className="info-item">
+                  <strong>Группа:</strong> 
+                  <span>{selectedEvent.group_name || '—'}</span>
+                </div>
+                <div className="info-item">
+                  <strong>Преподаватель:</strong> 
+                  <span>{selectedEvent.teacher_name || '—'}</span>
+                </div>
+                <div className="info-item">
+                  <strong>Дата и время:</strong>
+                  <span>
+                    {new Date(selectedEvent.holding_date || selectedEvent.start).toLocaleString('ru-RU',{
+                      day:'2-digit', month:'2-digit', year:'numeric',
+                      hour:'2-digit', minute:'2-digit'
+                    })}
+                  </span>
+                </div>
+              </div>
+
+              {selectedEvent.description && (
+                <div className="event-description">
+                  <strong>Описание:</strong>
+                  <p>{selectedEvent.description}</p>
+                </div>
+              )}
+
+              {selectedEvent.is_opened && user.role === 'student' && (
+                <div className="event-actions">
+                  <button 
+                    className="btn-primary"
+                    onClick={() => {
+                      // Здесь можно добавить переход к уроку
+                      console.log('Открыть урок:', selectedEvent);
+                    }}
+                  >
+                    Перейти к уроку
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

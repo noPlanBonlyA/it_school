@@ -3,26 +3,22 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate }               from 'react-router-dom';
 import Sidebar                        from '../components/Sidebar';
 import Topbar                         from '../components/TopBar';
-import axios                          from 'axios';
-import { useAuth } from '../contexts/AuthContext';
+import api                            from '../api/axiosInstance'; // axios с baseURL и авторизацией
+import { useAuth }                   from '../contexts/AuthContext';
 import '../styles/ManageNewsPage.css';
 
-const API_BASE = 'http://localhost:8080/api';
-
 export default function ManageNewsPage() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [newsList, setNewsList]   = useState([]);
-  const [search, setSearch]       = useState('');
-  const [filtered, setFiltered]   = useState([]);
-  const [showSug, setShowSug]     = useState(false);
+  const navigate   = useNavigate();
+  const { user }   = useAuth();
 
-  const [form, setForm] = useState({
-    name:        '',
-    description: '',
-    status:      'low'
-  });
+  const emptyForm  = { name:'', description:'', is_pinned:false };
+  const [form, setForm]         = useState(emptyForm);
+  const [imageFile, setImageFile] = useState(null);
   const [errors, setErrors]     = useState({});
+  const [newsList, setNewsList] = useState([]);
+  const [search, setSearch]     = useState('');
+  const [filtered, setFiltered] = useState([]);
+  const [showSug, setShowSug]   = useState(false);
   const [editItem, setEditItem] = useState(null);
 
   useEffect(() => {
@@ -30,131 +26,120 @@ export default function ManageNewsPage() {
   }, []);
 
   useEffect(() => {
-    setFiltered(
-      newsList.filter(item =>
-        item.name.toLowerCase().includes(search.toLowerCase())
-      )
-    );
+    const q = search.toLowerCase();
+    setFiltered(newsList.filter(n => n.name.toLowerCase().includes(q)));
   }, [search, newsList]);
 
   async function loadNews() {
     try {
-      const response = await axios.get(`${API_BASE}/news/`);
-      setNewsList(response.data);
+      const { data } = await api.get('/news/', { params:{ limit:100, offset:0 }});
+      setNewsList(data.objects || []);
     } catch (e) {
-      console.error('Ошибка загрузки новостей:', e);
+      console.error(e);
       alert('Не удалось загрузить новости');
     }
   }
 
-  const handleCreate = async () => {
+  async function handleCreate() {
     setErrors({});
     try {
-      const payload = { ...form };
-      const response = await axios.post(`${API_BASE}/news/`, payload);
-      console.log('Создана новость:', response.data);
+      const fd = new FormData();
+      // news_data — строка, внутри JSON с exactly этими ключами
+      fd.append('news_data', JSON.stringify({
+        name:        form.name,
+        description: form.description,
+        is_pinned:   form.is_pinned
+      }));
+      if (imageFile) {
+        fd.append('image', imageFile);
+      }
+      await api.post('/news/', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       alert('Новость создана');
-      setForm({ name: '', description: '', status: 'low' });
+      setForm(emptyForm);
+      setImageFile(null);
       loadNews();
     } catch (e) {
-      console.error('Ошибка создания новости:', e);
+      console.error(e);
       if (e.response?.status === 422) {
-        // Ожидаем, что e.response.data.detail — массив ошибок
-        setErrors(e.response.data.detail || {});
+        const detail = e.response.data.detail;
+        setErrors({
+          form: Array.isArray(detail)
+            ? detail.map(d => d.msg).join('; ')
+            : JSON.stringify(detail)
+        });
       } else {
         alert('Ошибка создания новости');
       }
     }
-  };
+  }
 
-  const handleSelect = (item) => {
-    // При выборе заполняем editItem со всеми полями, включая id
-    setEditItem({ ...item });
-    setErrors({});
-    setSearch('');
-  };
-
-  const handleUpdate = async () => {
+  async function handleUpdate() {
     if (!editItem) return;
-
-    console.log('Кнопка "Сохранить" нажата, editItem =', editItem);
-
     setErrors({});
     try {
-      // Теперь обязательно передаём поле id вместе с остальными
-      const payload = {
-        id:          editItem.id,
+      const fd = new FormData();
+      fd.append('news_data', JSON.stringify({
         name:        editItem.name,
         description: editItem.description,
-        status:      editItem.status
-      };
-      console.log('Отправляем PUT payload:', payload);
-
-      const response = await axios.put(
-        `${API_BASE}/news/${editItem.id}`,
-        payload
-      );
-      console.log('Ответ PUT:', response.data);
-
-      alert('Изменено');
-      loadNews();
+        is_pinned:   editItem.is_pinned
+      }));
+      // если заменяем картинку:
+      if (imageFile) {
+        fd.append('image', imageFile);
+      }
+      await api.put(`/news/${editItem.id}`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      alert('Новость обновлена');
       setEditItem(null);
+      setImageFile(null);
+      loadNews();
     } catch (e) {
-      console.error('Ошибка при обновлении новости:', e);
-
+      console.error(e);
       if (e.response?.status === 422) {
-        // e.response.data.detail может быть массивом из объектов вида
-        // { loc: [...], msg: "...", type: "..." }
-        // Или, если сервер возвращает { detail: { ... } }, нужно адаптировать
         const detail = e.response.data.detail;
-        // Если detail — массив, попробуем собрать сообщение в строку или показать по полям
-        if (Array.isArray(detail)) {
-          // Например, возьмём первый объект и выведем его сообщение
-          setErrors({ form: detail.map(d => d.msg).join(', ') });
-        } else {
-          setErrors(detail || {});
-        }
+        setErrors({
+          form: Array.isArray(detail)
+            ? detail.map(d => d.msg).join('; ')
+            : JSON.stringify(detail)
+        });
       } else {
         alert('Ошибка обновления новости');
       }
     }
-  };
+  }
 
-  const handleDelete = async () => {
-    if (!editItem) return;
-    if (!window.confirm('Вы действительно хотите удалить эту новость?')) return;
+  async function handleDelete() {
+    if (!editItem || !window.confirm('Удалить эту новость?')) return;
     try {
-      const response = await axios.delete(`${API_BASE}/news/${editItem.id}`);
-      console.log('Удалено, ответ DELETE:', response.data);
-      alert('Удалено');
-      loadNews();
+      await api.delete(`/news/${editItem.id}`);
+      alert('Новость удалена');
       setEditItem(null);
+      loadNews();
     } catch (e) {
-      console.error('Ошибка удаления новости:', e);
-      alert('Ошибка удаления новости');
+      console.error(e);
+      alert('Ошибка удаления');
     }
-  };
+  }
 
   const fullName = [user.first_name, user.surname, user.patronymic]
-    .filter(Boolean)
-    .join(' ');
+    .filter(Boolean).join(' ');
 
   return (
     <div className="manage-news app-layout">
-      <Sidebar activeItem="manageNews" userRole="admin" />
-
+      <Sidebar activeItem="news" userRole={user.role} />
       <div className="main-content">
         <Topbar
           userName={fullName}
-          userRole="admin"
-          notifications={0}
-          onBellClick={() => {}}
+          userRole={user.role}
           onProfileClick={() => navigate('/profile')}
         />
 
         <h1>Управление новостями</h1>
 
-        {/* Блок создания */}
+        {/* Создание */}
         <div className="block">
           <h2>Создать новость</h2>
           <div className="news-form form-grid">
@@ -163,56 +148,65 @@ export default function ManageNewsPage() {
               <input
                 type="text"
                 value={form.name}
-                onChange={e => setForm(s => ({ ...s, name: e.target.value }))}
-                placeholder="Введите заголовок"
+                onChange={e => setForm(f=>({...f, name:e.target.value}))}
               />
-              {errors.name && <div className="error-text">{errors.name}</div>}
             </div>
             <div className="field field-full">
               <label>Описание</label>
               <textarea
                 value={form.description}
-                onChange={e => setForm(s => ({ ...s, description: e.target.value }))}
-                placeholder="Введите описание"
+                onChange={e=>setForm(f=>({...f, description:e.target.value}))}
               />
-              {errors.description && <div className="error-text">{errors.description}</div>}
             </div>
             <div className="field">
-              <label>Статус</label>
-              <select
-                value={form.status}
-                onChange={e => setForm(s => ({ ...s, status: e.target.value }))}
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
-              {errors.status && <div className="error-text">{errors.status}</div>}
+              <label>
+                <input
+                  type="checkbox"
+                  checked={form.is_pinned}
+                  onChange={e=>setForm(f=>({...f, is_pinned:e.target.checked}))}
+                />
+                Закрепить новость
+              </label>
             </div>
-            <div className="buttons-create">
-              <button type="button" className="btn-primary" onClick={handleCreate}>
+            <div className="field">
+              <label>Картинка (опционально)</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e=>setImageFile(e.target.files[0]||null)}
+              />
+            </div>
+
+            {errors.form && (
+              <div className="error-text" style={{gridColumn:'1/-1'}}>
+                {errors.form}
+              </div>
+            )}
+
+            <div className="buttons-create" style={{gridColumn:'1/-1'}}>
+              <button className="btn-primary" onClick={handleCreate}>
                 Создать
               </button>
             </div>
           </div>
         </div>
 
-        {/* Блок поиска/редактирования */}
+        {/* Редактирование / удаление */}
         <div className="block">
-          <h2>Найти / Изменить / Удалить</h2>
+          <h2>Поиск / Изменить / Удалить</h2>
           <div className="search-block">
             <input
               placeholder="Поиск по заголовку"
               value={search}
-              onChange={e => setSearch(e.target.value)}
-              onFocus={() => setShowSug(true)}
-              onBlur={() => setTimeout(() => setShowSug(false), 200)}
+              onChange={e=>setSearch(e.target.value)}
+              onFocus={()=>setShowSug(true)}
+              onBlur={()=>setTimeout(()=>setShowSug(false),200)}
             />
-            {showSug && filtered.length > 0 && (
+            {showSug && filtered.length>0 && (
               <ul className="suggestions">
-                {filtered.map(item => (
-                  <li key={item.id} onClick={() => handleSelect(item)}>
-                    {item.name}
+                {filtered.map(n=>(
+                  <li key={n.id} onClick={()=>setEditItem(n)}>
+                    {n.name}
                   </li>
                 ))}
               </ul>
@@ -220,54 +214,55 @@ export default function ManageNewsPage() {
           </div>
 
           {editItem && (
-            <div className="news-form form-grid">
+            <div className="news-form form-grid" style={{marginTop:20}}>
               <div className="field">
                 <label>Заголовок</label>
                 <input
                   type="text"
                   value={editItem.name}
-                  onChange={e =>
-                    setEditItem(s => ({ ...s, name: e.target.value }))
-                  }
-                  placeholder="Редактируйте заголовок"
+                  onChange={e=>setEditItem(i=>({...i,name:e.target.value}))}
                 />
-                {errors.name && <div className="error-text">{errors.name}</div>}
               </div>
               <div className="field field-full">
                 <label>Описание</label>
                 <textarea
                   value={editItem.description}
-                  onChange={e =>
-                    setEditItem(s => ({ ...s, description: e.target.value }))
-                  }
-                  placeholder="Редактируйте описание"
+                  onChange={e=>setEditItem(i=>({...i,description:e.target.value}))}
                 />
-                {errors.description && <div className="error-text">{errors.description}</div>}
               </div>
               <div className="field">
-                <label>Статус</label>
-                <select
-                  value={editItem.status}
-                  onChange={e =>
-                    setEditItem(s => ({ ...s, status: e.target.value }))
-                  }
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-                {errors.status && <div className="error-text">{errors.status}</div>}
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={editItem.is_pinned}
+                    onChange={e=>setEditItem(i=>({...i,is_pinned:e.target.checked}))}
+                  />
+                  Закрепить
+                </label>
               </div>
-              <div className="buttons-edit">
-                <button type="button" className="btn-primary" onClick={handleUpdate}>
+              <div className="field">
+                <label>Новая картинка (опционально)</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={e=>setImageFile(e.target.files[0]||null)}
+                />
+              </div>
+
+              {errors.form && (
+                <div className="error-text" style={{gridColumn:'1/-1'}}>
+                  {errors.form}
+                </div>
+              )}
+
+              <div className="buttons-edit" style={{gridColumn:'1/-1'}}>
+                <button className="btn-primary" onClick={handleUpdate}>
                   Сохранить
                 </button>
-                <button type="button" className="btn-danger" onClick={handleDelete}>
+                <button className="btn-danger" onClick={handleDelete}>
                   Удалить
                 </button>
               </div>
-              {/* Если сервер вернул какие-то неполя 422, отобразим общий текст */}
-              {errors.form && <div className="error-text">{errors.form}</div>}
             </div>
           )}
         </div>

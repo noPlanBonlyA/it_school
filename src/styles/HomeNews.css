@@ -1,49 +1,60 @@
 /* src/styles/HomeNews.css */
+.news-row {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+.news-row.pinned {
+  background: #fffbe6;
+  font-weight: bold;
+}
+.news-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  margin-right: 8px;
+}
+.news-title {
+  flex: 1;
+}
 
-.news-widgets {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 12px;
-    max-height: 300px;   /* Ограничение по высоте + скролл */
-    overflow-y: auto;
-  }
-  
-  .no-news {
-    font-size: 14px;
-    color: #646464;
-    text-align: center;
-    padding: 16px 0;
-  }
-  
-  .news-widget {
-    background: #FFFFFF;
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    padding: 12px 16px;
-    transition: background 0.2s;
-    cursor: pointer;
-  }
-  .news-widget:hover {
-    background: #F5F6FA;
-  }
-  
-  .news-title {
-    font-weight: 600;
-    font-size: 16px;
-    color: #202224;
-    margin-bottom: 4px;
-  }
-  
-  .news-date {
-    font-size: 12px;
-    color: #919191;
-    margin-bottom: 8px;
-  }
-  
-  .news-desc {
-    font-size: 14px;
-    color: #646464;
-    line-height: 1.4;
-  }
-  
+/* src/styles/NewsModal.css */
+.news-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.news-modal {
+  background: white;
+  padding: 20px;
+  max-width: 600px;
+  width: 90%;
+  border-radius: 4px;
+  position: relative;
+}
+.news-modal .close-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.news-image {
+  width: 100%;
+  margin: 10px 0;
+  border-radius: 4px;
+}
+.news-date {
+  display: block;
+  margin-bottom: 10px;
+  color: #888;
+}
+.news-text {
+  line-height: 1.5;
+}

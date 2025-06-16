@@ -108,22 +108,28 @@ export default function ManageTeachersPage() {
     setSearch('');
   };
 
-  const save  = async()=>{
-    if(!edit) return;
+  /* ───────── СОХРАНЕНИЕ ───────── */
+  const save = async () => {
+    if (!edit) return;
     setErrors({});
-    try{
-      await updateUser(edit.id,{
-        first_name:edit.first_name,surname:edit.surname,patronymic:edit.patronymic,
-        birth_date:edit.birth_date||null,email:edit.email,
-        phone_number:edit.phone_number,role:'teacher'
+    try {
+      // Убираем username из запроса
+      await updateUser(edit.id, {
+        first_name: edit.first_name,
+        surname: edit.surname,
+        patronymic: edit.patronymic,
+        birth_date: edit.birth_date || null,
+        email: edit.email,
+        phone_number: edit.phone_number,
+        role: 'teacher'
+        // username НЕ передаем
       });
-      await updateTeacher(edit.teacherId,{});
       alert('Сохранено');
-      await load();
+      load();
       setEdit(null);
-    }catch(e){
-      if(e.response?.data?.username) setErrors({ username:e.response.data.username });
-      else alert('Ошибка сохранения');
+    } catch (e) {
+      console.error('Error saving teacher:', e);
+      alert('Ошибка сохранения');
     }
   };
 
@@ -146,8 +152,12 @@ export default function ManageTeachersPage() {
   <div className="manage-users app-layout">
     <Sidebar activeItem="manage-teachers" userRole={user.role}/>
     <div className="main-content">
-      <Topbar userName={fio} userRole={user.role} notifications={0}
-              onBellClick={()=>{}} onProfileClick={()=>nav('/profile')}/>
+      <Topbar 
+        userName={fio} 
+        userRole={user.role}
+        onBellClick={() => {}} 
+        onProfileClick={() => nav('/profile')}
+      />
 
       <h1>Управление преподавателями</h1>
 
@@ -197,17 +207,20 @@ export default function ManageTeachersPage() {
         {edit&&(
           <div className="user-form form-grid" style={{marginTop:20}}>
             {['first_name','surname','patronymic','birth_date',
-              'email','username','phone_number'].map(f=>(
+              'email','phone_number'].map(f=>(  // Убрали 'username' из редактируемых полей
               <div className="field" key={f}>
                 <label>{f.replace('_',' ')}</label>
                 <input type={f==='birth_date'?'date':'text'}
                        value={edit[f]||''}
                        onChange={e=>setEdit(s=>({...s,[f]:e.target.value}))}/>
-                {f==='username'&&errors.username&&(
-                  <div className="error-text">{errors.username[0]}</div>
-                )}
               </div>
             ))}
+            {/* Показываем username только для отображения */}
+            <div className="field">
+              <label>Логин (только чтение)</label>
+              <input type="text" value={edit.username||'(генерируется автоматически)'} 
+                     disabled style={{backgroundColor:'#f5f5f5'}}/>
+            </div>
             <div className="buttons" style={{gridColumn:'1 / -1'}}>
               <button className="btn-primary" onClick={save}>Сохранить</button>
               <button className="btn-danger"  onClick={()=>setModDelete(true)}>Удалить</button>

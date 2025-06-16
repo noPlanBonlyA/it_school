@@ -1,68 +1,83 @@
+// src/pages/StudentLessonPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate }     from 'react-router-dom';
-
-import Sidebar   from '../components/Sidebar';
-import Topbar    from '../components/TopBar';
-import { useAuth } from '../contexts/AuthContext';
-
-import {
-  getLesson,
-  getStudentLessonMaterial
-} from '../services/lessonService';
+import Sidebar                         from '../components/Sidebar';
+import Topbar                          from '../components/TopBar';
+import { useAuth }                     from '../contexts/AuthContext';
+import { getLessonWithMaterials }      from '../services/lessonService';
+import { submitHomework, getStudentMaterials } from '../services/homeworkService';
 
 export default function StudentLessonPage() {
   const { courseId, lessonId } = useParams();
-  const { user } = useAuth();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const [lesson,   setLesson]   = useState(null);
-  const [material, setMaterial] = useState(null);   // { type:'html'|'file', html|url }
+  const [lesson, setLesson] = useState(null);
+  const [text, setText]     = useState('');
+  const [file, setFile]     = useState(null);
+  const [submitted, setSubmitted] = useState(false);
 
-  /* ───── загрузка ───── */
-  useEffect(() => { (async () => {
-    try {
-      const l  = await getLesson(courseId, lessonId);             // **403-safe**
-      setLesson(l);
+  useEffect(() => {
+    (async () => {
+      setLesson(await getLessonWithMaterials(courseId, lessonId));
+      const mats = await getStudentMaterials(courseId, lessonId);
+      if (mats.length) setSubmitted(true);
+    })();
+  }, [courseId, lessonId]);
 
-      const m  = await getStudentLessonMaterial(courseId, lessonId);
-      setMaterial(m);
-    } catch (e) {
-      alert('Не удалось загрузить урок');
-      console.error(e);
+  const handleSubmit = async () => {
+    if (!text.trim() && !file) {
+      alert('Введите текст или выберите файл');
+      return;
     }
-  })(); }, [courseId, lessonId]);
+    try {
+      await submitHomework(courseId, lessonId, { text, file });
+      setSubmitted(true);
+      alert('Домашнее задание отправлено');
+    } catch (e) {
+      console.error(e);
+      alert('Ошибка отправки');
+    }
+  };
 
-  const fio = [user.first_name, user.surname, user.patronymic].filter(Boolean).join(' ');
+  if (!lesson) return <div>Загрузка…</div>;
+  const fullName = [user.first_name,user.surname,user.patronymic].filter(Boolean).join(' ');
 
   return (
-    <div className="lesson-page app-layout">
+    <div className="app-layout">
       <Sidebar activeItem="studentCourses" userRole={user.role} />
-
       <div className="main-content">
-        <Topbar
-          userName={fio}
-          userRole={user.role}
-          onProfileClick={() => navigate('/profile')}
-        />
+        <Topbar userName={fullName} userRole={user.role} onProfileClick={()=>navigate('/profile')} />
 
-        <h1>{lesson ? lesson.name : 'Загрузка…'}</h1>
+        <h1>{lesson.name}</h1>
+        <p><strong>Описание:</strong> {lesson.description || 'Нет описания'}</p>
+        <p><strong>Материалы:</strong></p>
+        <ul>
+          <li>Для учителя: <a href={lesson.teacher_material.url} target="_blank" rel="noreferrer">скачать</a></li>
+          <li>Для ученика: <a href={lesson.student_material.url} target="_blank" rel="noreferrer">скачать</a></li>
+          <li>Домашнее задание: <a href={lesson.homework.url} target="_blank" rel="noreferrer">скачать</a></li>
+        </ul>
 
-        {!material ? (
-          <p>Материал загружается…</p>
-        ) : material.type === 'html' ? (
-          <div
-            className="lesson-content"
-            dangerouslySetInnerHTML={{ __html: material.html }}
-          />
+        {submitted ? (
+          <div className="hw-submitted">Вы уже сдали ДЗ ✓</div>
         ) : (
-          <iframe
-            className="lesson-iframe"
-            src={material.url}
-            title={material.name}
-            width="100%"
-            height="800"
-            style={{ border: 'none' }}
-          />
+          <div className="hw-form">
+            <h2>Сдать домашнее задание</h2>
+            <textarea
+              placeholder="Текст домашнего задания..."
+              value={text}
+              onChange={e => setText(e.target.value)}
+              disabled={!!file}
+            />
+            <input
+              type="file"
+              onChange={e => setFile(e.target.files[0] || null)}
+              disabled={!!text.trim()}
+            />
+            <button className="btn-primary" onClick={handleSubmit}>
+              Отправить ДЗ
+            </button>
+          </div>
         )}
       </div>
     </div>

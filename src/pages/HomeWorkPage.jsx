@@ -1,13 +1,10 @@
 // src/pages/HomeworkPage.jsx
 import React, { useState } from 'react';
-import { useNavigate }       from 'react-router-dom';
-import Sidebar               from '../components/Sidebar';
-import Topbar                from '../components/TopBar';
+import Sidebar from '../components/Sidebar';
+import Topbar from '../components/TopBar';
 import '../styles/HomeworkPage.css';
 
 export default function HomeworkPage() {
-  const navigate = useNavigate();
-
   // Пример данных: группы и темы и домашки студентов
   const groupsData = [
     {
@@ -48,8 +45,8 @@ export default function HomeworkPage() {
     }
   ];
 
-  const [selectedGroupId, setSelectedGroupId]   = useState(null);
-  const [selectedTopicId, setSelectedTopicId]   = useState(null);
+  const [selectedGroupId, setSelectedGroupId] = useState(null);
+  const [selectedTopicId, setSelectedTopicId] = useState(null);
   const [expandedSubmission, setExpandedSubmission] = useState(null);
   const [data, setData] = useState(groupsData);
 
@@ -119,9 +116,9 @@ export default function HomeworkPage() {
       <div className="main-content">
         <Topbar
           userName="Бойцев Антон"
-          userRole="Преподаватель"
-          notifications={0}
+          userRole="teacher"
           onBellClick={() => {}}
+          onProfileClick={() => {}}
         />
 
         <div className="content-area homework-page">

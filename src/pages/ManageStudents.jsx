@@ -107,11 +107,11 @@ export default function ManageStudentsPage() {
   };
 
   /* ---------- выбор ---------- */
-  const select=o=>{
+  const select = o => {
     setEdit({
-      ...o.user,
-      studentId : o.student.id,
-      points    : o.student.points
+      ...o.user,           // содержит user.id, username и другие поля пользователя
+      studentId: o.student.id,  // ID студенческого профиля
+      points: o.student.points
     });
     setSearch('');
   };
@@ -121,17 +121,38 @@ export default function ManageStudentsPage() {
     if(!edit) return;
     setErrors({});
     try{
-      await updateUser(edit.id,{
-        first_name:edit.first_name, surname:edit.surname, patronymic:edit.patronymic,
-        birth_date:edit.birth_date||null, email:edit.email, phone_number:edit.phone_number,
-        role:'student'
+      // 1. Обновляем пользователя
+      await updateUser(edit.id, {
+        first_name: edit.first_name, 
+        surname: edit.surname, 
+        patronymic: edit.patronymic,
+        birth_date: edit.birth_date || null, 
+        email: edit.email, 
+        phone_number: edit.phone_number,
+        role: 'student'
       });
-      await updateStudent(edit.studentId,{ points:edit.points });
+      
+      // 2. Обновляем студенческий профиль с полными данными
+      await updateStudent(edit.studentId, { 
+        user_id: edit.id,        // ID пользователя
+        points: edit.points,     // Очки
+        id: edit.studentId       // ID студенческого профиля
+      });
+      
       alert('Сохранено');
-      load(); setEdit(null);
+      load(); 
+      setEdit(null);
     }catch(e){
-      if(e.response?.data?.username) setErrors({ username:e.response.data.username });
-      else alert('Ошибка сохранения');
+      console.error('Error saving student:', e);
+      console.error('Edit object:', edit);
+      
+      // Более детальная обработка ошибок
+      if (e.response?.status === 422) {
+        console.error('Validation error details:', e.response.data);
+        alert('Ошибка валидации данных. Проверьте консоль для деталей.');
+      } else {
+        alert('Ошибка сохранения');
+      }
     }
   };
 
@@ -211,17 +232,20 @@ export default function ManageStudentsPage() {
           {edit && (
             <div className="user-form form-grid" style={{marginTop:20}}>
               {['first_name','surname','patronymic','birth_date',
-                'email','username','phone_number'].map(f=>(
+                'email','phone_number'].map(f=>(  // Убрали 'username' из редактируемых полей
                 <div className="field" key={f}>
                   <label>{f.replace('_',' ')}</label>
                   <input type={f==='birth_date'?'date':'text'}
                          value={edit[f]||''}
                          onChange={e=>setEdit(s=>({...s,[f]:e.target.value}))}/>
-                  {f==='username' && errors.username && (
-                    <div className="error-text">{errors.username[0]}</div>
-                  )}
                 </div>
               ))}
+              {/* Показываем username только для отображения */}
+              <div className="field">
+                <label>Логин (только чтение)</label>
+                <input type="text" value={edit.username||'(генерируется автоматически)'} 
+                       disabled style={{backgroundColor:'#f5f5f5'}}/>
+              </div>
               <div className="field">
                 <label>Очки</label>
                 <input type="number" value={edit.points}

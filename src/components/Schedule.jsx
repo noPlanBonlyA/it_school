@@ -1,46 +1,33 @@
-// src/components/Schedule.jsx
-import React from 'react';
+/*  src/components/Schedule.jsx
+    Упрощённый список занятий     */
+
 import '../styles/Schedule.css';
 
-export default function Schedule({ events }) {
-  if (!events || events.length === 0) {
-    return (
-      <div className="schedule-list">
-        <div className="schedule-item empty">Пар нет</div>
-      </div>
-    );
-  }
+export default function Schedule({ events = [], onSelect = () => {} }) {
+  if (!events.length) return <p className="empty-text">Нет занятий</p>;
 
   return (
-    <div className="schedule-list">
-      {events.map(evt => (
-        <div key={evt.id} className="schedule-item">
-          {/* Цветная полоска слева */}
-          <div
-            className="color-bar"
-            style={{ backgroundColor: evt.color }}
-          ></div>
-
-          {/* Основная часть карточки */}
-          <div className="schedule-content">
-            <div className="schedule-title">{evt.title}</div>
-            <div className="schedule-time">
-              {new Date(evt.start).toLocaleTimeString('ru-RU', {
-                hour: '2-digit',
-                minute: '2-digit'
-              })}{' '}
-              –{' '}
-              {new Date(evt.end).toLocaleTimeString('ru-RU', {
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
-            </div>
-          </div>
-
-          {/* Аудитория справа (необязательно, если хотите) */}
-          <div className="schedule-audience">Ауд: {evt.audience}</div>
-        </div>
+    <ul className="schedule-list">
+      {events.map(ev => (
+        <li key={ev.id} onClick={() => onSelect(ev)}>
+          <span className="time">
+            {new Date(ev.holding_date || ev.start).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
+          </span>
+          <span className="title">{ev.lesson_name}</span>
+          {/* мелкий шрифт – группа/препод */}
+          <span className="meta">
+            {ev.group_name ? `гр. ${ev.group_name}` : ev.teacher_name}
+          </span>
+          {/* Дата проведения */}
+          <span className="date">
+            {new Date(ev.holding_date || ev.start).toLocaleDateString('ru-RU', {
+              day: '2-digit',
+              month: '2-digit', 
+              year: 'numeric'
+            })}
+          </span>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

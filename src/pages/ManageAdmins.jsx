@@ -82,19 +82,28 @@ export default function ManageAdminsPage() {
   /* ---------- выбор / save / delete ---------- */
   const handleSelect=u=>{setEdit({...u,birth_date:u.birth_date||''}); setSearch('');};
 
-  const handleUpdate=async()=>{
-    if(!edit)return;
+  /* ───────── СОХРАНЕНИЕ ───────── */
+  const save = async () => {
+    if (!edit) return;
     setErrors({});
-    try{
-      await updateUser(edit.id,{
-        first_name:edit.first_name,surname:edit.surname,patronymic:edit.patronymic,
-        birth_date:edit.birth_date||null,email:edit.email,
-        phone_number:edit.phone_number,role:'admin'
+    try {
+      // Убираем username из запроса
+      await updateUser(edit.id, {
+        first_name: edit.first_name,
+        surname: edit.surname,
+        patronymic: edit.patronymic,
+        birth_date: edit.birth_date || null,
+        email: edit.email,
+        phone_number: edit.phone_number,
+        role: edit.role || 'admin'
+        // username НЕ передаем
       });
-      alert('Сохранено'); load(); setEdit(null);
-    }catch(e){
-      if(e.response?.data?.username)setErrors({username:e.response.data.username});
-      else alert('Ошибка сохранения');
+      alert('Сохранено');
+      load();
+      setEdit(null);
+    } catch (e) {
+      console.error('Error saving admin:', e);
+      alert('Ошибка сохранения');
     }
   };
 
@@ -112,10 +121,10 @@ export default function ManageAdminsPage() {
       <Sidebar activeItem="manage-admins" userRole={user.role}/>
       <div className="main-content">
         <Topbar
-          userName={fullName} userRole={user.role}
-          notifications={0}
-          onBellClick={()=>{}}
-          onProfileClick={()=>navigate('/profile')}
+          userName={fullName}
+          userRole={user.role}
+          onBellClick={() => {}}
+          onProfileClick={() => navigate('/profile')}
         />
 
         <h1>Управление администраторами</h1>
@@ -168,19 +177,24 @@ export default function ManageAdminsPage() {
           {edit&&(
             <div className="user-form form-grid" style={{marginTop:20}}>
               {['first_name','surname','patronymic','birth_date',
-                'email','username','phone_number'].map(f=>(
+                'email','phone_number'].map(f=>(  // Убираем 'username' из редактируемых полей
                 <div className="field" key={f}>
                   <label>{f.replace('_',' ')}</label>
                   <input type={f==='birth_date'?'date':'text'}
                          value={edit[f]||''}
-                         onChange={e=>setEdit(s=>({...s,[f]:e.target.value}))}/>
-                  {f==='username'&&errors.username&&(
-                    <div className="error-text">{errors.username[0]}</div>
-                  )}
+                         onChange={e=>setEdit(s=>({...s,[f]:e.target.value}))}
+                         disabled={f === 'username'}  // Делаем поле только для чтения
+                         style={f === 'username' ? {backgroundColor:'#f5f5f5'} : {}}/>
                 </div>
               ))}
+              {/* Показываем username только для отображения */}
+              <div className="field">
+                <label>Логин (только чтение)</label>
+                <input type="text" value={edit.username||'(генерируется автоматически)'} 
+                       disabled style={{backgroundColor:'#f5f5f5'}}/>
+              </div>
               <div className="buttons" style={{gridColumn:'1 / -1'}}>
-                <button className="btn-primary" onClick={handleUpdate}>Сохранить</button>
+                <button className="btn-primary" onClick={save}>Сохранить</button>
                 <button className="btn-danger"  onClick={()=>setShowDeleteConfirm(true)}>Удалить</button>
               </div>
             </div>

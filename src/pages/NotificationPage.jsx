@@ -1,196 +1,158 @@
-// src/pages/NotificationsPage.jsx
+// src/pages/NotificationPage.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate }               from 'react-router-dom';
-import Sidebar                        from '../components/Sidebar';
-import Topbar                         from '../components/TopBar';
-import axios                          from 'axios';
+import { useNavigate }                from 'react-router-dom';
+
+import Sidebar   from '../components/Sidebar';
+import Topbar    from '../components/TopBar';
+import { useAuth } from '../contexts/AuthContext';
+import api        from '../api/axiosInstance';
+
 import '../styles/NotificationsPage.css';
 
-const API_BASE = 'http://localhost:8080/api';
+export default function NotificationPage() {
+  const navigate   = useNavigate();
+  const { user }   = useAuth();
 
-export default function NotificationsPage() {
-  const navigate = useNavigate();
-  const [title, setTitle]         = useState('');
-  const [message, setMessage]     = useState('');
-  const [recipientType, setRecipientType] = useState('all');
+  // текст уведомления
+  const [content, setContent] = useState('');
 
-  const [groups, setGroups]       = useState([]);
-  const [courses, setCourses]     = useState([]);
-  const [users, setUsers]         = useState([]);
+  // тип и цель рассылки
+  const [recipientType, setRecipientType] = useState('all'); // all, group, course, student
+  const [targetId, setTargetId]           = useState('');
 
-  const [groupSearch, setGroupSearch] = useState('');
-  const [filteredGroups, setFilteredGroups] = useState([]);
-  const [showGroupSug, setShowGroupSug]     = useState(false);
-  const [selectedGroup, setSelectedGroup]   = useState(null);
+  // справочники
+  const [groups, setGroups]   = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [students, setStudents] = useState([]);
 
-  const [courseSearch, setCourseSearch]     = useState('');
-  const [filteredCourses, setFilteredCourses] = useState([]);
-  const [showCourseSug, setShowCourseSug]     = useState(false);
-  const [selectedCourse, setSelectedCourse]   = useState(null);
+  // ui
+  const [error,   setError]   = useState('');
+  const [success, setSuccess] = useState('');
 
-  const [userSearch, setUserSearch]       = useState('');
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [showUserSug, setShowUserSug]     = useState(false);
-  const [selectedUser, setSelectedUser]   = useState(null);
-
-  const [error, setError]       = useState('');
-  const [success, setSuccess]   = useState('');
-
+  // ─── загрузка справочников ─────────────────────────
   useEffect(() => {
-    // Загрузка списка групп (берём res.data.objects)
-    axios.get(`${API_BASE}/groups/`)
-      .then(res => {
-        const grpArray = Array.isArray(res.data.objects) ? res.data.objects : [];
-        setGroups(grpArray);
-      })
-      .catch(err => {
-        console.error('Не удалось загрузить группы', err);
-        setGroups([]);
-      });
+    // группы
+    api.get('/groups/', { params:{ limit:100, offset:0 } })
+      .then(r => setGroups(r.data.objects || []))
+      .catch(() => {/* silent */});
 
-    // Загрузка списка курсов (берём res.data.objects)
-    axios.get(`${API_BASE}/courses/`)
-      .then(res => {
-        const crsArray = Array.isArray(res.data.objects) ? res.data.objects : [];
-        setCourses(crsArray);
-      })
-      .catch(err => {
-        console.error('Не удалось загрузить курсы', err);
-        setCourses([]);
-      });
+    // курсы
+    api.get('/courses/', { params:{ limit:100, offset:0 } })
+      .then(r => setCourses(r.data.objects || []))
+      .catch(() => {/* silent */});
 
-    // Загрузка списка пользователей (предполагаем, что это массив)
-    axios.get(`${API_BASE}/users/`)
-      .then(res => {
-        const usrArray = Array.isArray(res.data) ? res.data : [];
-        setUsers(usrArray);
-      })
-      .catch(err => {
-        console.error('Не удалось загрузить пользователей', err);
-        setUsers([]);
-      });
+    // студенты (пользователи с ролью student)
+    api.get('/users/', {
+      params:{ role:'student', limit:100, offset:0 }
+    })
+      .then(r => setStudents(r.data.objects || []))
+      .catch(() => {/* silent */});
   }, []);
 
-  useEffect(() => {
-    setFilteredGroups(
-      groups.filter(g =>
-        g.name.toLowerCase().includes(groupSearch.toLowerCase())
-      )
-    );
-  }, [groupSearch, groups]);
-
-  useEffect(() => {
-    setFilteredCourses(
-      courses.filter(c =>
-        c.name.toLowerCase().includes(courseSearch.toLowerCase())
-      )
-    );
-  }, [courseSearch, courses]);
-
-  useEffect(() => {
-    setFilteredUsers(
-      users.filter(u => {
-        const uname = typeof u.username === 'string' ? u.username.toLowerCase() : '';
-        const fullName = `${u.first_name || ''} ${u.surname || ''}`.trim().toLowerCase();
-        const query = userSearch.toLowerCase();
-        return uname.includes(query) || fullName.includes(query);
-      })
-    );
-  }, [userSearch, users]);
-
-  const resetSelections = () => {
-    setSelectedGroup(null);
-    setGroupSearch('');
-    setSelectedCourse(null);
-    setCourseSearch('');
-    setSelectedUser(null);
-    setUserSearch('');
-  };
-
-  const handleRecipientChange = e => {
-    setRecipientType(e.target.value);
-    resetSelections();
-    setError('');
-    setSuccess('');
-  };
-
+  // ─── отправка уведомления ──────────────────────────
   const handleSubmit = async () => {
-    setError('');
+    setError(''); 
     setSuccess('');
 
-    if (!title.trim() || !message.trim()) {
-      setError('Заполните заголовок и текст сообщения.');
+    if (!content.trim()) {
+      setError('Текст уведомления не может быть пустым.');
       return;
     }
 
-    let payload = { title, message, target: { type: recipientType } };
-
-    if (recipientType === 'group') {
-      if (!selectedGroup) {
-        setError('Выберите группу.');
-        return;
-      }
-      payload.target.group_id = selectedGroup.id;
-    } else if (recipientType === 'course') {
-      if (!selectedCourse) {
-        setError('Выберите курс.');
-        return;
-      }
-      payload.target.course_id = selectedCourse.id;
-    } else if (recipientType === 'user') {
-      if (!selectedUser) {
-        setError('Выберите пользователя.');
-        return;
-      }
-      payload.target.user_id = selectedUser.id;
-    }
-
     try {
-      await axios.post(`${API_BASE}/notifications/`, payload);
-      setSuccess('Уведомление успешно отправлено.');
-      setTitle('');
-      setMessage('');
-      resetSelections();
+      if (recipientType === 'all') {
+        // всем сразу
+        await api.post('/notifications/', { content }, {
+          params:{
+            recipient_type: 'group',
+            recipient_id:   'all',
+            create_notification_use_case: 'createNotificationUseCase'
+          }
+        });
+      }
+      else if (recipientType === 'group') {
+        if (!targetId) { setError('Выберите группу.'); return; }
+        await api.post('/notifications/', { content }, {
+          params:{
+            recipient_type: 'group',
+            recipient_id:   targetId,
+            create_notification_use_case: 'createNotificationUseCase'
+          }
+        });
+      }
+      else if (recipientType === 'student') {
+        if (!targetId) { setError('Выберите студента.'); return; }
+        await api.post('/notifications/', { content }, {
+          params:{
+            recipient_type: 'student',
+            recipient_id:   targetId,
+            create_notification_use_case: 'createNotificationUseCase'
+          }
+        });
+      }
+      else if (recipientType === 'course') {
+        if (!targetId) { setError('Выберите курс.'); return; }
+
+        // 1) получить все группы
+        const { data: grPage } = await api.get('/groups/', {
+          params:{ limit:100, offset:0 }
+        });
+        const brief = grPage.objects || [];
+
+        // 2) получить детали у каждой группы
+        const details = await Promise.all(
+          brief.map(g =>
+            api.get(`/groups/${g.id}`)
+               .then(r => r.data)
+               .catch(() => null)
+          )
+        );
+
+        // 3) отфильтровать группы, где есть наш курс
+        const courseGroups = details.filter(g =>
+          g && Array.isArray(g.courses) &&
+          g.courses.some(c => c.id === targetId)
+        );
+
+        // 4) отправить одно уведомление на каждую группу
+        await Promise.all(courseGroups.map(g =>
+          api.post('/notifications/', { content }, {
+            params:{
+              recipient_type: 'group',
+              recipient_id:   g.id,
+              create_notification_use_case: 'createNotificationUseCase'
+            }
+          })
+        ));
+      }
+
+      setSuccess('Уведомление(я) успешно отправлены.');
+      setContent('');
       setRecipientType('all');
+      setTargetId('');
     } catch (e) {
-      console.error('Ошибка при отправке уведомления:', e);
-      setError('Не удалось отправить уведомление.');
+      console.error(e);
+      setError('Ошибка при отправке. Проверьте консоль.');
     }
   };
 
-  const fullName = 'Администратор'; // заменить на контекст, если нужно
-
   return (
     <div className="manage-notifications app-layout">
-      <Sidebar activeItem="notifications" userRole="admin" />
+      <Sidebar activeItem="notifications" userRole={user.role}/>
       <div className="main-content">
-        <Topbar
-          userName={fullName}
-          userRole="admin"
-          notifications={0}
-          onBellClick={() => {}}
-          onProfileClick={() => navigate('/profile')}
-        />
+        <Topbar userName={`${user.first_name} ${user.surname}`}
+                userRole={user.role}
+                onProfileClick={() => navigate('/profile')} />
 
-        <h1>Создать уведомление</h1>
-
+        <h1>Рассылка уведомлений</h1>
         <div className="block notifications-block">
-          <div className="field">
-            <label>Заголовок</label>
-            <input
-              type="text"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              placeholder="Введите заголовок"
-            />
-          </div>
 
-          <div className="field field-full">
-            <label>Текст сообщения</label>
+          <div className="field">
+            <label>Текст уведомления</label>
             <textarea
-              value={message}
-              onChange={e => setMessage(e.target.value)}
-              placeholder="Введите текст уведомления"
+              value={content}
+              onChange={e => setContent(e.target.value)}
+              placeholder="Введите сообщение..."
             />
           </div>
 
@@ -198,118 +160,72 @@ export default function NotificationsPage() {
             <label>Кому отправить</label>
             <select
               value={recipientType}
-              onChange={handleRecipientChange}
+              onChange={e => {
+                setRecipientType(e.target.value);
+                setTargetId('');
+                setError('');
+                setSuccess('');
+              }}
             >
               <option value="all">Всем пользователям</option>
-              <option value="group">Группе</option>
-              <option value="course">Курсу</option>
-              <option value="user">Отдельному пользователю</option>
+              <option value="group">Конкретной группе</option>
+              <option value="course">Всем студентам курса</option>
+              <option value="student">Конкретному студенту</option>
             </select>
           </div>
 
           {recipientType === 'group' && (
             <div className="field">
-              <label>Выберите группу</label>
-              <input
-                type="text"
-                value={groupSearch}
-                onChange={e => {
-                  setGroupSearch(e.target.value);
-                  setSelectedGroup(null);
-                  setError('');
-                }}
-                onFocus={() => setShowGroupSug(true)}
-                onBlur={() => setTimeout(() => setShowGroupSug(false), 200)}
-                placeholder="Поиск по названию группы"
-              />
-              {showGroupSug && filteredGroups.length > 0 && (
-                <ul className="suggestions">
-                  {filteredGroups.map(g => (
-                    <li key={g.id} onClick={() => {
-                      setSelectedGroup(g);
-                      setGroupSearch(g.name);
-                      setShowGroupSug(false);
-                    }}>
-                      {g.name}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <label>Группа</label>
+              <select
+                value={targetId}
+                onChange={e => setTargetId(e.target.value)}
+              >
+                <option value="">— выберите группу —</option>
+                {groups.map(g =>
+                  <option key={g.id} value={g.id}>{g.name}</option>
+                )}
+              </select>
             </div>
           )}
 
           {recipientType === 'course' && (
             <div className="field">
-              <label>Выберите курс</label>
-              <input
-                type="text"
-                value={courseSearch}
-                onChange={e => {
-                  setCourseSearch(e.target.value);
-                  setSelectedCourse(null);
-                  setError('');
-                }}
-                onFocus={() => setShowCourseSug(true)}
-                onBlur={() => setTimeout(() => setShowCourseSug(false), 200)}
-                placeholder="Поиск по названию курса"
-              />
-              {showCourseSug && filteredCourses.length > 0 && (
-                <ul className="suggestions">
-                  {filteredCourses.map(c => (
-                    <li key={c.id} onClick={() => {
-                      setSelectedCourse(c);
-                      setCourseSearch(c.name);
-                      setShowCourseSug(false);
-                    }}>
-                      {c.name}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <label>Курс</label>
+              <select
+                value={targetId}
+                onChange={e => setTargetId(e.target.value)}
+              >
+                <option value="">— выберите курс —</option>
+                {courses.map(c =>
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                )}
+              </select>
             </div>
           )}
 
-          {recipientType === 'user' && (
+          {recipientType === 'student' && (
             <div className="field">
-              <label>Выберите пользователя</label>
-              <input
-                type="text"
-                value={userSearch}
-                onChange={e => {
-                  setUserSearch(e.target.value);
-                  setSelectedUser(null);
-                  setError('');
-                }}
-                onFocus={() => setShowUserSug(true)}
-                onBlur={() => setTimeout(() => setShowUserSug(false), 200)}
-                placeholder="Поиск по username или ФИО"
-              />
-              {showUserSug && filteredUsers.length > 0 && (
-                <ul className="suggestions">
-                  {filteredUsers.map(u => (
-                    <li key={u.id} onClick={() => {
-                      setSelectedUser(u);
-                      const displayName = typeof u.username === 'string'
-                        ? u.username
-                        : `${u.first_name} ${u.surname}`;
-                      setUserSearch(displayName);
-                      setShowUserSug(false);
-                    }}>
-                      {typeof u.username === 'string'
-                        ? u.username
-                        : `${u.first_name} ${u.surname}`} ({u.first_name} {u.surname})
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <label>Студент</label>
+              <select
+                value={targetId}
+                onChange={e => setTargetId(e.target.value)}
+              >
+                <option value="">— выберите студента —</option>
+                {students.map(u =>
+                  <option key={u.id} value={u.id}>
+                    {u.username} — {u.first_name} {u.surname}
+                  </option>
+                )}
+              </select>
             </div>
           )}
 
-          {error && <div className="error-text">{error}</div>}
+          {error   && <div className="error-text">{error}</div>}
           {success && <div className="success-text">{success}</div>}
 
           <div className="buttons-notif">
-            <button type="button" className="btn-primary" onClick={handleSubmit}>
+            <button className="btn-primary" onClick={handleSubmit}>
               Отправить уведомление
             </button>
           </div>

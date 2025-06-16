@@ -5,46 +5,40 @@ import Sidebar   from '../components/Sidebar';
 import Topbar    from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
 
-import {
-  getAllCourses,
-  listStudentCourses
-} from '../services/courseService';
+import { listStudentCourses } from '../services/courseService';
 import '../styles/CoursesPage.css';
 
-/* список курсов для ученика */
 export default function StudentCoursesPage() {
   const navigate      = useNavigate();
   const { user }      = useAuth();
 
-  const [myCourses,   setMyCourses]   = useState([]);  // только те, что привязаны к студенту
-  const [otherCourses,setOtherCourses]= useState([]);  // все остальные (read-only)
+  const [myCourses,   setMyCourses]   = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  /* ───── загрузка ───── */
+  /* ───── загрузка курсов из групп пользователя ───── */
   useEffect(() => { (async () => {
     try {
-      const mine = await listStudentCourses();            // → Array<Course>
-      const all  = (await getAllCourses(100, 0)).objects || [];
-
-      const mineIds = new Set(mine.map(c => c.id));
-
-      setMyCourses(mine);
-      setOtherCourses(all.filter(c => !mineIds.has(c.id)));
+      setLoading(true);
+      // Используем API /courses/student - возвращает только курсы из групп пользователя
+      const studentCourses = await listStudentCourses();
+      console.log('[StudentCourses] Available courses:', studentCourses);
+      setMyCourses(studentCourses);
     } catch (e) {
       console.error('Ошибка загрузки курсов:', e);
+    } finally {
+      setLoading(false);
     }
   })(); }, []);
 
   /* ───── helpers ───── */
   const openCourse = id => {
-    if (myCourses.some(c => c.id === id)) {
-      navigate(`/courses/${id}/student`);
-    }
+    navigate(`/courses/${id}/student`);
   };
 
   const fullName = [user.first_name, user.surname, user.patronymic]
                     .filter(Boolean).join(' ');
 
-  const renderCard = (c, locked = false) => {
+  const renderCard = (c) => {
     let img = '';
     if (c.photo?.url) {
       img = c.photo.url.startsWith('http')
@@ -53,7 +47,7 @@ export default function StudentCoursesPage() {
     }
 
     return (
-      <div className={`course-card ${locked ? 'locked' : ''}`} key={c.id}>
+      <div className="course-card available" key={c.id}>
         <div className="course-image-wrapper">
           {img ? (
             <img src={img} alt={c.name} className="course-image" />
@@ -64,19 +58,41 @@ export default function StudentCoursesPage() {
 
         <div className="course-body">
           <h2 className="course-title">{c.name}</h2>
+          <p className="course-description">{c.description}</p>
+          <div className="course-meta">
+            <span className="course-author">Автор: {c.author_name}</span>
+            <span className="course-price">₽{c.price}</span>
+          </div>
 
-          {locked ? (
-            <span className="course-locked-label">Недоступно</span>
-          ) : (
-            <button className="course-button" onClick={() => openCourse(c.id)}>
-              Открыть
+          <div className="course-status-container">
+            <span className="course-available-label">✅ Доступен</span>
+            <button className="course-button available" onClick={() => openCourse(c.id)}>
+              Открыть курс
             </button>
-          )}
-
+          </div>
         </div>
       </div>
     );
   };
+
+  if (loading) {
+    return (
+      <div className="courses-page app-layout">
+        <Sidebar activeItem="studentCourses" userRole={user.role} />
+        <div className="main-content">
+          <Topbar
+            userName={fullName}
+            userRole={user.role}
+            onProfileClick={() => navigate('/profile')}
+          />
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Загрузка курсов...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   /* ───── UI ───── */
   return (
@@ -87,32 +103,48 @@ export default function StudentCoursesPage() {
         <Topbar
           userName={fullName}
           userRole={user.role}
-          notifications={0}
           onBellClick={() => {}}
           onProfileClick={() => navigate('/profile')}
         />
 
-        <h1>Курсы</h1>
+        <h1>Мои курсы</h1>
 
-        {/* мои курсы */}
-        <h2 className="section-label">Мои курсы</h2>
-        {myCourses.length ? (
-          <div className="courses-grid">
-            {myCourses.map(c => renderCard(c))}
+        {/* доступные курсы */}
+        <section className="courses-section">
+          <div className="section-header">
+            <h2 className="section-label">Доступные курсы</h2>
+            <span className="course-count">{myCourses.length} курс(ов)</span>
           </div>
-        ) : (
-          <p>У вас пока нет доступных курсов.</p>
-        )}
-
-        {/* остальные */}
-        {otherCourses.length > 0 && (
-          <>
-            <h2 className="section-label">Другие курсы</h2>
+          {myCourses.length ? (
             <div className="courses-grid">
-              {otherCourses.map(c => renderCard(c, true))}
+              {myCourses.map(c => renderCard(c))}
             </div>
-          </>
-        )}
+          ) : (
+            <div className="empty-state">
+              <div className="empty-icon">📚</div>
+              <h3>У вас пока нет доступных курсов</h3>
+              <p>Курсы появятся после добавления вас в группу с курсами</p>
+            </div>
+          )}
+        </section>
+
+        {/* информационный блок */}
+        <section className="info-section">
+          <div className="info-card">
+            <h3>Как получить доступ к курсам?</h3>
+            <ol>
+              <li>Курсы доступны только через группы</li>
+              <li>Администратор должен добавить вас в группу</li>
+              <li>К группе должен быть привязан курс</li>
+              <li>После этого курс появится в вашем списке</li>
+            </ol>
+            <p>
+              <strong>Текущий статус:</strong> {myCourses.length > 0 
+                ? `У вас есть доступ к ${myCourses.length} курс(ам)` 
+                : 'Доступных курсов нет'}
+            </p>
+          </div>
+        </section>
       </div>
     </div>
   );

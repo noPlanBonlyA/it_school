@@ -1,4 +1,5 @@
-import React           from 'react';
+// src/App.jsx
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import HomePage             from './pages/HomePage';
@@ -17,10 +18,10 @@ import StudentCoursePage    from './pages/StudentCoursePage';
 import StudentLessonPage    from './pages/StudentLessonPage';
 
 import TeacherCoursesPage   from './pages/TeacherCoursesPage';
-import TeacherCoursePage    from './pages/TeacherCoursePage';   // 🔹 новинка
-import TeacherLessonPage    from './pages/TeacherLessonPage';   // 🔹 новинка
+import TeacherCoursePage    from './pages/TeacherCoursePage';
+import TeacherLessonPage    from './pages/TeacherLessonPage';
 
-import CourseDetailPage     from './pages/CourseDetailPage';    // «конструктор» уроков
+import CourseDetailPage     from './pages/CourseDetailPage';
 import HomeWorkPage         from './pages/HomeWorkPage';
 import ForgotPasswordPage   from './pages/ForgotPassword';
 import ResetPasswordPage    from './pages/ResetPassword';
@@ -28,69 +29,70 @@ import ManageNewsPage       from './pages/ManageNewsPage';
 import NotificationPage     from './pages/NotificationPage';
 
 import { useAuth }          from './contexts/AuthContext';
+import { NotificationsProvider } from './contexts/NotificationsContext';
 
-/* ———————————————————————————————————————— */
+/**
+ * Обёртка приватного маршрута:
+ * если пользователь не залогинен — редирект на /login
+ */
 function PrivateRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" />;
 }
-/* ———————————————————————————————————————— */
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <NotificationsProvider>
+      <BrowserRouter>
+        <Routes>
 
-        {/* ───── публичные ───── */}
-        <Route path="/login"                element={<LoginPage />} />
-        <Route path="/forgot-password"      element={<ForgotPasswordPage />} />
-        <Route path="/reset-password/:token?" element={<ResetPasswordPage />} />
+          {/* ───── публичные ───── */}
+          <Route path="/login"                  element={<LoginPage />} />
+          <Route path="/forgot-password"        element={<ForgotPasswordPage />} />
+          <Route path="/reset-password/:token?" element={<ResetPasswordPage />} />
 
-        {/* ───── базовые приватные ───── */}
-        <Route path="/home"     element={<PrivateRoute><HomePage /></PrivateRoute>} />
-        <Route path="/profile"  element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+          {/* ───── базовые приватные ───── */}
+          <Route path="/home"     element={<PrivateRoute><HomePage /></PrivateRoute>} />
+          <Route path="/profile"  element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
 
-        {/* ───────────────────── STUDENT ───────────────────── */}
-        <Route path="/courses"
-               element={<PrivateRoute><StudentCoursesPage /></PrivateRoute>} />
-        <Route path="/courses/:courseId/student"
-               element={<PrivateRoute><StudentCoursePage /></PrivateRoute>} />
-        <Route path="/courses/:courseId/lessons/:lessonId"
-               element={<PrivateRoute><StudentLessonPage /></PrivateRoute>} />
+          {/* ───────────────────── STUDENT ───────────────────── */}
+          <Route path="/courses"
+                 element={<PrivateRoute><StudentCoursesPage /></PrivateRoute>} />
+          <Route path="/courses/:courseId/student"
+                 element={<PrivateRoute><StudentCoursePage /></PrivateRoute>} />
+          <Route path="/courses/:courseId/lessons/:lessonId"
+                 element={<PrivateRoute><StudentLessonPage /></PrivateRoute>} />
 
-        {/* ───────────────────── TEACHER ───────────────────── */}
-        {/* список курсов (доступные / недоступные) */}
-        <Route path="/teacher-courses"
-               element={<PrivateRoute><TeacherCoursesPage /></PrivateRoute>} />
+          {/* ───────────────────── TEACHER ───────────────────── */}
+          <Route path="/teacher-courses"
+                 element={<PrivateRoute><TeacherCoursesPage /></PrivateRoute>} />
+          <Route path="/courses/:courseId/teacher"
+                 element={<PrivateRoute><TeacherCoursePage /></PrivateRoute>} />
+          <Route path="/courses/:courseId/teacher/lessons/:lessonId"
+                 element={<PrivateRoute><TeacherLessonPage /></PrivateRoute>} />
 
-        {/* просмотр конкретного курса преподавателя (список занятий) */}
-        <Route path="/courses/:courseId/teacher"
-               element={<PrivateRoute><TeacherCoursePage /></PrivateRoute>} />
+          {/* «конструктор» курса / уроков */}
+          <Route path="/courses/:courseId"
+                 element={<PrivateRoute><CourseDetailPage /></PrivateRoute>} />
 
-        {/* просмотр конкретного урока преподавателя */}
-        <Route path="/courses/:courseId/teacher/lessons/:lessonId"
-               element={<PrivateRoute><TeacherLessonPage /></PrivateRoute>} />
+          <Route path="/homework"
+                 element={<PrivateRoute><HomeWorkPage /></PrivateRoute>} />
 
-        {/* «конструктор» курса / уроков (остался по старому URL) */}
-        <Route path="/courses/:courseId"
-               element={<PrivateRoute><CourseDetailPage /></PrivateRoute>} />
+          {/* ───────────────── ADMIN / SUPERADMIN ───────────────── */}
+          <Route path="/groups"         element={<PrivateRoute><ManageGroupPage /></PrivateRoute>} />
+          <Route path="/schedule"       element={<PrivateRoute><SchedulePage /></PrivateRoute>} />
+          <Route path="/manage-users"   element={<PrivateRoute><ManageStudentsPage /></PrivateRoute>} />
+          <Route path="/manage-teachers"element={<PrivateRoute><ManageTeachersPage /></PrivateRoute>} />
+          <Route path="/manage-admins"  element={<PrivateRoute><ManageAdminsPage /></PrivateRoute>} />
+          <Route path="/manage-courses" element={<PrivateRoute><ManageCoursePage /></PrivateRoute>} />
+          <Route path="/news"           element={<PrivateRoute><ManageNewsPage /></PrivateRoute>} />
+          <Route path="/broadcast"  element={<PrivateRoute><NotificationPage /></PrivateRoute>} />
 
-        <Route path="/homework"
-               element={<PrivateRoute><HomeWorkPage /></PrivateRoute>} />
+          {/* ───── fallback ───── */}
+          <Route path="*" element={<Navigate to="/home" />} />
 
-        {/* ───────────────── ADMIN / SUPERADMIN ───────────────── */}
-        <Route path="/groups"            element={<PrivateRoute><ManageGroupPage /></PrivateRoute>} />
-        <Route path="/schedule"          element={<PrivateRoute><SchedulePage /></PrivateRoute>} />
-        <Route path="/manage-users"      element={<PrivateRoute><ManageStudentsPage /></PrivateRoute>} />
-        <Route path="/manage-teachers"   element={<PrivateRoute><ManageTeachersPage /></PrivateRoute>} />
-        <Route path="/manage-admins"     element={<PrivateRoute><ManageAdminsPage /></PrivateRoute>} />
-        <Route path="/manage-courses"    element={<PrivateRoute><ManageCoursePage /></PrivateRoute>} />
-        <Route path="/news"              element={<PrivateRoute><ManageNewsPage /></PrivateRoute>} />
-        <Route path="/notifications"     element={<PrivateRoute><NotificationPage /></PrivateRoute>} />
-
-        {/* ───── fallback ───── */}
-        <Route path="*" element={<Navigate to="/home" />} />
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </NotificationsProvider>
   );
 }
