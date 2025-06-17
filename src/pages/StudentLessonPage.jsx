@@ -18,20 +18,40 @@ export default function StudentLessonPage() {
   const [file, setFile] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
+        setError(null);
+        
+        console.log('[StudentLessonPage] Loading lesson:', { courseId, lessonId });
         
         // Загружаем информацию об уроке
-        const lessonData = await getLessonWithMaterials(courseId, lessonId);
-        setLesson(lessonData);
+        try {
+          const lessonData = await getLessonWithMaterials(courseId, lessonId);
+          console.log('[StudentLessonPage] Lesson loaded:', lessonData);
+          setLesson(lessonData);
+        } catch (lessonError) {
+          console.error('[StudentLessonPage] Error loading lesson:', lessonError);
+          setError('Не удалось загрузить информацию об уроке');
+          return;
+        }
         
         // Проверяем, отправлял ли студент домашнее задание
-        const mats = await getStudentMaterials(courseId, lessonId);
-        if (mats.length) setSubmitted(true);
+        try {
+          const materials = await getStudentMaterials(courseId, lessonId);
+          console.log('[StudentLessonPage] Student materials:', materials);
+          
+          if (materials && materials.length > 0) {
+            setSubmitted(true);
+          }
+        } catch (materialsError) {
+          console.warn('[StudentLessonPage] Could not check materials:', materialsError);
+          // Не блокируем интерфейс если не удалось проверить материалы
+        }
         
       } catch (err) {
         console.error('[StudentLessonPage] Error loading lesson:', err);
@@ -43,18 +63,92 @@ export default function StudentLessonPage() {
   }, [courseId, lessonId]);
 
   const handleSubmit = async () => {
-    if (!text.trim() && !file) {
-      alert('Введите текст или выберите файл');
+    // ИСПРАВЛЕНО: Более строгая валидация
+    const hasText = text && text.trim().length > 0;
+    const hasFile = file && file instanceof File;
+    
+    if (!hasText && !hasFile) {
+      alert('Введите текст домашнего задания или выберите файл');
       return;
     }
+    
     try {
-      await submitHomework(courseId, lessonId, { text, file });
+      setSubmitting(true);
+      console.log('[StudentLessonPage] Submitting homework:', { 
+        courseId, 
+        lessonId, 
+        hasText,
+        hasFile,
+        textLength: text?.length || 0,
+        fileName: file?.name,
+        fileSize: file?.size
+      });
+      
+      const result = await submitHomework(courseId, lessonId, { 
+        text: hasText ? text.trim() : null, 
+        file: hasFile ? file : null
+      });
+      
+      console.log('[StudentLessonPage] Homework submission result:', result);
+      
       setSubmitted(true);
-      alert('Домашнее задание отправлено');
-    } catch (e) {
-      console.error(e);
-      alert('Ошибка отправки');
+      setText('');
+      setFile(null);
+      
+      // Очищаем input файла
+      const fileInput = document.getElementById('homework-file');
+      if (fileInput) {
+        fileInput.value = '';
+      }
+      
+      alert('Домашнее задание успешно отправлено!');
+    } catch (error) {
+      console.error('[StudentLessonPage] Error submitting homework:', error);
+      
+      let errorMessage = 'Ошибка отправки домашнего задания.';
+      
+      if (error.response?.data?.detail) {
+        if (Array.isArray(error.response.data.detail)) {
+          errorMessage = error.response.data.detail.map(err => err.msg).join(', ');
+        } else if (typeof error.response.data.detail === 'string') {
+          errorMessage = error.response.data.detail;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(`${errorMessage} Попробуйте еще раз.`);
+    } finally {
+      setSubmitting(false);
     }
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      // ДОБАВЛЕНО: Проверяем размер файла (например, макс 10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (selectedFile.size > maxSize) {
+        alert('Файл слишком большой. Максимальный размер: 10MB');
+        e.target.value = ''; // Очищаем input
+        return;
+      }
+      
+      console.log('[StudentLessonPage] File selected:', {
+        name: selectedFile.name,
+        size: selectedFile.size,
+        type: selectedFile.type
+      });
+      setFile(selectedFile);
+    } else {
+      setFile(null);
+    }
+  };
+
+  const handleTextChange = (e) => {
+    const newText = e.target.value;
+    setText(newText);
+    console.log('[StudentLessonPage] Text changed, length:', newText.length);
   };
 
   const fullName = [user.first_name, user.surname, user.patronymic]
@@ -138,7 +232,13 @@ export default function StudentLessonPage() {
             <h2>Информация об уроке</h2>
             <p><strong>Описание:</strong> {lesson.description || 'Нет описания'}</p>
             {lesson.holding_date && (
-              <p><strong>Дата проведения:</strong> {new Date(lesson.holding_date).toLocaleDateString()}</p>
+              <p><strong>Дата проведения:</strong> {new Date(lesson.holding_date).toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}</p>
             )}
           </div>
 
@@ -186,7 +286,7 @@ export default function StudentLessonPage() {
               </div>
             ) : (
               <div className="hw-form">
-                <p>Выберите один из способов сдачи домашнего задания:</p>
+                <p>Отправьте домашнее задание текстом или файлом:</p>
                 
                 <div className="submission-options">
                   <div className="submission-option">
@@ -194,34 +294,50 @@ export default function StudentLessonPage() {
                     <textarea
                       placeholder="Введите ваш ответ здесь..."
                       value={text}
-                      onChange={e => setText(e.target.value)}
-                      disabled={!!file}
+                      onChange={handleTextChange}
+                      disabled={submitting}
                       className="text-homework"
+                      rows={6}
                     />
+                    <small>Количество символов: {text.length}</small>
                   </div>
                   
                   <div className="submission-option">
-                    <h3>Загрузить файл</h3>
+                    <h3>Или загрузить файл</h3>
                     <div className="file-upload">
                       <input
                         type="file"
                         id="homework-file"
-                        onChange={e => setFile(e.target.files[0] || null)}
-                        disabled={!!text.trim()}
+                        onChange={handleFileChange}
+                        disabled={submitting}
+                        accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.txt,.zip,.rar"
                       />
-                      <label htmlFor="homework-file" className={!!text.trim() ? "disabled" : ""}>
-                        {file ? file.name : "Выберите файл"}
+                      <label 
+                        htmlFor="homework-file" 
+                        className={submitting ? "disabled" : ""}
+                      >
+                        {file ? `📎 ${file.name}` : "📁 Выберите файл"}
                       </label>
                     </div>
+                    {file && (
+                      <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                        Размер: {Math.round(file.size / 1024)} KB
+                      </div>
+                    )}
                   </div>
                 </div>
                 
                 <button 
                   className="btn-primary"
                   onClick={handleSubmit}
-                  disabled={!text.trim() && !file}
+                  disabled={(!text.trim() && !file) || submitting}
+                  style={{
+                    marginTop: '20px',
+                    width: '100%',
+                    padding: '12px'
+                  }}
                 >
-                  Отправить домашнее задание
+                  {submitting ? 'Отправка...' : 'Отправить домашнее задание'}
                 </button>
               </div>
             )}

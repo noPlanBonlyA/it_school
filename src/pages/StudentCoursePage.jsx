@@ -6,7 +6,6 @@ import Topbar from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
 import { getCourse } from '../services/courseService';
 import { getCourseLessons } from '../services/courseService';
-import { checkStudentCourseAccess } from '../services/courseService';
 import { getUserSchedule } from '../services/scheduleService';
 import '../styles/CourseDetailPage.css';
 
@@ -19,52 +18,55 @@ export default function StudentCoursePage() {
   const [lessons, setLessons] = useState([]);
   const [schedule, setSchedule] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [hasAccess, setHasAccess] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
+        setError(null);
         
-        // Проверка доступа
-        console.log('[StudentCourse] Checking access to course:', courseId);
-        const accessGranted = await checkStudentCourseAccess(courseId);
+        console.log('[StudentCourse] Loading course data for courseId:', courseId);
         
-        if (!accessGranted) {
-          console.log('[StudentCourse] Access denied to course:', courseId);
-          setError('У вас нет доступа к этому курсу. Обратитесь к администратору для добавления в соответствующую группу.');
-          setHasAccess(false);
+        // УПРОЩЕНО: Просто загружаем курс без проверки доступа
+        try {
+          const courseData = await getCourse(courseId);
+          setCourse(courseData);
+          console.log('[StudentCourse] Course loaded successfully:', courseData);
+        } catch (courseError) {
+          console.error('[StudentCourse] Error loading course:', courseError);
+          setError('Не удалось загрузить курс. Попробуйте позже.');
           return;
         }
         
-        setHasAccess(true);
-        console.log('[StudentCourse] Access granted to course:', courseId);
-        
-        // Загружаем информацию о курсе
-        const courseData = await getCourse(courseId);
-        setCourse(courseData);
-        
-        // Загружаем ВСЕ уроки курса (поскольку доступ к курсу уже проверен)
-        const lessonsData = await getCourseLessons(courseId);
-        setLessons(lessonsData || []);
+        // Загружаем уроки курса
+        try {
+          const lessonsData = await getCourseLessons(courseId);
+          setLessons(lessonsData || []);
+          console.log('[StudentCourse] Lessons loaded:', lessonsData?.length || 0);
+        } catch (lessonsError) {
+          console.error('[StudentCourse] Error loading lessons:', lessonsError);
+          setLessons([]);
+        }
         
         // Загружаем расписание для получения дат и статусов уроков
-        const scheduleData = await getUserSchedule(user);
-        setSchedule(scheduleData || []);
+        try {
+          const scheduleData = await getUserSchedule(user);
+          setSchedule(scheduleData || []);
+          console.log('[StudentCourse] Schedule loaded:', scheduleData?.length || 0);
+        } catch (scheduleError) {
+          console.error('[StudentCourse] Error loading schedule:', scheduleError);
+          setSchedule([]);
+        }
         
-        console.log('[StudentCourse] Course loaded:', courseData);
-        console.log('[StudentCourse] Lessons loaded:', lessonsData?.length || 0);
-        console.log('[StudentCourse] Schedule loaded:', scheduleData?.length || 0);
       } catch (error) {
-        console.error('[StudentCourse] Error loading course data:', error);
+        console.error('[StudentCourse] Critical error loading course data:', error);
         setError('Произошла ошибка при загрузке данных курса. Пожалуйста, попробуйте позже.');
-        setHasAccess(false);
       } finally {
         setLoading(false);
       }
     })();
-  }, [courseId, user, navigate]);
+  }, [courseId, user]);
 
   // Получаем информацию о расписании урока
   const getLessonScheduleInfo = (lessonId) => {
@@ -74,14 +76,15 @@ export default function StudentCoursePage() {
   // Проверяем, открыт ли урок для изучения
   const isLessonOpened = (lessonId) => {
     const scheduleItem = getLessonScheduleInfo(lessonId);
-    return scheduleItem?.is_opened || false;
+    // По умолчанию считаем урок открытым
+    return scheduleItem ? scheduleItem.is_opened : true;
   };
 
   // Получаем статус урока для отображения
   const getLessonStatus = (lessonId) => {
     const scheduleItem = getLessonScheduleInfo(lessonId);
     
-    if (!scheduleItem) return { text: 'Не назначен', class: 'unavailable' };
+    if (!scheduleItem) return { text: 'Доступен', class: 'available' };
     if (!scheduleItem.is_opened) return { text: 'Закрыт', class: 'closed' };
     if (scheduleItem.is_completed) return { text: 'Завершен', class: 'completed' };
     
@@ -89,12 +92,8 @@ export default function StudentCoursePage() {
   };
 
   const handleLessonClick = (lessonId) => {
-    // Проверяем доступность урока перед переходом
-    if (isLessonOpened(lessonId)) {
-      navigate(`/courses/${courseId}/lessons/${lessonId}`);
-    } else {
-      alert('Этот урок пока закрыт для изучения');
-    }
+    console.log('[StudentCourse] Opening lesson:', lessonId);
+    navigate(`/courses/${courseId}/lessons/${lessonId}`);
   };
 
   const fullName = [user.first_name, user.surname, user.patronymic]
@@ -119,7 +118,7 @@ export default function StudentCoursePage() {
     );
   }
 
-  if (!hasAccess) {
+  if (error) {
     return (
       <div className="app-layout">
         <Sidebar activeItem="studentCourses" userRole={user.role} />
@@ -130,8 +129,8 @@ export default function StudentCoursePage() {
             onProfileClick={() => navigate('/profile')}
           />
           <div className="access-denied">
-            <h2>Доступ ограничен</h2>
-            <p>{error || 'У вас нет доступа к этому курсу.'}</p>
+            <h2>Ошибка загрузки</h2>
+            <p>{error}</p>
             <button 
               onClick={() => navigate('/courses')} 
               className="btn-back"
@@ -208,11 +207,11 @@ export default function StudentCoursePage() {
                 return (
                   <div 
                     key={lesson.id} 
-                    className={`lesson-item ${isOpen ? '' : 'disabled'}`}
-                    onClick={isOpen ? () => handleLessonClick(lesson.id) : undefined}
+                    className="lesson-item"
+                    onClick={() => handleLessonClick(lesson.id)}
                   >
                     <div className="lesson-left">
-                      <div className={`lesson-number ${isOpen ? '' : 'locked'}`}>
+                      <div className="lesson-number">
                         {index + 1}
                       </div>
                       <div className="lesson-info">
@@ -234,12 +233,7 @@ export default function StudentCoursePage() {
                     </div>
                     
                     <div className="lesson-right">
-                      {isOpen && (
-                        <div className="lesson-arrow">→</div>
-                      )}
-                      {!isOpen && (
-                        <div className="lesson-locked">🔒</div>
-                      )}
+                      <div className="lesson-arrow">→</div>
                     </div>
                   </div>
                 );

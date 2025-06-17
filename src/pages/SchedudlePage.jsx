@@ -12,7 +12,7 @@ import dayGridPlugin     from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
 import { useAuth }         from '../contexts/AuthContext';
-import { getUserSchedule } from '../services/scheduleService';
+import { getUserScheduleOptimized } from '../services/scheduleService';
 
 import '../styles/SchedulePage.css';
 
@@ -29,7 +29,7 @@ export default function SchedulePage() {
     (async () => {
       try {
         setLoading(true);
-        const schedule = await getUserSchedule(user);
+        const schedule = await getUserScheduleOptimized(user);
         console.log('[Schedule] Loaded events:', schedule);
         setEvents(schedule || []);
       } catch (error) {
@@ -43,8 +43,8 @@ export default function SchedulePage() {
 
   // ───── подготовка событий для FullCalendar ─────
   const calendarEvents = useMemo(() => events.map(e => {
-    const startDate = new Date(e.holding_date || e.start);
-    const endDate = new Date(startDate.getTime() + (90 * 60 * 1000)); // +90 минут
+    const startDate = new Date(e.start_datetime || e.start);
+    const endDate = new Date(e.end_datetime || e.end);
     
     // Определяем цвет в зависимости от статуса
     let backgroundColor = '#6c757d'; // серый по умолчанию
@@ -59,8 +59,8 @@ export default function SchedulePage() {
       start          : startDate.toISOString(),
       end            : endDate.toISOString(),
       title          : user.role === 'student'
-        ? e.lesson_name
-        : `${e.lesson_name} (${e.group_name || 'группа'})`,
+        ? `${e.lesson_name}${e.auditorium ? ` (${e.auditorium})` : ''}`
+        : `${e.lesson_name} (${e.group_name || 'группа'})${e.auditorium ? ` - ${e.auditorium}` : ''}`,
       backgroundColor: backgroundColor,
       borderColor    : 'transparent',
       textColor      : '#ffffff',
@@ -68,6 +68,7 @@ export default function SchedulePage() {
         course_name: e.course_name,
         group_name: e.group_name,
         teacher_name: e.teacher_name,
+        auditorium: e.auditorium,
         is_opened: e.is_opened,
         description: e.description
       }
@@ -79,7 +80,7 @@ export default function SchedulePage() {
     if (!events.length) return null;
     const todayMid = new Date().setHours(0,0,0,0);
     const days = Array.from(new Set(
-      events.map(e => new Date(e.holding_date || e.start).setHours(0,0,0,0))
+      events.map(e => new Date(e.start_datetime || e.start).setHours(0,0,0,0))
     )).filter(d => d >= todayMid).sort();
     
     return days.length ? new Date(days[0]) : null;
@@ -88,11 +89,11 @@ export default function SchedulePage() {
   const nearestDayEvents = useMemo(() => {
     if (!nearestDayISO) return [];
     return events.filter(ev => {
-      const eventDate = new Date(ev.holding_date || ev.start);
+      const eventDate = new Date(ev.start_datetime || ev.start);
       return eventDate.setHours(0,0,0,0) === nearestDayISO.getTime();
     }).sort((a, b) => {
-      const timeA = new Date(a.holding_date || a.start);
-      const timeB = new Date(b.holding_date || b.start);
+      const timeA = new Date(a.start_datetime || a.start);
+      const timeB = new Date(b.start_datetime || b.start);
       return timeA - timeB;
     });
   }, [events, nearestDayISO]);
@@ -261,23 +262,49 @@ export default function SchedulePage() {
                   <strong>Курс:</strong> 
                   <span>{selectedEvent.course_name}</span>
                 </div>
+                
+                {selectedEvent.group_name && selectedEvent.group_name !== 'Группа не найдена' && (
+                  <div className="info-item">
+                    <strong>Группа:</strong> 
+                    <span>👥 {selectedEvent.group_name}</span>
+                  </div>
+                )}
+                
+                {selectedEvent.teacher_name && selectedEvent.teacher_name !== 'Преподаватель не назначен' && (
+                  <div className="info-item">
+                    <strong>Преподаватель:</strong> 
+                    <span>👩‍🏫 {selectedEvent.teacher_name}</span>
+                  </div>
+                )}
+                
+                {selectedEvent.auditorium && (
+                  <div className="info-item">
+                    <strong>Аудитория:</strong> 
+                    <span>📍 {selectedEvent.auditorium}</span>
+                  </div>
+                )}
+                
                 <div className="info-item">
-                  <strong>Группа:</strong> 
-                  <span>{selectedEvent.group_name || '—'}</span>
-                </div>
-                <div className="info-item">
-                  <strong>Преподаватель:</strong> 
-                  <span>{selectedEvent.teacher_name || '—'}</span>
-                </div>
-                <div className="info-item">
-                  <strong>Дата и время:</strong>
+                  <strong>Время:</strong>
                   <span>
-                    {new Date(selectedEvent.holding_date || selectedEvent.start).toLocaleString('ru-RU',{
+                    {new Date(selectedEvent.start_datetime || selectedEvent.start).toLocaleString('ru-RU',{
                       day:'2-digit', month:'2-digit', year:'numeric',
+                      hour:'2-digit', minute:'2-digit'
+                    })}
+                    {' - '}
+                    {new Date(selectedEvent.end_datetime || selectedEvent.end).toLocaleTimeString('ru-RU',{
                       hour:'2-digit', minute:'2-digit'
                     })}
                   </span>
                 </div>
+                
+                {/* ДОБАВЛЕНО: Отладочная информация */}
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="info-item" style={{ fontSize: '10px', opacity: 0.7 }}>
+                    <strong>Debug:</strong>
+                    <span>Group ID: {selectedEvent.group_id}, Lesson ID: {selectedEvent.lesson_id}</span>
+                  </div>
+                )}
               </div>
 
               {selectedEvent.description && (

@@ -93,6 +93,10 @@ export default function ManageGroupPage() {
   const [tFil, setTFil] = useState('');
   const [cFil, setCFil] = useState('');
 
+  const [schedulingMode, setSchedulingMode] = useState(false);
+  const [courseLessons, setCourseLessons] = useState([]);
+  const [lessonSchedules, setLessonSchedules] = useState({});
+
   /* ─── initial groups load ────────*/
   useEffect(() => { 
     (async () => {
@@ -333,20 +337,85 @@ export default function ManageGroupPage() {
   const addCourse = async () => {
     if (!chosenC) return;
     try {
-      await attachCourseToGroup(chosenC, sel.id);   // backend создаёт lesson-groups
-      const fr = await refresh(sel.id);             // курсы придут от API
+      // Получаем уроки курса
+      const lessonsResponse = await api.get(`/courses/${chosenC}/lessons`);
+      const lessons = lessonsResponse.data.objects || [];
+      
+      if (lessons.length === 0) {
+        alert('У курса нет уроков – добавьте хотя бы один урок.');
+        return;
+      }
+
+      // Переходим в режим планирования расписания
+      setCourseLessons(lessons);
+      setLessonSchedules({});
+      setSchedulingMode(true);
+      
+    } catch(e) {
+      console.error('Error loading course lessons:', e);
+      alert('Не удалось загрузить уроки курса');
+    }
+  };
+
+  const confirmSchedule = async () => {
+    try {
+      // Проверяем, что все уроки имеют расписание
+      const scheduleEntries = Object.entries(lessonSchedules);
+      if (scheduleEntries.length !== courseLessons.length) {
+        alert('Установите время для всех уроков');
+        return;
+      }
+
+      // Формируем массив lesson-group объектов
+      const lessonGroups = scheduleEntries.map(([lessonId, schedule]) => ({
+        lesson_id: lessonId,
+        group_id: sel.id,
+        start_datetime: schedule.start_datetime,
+        end_datetime: schedule.end_datetime,
+        is_opened: false, // по умолчанию закрыто
+        auditorium: schedule.auditorium || ''
+      }));
+
+      // Создаем lesson-groups через bulk API
+      await api.post('/courses/lesson-groups', lessonGroups);
+      
+      // Обновляем группу
+      const fr = await refresh(sel.id);
       if (fr) {
         setSel(fr); 
         setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
       }
-      setChosenC(null); setAddCou(false); setCFil('');
-      alert('Курс успешно добавлен к группе');
-    } catch(e){
-      console.error('Error adding course:', e);
-      if(e.message==='NO_LESSONS')      alert('У курса нет уроков – добавьте хотя бы один.');
-      else if(e.response?.status===409) alert('Часть уроков уже привязана к группе');
-      else                              alert('Не удалось привязать курс');
+      
+      // Сбрасываем состояние
+      setSchedulingMode(false);
+      setCourseLessons([]);
+      setLessonSchedules({});
+      setChosenC(null);
+      setAddCou(false);
+      setCFil('');
+      
+      alert('Курс успешно добавлен к группе с расписанием');
+      
+    } catch(e) {
+      console.error('Error creating schedule:', e);
+      alert('Не удалось создать расписание');
     }
+  };
+
+  const cancelScheduling = () => {
+    setSchedulingMode(false);
+    setCourseLessons([]);
+    setLessonSchedules({});
+  };
+
+  const updateLessonSchedule = (lessonId, field, value) => {
+    setLessonSchedules(prev => ({
+      ...prev,
+      [lessonId]: {
+        ...prev[lessonId],
+        [field]: value
+      }
+    }));
   };
 
   /* ────────────── UI helpers ───────────────────*/
@@ -640,7 +709,7 @@ export default function ManageGroupPage() {
                     </div>
 
                     {/* выбор нового */}
-                    {addCou && (
+                    {addCou && !schedulingMode && (
                       <div style={{ border: '1px solid #e5e7eb', borderRadius: '6px', padding: '12px' }}>
                         <input placeholder="Поиск курсов..." value={cFil} onChange={e=>setCFil(e.target.value)}
                                style={{ width: '100%', marginBottom: '8px' }}/>
@@ -669,6 +738,94 @@ export default function ManageGroupPage() {
                                 style={{ width: '100%' }}>
                           Добавить курс
                         </button>
+                      </div>
+                    )}
+
+                    {/* Планирование расписания */}
+                    {schedulingMode && (
+                      <div style={{ border: '2px solid #007bff', borderRadius: '8px', padding: '16px', background: '#f8f9ff' }}>
+                        <h4 style={{ margin: '0 0 16px 0', color: '#007bff' }}>
+                          Планирование расписания для курса: {courses.find(c => c.id === chosenC)?.name}
+                        </h4>
+                        
+                        <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                          {courseLessons.map((lesson, index) => (
+                            <div key={lesson.id} style={{ 
+                              border: '1px solid #e5e7eb', 
+                              borderRadius: '6px', 
+                              padding: '12px', 
+                              marginBottom: '12px',
+                              background: 'white'
+                            }}>
+                              <h5 style={{ margin: '0 0 12px 0' }}>
+                                Урок {index + 1}: {lesson.name}
+                              </h5>
+                              
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                <div>
+                                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 'bold' }}>
+                                    Дата и время начала:
+                                  </label>
+                                  <input
+                                    type="datetime-local"
+                                    value={lessonSchedules[lesson.id]?.start_datetime || ''}
+                                    onChange={e => updateLessonSchedule(lesson.id, 'start_datetime', e.target.value)}
+                                    style={{ width: '100%', padding: '6px', border: '1px solid #ccc', borderRadius: '4px' }}
+                                    required
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 'bold' }}>
+                                    Дата и время окончания:
+                                  </label>
+                                  <input
+                                    type="datetime-local"
+                                    value={lessonSchedules[lesson.id]?.end_datetime || ''}
+                                    onChange={e => updateLessonSchedule(lesson.id, 'end_datetime', e.target.value)}
+                                    style={{ width: '100%', padding: '6px', border: '1px solid #ccc', borderRadius: '4px' }}
+                                    required
+                                  />
+                                </div>
+                              </div>
+                              
+                              <div style={{ marginTop: '12px' }}>
+                                <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 'bold' }}>
+                                  Аудитория (необязательно):
+                                </label>
+                                <input
+                                  type="text"
+                                  value={lessonSchedules[lesson.id]?.auditorium || ''}
+                                  onChange={e => updateLessonSchedule(lesson.id, 'auditorium', e.target.value)}
+                                  placeholder="Например: 101, Онлайн, Zoom"
+                                  style={{ width: '100%', padding: '6px', border: '1px solid #ccc', borderRadius: '4px' }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                          <button 
+                            className="btn-primary" 
+                            onClick={confirmSchedule}
+                            disabled={Object.keys(lessonSchedules).length !== courseLessons.length}
+                            style={{ flex: 1 }}
+                          >
+                            Подтвердить расписание
+                          </button>
+                          <button 
+                            className="btn-secondary" 
+                            onClick={cancelScheduling}
+                            style={{ flex: 1, background: '#6c757d', color: 'white', border: 'none' }}
+                          >
+                            Отмена
+                          </button>
+                        </div>
+                        
+                        <div style={{ marginTop: '8px', fontSize: '12px', color: '#6b7280' }}>
+                          Установлено расписание для {Object.keys(lessonSchedules).length} из {courseLessons.length} уроков
+                        </div>
                       </div>
                     )}
                   </div>

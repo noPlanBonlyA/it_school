@@ -9,7 +9,7 @@ import NewsModal from '../components/NewsModal';
 
 import { useAuth }          from '../contexts/AuthContext';
 import userService          from '../services/userService';
-import { getUserSchedule }  from '../services/scheduleService';
+import { getUserScheduleOptimized } from '../services/scheduleService';
 import { createNotificationForStudent } from '../services/notificationService';
 import { findStudentByUser, debugAllStudents } from '../services/studentService';
 
@@ -45,7 +45,7 @@ export default function HomePage() {
     if (!user) return;
     (async () => {
       try {
-        setEv(await getUserSchedule(user));
+        setEv(await getUserScheduleOptimized(user));
       } catch {
         console.error('schedule fetch error');
       }
@@ -251,24 +251,91 @@ export default function HomePage() {
         {selEvent && (
           <aside className="event-details">
             <button className="close-btn" onClick={() => setSel(null)}>×</button>
-            <h2>{selEvent.lesson_name}</h2>
-            <p><strong>Курс:</strong> {selEvent.course_name}</p>
-            <p><strong>Группа:</strong> {selEvent.group_name}</p>
-            <p><strong>Преподаватель:</strong> {selEvent.teacher_name}</p>
-            <p>
-              <strong>Время:</strong><br/>
-              {new Date(selEvent.start).toLocaleTimeString('ru-RU', {
-                hour:'2-digit', minute:'2-digit'
-              })} –{' '}
-              {new Date(selEvent.end).toLocaleTimeString('ru-RU', {
-                hour:'2-digit', minute:'2-digit'
-              })}
-            </p>
+            
+            <div className="event-header">
+              <h2>{selEvent.lesson_name}</h2>
+              <div className={`status-badge ${selEvent.is_opened ? 'opened' : 'closed'}`}>
+                {selEvent.is_opened ? '🟢 Открыт' : '🔴 Закрыт'}
+              </div>
+            </div>
+
+            <div className="event-info">
+              <div className="info-item">
+                <strong>Курс:</strong> 
+                <span>{selEvent.course_name}</span>
+              </div>
+              
+              {selEvent.group_name && (
+                <div className="info-item">
+                  <strong>Группа:</strong> 
+                  <span>👥 {selEvent.group_name}</span>
+                </div>
+              )}
+              
+              {selEvent.teacher_name && (
+                <div className="info-item">
+                  <strong>Преподаватель:</strong> 
+                  <span>👩‍🏫 {selEvent.teacher_name}</span>
+                </div>
+              )}
+              
+              {selEvent.auditorium && (
+                <div className="info-item">
+                  <strong>Аудитория:</strong> 
+                  <span>📍 {selEvent.auditorium}</span>
+                </div>
+              )}
+              
+              <div className="info-item">
+                <strong>Время:</strong>
+                <span>
+                  {new Date(selEvent.start_datetime || selEvent.start).toLocaleString('ru-RU',{
+                    day:'2-digit', month:'2-digit', year:'numeric',
+                    hour:'2-digit', minute:'2-digit'
+                  })}
+                  {' - '}
+                  {new Date(selEvent.end_datetime || selEvent.end).toLocaleTimeString('ru-RU',{
+                    hour:'2-digit', minute:'2-digit'
+                  })}
+                </span>
+              </div>
+              
+              <div className="info-item">
+                <strong>Продолжительность:</strong>
+                <span>
+                  {(() => {
+                    const start = new Date(selEvent.start_datetime || selEvent.start);
+                    const end = new Date(selEvent.end_datetime || selEvent.end);
+                    const diffMinutes = Math.round((end - start) / (1000 * 60));
+                    return `${diffMinutes} минут`;
+                  })()}
+                </span>
+              </div>
+            </div>
+
             {selEvent.description && (
-              <>
+              <div className="event-description">
                 <strong>Описание:</strong>
                 <p>{selEvent.description}</p>
-              </>
+              </div>
+            )}
+
+            {selEvent.is_opened && fullUser.role === 'student' && (
+              <div className="event-actions">
+                <button 
+                  className="btn-primary"
+                  onClick={() => {
+                    // ИСПРАВЛЕНО: правильная навигация к уроку
+                    if (selEvent.lesson_id && selEvent.course_id) {
+                      navigate(`/courses/${selEvent.course_id}/lessons/${selEvent.lesson_id}`);
+                    } else {
+                      alert('Информация об уроке недоступна');
+                    }
+                  }}
+                >
+                  Перейти к уроку
+                </button>
+              </div>
             )}
           </aside>
         )}

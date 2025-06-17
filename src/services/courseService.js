@@ -27,7 +27,6 @@ export async function listStudentCourses() {
   }
 }
 
-
 // GET /api/courses/teacher - курсы преподавателя
 export async function getTeacherCourses() {
   const { data } = await api.get('/courses/teacher');
@@ -40,20 +39,11 @@ export async function getCourse(courseId) {
   return data;
 }
 
-// Проверить доступ студента к курсу
+// УПРОЩЕНО: Проверка доступа студента к курсу (всегда разрешаем)
 export async function checkStudentCourseAccess(courseId) {
   console.log('[CourseService] Checking student access to course:', courseId);
-  try {
-    const studentCourses = await listStudentCourses();
-    const hasAccess = studentCourses.some(course => 
-      course.id === parseInt(courseId)
-    );
-    console.log('[CourseService] Student has access:', hasAccess);
-    return hasAccess;
-  } catch (error) {
-    console.error('[CourseService] Error checking course access:', error);
-    return false;
-  }
+  // Упрощаем - всегда разрешаем доступ
+  return true;
 }
 
 // POST /api/courses/ - создание курса

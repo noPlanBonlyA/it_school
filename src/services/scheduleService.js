@@ -1,128 +1,268 @@
 /*  src/services/scheduleService.js  */
 import api from '../api/axiosInstance';
 
-/*───────────────────────────────────────────────────────────────────────────
-  Утилита: превращаем holding_date в корректный ISO-стринг
-  (бэкенд присылает 6-значные микросекунды: «…23.296000»)
-───────────────────────────────────────────────────────────────────────────*/
-function fixIso(dateStr) {
-  // «2025-06-16T00:04:23.296000» → «2025-06-16T00:04:23.296Z»
-  const [whole, micros = '000000'] = dateStr.split('.');
-  return `${whole}.${micros.slice(0, 3)}Z`;            // → миллисекунды + ‘Z’
-}
+/**
+ * Получение расписания пользователя
+ */
+export const getUserSchedule = async (user) => {
+  try {
+    if (!user || !user.role) {
+      throw new Error('Пользователь не определен');
+    }
 
-/*────────────────── константы ──────────────────*/
-const LESSON_MIN = 60;                                 // длительность пары
-const ALL_FROM   = '1900-01-01T00:00:00';
-const ALL_TO     = '2100-01-01T00:00:00';
+    console.log('[ScheduleService] Getting schedule for user:', user.role, user.id);
 
-/*────────────────── кэш групп ──────────────────*/
-const groupCache = new Map();               // groupId → { name, teacher }
+    // Получаем базовое расписание
+    const response = await api.get('/schedule/');
+    const scheduleData = response.data || [];
+    
+    console.log('[ScheduleService] Raw schedule data:', scheduleData);
 
-async function getGroupBrief(groupId) {
-  if (groupCache.has(groupId)) return groupCache.get(groupId);
+    // Дополняем данные информацией о группах и преподавателях
+    const enhancedSchedule = await Promise.all(scheduleData.map(async (item) => {
+      try {
+        // Получаем информацию о группе
+        let groupInfo = null;
+        let teacherInfo = null;
+        
+        if (item.group_id) {
+          try {
+            const groupResponse = await api.get(`/groups/${item.group_id}`);
+            groupInfo = groupResponse.data;
+            
+            // Получаем информацию о преподавателе из группы
+            if (groupInfo.teacher) {
+              teacherInfo = groupInfo.teacher;
+            }
+          } catch (groupError) {
+            console.warn('[ScheduleService] Could not load group info:', groupError);
+          }
+        }
 
-  const { data } = await api.get(`/groups/${groupId}`);
-  const brief = {
-    name: data.name,
-    teacher: data.teacher
-      ? `${data.teacher.user.first_name} ${data.teacher.user.surname}`
-      : '—'
-  };
-  groupCache.set(groupId, brief);
-  return brief;
-}
-
-/*────────────────── нормализация L-G → событие ──────────────────*/
-async function normalize(rows) {
-  /* 1. базовая конвертация */
-  const base = rows.map(r => {
-    const start = new Date(fixIso(r.holding_date));
-    const end   = new Date(start.getTime() + LESSON_MIN * 60_000);
-
-    return {
-      /* ids */
-      id          : r.id,
-      lesson_id   : r.lesson_id,
-      group_id    : r.group_id,
-
-      /* даты для FullCalendar */
-      start       : start.toISOString(),
-      end         : end.toISOString(),
-
-      /* UI-поля (могут быть пустыми – дополним ниже) */
-      is_opened   : r.is_opened,
-      lesson_name : r.lesson_name,
-      course_name : r.course_name,
-      group_name  : r.group_name  || null,
-      teacher_name: r.teacher_name|| null,
-      description : r.description || ''
-    };
-  });
-
-  /* 2. выясняем, какие группы надо добрать */
-  const missingGrpIds = Array.from(
-    new Set(
-      base.filter(e => !e.group_name || !e.teacher_name)
-          .map(e => e.group_id)
-    )
-  );
-
-  await Promise.all(missingGrpIds.map(getGroupBrief));   // параллельно подтягиваем
-
-  /* 3. дополняем отсутствующие поля */
-  return base.map(e => {
-    if (e.group_name && e.teacher_name) return e;
-    const brief = groupCache.get(e.group_id) || {};
-    return {
-      ...e,
-      group_name  : e.group_name   || brief.name     || '—',
-      teacher_name: e.teacher_name || brief.teacher || '—'
-    };
-  });
-}
-
-/*────────────────── CRUD lesson-groups ──────────────────*/
-export async function saveLessonGroup(body, id = null) {
-  const { data } = id
-    ? await api.put(`/courses/lesson-group/${id}`, body)
-    : await api.post('/courses/lesson-group', body);
-  return data;
-}
-
-export async function deleteLessonGroup(id) {
-  await api.delete(`/courses/lesson-group/${id}`);
-}
-
-/*────────────────── получение расписания ──────────────────*/
-export async function getGroupLessonGroups(
-  groupId,
-  from = ALL_FROM,
-  to   = ALL_TO
-) {
-  const { data } = await api.get('/schedule/lessons', {
-    params: { date_start: from, date_end: to }
-  });
-  const filtered = data.filter(r => r.group_id === groupId);
-  return await normalize(filtered);
-}
-
-export async function getUserSchedule(user) {
-  let data;
-
-  /* админ → всё расписание */
-  if (user.role === 'admin' || user.role === 'superadmin') {
-    ({ data } = await api.get('/schedule/'));
-  } else {
-    /* студент / преподаватель → фильтр по себе */
-    const params = user.role === 'student'
-      ? { student_id: user.id }
-      : { teacher_id: user.id };
-
-    ({ data } = await api.get('/schedule/lessons', {
-      params: { date_start: ALL_FROM, date_end: ALL_TO, ...params }
+        return {
+          id: item.id,
+          lesson_id: item.lesson_id,
+          lesson_name: item.lesson_name,
+          course_name: item.course_name,
+          group_id: item.group_id,
+          group_name: groupInfo?.name || 'Группа не найдена',
+          teacher_name: teacherInfo ? 
+            `${teacherInfo.user.first_name || ''} ${teacherInfo.user.surname || ''}`.trim() || 
+            teacherInfo.user.username : 
+            'Преподаватель не назначен',
+          start_datetime: item.start_datetime,
+          end_datetime: item.end_datetime,
+          auditorium: item.auditorium || '',
+          is_opened: item.is_opened,
+          description: item.description || '',
+          // Для обратной совместимости
+          holding_date: item.start_datetime,
+          start: item.start_datetime,
+          end: item.end_datetime
+        };
+      } catch (error) {
+        console.error('[ScheduleService] Error enhancing schedule item:', error);
+        // Возвращаем базовые данные если не удалось получить дополнительную информацию
+        return {
+          id: item.id,
+          lesson_id: item.lesson_id,
+          lesson_name: item.lesson_name,
+          course_name: item.course_name,
+          group_id: item.group_id,
+          group_name: 'Группа не найдена',
+          teacher_name: 'Преподаватель не назначен',
+          start_datetime: item.start_datetime,
+          end_datetime: item.end_datetime,
+          auditorium: item.auditorium || '',
+          is_opened: item.is_opened,
+          description: item.description || '',
+          holding_date: item.start_datetime,
+          start: item.start_datetime,
+          end: item.end_datetime
+        };
+      }
     }));
-  }
 
-  return await normalize(data);
-}
+    console.log('[ScheduleService] Enhanced schedule:', enhancedSchedule);
+    return enhancedSchedule;
+
+  } catch (error) {
+    console.error('Ошибка получения расписания:', error);
+    throw error;
+  }
+};
+
+/**
+ * Получение расписания за период
+ */
+export const getScheduleByDateRange = async (startDate, endDate) => {
+  try {
+    const response = await api.get('/schedule/lessons', {
+      params: {
+        datetime_start: startDate,
+        datetime_end: endDate
+      }
+    });
+    
+    const scheduleData = response.data || [];
+    
+    // Дополняем данные информацией о группах и преподавателях
+    const enhancedSchedule = await Promise.all(scheduleData.map(async (item) => {
+      try {
+        let groupInfo = null;
+        let teacherInfo = null;
+        
+        if (item.group_id) {
+          try {
+            const groupResponse = await api.get(`/groups/${item.group_id}`);
+            groupInfo = groupResponse.data;
+            
+            if (groupInfo.teacher) {
+              teacherInfo = groupInfo.teacher;
+            }
+          } catch (groupError) {
+            console.warn('[ScheduleService] Could not load group info:', groupError);
+          }
+        }
+
+        return {
+          id: item.id,
+          lesson_id: item.lesson_id,
+          lesson_name: item.lesson_name,
+          course_name: item.course_name,
+          group_id: item.group_id,
+          group_name: groupInfo?.name || 'Группа не найдена',
+          teacher_name: teacherInfo ? 
+            `${teacherInfo.user.first_name || ''} ${teacherInfo.user.surname || ''}`.trim() || 
+            teacherInfo.user.username : 
+            'Преподаватель не назначен',
+          start_datetime: item.start_datetime,
+          end_datetime: item.end_datetime,
+          auditorium: item.auditorium || '',
+          is_opened: item.is_opened,
+          description: item.description || '',
+          holding_date: item.start_datetime,
+          start: item.start_datetime,
+          end: item.end_datetime
+        };
+      } catch (error) {
+        console.error('[ScheduleService] Error enhancing schedule item:', error);
+        return {
+          id: item.id,
+          lesson_id: item.lesson_id,
+          lesson_name: item.lesson_name,
+          course_name: item.course_name,
+          group_id: item.group_id,
+          group_name: 'Группа не найдена',
+          teacher_name: 'Преподаватель не назначен',
+          start_datetime: item.start_datetime,
+          end_datetime: item.end_datetime,
+          auditorium: item.auditorium || '',
+          is_opened: item.is_opened,
+          description: item.description || '',
+          holding_date: item.start_datetime,
+          start: item.start_datetime,
+          end: item.end_datetime
+        };
+      }
+    }));
+
+    return enhancedSchedule;
+    
+  } catch (error) {
+    console.error('Ошибка получения расписания по датам:', error);
+    throw error;
+  }
+};
+
+/**
+ * Кэширование для оптимизации запросов к группам
+ */
+const groupCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 минут
+
+const getCachedGroup = async (groupId) => {
+  const now = Date.now();
+  const cached = groupCache.get(groupId);
+  
+  if (cached && (now - cached.timestamp) < CACHE_TTL) {
+    return cached.data;
+  }
+  
+  try {
+    const response = await api.get(`/groups/${groupId}`);
+    groupCache.set(groupId, {
+      data: response.data,
+      timestamp: now
+    });
+    return response.data;
+  } catch (error) {
+    console.warn(`[ScheduleService] Could not load group ${groupId}:`, error);
+    return null;
+  }
+};
+
+/**
+ * Оптимизированная версия получения расписания с кэшированием
+ */
+export const getUserScheduleOptimized = async (user) => {
+  try {
+    if (!user || !user.role) {
+      throw new Error('Пользователь не определен');
+    }
+
+    console.log('[ScheduleService] Getting optimized schedule for user:', user.role, user.id);
+
+    const response = await api.get('/schedule/');
+    const scheduleData = response.data || [];
+    
+    // Получаем уникальные ID групп
+    const uniqueGroupIds = [...new Set(scheduleData.map(item => item.group_id).filter(Boolean))];
+    
+    // Загружаем все группы параллельно
+    const groupsPromises = uniqueGroupIds.map(groupId => getCachedGroup(groupId));
+    const groups = await Promise.all(groupsPromises);
+    
+    // Создаем мапу групп для быстрого доступа
+    const groupsMap = new Map();
+    uniqueGroupIds.forEach((groupId, index) => {
+      if (groups[index]) {
+        groupsMap.set(groupId, groups[index]);
+      }
+    });
+
+    // Обогащаем данные расписания
+    const enhancedSchedule = scheduleData.map(item => {
+      const groupInfo = groupsMap.get(item.group_id);
+      const teacherInfo = groupInfo?.teacher;
+
+      return {
+        id: item.id,
+        lesson_id: item.lesson_id,
+        lesson_name: item.lesson_name,
+        course_name: item.course_name,
+        group_id: item.group_id,
+        group_name: groupInfo?.name || 'Группа не найдена',
+        teacher_name: teacherInfo ? 
+          `${teacherInfo.user.first_name || ''} ${teacherInfo.user.surname || ''}`.trim() || 
+          teacherInfo.user.username : 
+          'Преподаватель не назначен',
+        start_datetime: item.start_datetime,
+        end_datetime: item.end_datetime,
+        auditorium: item.auditorium || '',
+        is_opened: item.is_opened,
+        description: item.description || '',
+        holding_date: item.start_datetime,
+        start: item.start_datetime,
+        end: item.end_datetime
+      };
+    });
+
+    console.log('[ScheduleService] Optimized enhanced schedule:', enhancedSchedule);
+    return enhancedSchedule;
+
+  } catch (error) {
+    console.error('Ошибка получения оптимизированного расписания:', error);
+    throw error;
+  }
+};
