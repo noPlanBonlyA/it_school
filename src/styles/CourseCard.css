@@ -1,42 +1,207 @@
+/* Стили для грида курсов */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 8px;
+}
+
+.section-label {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.course-count {
+  background-color: #e5e7eb;
+  color: #4b5563;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 /* Карточка курса */
 .course-card {
-    width: 16rem;                    /* 256 px (как w-64)   */
-    background: #ffffff;
-    border-radius: 1rem;             /* rounded-2xl         */
-    box-shadow: 0 1px 2px rgba(0,0,0,.05),
-                0 4px 6px rgba(0,0,0,.05);
-    padding: 0.5rem;                 /* p-2                 */
-    cursor: pointer;
-    transition: box-shadow .15s ease, transform .15s ease;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,.05),
+              0 4px 6px rgba(0,0,0,.05);
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: box-shadow .15s ease, transform .15s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.course-card:hover {
+  box-shadow: 0 6px 12px rgba(0,0,0,.1);
+  transform: translateY(-4px);
+}
+
+/* Обложка */
+.course-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 0.75rem;
+}
+
+.course-placeholder {
+  width: 100%;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border-radius: 0.75rem;
+}
+
+.course-placeholder span {
+  font-size: 48px;
+}
+
+/* Текст под обложкой */
+.course-card .meta {
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.course-card .meta h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.course-card .meta p {
+  margin: 0.3rem 0 0.8rem;
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.course-info-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.course-info-footer .author,
+.course-info-footer .age {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.course-info-footer .author {
+  max-width: 60%;
+}
+
+.course-info-footer .age {
+  max-width: 40%;
+}
+
+/* Пустое состояние */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.empty-state h3 {
+  margin: 10px 0;
+  color: #374151;
+}
+
+.empty-state p {
+  color: #6b7280;
+  margin-bottom: 0;
+}
+
+/* Информационная секция */
+.info-section {
+  margin-top: 40px;
+}
+
+.info-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.info-card h3 {
+  margin-top: 0;
+  color: #1f2937;
+  margin-bottom: 16px;
+}
+
+.info-card ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.info-card li {
+  margin-bottom: 8px;
+  color: #4b5563;
+}
+
+.info-card p {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  color: #4b5563;
+}
+
+/* Дополнительные стили */
+.courses-page h1 {
+  margin-bottom: 24px;
+  color: #1f2937;
+}
+
+.courses-section {
+  margin-bottom: 40px;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .courses-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
   }
-  
-  .course-card:hover {
-    box-shadow: 0 6px 12px rgba(0,0,0,.12);
-    transform: translateY(-2px);
-  }
-  
-  /* Обложка */
-  .course-card img {
-    width: 100%;
-    height: 9rem;                    /* 144 px = h-36        */
-    object-fit: cover;
-    border-radius: 0.75rem;          /* rounded-xl          */
-  }
-  
-  /* Текст под обложкой */
-  .course-card .meta {
-    margin-top: 0.5rem;              /* mt-2                */
-  }
-  
-  .course-card .meta h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
-  
-  .course-card .meta p {
-    margin: 0.2rem 0;
-    font-size: 0.9rem;
-    color: #555;
-  }
-  
+}

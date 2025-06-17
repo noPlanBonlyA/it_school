@@ -78,13 +78,33 @@
   align-items: center;
   margin-bottom: 8px;
 }
-.forgot-link {
-  font-size: 16px;
-  color: #646464;
+
+.password-header label {
+  margin: 0;
+  font-weight: 500;
+  color: #374151;
+}
+
+.forgot-password-link {
   background: none;
   border: none;
+  color: #6366f1;
+  font-size: 14px;
   cursor: pointer;
+  text-decoration: none;
   padding: 0;
+  transition: color 0.2s ease;
+}
+
+.forgot-password-link:hover {
+  color: #4f46e5;
+  text-decoration: underline;
+}
+
+.forgot-password-link:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* Пароль: обёртка + глазок */

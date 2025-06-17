@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate }  from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Sidebar   from '../components/Sidebar';
 import Topbar    from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
 
 import { listStudentCourses } from '../services/courseService';
-import '../styles/CoursesPage.css';
+import '../styles/CourseCard.css';
 
 export default function StudentCoursesPage() {
   const navigate      = useNavigate();
@@ -14,17 +14,19 @@ export default function StudentCoursesPage() {
 
   const [myCourses,   setMyCourses]   = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   /* ───── загрузка курсов из групп пользователя ───── */
   useEffect(() => { (async () => {
     try {
       setLoading(true);
       // Используем API /courses/student - возвращает только курсы из групп пользователя
-      const studentCourses = await listStudentCourses();
-      console.log('[StudentCourses] Available courses:', studentCourses);
-      setMyCourses(studentCourses);
-    } catch (e) {
-      console.error('Ошибка загрузки курсов:', e);
+      const courses = await listStudentCourses();
+      console.log('[StudentCoursesPage] Loaded courses:', courses);
+      setMyCourses(courses || []);
+    } catch (err) {
+      console.error('[StudentCoursesPage] Error loading courses:', err);
+      setError('Не удалось загрузить ваши курсы. Пожалуйста, попробуйте позже.');
     } finally {
       setLoading(false);
     }
@@ -38,37 +40,33 @@ export default function StudentCoursesPage() {
   const fullName = [user.first_name, user.surname, user.patronymic]
                     .filter(Boolean).join(' ');
 
-  const renderCard = (c) => {
-    let img = '';
-    if (c.photo?.url) {
-      img = c.photo.url.startsWith('http')
-        ? c.photo.url
-        : `${window.location.protocol}//${window.location.hostname}:8080${c.photo.url}`;
+  const renderCourseCard = (course) => {
+    let imageUrl = '';
+    if (course.photo?.url) {
+      imageUrl = course.photo.url.startsWith('http')
+        ? course.photo.url
+        : `${window.location.protocol}//${window.location.hostname}:8080${course.photo.url}`;
     }
 
     return (
-      <div className="course-card available" key={c.id}>
-        <div className="course-image-wrapper">
-          {img ? (
-            <img src={img} alt={c.name} className="course-image" />
-          ) : (
-            <div className="course-image placeholder" />
-          )}
-        </div>
-
-        <div className="course-body">
-          <h2 className="course-title">{c.name}</h2>
-          <p className="course-description">{c.description}</p>
-          <div className="course-meta">
-            <span className="course-author">Автор: {c.author_name}</span>
-            <span className="course-price">₽{c.price}</span>
+      <div 
+        key={course.id} 
+        className="course-card" 
+        onClick={() => openCourse(course.id)}
+      >
+        {imageUrl ? (
+          <img src={imageUrl} alt={course.name} />
+        ) : (
+          <div className="course-placeholder">
+            <span>📚</span>
           </div>
-
-          <div className="course-status-container">
-            <span className="course-available-label">✅ Доступен</span>
-            <button className="course-button available" onClick={() => openCourse(c.id)}>
-              Открыть курс
-            </button>
+        )}
+        <div className="meta">
+          <h3>{course.name}</h3>
+          <p>{course.description?.substring(0, 60)}...</p>
+          <div className="course-info-footer">
+            {course.author_name && <span className="author">👩‍🏫 {course.author_name}</span>}
+            {course.age_category && <span className="age">👥 {course.age_category}</span>}
           </div>
         </div>
       </div>
@@ -86,7 +84,7 @@ export default function StudentCoursesPage() {
             onProfileClick={() => navigate('/profile')}
           />
           <div className="loading-container">
-            <div className="loading-spinner"></div>
+            <div className="loader"></div>
             <p>Загрузка курсов...</p>
           </div>
         </div>
@@ -103,13 +101,17 @@ export default function StudentCoursesPage() {
         <Topbar
           userName={fullName}
           userRole={user.role}
-          onBellClick={() => {}}
           onProfileClick={() => navigate('/profile')}
         />
 
         <h1>Мои курсы</h1>
 
-        {/* доступные курсы */}
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+
         <section className="courses-section">
           <div className="section-header">
             <h2 className="section-label">Доступные курсы</h2>
@@ -117,7 +119,7 @@ export default function StudentCoursesPage() {
           </div>
           {myCourses.length ? (
             <div className="courses-grid">
-              {myCourses.map(c => renderCard(c))}
+              {myCourses.map(course => renderCourseCard(course))}
             </div>
           ) : (
             <div className="empty-state">
@@ -128,7 +130,6 @@ export default function StudentCoursesPage() {
           )}
         </section>
 
-        {/* информационный блок */}
         <section className="info-section">
           <div className="info-card">
             <h3>Как получить доступ к курсам?</h3>

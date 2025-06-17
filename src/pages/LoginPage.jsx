@@ -42,6 +42,11 @@ export default function LoginPage() {
     }
   };
 
+  const handleForgotPassword = () => {
+    // Переход на страницу восстановления пароля
+    navigate('/forgot-password');
+  };
+
   return (
     <div className="login-container">
       <div className="login-background" />
@@ -56,12 +61,12 @@ export default function LoginPage() {
         <form className="login-form" onSubmit={handleSubmit}>
 
           <div className="input-group">
-            <label htmlFor="login-username">Логин</label>
+            <label htmlFor="login-username">Введите логин</label>
             <input
               id="login-username"
               type="text"
               className="input-control"
-              placeholder="ivan_ivanov"
+              placeholder="ivan_ivanov@gmail.com"
               value={username}
               onChange={e => setUsername(e.target.value)}
               required
@@ -71,6 +76,13 @@ export default function LoginPage() {
           <div className="input-group">
             <div className="password-header">
               <label htmlFor="login-password">Пароль</label>
+              <button 
+                type="button" 
+                className="forgot-password-link"
+                onClick={handleForgotPassword}
+              >
+                Забыли пароль?
+              </button>
             </div>
             <div className="password-wrapper">
               <input

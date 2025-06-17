@@ -27,6 +27,7 @@ export async function listStudentCourses() {
   }
 }
 
+
 // GET /api/courses/teacher - курсы преподавателя
 export async function getTeacherCourses() {
   const { data } = await api.get('/courses/teacher');
@@ -93,6 +94,22 @@ export async function getCourseLessons(courseId, limit = 100, offset = 0) {
     params: { limit, offset } 
   });
   return data.objects || [];
+}
+
+/**
+ * Получить материалы урока для студента
+ */
+export async function getStudentLessonMaterials(courseId, lessonId) {
+  console.log('[CourseService] Getting student lesson materials:', { courseId, lessonId });
+  
+  try {
+    const response = await api.get(`/courses/${courseId}/lessons/${lessonId}/student-materials`);
+    console.log('[CourseService] Student lesson materials loaded:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[CourseService] Error loading student lesson materials:', error.response?.data || error.message);
+    throw error;
+  }
 }
 
 // Псевдонимы для совместимости

@@ -1,0 +1,215 @@
+/* Стили для страницы урока */
+.lesson-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 20px;
+}
+
+.lesson-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.lesson-content {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.lesson-info, .lesson-materials, .homework-submission {
+  margin-bottom: 32px;
+}
+
+.lesson-info h2, .lesson-materials h2, .homework-submission h2 {
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e5e7eb;
+  color: #1f2937;
+}
+
+.materials-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.material-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.material-item:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.material-icon {
+  font-size: 28px;
+  margin-right: 16px;
+}
+
+.material-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+}
+
+.material-info a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.material-info a:hover {
+  text-decoration: underline;
+}
+
+/* Homework submission styles */
+.hw-submitted {
+  text-align: center;
+  padding: 24px;
+  background-color: #f0fdf4;
+  border-radius: 8px;
+  border: 1px solid #86efac;
+}
+
+.submitted-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.hw-submitted h3 {
+  margin: 0 0 8px 0;
+  color: #16a34a;
+}
+
+.hw-submitted p {
+  color: #4b5563;
+  margin: 0;
+}
+
+.hw-form {
+  padding: 0;
+}
+
+.submission-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.submission-option h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+}
+
+.text-homework {
+  width: 100%;
+  height: 150px;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  resize: vertical;
+}
+
+.file-upload {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.file-upload input[type="file"] {
+  position: absolute;
+  left: -9999px;
+}
+
+.file-upload label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-upload label:hover {
+  background-color: #e5e7eb;
+}
+
+.file-upload label.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.btn-primary:disabled {
+  background-color: #93c5fd;
+  cursor: not-allowed;
+}
+
+/* Error and loading containers */
+.error-container {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.error-container h2 {
+  color: #dc2626;
+  margin-bottom: 16px;
+}
+
+.error-container p {
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+}
+
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

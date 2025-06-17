@@ -75,3 +75,68 @@ export async function findTeacherByUser(user_id) {
     return null;
   }
 }
+
+/**
+ * Найти студента по user_id
+ */
+export async function findStudentByUser(userId) {
+  console.log('[StudentService] Finding student by user ID:', userId);
+  
+  try {
+    // ИСПРАВЛЕНО: Для студентов используем /students/me вместо общего списка
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    if (currentUser?.role === 'student' && currentUser?.id === userId) {
+      console.log('[StudentService] Using /students/me for current student');
+      const { data } = await api.get('/students/me');
+      console.log('[StudentService] Current student found:', data);
+      return data;
+    }
+    
+    // Для администраторов и преподавателей - поиск в общем списке
+    const { data } = await api.get('/students/', { 
+      params: { limit: 100, offset: 0 } 
+    });
+    
+    const student = data.objects?.find(s => s.user_id === userId);
+    console.log('[StudentService] Student found in list:', student);
+    return student || null;
+    
+  } catch (error) {
+    console.error('[StudentService] Error finding student:', {
+      userId,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    
+    // Если это 403 ошибка и текущий пользователь - студент, пробуем /students/me
+    if (error.response?.status === 403) {
+      try {
+        console.log('[StudentService] Trying /students/me as fallback...');
+        const { data } = await api.get('/students/me');
+        console.log('[StudentService] Fallback successful:', data);
+        return data;
+      } catch (fallbackError) {
+        console.error('[StudentService] Fallback also failed:', fallbackError);
+        return null;
+      }
+    }
+    
+    return null;
+  }
+}
+
+/**
+ * Получить информацию о текущем студенте
+ */
+export async function getCurrentStudent() {
+  console.log('[StudentService] Getting current student info...');
+  try {
+    const { data } = await api.get('/students/me');
+    console.log('[StudentService] Current student:', data);
+    return data;
+  } catch (error) {
+    console.error('[StudentService] Error getting current student:', error);
+    throw error;
+  }
+}
