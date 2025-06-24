@@ -22,11 +22,13 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [fullUser,  setFull]     = useState(null);
-  const [events,    setEv]       = useState([]);
-  const [selEvent,  setSel]      = useState(null);
-  const [news,      setNews]     = useState([]);
-  const [modalItem, setModalItem]= useState(null);
+  const [fullUser,     setFull]        = useState(null);
+  const [studentData,  setStudentData] = useState(null);
+  const [events,       setEv]          = useState([]);
+  const [selEvent,     setSel]         = useState(null);
+  const [news,         setNews]        = useState([]);
+  const [modalItem,    setModalItem]   = useState(null);
+  const [coinsLoading, setCoinsLoading] = useState(true);
 
   // Загрузка профиля
   useEffect(() => {
@@ -38,6 +40,44 @@ export default function HomePage() {
       .then(setFull)
       .catch(() => navigate('/login', { replace: true }));
   }, [user, navigate]);
+
+  // Загрузка данных студента с монетами
+  useEffect(() => {
+    if (!user || user.role !== 'student') {
+      setCoinsLoading(false);
+      return;
+    }
+
+    const loadStudentData = async () => {
+      try {
+        setCoinsLoading(true);
+        console.log('[HomePage] Loading student data for coins...');
+        
+        // Используем эндпоинт /students/me для получения данных с монетами
+        const response = await api.get('/students/me');
+        console.log('[HomePage] Student data response:', response.data);
+        
+        setStudentData(response.data);
+      } catch (error) {
+        console.error('[HomePage] Error loading student data:', error);
+        
+        // Fallback: пробуем найти студента через findStudentByUser
+        try {
+          const fallbackData = await findStudentByUser(user.id);
+          console.log('[HomePage] Fallback student data:', fallbackData);
+          setStudentData(fallbackData);
+        } catch (fallbackError) {
+          console.error('[HomePage] Fallback also failed:', fallbackError);
+          // Устанавливаем данные по умолчанию
+          setStudentData({ points: 0 });
+        }
+      } finally {
+        setCoinsLoading(false);
+      }
+    };
+
+    loadStudentData();
+  }, [user]);
 
   // Загрузка расписания
   useEffect(() => {
@@ -93,6 +133,16 @@ export default function HomePage() {
     };
   }, [events]);
 
+  // Получаем количество монет в зависимости от роли
+  const getCoinsAmount = () => {
+    if (user?.role === 'student') {
+      if (coinsLoading) return '...';
+      return studentData?.points ?? 0;
+    }
+    // Для преподавателей и админов монеты не отображаются
+    return fullUser?.points ?? 0;
+  };
+
   // Прелоадер
   if (!fullUser) return <div className="loading">Загрузка…</div>;
   const fio = [fullUser.first_name, fullUser.surname]
@@ -144,6 +194,22 @@ export default function HomePage() {
     }
   };
 
+  // Тест загрузки монет
+  const testCoinsReload = async () => {
+    try {
+      setCoinsLoading(true);
+      const response = await api.get('/students/me');
+      console.log('Coins reload test:', response.data);
+      setStudentData(response.data);
+      alert(`Монеты обновлены: ${response.data.points}`);
+    } catch (error) {
+      console.error('Coins reload error:', error);
+      alert(`Ошибка обновления монет: ${error.message}`);
+    } finally {
+      setCoinsLoading(false);
+    }
+  };
+
   return (
     <div className="app-layout">
       <Sidebar activeItem="dashboard" userRole={fullUser.role} />
@@ -175,7 +241,8 @@ export default function HomePage() {
                 border: 'none',
                 padding: '10px 15px',
                 borderRadius: '5px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '12px'
               }}
             >
               Отладка студентов
@@ -188,7 +255,8 @@ export default function HomePage() {
                 border: 'none',
                 padding: '10px 15px',
                 borderRadius: '5px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '12px'
               }}
             >
               Тест профиля
@@ -201,10 +269,25 @@ export default function HomePage() {
                 border: 'none',
                 padding: '10px 15px',
                 borderRadius: '5px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '12px'
               }}
             >
               Тест уведомления
+            </button>
+            <button 
+              onClick={testCoinsReload}
+              style={{
+                background: '#ffc107',
+                color: 'black',
+                border: 'none',
+                padding: '10px 15px',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              Обновить монеты
             </button>
           </div>
         )}
@@ -238,8 +321,27 @@ export default function HomePage() {
 
           {/* Бесткоины */}
           <div className="card events">
-            <h3>Бесткоины</h3>
-            <BestCoins amount={fullUser.points ?? 0} />
+            <div className="bestcoins-header">
+              <h3>Бесткоины</h3>
+              {user?.role === 'student' && (
+                <div className="coins-info">
+                  {coinsLoading ? (
+                    <span className="coins-loading">Загрузка...</span>
+                  ) : (
+                    <div className="coins-details">
+                      <span className="coins-source">Данные из: /students/me</span>
+                      <span className="coins-updated">
+                        Обновлено: {new Date().toLocaleTimeString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <BestCoins 
+              amount={getCoinsAmount()} 
+              loading={user?.role === 'student' ? coinsLoading : false}
+            />
           </div>
         </section>
 

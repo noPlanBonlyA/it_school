@@ -1,0 +1,570 @@
+.rating-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
+}
+
+/* Заголовок */
+.rating-header {
+  text-align: center;
+  margin-bottom: 32px;
+  background: white;
+  padding: 32px;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.rating-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 12px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rating-description {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin: 0 0 24px 0;
+  font-weight: 500;
+}
+
+.current-position {
+  margin-top: 16px;
+}
+
+.position-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 6px 16px rgba(251, 191, 36, 0.4);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Статистика */
+.rating-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  padding: 28px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  transform: rotate(45deg);
+}
+
+.stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+}
+
+.stat-icon {
+  font-size: 3rem;
+  opacity: 0.9;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.stat-number {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.stat-label {
+  font-size: 1rem;
+  opacity: 0.9;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Таблица рейтинга */
+.rating-table-container {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 32px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.rating-table {
+  width: 100%;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px 140px;
+  gap: 16px;
+  padding: 24px 28px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.table-body {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px 140px;
+  gap: 16px;
+  padding: 20px 28px;
+  border-bottom: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
+  align-items: center;
+  background: white;
+}
+
+.table-row:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transform: translateX(4px);
+}
+
+.table-row.current-user {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-left: 5px solid #f59e0b;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.table-row.current-user:hover {
+  background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
+}
+
+/* Топ позиции */
+.table-row.top-1 {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-left: 5px solid #fbbf24;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+}
+
+.table-row.top-2 {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-left: 5px solid #94a3b8;
+  box-shadow: 0 4px 12px rgba(148, 163, 184, 0.2);
+}
+
+.table-row.top-3 {
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+  border-left: 5px solid #fb923c;
+  box-shadow: 0 4px 12px rgba(251, 146, 60, 0.2);
+}
+
+/* Ячейки */
+.rank-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rank-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.medal {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.rank-number {
+  font-weight: 800;
+  color: #374151;
+  font-size: 1.2rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.student-cell {
+  display: flex;
+  align-items: center;
+}
+
+.student-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.student-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 800;
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  border: 3px solid white;
+}
+
+.avatar-text {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.student-details {
+  flex: 1;
+}
+
+.student-name {
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 4px;
+  font-size: 1.1rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.student-email {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.current-user-badge {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.points-cell {
+  text-align: center;
+}
+
+.points-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.points-number {
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: #f59e0b;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.points-icon {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.progress-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.5s ease;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(102, 126, 234, 0.4);
+}
+
+.progress-text {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #6b7280;
+  min-width: 40px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Уведомление о демо */
+.demo-notice {
+  margin: 20px 0;
+  text-align: center;
+  padding: 16px;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-radius: 16px;
+  border: 1px solid #93c5fd;
+}
+
+.demo-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.demo-notice p {
+  font-size: 0.95rem;
+  color: #1e40af;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Пустое состояние */
+.empty-rating {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+}
+
+.empty-icon {
+  font-size: 5rem;
+  margin-bottom: 24px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.empty-rating h3 {
+  color: #374151;
+  margin-bottom: 16px;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.empty-rating p {
+  color: #6b7280;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Подвал */
+.rating-footer {
+  margin-top: 32px;
+}
+
+.info-card {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.info-card h3 {
+  color: #1f2937;
+  margin: 0 0 20px 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.info-card ul {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.info-card li {
+  color: #4b5563;
+  margin-bottom: 12px;
+  line-height: 1.6;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+/* Загрузка и ошибки */
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+  background: white;
+  margin: 24px;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.error-container h2 {
+  color: #dc2626;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.error-container p {
+  color: #6b7280;
+  margin-bottom: 24px;
+  font-size: 1.1rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .rating-container {
+    padding: 16px;
+  }
+  
+  .rating-header {
+    padding: 24px 20px;
+  }
+  
+  .rating-header h1 {
+    font-size: 2rem;
+  }
+  
+  .rating-stats {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .stat-card {
+    padding: 20px;
+  }
+  
+  .table-header,
+  .table-row {
+    grid-template-columns: 60px 1fr 80px;
+    gap: 12px;
+    padding: 16px 20px;
+  }
+  
+  .progress-cell {
+    display: none;
+  }
+  
+  .header-progress {
+    display: none;
+  }
+  
+  .student-info {
+    gap: 12px;
+  }
+  
+  .student-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+  }
+  
+  .points-number {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 50px 1fr 70px;
+    gap: 8px;
+    padding: 14px 16px;
+  }
+  
+  .student-details {
+    min-width: 0;
+  }
+  
+  .student-name,
+  .student-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .current-user-badge {
+    display: none;
+  }
+  
+  .info-card {
+    padding: 24px;
+  }
+}

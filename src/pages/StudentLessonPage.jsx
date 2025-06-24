@@ -1,12 +1,13 @@
 // src/pages/StudentLessonPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
-import { getLessonWithMaterials } from '../services/lessonService';
-import { submitHomework, getStudentMaterials } from '../services/homeworkService';
 import '../styles/StudentLessonPage.css';
+
+import { getStudentMaterials, submitHomework } from '../services/homeworkService';
 
 export default function StudentLessonPage() {
   const { courseId, lessonId } = useParams();
@@ -14,7 +15,6 @@ export default function StudentLessonPage() {
   const { user } = useAuth();
 
   const [lesson, setLesson] = useState(null);
-  const [text, setText] = useState('');
   const [file, setFile] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -27,30 +27,66 @@ export default function StudentLessonPage() {
         setLoading(true);
         setError(null);
         
-        console.log('[StudentLessonPage] Loading lesson:', { courseId, lessonId });
+        console.log('[StudentLessonPage] Loading lesson materials:', { courseId, lessonId });
         
-        // Загружаем информацию об уроке
+        // ИСПРАВЛЕНО: Загружаем материалы через правильный endpoint
         try {
-          const lessonData = await getLessonWithMaterials(courseId, lessonId);
-          console.log('[StudentLessonPage] Lesson loaded:', lessonData);
-          setLesson(lessonData);
-        } catch (lessonError) {
-          console.error('[StudentLessonPage] Error loading lesson:', lessonError);
-          setError('Не удалось загрузить информацию об уроке');
+          const materialsResponse = await getStudentMaterials(courseId, lessonId);
+          console.log('[StudentLessonPage] Materials loaded:', materialsResponse);
+          
+          // Устанавливаем данные урока из материалов
+          setLesson({
+            id: materialsResponse.id,
+            name: materialsResponse.name,
+            // Пока что ставим заглушки для URL-ов, они будут из других endpoints
+            student_material_url: null,
+            homework_material_url: null
+          });
+        } catch (materialsError) {
+          console.error('[StudentLessonPage] Error loading materials:', materialsError);
+          setError('Не удалось загрузить материалы урока');
           return;
         }
         
         // Проверяем, отправлял ли студент домашнее задание
+        // Это проверим через lesson-student endpoint
         try {
-          const materials = await getStudentMaterials(courseId, lessonId);
-          console.log('[StudentLessonPage] Student materials:', materials);
+          // Получаем расписание для этого урока
+          const scheduleResponse = await fetch('http://localhost:8080/api/schedule/', {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
           
-          if (materials && materials.length > 0) {
-            setSubmitted(true);
+          if (scheduleResponse.ok) {
+            const schedule = await scheduleResponse.json();
+            const lessonGroups = schedule.filter(item => item.lesson_id === lessonId);
+            
+            // Для каждой группы проверяем lesson-students
+            for (const lessonGroup of lessonGroups) {
+              try {
+                const response = await fetch(`http://localhost:8080/api/courses/lesson-student?lesson_group_id=${lessonGroup.id}`, {
+                  headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                  }
+                });
+                
+                if (response.ok) {
+                  const lessonStudents = await response.json();
+                  const currentStudent = lessonStudents.find(ls => ls.student.user_id === user.id);
+                  
+                  if (currentStudent && currentStudent.is_sent_homework) {
+                    setSubmitted(true);
+                    break;
+                  }
+                }
+              } catch (error) {
+                console.warn('[StudentLessonPage] Could not check lesson students:', error);
+              }
+            }
           }
-        } catch (materialsError) {
-          console.warn('[StudentLessonPage] Could not check materials:', materialsError);
-          // Не блокируем интерфейс если не удалось проверить материалы
+        } catch (error) {
+          console.warn('[StudentLessonPage] Could not check homework status:', error);
         }
         
       } catch (err) {
@@ -60,7 +96,7 @@ export default function StudentLessonPage() {
         setLoading(false);
       }
     })();
-  }, [courseId, lessonId]);
+  }, [courseId, lessonId, user.id]);
 
   const handleSubmit = async () => {
     console.log('[StudentLessonPage] === SUBMIT DEBUG START ===');
@@ -174,12 +210,6 @@ export default function StudentLessonPage() {
     }
   };
 
-  const handleTextChange = (e) => {
-    const newText = e.target.value;
-    setText(newText);
-    console.log('[StudentLessonPage] Text changed, length:', newText.length);
-  };
-
   const fullName = [user.first_name, user.surname, user.patronymic]
     .filter(Boolean).join(' ');
 
@@ -259,48 +289,29 @@ export default function StudentLessonPage() {
         <div className="lesson-content">
           <div className="lesson-info">
             <h2>Информация об уроке</h2>
-            <p><strong>Описание:</strong> {lesson.description || 'Нет описания'}</p>
-            {lesson.holding_date && (
-              <p><strong>Дата проведения:</strong> {new Date(lesson.holding_date).toLocaleDateString('ru-RU', {
-                day: '2-digit',
-                month: '2-digit', 
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}</p>
-            )}
+            <p><strong>Урок:</strong> {lesson.name}</p>
+            <p><em>Материалы загружаются через API endpoints</em></p>
           </div>
 
           <div className="lesson-materials">
             <h2>Учебные материалы</h2>
             <div className="materials-list">
-              {lesson.student_material?.url && (
-                <div className="material-item">
-                  <div className="material-icon">📄</div>
-                  <div className="material-info">
-                    <h3>Материал для ученика</h3>
-                    <a href={lesson.student_material.url} target="_blank" rel="noreferrer">
-                      Просмотреть / Скачать
-                    </a>
-                  </div>
+              {/* ВРЕМЕННО: Показываем что материалы будут загружены через API */}
+              <div className="material-item">
+                <div className="material-icon">📄</div>
+                <div className="material-info">
+                  <h3>Материалы урока</h3>
+                  <p>Материалы будут загружены через endpoint /student-materials</p>
                 </div>
-              )}
+              </div>
               
-              {lesson.homework?.url && (
-                <div className="material-item">
-                  <div className="material-icon">📝</div>
-                  <div className="material-info">
-                    <h3>Домашнее задание</h3>
-                    <a href={lesson.homework.url} target="_blank" rel="noreferrer">
-                      Просмотреть / Скачать
-                    </a>
-                  </div>
+              <div className="material-item">
+                <div className="material-icon">📝</div>
+                <div className="material-info">
+                  <h3>Домашнее задание</h3>
+                  <p>Задание будет загружено через endpoint /student-materials</p>
                 </div>
-              )}
-              
-              {!lesson.student_material?.url && !lesson.homework?.url && (
-                <p>Материалы для этого урока не загружены</p>
-              )}
+              </div>
             </div>
           </div>
 

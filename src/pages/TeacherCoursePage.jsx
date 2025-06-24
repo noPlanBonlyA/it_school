@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
 import { getCourse } from '../services/courseService';
-import { listLessons } from '../services/lessonService';
+import { getCourseLessons } from '../services/lessonService';
 import '../styles/CourseDetailPage.css';
 import '../styles/TeacherCoursePage.css'; // Добавляем новые стили
 
@@ -16,6 +16,7 @@ export default function TeacherCoursePage() {
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // ДОБАВЛЕНО: состояние для ошибок
 
   /* ───── загрузка ───── */
   useEffect(() => {
@@ -24,12 +25,13 @@ export default function TeacherCoursePage() {
         setLoading(true);
         const courseData = await getCourse(courseId);
         setCourse(courseData);
-
-        const l = await listLessons(courseId);
-        setLessons(l.objects || []);
-      } catch (e) {
-        alert('Не удалось загрузить курс');
-        console.error(e);
+        
+        // ИСПРАВЛЕНО: используем getCourseLessons вместо listLessons
+        const lessonsData = await getCourseLessons(courseId);
+        setLessons(lessonsData);
+      } catch (error) {
+        console.error('Error loading course data:', error);
+        setError('Ошибка загрузки данных курса');
       } finally {
         setLoading(false);
       }
@@ -60,6 +62,23 @@ export default function TeacherCoursePage() {
   const handleCreateLesson = () => {
     navigate(`/courses/${courseId}/lessons/create`);
   };
+
+  // ДОБАВЛЕНО: обработка ошибок в render
+  if (error) {
+    return (
+      <div className="app-layout">
+        <Sidebar activeItem="teacherCourses" userRole={user.role} />
+        <div className="main-content">
+          <Topbar userName={fio} userRole={user.role} onProfileClick={() => navigate('/profile')} />
+          <div className="error-container">
+            <h2>Ошибка</h2>
+            <p>{error}</p>
+            <button onClick={() => window.location.reload()}>Перезагрузить</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   /* ───────────────── UI ───────────────── */
   return (

@@ -28,6 +28,7 @@ import ForgotPasswordPage   from './pages/ForgotPassword';
 import ResetPasswordPage    from './pages/ResetPassword';
 import ManageNewsPage       from './pages/ManageNewsPage';
 import NotificationPage     from './pages/NotificationPage';
+import RatingPage          from './pages/RatingPage';
 
 import { useAuth }          from './contexts/AuthContext';
 import { NotificationsProvider } from './contexts/NotificationsContext';
@@ -59,6 +60,7 @@ export default function App() {
           <Route path="/courses" element={<PrivateRoute><StudentCoursesPage /></PrivateRoute>} />
           <Route path="/courses/:courseId/student" element={<PrivateRoute><StudentCoursePage /></PrivateRoute>} />
           <Route path="/courses/:courseId/lessons/:lessonId" element={<PrivateRoute><StudentLessonPage /></PrivateRoute>} />
+          <Route path="/rating" element={<PrivateRoute><RatingPage /></PrivateRoute>} />
 
           {/* ───────────────────── TEACHER ───────────────────── */}
           <Route path="/teacher-courses" element={<PrivateRoute><TeacherCoursesPage /></PrivateRoute>} />
