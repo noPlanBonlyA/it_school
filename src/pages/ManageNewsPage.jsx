@@ -1,25 +1,27 @@
 // src/pages/ManageNewsPage.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate }               from 'react-router-dom';
-import Sidebar                        from '../components/Sidebar';
-import Topbar                         from '../components/TopBar';
-import api                            from '../api/axiosInstance'; // axios с baseURL и авторизацией
-import { useAuth }                   from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
+import Topbar from '../components/TopBar';
+import api from '../api/axiosInstance';
+import { useAuth } from '../contexts/AuthContext';
 import '../styles/ManageNewsPage.css';
 
 export default function ManageNewsPage() {
-  const navigate   = useNavigate();
-  const { user }   = useAuth();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const emptyForm  = { name:'', description:'', is_pinned:false };
-  const [form, setForm]         = useState(emptyForm);
+  const emptyForm = { name: '', description: '', is_pinned: false };
+  const [form, setForm] = useState(emptyForm);
   const [imageFile, setImageFile] = useState(null);
-  const [errors, setErrors]     = useState({});
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [errors, setErrors] = useState({});
   const [newsList, setNewsList] = useState([]);
-  const [search, setSearch]     = useState('');
+  const [search, setSearch] = useState('');
   const [filtered, setFiltered] = useState([]);
-  const [showSug, setShowSug]   = useState(false);
+  const [showSug, setShowSug] = useState(false);
   const [editItem, setEditItem] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     loadNews();
@@ -30,38 +32,100 @@ export default function ManageNewsPage() {
     setFiltered(newsList.filter(n => n.name.toLowerCase().includes(q)));
   }, [search, newsList]);
 
+  // Обработка выбора файла
+  const handleFileSelect = (file, isEdit = false) => {
+    if (!file) return;
+
+    // Проверяем тип файла
+    if (!file.type.startsWith('image/')) {
+      alert('Пожалуйста, выберите изображение');
+      return;
+    }
+
+    // Проверяем размер файла (максимум 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Размер файла не должен превышать 5MB');
+      return;
+    }
+
+    setImageFile(file);
+
+    // Создаем превью
+    const reader = new FileReader();
+    reader.onload = (e) => setPreviewUrl(e.target.result);
+    reader.readAsDataURL(file);
+
+    console.log('[ManageNewsPage] File selected:', {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      isEdit
+    });
+  };
+
   async function loadNews() {
     try {
-      const { data } = await api.get('/news/', { params:{ limit:100, offset:0 }});
-      setNewsList(data.objects || []);
+      const { data } = await api.get('/news/', { params: { limit: 100, offset: 0 } });
+      const newsList = data.objects || [];
+      
+      // Добавляем image_url для каждой новости
+      const mappedNews = newsList.map(news => ({
+        ...news,
+        image_url: news.photo?.url ? (
+          news.photo.url.startsWith('http') 
+            ? news.photo.url 
+            : `${window.location.protocol}//${window.location.hostname}:8080${news.photo.url}`
+        ) : null
+      }));
+      
+      setNewsList(mappedNews);
+      console.log('[ManageNewsPage] News loaded:', mappedNews);
     } catch (e) {
-      console.error(e);
+      console.error('[ManageNewsPage] Error loading news:', e);
       alert('Не удалось загрузить новости');
     }
   }
 
   async function handleCreate() {
     setErrors({});
+    setUploading(true);
+    
     try {
-      const fd = new FormData();
-      // news_data — строка, внутри JSON с exactly этими ключами
-      fd.append('news_data', JSON.stringify({
-        name:        form.name,
+      console.log('[ManageNewsPage] Creating news:', {
+        form,
+        hasImage: !!imageFile,
+        imageName: imageFile?.name
+      });
+
+      const formData = new FormData();
+      
+      // ИСПРАВЛЕНО: news_data С полем photo
+      const newsData = {
+        name: form.name,
         description: form.description,
-        is_pinned:   form.is_pinned
-      }));
+        is_pinned: form.is_pinned
+      };
+      
+      // Если есть файл, добавляем поле photo с именем
       if (imageFile) {
-        fd.append('image', imageFile);
+        newsData.photo = { name: imageFile.name };
+        formData.append('image', imageFile);
       }
-      await api.post('/news/', fd, {
+      
+      formData.append('news_data', JSON.stringify(newsData));
+
+      const response = await api.post('/news/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
+
+      console.log('[ManageNewsPage] News created successfully:', response.data);
       alert('Новость создана');
       setForm(emptyForm);
       setImageFile(null);
+      setPreviewUrl(null);
       loadNews();
     } catch (e) {
-      console.error(e);
+      console.error('[ManageNewsPage] Error creating news:', e);
       if (e.response?.status === 422) {
         const detail = e.response.data.detail;
         setErrors({
@@ -70,34 +134,54 @@ export default function ManageNewsPage() {
             : JSON.stringify(detail)
         });
       } else {
-        alert('Ошибка создания новости');
+        alert('Ошибка создания новости: ' + (e.response?.data?.detail || e.message));
       }
+    } finally {
+      setUploading(false);
     }
   }
 
   async function handleUpdate() {
     if (!editItem) return;
     setErrors({});
+    setUploading(true);
+    
     try {
-      const fd = new FormData();
-      fd.append('news_data', JSON.stringify({
-        name:        editItem.name,
+      console.log('[ManageNewsPage] Updating news:', {
+        editItem,
+        hasImage: !!imageFile,
+        imageName: imageFile?.name
+      });
+
+      const formData = new FormData();
+      
+      // ИСПРАВЛЕНО: news_data С полем photo
+      const newsData = {
+        name: editItem.name,
         description: editItem.description,
-        is_pinned:   editItem.is_pinned
-      }));
-      // если заменяем картинку:
+        is_pinned: editItem.is_pinned
+      };
+      
+      // Если заменяем картинку, добавляем поле photo с именем
       if (imageFile) {
-        fd.append('image', imageFile);
+        newsData.photo = { name: imageFile.name };
+        formData.append('image', imageFile);
       }
-      await api.put(`/news/${editItem.id}`, fd, {
+      
+      formData.append('news_data', JSON.stringify(newsData));
+
+      const response = await api.put(`/news/${editItem.id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
+
+      console.log('[ManageNewsPage] News updated successfully:', response.data);
       alert('Новость обновлена');
       setEditItem(null);
       setImageFile(null);
+      setPreviewUrl(null);
       loadNews();
     } catch (e) {
-      console.error(e);
+      console.error('[ManageNewsPage] Error updating news:', e);
       if (e.response?.status === 422) {
         const detail = e.response.data.detail;
         setErrors({
@@ -106,8 +190,10 @@ export default function ManageNewsPage() {
             : JSON.stringify(detail)
         });
       } else {
-        alert('Ошибка обновления новости');
+        alert('Ошибка обновления новости: ' + (e.response?.data?.detail || e.message));
       }
+    } finally {
+      setUploading(false);
     }
   }
 
@@ -119,10 +205,23 @@ export default function ManageNewsPage() {
       setEditItem(null);
       loadNews();
     } catch (e) {
-      console.error(e);
+      console.error('[ManageNewsPage] Error deleting news:', e);
       alert('Ошибка удаления');
     }
   }
+
+  // Функция для получения URL изображения
+  const getImageUrl = (news) => {
+    if (previewUrl && editItem?.id === news?.id) return previewUrl;
+    
+    if (news?.photo?.url) {
+      return news.photo.url.startsWith('http') 
+        ? news.photo.url 
+        : `${window.location.protocol}//${window.location.hostname}:8080${news.photo.url}`;
+    }
+    
+    return news?.image_url || null;
+  };
 
   const fullName = [user.first_name, user.surname, user.patronymic]
     .filter(Boolean).join(' ');
@@ -148,14 +247,14 @@ export default function ManageNewsPage() {
               <input
                 type="text"
                 value={form.name}
-                onChange={e => setForm(f=>({...f, name:e.target.value}))}
+                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
               />
             </div>
             <div className="field field-full">
               <label>Описание</label>
               <textarea
                 value={form.description}
-                onChange={e=>setForm(f=>({...f, description:e.target.value}))}
+                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
               />
             </div>
             <div className="field">
@@ -163,7 +262,7 @@ export default function ManageNewsPage() {
                 <input
                   type="checkbox"
                   checked={form.is_pinned}
-                  onChange={e=>setForm(f=>({...f, is_pinned:e.target.checked}))}
+                  onChange={e => setForm(f => ({ ...f, is_pinned: e.target.checked }))}
                 />
                 Закрепить новость
               </label>
@@ -173,19 +272,39 @@ export default function ManageNewsPage() {
               <input
                 type="file"
                 accept="image/*"
-                onChange={e=>setImageFile(e.target.files[0]||null)}
+                onChange={e => handleFileSelect(e.target.files[0], false)}
               />
+              {previewUrl && !editItem && (
+                <div style={{ marginTop: '10px' }}>
+                  <img 
+                    src={previewUrl} 
+                    alt="Превью" 
+                    style={{ maxWidth: '200px', maxHeight: '150px', objectFit: 'cover', borderRadius: '4px' }}
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => { setImageFile(null); setPreviewUrl(null); }}
+                    style={{ marginLeft: '10px', padding: '5px 10px' }}
+                  >
+                    Удалить
+                  </button>
+                </div>
+              )}
             </div>
 
             {errors.form && (
-              <div className="error-text" style={{gridColumn:'1/-1'}}>
+              <div className="error-text" style={{ gridColumn: '1/-1' }}>
                 {errors.form}
               </div>
             )}
 
-            <div className="buttons-create" style={{gridColumn:'1/-1'}}>
-              <button className="btn-primary" onClick={handleCreate}>
-                Создать
+            <div className="buttons-create" style={{ gridColumn: '1/-1' }}>
+              <button 
+                className="btn-primary" 
+                onClick={handleCreate}
+                disabled={uploading || !form.name.trim()}
+              >
+                {uploading ? 'Создание...' : 'Создать'}
               </button>
             </div>
           </div>
@@ -198,15 +317,25 @@ export default function ManageNewsPage() {
             <input
               placeholder="Поиск по заголовку"
               value={search}
-              onChange={e=>setSearch(e.target.value)}
-              onFocus={()=>setShowSug(true)}
-              onBlur={()=>setTimeout(()=>setShowSug(false),200)}
+              onChange={e => setSearch(e.target.value)}
+              onFocus={() => setShowSug(true)}
+              onBlur={() => setTimeout(() => setShowSug(false), 200)}
             />
-            {showSug && filtered.length>0 && (
+            {showSug && filtered.length > 0 && (
               <ul className="suggestions">
-                {filtered.map(n=>(
-                  <li key={n.id} onClick={()=>setEditItem(n)}>
-                    {n.name}
+                {filtered.map(n => (
+                  <li key={n.id} onClick={() => { setEditItem(n); setShowSug(false); }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      {getImageUrl(n) && (
+                        <img 
+                          src={getImageUrl(n)} 
+                          alt="" 
+                          style={{ width: '30px', height: '30px', objectFit: 'cover', borderRadius: '4px' }}
+                        />
+                      )}
+                      <span>{n.name}</span>
+                      {n.is_pinned && <span style={{ color: '#007bff' }}>📌</span>}
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -214,20 +343,20 @@ export default function ManageNewsPage() {
           </div>
 
           {editItem && (
-            <div className="news-form form-grid" style={{marginTop:20}}>
+            <div className="news-form form-grid" style={{ marginTop: 20 }}>
               <div className="field">
                 <label>Заголовок</label>
                 <input
                   type="text"
                   value={editItem.name}
-                  onChange={e=>setEditItem(i=>({...i,name:e.target.value}))}
+                  onChange={e => setEditItem(i => ({ ...i, name: e.target.value }))}
                 />
               </div>
               <div className="field field-full">
                 <label>Описание</label>
                 <textarea
                   value={editItem.description}
-                  onChange={e=>setEditItem(i=>({...i,description:e.target.value}))}
+                  onChange={e => setEditItem(i => ({ ...i, description: e.target.value }))}
                 />
               </div>
               <div className="field">
@@ -235,32 +364,72 @@ export default function ManageNewsPage() {
                   <input
                     type="checkbox"
                     checked={editItem.is_pinned}
-                    onChange={e=>setEditItem(i=>({...i,is_pinned:e.target.checked}))}
+                    onChange={e => setEditItem(i => ({ ...i, is_pinned: e.target.checked }))}
                   />
                   Закрепить
                 </label>
               </div>
               <div className="field">
-                <label>Новая картинка (опционально)</label>
+                <label>Изображение</label>
+                
+                {/* Текущее изображение */}
+                {getImageUrl(editItem) && (
+                  <div style={{ marginBottom: '10px' }}>
+                    <img 
+                      src={getImageUrl(editItem)} 
+                      alt="Текущее изображение" 
+                      style={{ maxWidth: '200px', maxHeight: '150px', objectFit: 'cover', borderRadius: '4px' }}
+                    />
+                    <p style={{ fontSize: '12px', color: '#666', margin: '5px 0' }}>
+                      {previewUrl ? 'Новое изображение (не сохранено)' : 'Текущее изображение'}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Выбор нового файла */}
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={e=>setImageFile(e.target.files[0]||null)}
+                  onChange={e => handleFileSelect(e.target.files[0], true)}
                 />
+                
+                {previewUrl && (
+                  <button 
+                    type="button" 
+                    onClick={() => { setImageFile(null); setPreviewUrl(null); }}
+                    style={{ marginTop: '5px', padding: '5px 10px' }}
+                  >
+                    Отменить замену
+                  </button>
+                )}
               </div>
 
               {errors.form && (
-                <div className="error-text" style={{gridColumn:'1/-1'}}>
+                <div className="error-text" style={{ gridColumn: '1/-1' }}>
                   {errors.form}
                 </div>
               )}
 
-              <div className="buttons-edit" style={{gridColumn:'1/-1'}}>
-                <button className="btn-primary" onClick={handleUpdate}>
-                  Сохранить
+              <div className="buttons-edit" style={{ gridColumn: '1/-1' }}>
+                <button 
+                  className="btn-primary" 
+                  onClick={handleUpdate}
+                  disabled={uploading}
+                >
+                  {uploading ? 'Сохранение...' : 'Сохранить'}
                 </button>
                 <button className="btn-danger" onClick={handleDelete}>
                   Удалить
+                </button>
+                <button 
+                  className="btn-secondary" 
+                  onClick={() => { 
+                    setEditItem(null); 
+                    setImageFile(null); 
+                    setPreviewUrl(null); 
+                  }}
+                >
+                  Отмена
                 </button>
               </div>
             </div>

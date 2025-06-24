@@ -14,7 +14,7 @@ import {
 } from '../services/courseService';
 
 import '../styles/ManageUserPage.css';   // старая сетка + модалки
-import '../styles/CourseGrid.css';       // сетка карточек (см. предыдущий ответ)
+import '../styles/CourseGrid.css';       // сетка карточек
 
 export default function ManageCoursesPage() {
   const navigate = useNavigate();
@@ -37,13 +37,16 @@ export default function ManageCoursesPage() {
     author_name: ''
   });
   const [formImage, setFormImage] = useState(null);
+  const [formPreviewUrl, setFormPreviewUrl] = useState(null);
   const [showConfirmCreate, setShowConfirmCreate] = useState(false);
 
   /* редактирование */
   const [edit, setEdit] = useState(null);
   const [editImage, setEditImage] = useState(null);
+  const [editPreviewUrl, setEditPreviewUrl] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showConfirmUpdate, setShowConfirmUpdate] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   /* ---------- effects ---------- */
   useEffect(() => { load(); }, []);
@@ -64,27 +67,93 @@ export default function ManageCoursesPage() {
     );
   }, [search, courses]);
 
+  /* ---------- обработка файлов ---------- */
+  const handleFileSelect = (file, isEdit = false) => {
+    if (!file) return;
+
+    // Проверяем тип файла
+    if (!file.type.startsWith('image/')) {
+      alert('Пожалуйста, выберите изображение');
+      return;
+    }
+
+    // Проверяем размер файла (максимум 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Размер файла не должен превышать 5MB');
+      return;
+    }
+
+    if (isEdit) {
+      setEditImage(file);
+      // Создаем превью
+      const reader = new FileReader();
+      reader.onload = (e) => setEditPreviewUrl(e.target.result);
+      reader.readAsDataURL(file);
+    } else {
+      setFormImage(file);
+      // Создаем превью
+      const reader = new FileReader();
+      reader.onload = (e) => setFormPreviewUrl(e.target.result);
+      reader.readAsDataURL(file);
+    }
+
+    console.log('[ManageCourse] File selected:', {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      isEdit
+    });
+  };
+
+  // Функция для получения URL изображения
+  const getImageUrl = (course) => {
+    if (editPreviewUrl && edit?.id === course?.id) return editPreviewUrl;
+    
+    if (course?.photo?.url) {
+      return course.photo.url.startsWith('http') 
+        ? course.photo.url 
+        : `${window.location.protocol}//${window.location.hostname}:8080${course.photo.url}`;
+    }
+    
+    return null;
+  };
+
   /* ---------- handlers ---------- */
   const handleCreate = async () => {
+    setUploading(true);
     try {
       const fd = new FormData();
-      fd.append('course_data', JSON.stringify({
+      
+      // Данные курса
+      const courseData = {
         name:         form.name,
         description:  form.description,
         age_category: form.age_category,
         price:        Number(form.price),
         author_name:  form.author_name
-      }));
-      if (formImage) fd.append('image', formImage);
+      };
+      
+      // Если есть изображение, добавляем поле photo с именем
+      if (formImage) {
+        courseData.photo = { name: formImage.name };
+        fd.append('image', formImage);
+      }
+      
+      fd.append('course_data', JSON.stringify(courseData));
 
       await createCourse(fd);
       setForm({ name:'', description:'', age_category:'', price:'', author_name:'' });
       setFormImage(null);
+      setFormPreviewUrl(null);
       setShowConfirmCreate(false);
       await load();
-    } catch {
+      alert('Курс создан успешно');
+    } catch (e) {
+      console.error('[ManageCourse] Error creating course:', e);
       alert('Ошибка создания курса');
       setShowConfirmCreate(false);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -98,29 +167,45 @@ export default function ManageCoursesPage() {
       author_name:  c.author_name || ''
     });
     setEditImage(null);
+    setEditPreviewUrl(null);
     setSearch('');
   };
 
   const handleUpdate = async () => {
+    setUploading(true);
     try {
       const fd = new FormData();
-      fd.append('course_data', JSON.stringify({
+      
+      // Данные курса
+      const courseData = {
         name:         edit.name,
         description:  edit.description,
         age_category: edit.age_category,
         price:        Number(edit.price),
         author_name:  edit.author_name
-      }));
-      if (editImage) fd.append('image', editImage);
+      };
+      
+      // Если заменяем изображение, добавляем поле photo с именем
+      if (editImage) {
+        courseData.photo = { name: editImage.name };
+        fd.append('image', editImage);
+      }
+      
+      fd.append('course_data', JSON.stringify(courseData));
 
       await updateCourse(edit.id, fd);
       setEdit(null);
       setEditImage(null);
+      setEditPreviewUrl(null);
       setShowConfirmUpdate(false);
       await load();
-    } catch {
+      alert('Курс обновлен успешно');
+    } catch (e) {
+      console.error('[ManageCourse] Error updating course:', e);
       alert('Ошибка обновления курса');
       setShowConfirmUpdate(false);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -130,6 +215,7 @@ export default function ManageCoursesPage() {
       setEdit(null);
       setShowConfirmDelete(false);
       await load();
+      alert('Курс удален успешно');
     } catch {
       alert('Ошибка удаления курса');
       setShowConfirmDelete(false);
@@ -182,17 +268,37 @@ export default function ManageCoursesPage() {
             ))}
 
             <div className="field">
-              <label>Изображение</label>
+              <label>Изображение (опционально)</label>
               <input
                 type="file"
                 accept="image/*"
-                onChange={e => setFormImage(e.target.files[0] || null)}
+                onChange={e => handleFileSelect(e.target.files[0], false)}
               />
+              {formPreviewUrl && (
+                <div style={{ marginTop: '10px' }}>
+                  <img 
+                    src={formPreviewUrl} 
+                    alt="Превью" 
+                    style={{ maxWidth: '200px', maxHeight: '150px', objectFit: 'cover', borderRadius: '4px' }}
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => { setFormImage(null); setFormPreviewUrl(null); }}
+                    style={{ marginLeft: '10px', padding: '5px 10px' }}
+                  >
+                    Удалить
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="buttons" style={{ gridColumn:'1 / -1' }}>
-              <button className="btn-primary" onClick={() => setShowConfirmCreate(true)}>
-                Создать
+              <button 
+                className="btn-primary" 
+                onClick={() => setShowConfirmCreate(true)}
+                disabled={uploading || !form.name.trim()}
+              >
+                {uploading ? 'Создание...' : 'Создать'}
               </button>
             </div>
           </div>
@@ -215,7 +321,16 @@ export default function ManageCoursesPage() {
               <ul className="suggestions">
                 {filtered.map(c => (
                   <li key={c.id} onClick={() => handleSelect(c)}>
-                    {c.name} ({c.author_name})
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      {getImageUrl(c) && (
+                        <img 
+                          src={getImageUrl(c)} 
+                          alt="" 
+                          style={{ width: '30px', height: '30px', objectFit: 'cover', borderRadius: '4px' }}
+                        />
+                      )}
+                      <span>{c.name} ({c.author_name})</span>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -249,20 +364,60 @@ export default function ManageCoursesPage() {
               ))}
 
               <div className="field">
-                <label>Новое изображение (опционально)</label>
+                <label>Изображение</label>
+                
+                {/* Текущее изображение */}
+                {getImageUrl(edit) && (
+                  <div style={{ marginBottom: '10px' }}>
+                    <img 
+                      src={getImageUrl(edit)} 
+                      alt="Текущее изображение" 
+                      style={{ maxWidth: '200px', maxHeight: '150px', objectFit: 'cover', borderRadius: '4px' }}
+                    />
+                    <p style={{ fontSize: '12px', color: '#666', margin: '5px 0' }}>
+                      {editPreviewUrl ? 'Новое изображение (не сохранено)' : 'Текущее изображение'}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Выбор нового файла */}
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={e => setEditImage(e.target.files[0] || null)}
+                  onChange={e => handleFileSelect(e.target.files[0], true)}
                 />
+                
+                {editPreviewUrl && (
+                  <button 
+                    type="button" 
+                    onClick={() => { setEditImage(null); setEditPreviewUrl(null); }}
+                    style={{ marginTop: '5px', padding: '5px 10px' }}
+                  >
+                    Отменить замену
+                  </button>
+                )}
               </div>
 
               <div className="buttons" style={{ gridColumn:'1 / -1' }}>
-                <button className="btn-primary" onClick={() => setShowConfirmUpdate(true)}>
-                  Сохранить
+                <button 
+                  className="btn-primary" 
+                  onClick={() => setShowConfirmUpdate(true)}
+                  disabled={uploading}
+                >
+                  {uploading ? 'Сохранение...' : 'Сохранить'}
                 </button>
-                <button className="btn-danger"  onClick={() => setShowConfirmDelete(true)}>
+                <button className="btn-danger" onClick={() => setShowConfirmDelete(true)}>
                   Удалить
+                </button>
+                <button 
+                  className="btn-secondary" 
+                  onClick={() => { 
+                    setEdit(null); 
+                    setEditImage(null); 
+                    setEditPreviewUrl(null); 
+                  }}
+                >
+                  Отмена
                 </button>
               </div>
             </div>
@@ -272,7 +427,7 @@ export default function ManageCoursesPage() {
         {/* ---------------- COURSES GRID ---------------- */}
         {courses.length > 0 && (
           <div className="block">
-            <h2>Мои курсы</h2>
+            <h2>Все курсы</h2>
             <div className="card-grid">
               {courses.map(c => (
                 <CourseCard
@@ -292,8 +447,12 @@ export default function ManageCoursesPage() {
             <div className="modal-content">
               <p>Создать курс?</p>
               <div className="modal-buttons">
-                <button className="btn-primary"   onClick={handleCreate}>Да</button>
-                <button className="btn-secondary" onClick={() => setShowConfirmCreate(false)}>Нет</button>
+                <button className="btn-primary" onClick={handleCreate} disabled={uploading}>
+                  {uploading ? 'Создание...' : 'Да'}
+                </button>
+                <button className="btn-secondary" onClick={() => setShowConfirmCreate(false)}>
+                  Нет
+                </button>
               </div>
             </div>
           </div>
@@ -304,8 +463,12 @@ export default function ManageCoursesPage() {
             <div className="modal-content">
               <p>Сохранить изменения?</p>
               <div className="modal-buttons">
-                <button className="btn-primary"   onClick={handleUpdate}>Да</button>
-                <button className="btn-secondary" onClick={() => setShowConfirmUpdate(false)}>Нет</button>
+                <button className="btn-primary" onClick={handleUpdate} disabled={uploading}>
+                  {uploading ? 'Сохранение...' : 'Да'}
+                </button>
+                <button className="btn-secondary" onClick={() => setShowConfirmUpdate(false)}>
+                  Нет
+                </button>
               </div>
             </div>
           </div>
@@ -316,7 +479,7 @@ export default function ManageCoursesPage() {
             <div className="modal-content">
               <p>Удалить курс?</p>
               <div className="modal-buttons">
-                <button className="btn-primary"   onClick={handleDelete}>Да</button>
+                <button className="btn-primary" onClick={handleDelete}>Да</button>
                 <button className="btn-secondary" onClick={() => setShowConfirmDelete(false)}>Нет</button>
               </div>
             </div>

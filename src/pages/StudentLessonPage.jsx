@@ -65,14 +65,13 @@ export default function StudentLessonPage() {
   const handleSubmit = async () => {
     console.log('[StudentLessonPage] === SUBMIT DEBUG START ===');
     
-    // ИСПРАВЛЕНО: Более строгая валидация
-    const hasText = text && text.trim().length > 0;
+    // ИСПРАВЛЕНО: Только файл обязателен
     const hasFile = file && file instanceof File;
     
-    console.log('[StudentLessonPage] Validation:', { hasText, hasFile, textValue: text, fileValue: file });
+    console.log('[StudentLessonPage] Validation:', { hasFile, fileValue: file });
     
-    if (!hasText && !hasFile) {
-      alert('Введите текст домашнего задания или выберите файл');
+    if (!hasFile) {
+      alert('Выберите файл для отправки домашнего задания');
       return;
     }
     
@@ -81,29 +80,34 @@ export default function StudentLessonPage() {
       console.log('[StudentLessonPage] Submitting homework with params:', { 
         courseId, 
         lessonId, 
-        hasText,
         hasFile,
-        textLength: text?.length || 0,
-        textPreview: text?.substring(0, 100),
         fileName: file?.name,
         fileSize: file?.size,
         fileType: file?.type
       });
       
-      // ВРЕМЕННО: Попробуем отправить только текст для отладки
-      const submissionData = {
-        text: hasText ? text.trim() : (hasFile ? 'Выполнено (см. прикрепленный файл)' : ''),
-        file: hasFile ? file : null
-      };
+      // ИСПРАВЛЕНО: Формируем FormData согласно API
+      const formData = new FormData();
       
-      console.log('[StudentLessonPage] Final submission data:', submissionData);
+      // homework_data с именем файла (согласно API документации)
+      formData.append('homework_data', JSON.stringify({
+        name: file.name
+      }));
       
-      const result = await submitHomework(courseId, lessonId, submissionData);
+      // Файл как homework_file (согласно API)
+      formData.append('homework_file', file);
+      
+      console.log('[StudentLessonPage] FormData prepared:', {
+        homework_data: JSON.stringify({ name: file.name }),
+        homework_file_name: file.name
+      });
+      
+      // Отправляем через правильный endpoint
+      const result = await submitHomework(courseId, lessonId, formData);
       
       console.log('[StudentLessonPage] Homework submission result:', result);
       
       setSubmitted(true);
-      setText('');
       setFile(null);
       
       // Очищаем input файла
@@ -311,24 +315,11 @@ export default function StudentLessonPage() {
               </div>
             ) : (
               <div className="hw-form">
-                <p>Отправьте домашнее задание текстом или файлом:</p>
+                <p>Загрузите файл с выполненным домашним заданием:</p>
                 
                 <div className="submission-options">
                   <div className="submission-option">
-                    <h3>Текстовый ответ</h3>
-                    <textarea
-                      placeholder="Введите ваш ответ здесь..."
-                      value={text}
-                      onChange={handleTextChange}
-                      disabled={submitting}
-                      className="text-homework"
-                      rows={6}
-                    />
-                    <small>Количество символов: {text.length}</small>
-                  </div>
-                  
-                  <div className="submission-option">
-                    <h3>Или загрузить файл</h3>
+                    <h3>Загрузить файл</h3>
                     <div className="file-upload">
                       <input
                         type="file"
@@ -336,6 +327,7 @@ export default function StudentLessonPage() {
                         onChange={handleFileChange}
                         disabled={submitting}
                         accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.txt,.zip,.rar"
+                        required
                       />
                       <label 
                         htmlFor="homework-file" 
@@ -345,8 +337,21 @@ export default function StudentLessonPage() {
                       </label>
                     </div>
                     {file && (
-                      <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
-                        Размер: {Math.round(file.size / 1024)} KB
+                      <div style={{ marginTop: '8px' }}>
+                        <div style={{ fontSize: '12px', color: '#666' }}>
+                          Размер: {Math.round(file.size / 1024)} KB
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            setFile(null);
+                            const fileInput = document.getElementById('homework-file');
+                            if (fileInput) fileInput.value = '';
+                          }}
+                          style={{ marginTop: '5px', padding: '5px 10px', fontSize: '12px' }}
+                        >
+                          Удалить файл
+                        </button>
                       </div>
                     )}
                   </div>
@@ -355,7 +360,7 @@ export default function StudentLessonPage() {
                 <button 
                   className="btn-primary"
                   onClick={handleSubmit}
-                  disabled={(!text.trim() && !file) || submitting}
+                  disabled={!file || submitting}
                   style={{
                     marginTop: '20px',
                     width: '100%',
