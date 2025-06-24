@@ -12,12 +12,11 @@ import userService          from '../services/userService';
 import { getUserScheduleOptimized } from '../services/scheduleService';
 import { createNotificationForStudent } from '../services/notificationService';
 import { findStudentByUser, debugAllStudents } from '../services/studentService';
+import api from '../api/axiosInstance';
 
 import '../styles/HomePage.css';
 import '../styles/Schedule.css';
 import '../styles/HomeNews.css';
-
-const API = 'http://localhost:8080/api';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -54,9 +53,9 @@ export default function HomePage() {
 
   // Загрузка и сортировка новостей
   useEffect(() => {
-    fetch(`${API}/news/`)
-      .then(r => r.json())
-      .then(arr => {
+    api.get('/news/')
+      .then(response => {
+        const arr = response.data;
         const list = Array.isArray(arr) ? arr : (arr.objects || []);
         // добавляем image_url, если есть
         const mapped = list.map(n => ({

@@ -1,0 +1,389 @@
+/* Основной контейнер страницы уроков */
+.lessons-page {
+  padding: 20px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.lessons-page h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #202224;
+  margin-bottom: 20px;
+}
+
+/* Сетка с тремя колонками */
+.lessons-grid {
+  display: grid;
+  grid-template-columns: 300px 350px 1fr;
+  gap: 24px;
+  height: calc(100vh - 180px);
+}
+
+/* Общие стили для колонок */
+.column {
+  background: #FFFFFF;
+  border-radius: 12px;
+  border: 0.5px solid #E5E5E5;
+  padding: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.column h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #202224;
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F0F0F0;
+}
+
+/* Колонка групп */
+.groups-col {
+  min-width: 280px;
+}
+
+.groups-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.groups-list li {
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.groups-list li:hover {
+  background: #F8F9FA;
+  border-color: #E5E5E5;
+}
+
+.groups-list li.selected {
+  background: #E3F2FD;
+  border-color: #2196F3;
+}
+
+.group-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.group-name {
+  font-weight: 600;
+  color: #202224;
+  font-size: 14px;
+}
+
+.group-meta {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Колонка уроков */
+.topics-col {
+  min-width: 330px;
+}
+
+.topics-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.topics-list li {
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.topics-list li:hover {
+  background: #F8F9FA;
+  border-color: #E5E5E5;
+}
+
+.topics-list li.selected {
+  background: #E8F5E8;
+  border-color: #4CAF50;
+}
+
+.lesson-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lesson-title {
+  font-weight: 600;
+  color: #202224;
+  font-size: 14px;
+}
+
+.lesson-meta {
+  font-size: 12px;
+  color: #666;
+}
+
+.lesson-date {
+  font-size: 12px;
+  color: #888;
+}
+
+/* Колонка студентов */
+.students-col {
+  overflow: hidden;
+}
+
+.students-content {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.student-item {
+  border: 1px solid #E5E5E5;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.student-header {
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.student-header:hover {
+  background: #F8F9FA;
+}
+
+.student-header.expanded {
+  background: #F0F8FF;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.student-info {
+  flex: 1;
+}
+
+.student-name {
+  font-weight: 600;
+  color: #202224;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.student-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.lesson-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grade-display {
+  background: #E8F5E8;
+  color: #2E7D32;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.expand-icon {
+  font-size: 12px;
+  color: #666;
+  transition: transform 0.2s;
+}
+
+.expand-icon.rotated {
+  transform: rotate(180deg);
+}
+
+/* Детали студента */
+.student-details {
+  padding: 20px;
+  background: #FAFBFC;
+  border-top: 1px solid #E5E5E5;
+}
+
+/* Секция посещаемости */
+.attendance-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  border: 1px solid #E5E5E5;
+}
+
+.attendance-field {
+  margin-bottom: 12px;
+}
+
+.attendance-field:last-child {
+  margin-bottom: 0;
+}
+
+.attendance-field label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #202224;
+  cursor: pointer;
+}
+
+.attendance-field input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Секция оценок за урок */
+.lesson-grading-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  border: 1px solid #E5E5E5;
+}
+
+.grade-field {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.grade-field:last-child {
+  margin-bottom: 0;
+}
+
+.grade-field label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #202224;
+}
+
+.grade-field input {
+  padding: 8px 12px;
+  border: 1px solid #D5D5D5;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #FFFFFF;
+  max-width: 120px;
+}
+
+.grade-field input:focus {
+  outline: none;
+  border-color: #2196F3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+/* Кнопки */
+.details-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background: #1976D2;
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: #FFFFFF;
+  color: #666;
+  border: 1px solid #D5D5D5;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #F8F9FA;
+  border-color: #999;
+}
+
+/* Общие стили */
+.placeholder {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 40px 20px;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+}
+
+.error {
+  background: #FFEBEE;
+  color: #C62828;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border: 1px solid #FFCDD2;
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+  .lessons-grid {
+    grid-template-columns: 280px 320px 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .lessons-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    height: auto;
+  }
+  
+  .column {
+    height: 400px;
+  }
+  
+  .lessons-page {
+    padding: 16px;
+  }
+}

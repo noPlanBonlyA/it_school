@@ -23,6 +23,7 @@ import TeacherLessonPage    from './pages/TeacherLessonPage';
 
 import CourseDetailPage     from './pages/CourseDetailPage';
 import HomeWorkPage         from './pages/HomeWorkPage';
+import LessonsPage          from './pages/LessonsPage';        // Добавляем импорт страницы уроков
 import ForgotPasswordPage   from './pages/ForgotPassword';
 import ResetPasswordPage    from './pages/ResetPassword';
 import ManageNewsPage       from './pages/ManageNewsPage';
@@ -57,7 +58,6 @@ export default function App() {
           {/* ───────────────────── STUDENT ───────────────────── */}
           <Route path="/courses" element={<PrivateRoute><StudentCoursesPage /></PrivateRoute>} />
           <Route path="/courses/:courseId/student" element={<PrivateRoute><StudentCoursePage /></PrivateRoute>} />
-          {/* ИСПРАВЛЕНО: правильный маршрут для студентов */}
           <Route path="/courses/:courseId/lessons/:lessonId" element={<PrivateRoute><StudentLessonPage /></PrivateRoute>} />
 
           {/* ───────────────────── TEACHER ───────────────────── */}
@@ -68,6 +68,7 @@ export default function App() {
           {/* «конструктор» курса / уроков */}
           <Route path="/courses/:courseId" element={<PrivateRoute><CourseDetailPage /></PrivateRoute>} />
 
+          <Route path="/lessons" element={<PrivateRoute><LessonsPage /></PrivateRoute>} />     {/* Добавляем маршрут для страницы уроков */}
           <Route path="/homework" element={<PrivateRoute><HomeWorkPage /></PrivateRoute>} />
 
           {/* ───────────────── ADMIN / SUPERADMIN ───────────────── */}

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import axios  from 'axios';
 import Toast  from '../components/Toast';
 import '../styles/PasswordReset.css';
+import api from '../api/axiosInstance';
 
 export default function ResetPassword() {
   const navigate   = useNavigate();
@@ -13,8 +13,6 @@ export default function ResetPassword() {
   const [newPassword, setNewPassword]         = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [toast, setToast]                     = useState({ message: '', type: 'info' });
-
-  const API_BASE = 'http://localhost:8080';
 
   useEffect(() => {
     // 1) Пытаемся взять токен из URL-параметра   /reset-password/:token
@@ -47,7 +45,7 @@ export default function ResetPassword() {
     }
 
     try {
-      await axios.post(`${API_BASE}/api/users/confirm_reset_password`, {
+      await api.post('/users/confirm_reset_password', {  // ✅ Правильный эндпоинт согласно API
         token,
         new_password: newPassword,
       });

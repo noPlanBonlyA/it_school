@@ -37,8 +37,8 @@ const hi = (txt, q) => {
 const mapUserObj = o => {
   const u = o.user || o;
   return {
-    profileId : o.id,                 // teacher/student-профиля
-    userId    : o.user_id || o.id,    // user
+    profileId : o.id,        // ID студенческого профиля (для добавления в группу)
+    userId    : o.user_id || o.id,    // ID пользователя
     first_name: u.first_name || '',
     surname   : u.surname    || '',
     username  : u.username   || ''
@@ -124,8 +124,31 @@ export default function ManageGroupPage() {
   const loadStu = async () => { 
     if (stuLoaded) return;
     try {
-      const list = await getAllUsers({ role:'student', limit:100, offset:0 });
-      setStudents(list.map(mapUserObj)); 
+      // Загружаем пользователей со студенческой ролью
+      const usersList = await getAllUsers({ role:'student', limit:100, offset:0 });
+      
+      // Для каждого пользователя получаем его студенческий профиль
+      const studentsData = await Promise.all(
+        usersList.map(async (user) => {
+          try {
+            const studentProfile = await findStudentByUser(user.id);
+            return {
+              profileId: studentProfile.id,     // ID студенческого профиля
+              userId: user.id,                  // ID пользователя
+              first_name: user.first_name || '',
+              surname: user.surname || '',
+              username: user.username || ''
+            };
+          } catch (error) {
+            console.warn(`No student profile for user ${user.id}:`, error);
+            return null;
+          }
+        })
+      );
+      
+      // Фильтруем только тех, у кого есть студенческий профиль
+      const validStudents = studentsData.filter(s => s !== null);
+      setStudents(validStudents);
       setSL(true);
     } catch (error) {
       console.error('Error loading students:', error);
@@ -259,25 +282,36 @@ export default function ManageGroupPage() {
 
   /* ────────────── STUDENTS ───────────────────*/
   const addStudents = async () => {
-    if (!chk.size) return;
-    const ids = [];
+    if (!chk.size) {
+      alert('Выберите студентов');
+      return;
+    }
+
     try {
-      for (const uid of chk) {
-        const profile = await findStudentByUser(uid);
-        if (!profile){ alert(`У пользователя ${uid} нет Student-профиля`); return; }
-        ids.push(profile.id);
-      }
+      console.log('[ManageGroupPage] Adding students:', {
+        groupId: sel.id,
+        selectedStudents: Array.from(chk),
+        allStudents: students.length
+      });
+
+      // ИСПРАВЛЕНО: используем student profile IDs, а не user IDs
+      const studentProfileIds = Array.from(chk);
       
-      await addStudentsToGroup(sel.id, { students_id: ids });
+      await addStudentsToGroup(sel.id, studentProfileIds);
+      
+      // ИСПРАВЛЕНО: обновляем группу и состояние
       const fr = await refresh(sel.id);
       if (fr) {
         setSel(fr); 
         setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
       }
-      setChk(new Set()); setSFil(''); setAddStu(false);
-    } catch (error) { 
-      console.error('Error adding students:', error);
-      alert('Не удалось добавить студентов'); 
+      
+      setChk(new Set());
+      setAddStu(false);
+      console.log('[ManageGroupPage] Students added successfully');
+    } catch (error) {
+      console.error('[ManageGroupPage] Error adding students:', error);
+      alert('Ошибка при добавлении студентов: ' + (error.response?.data?.detail || error.message));
     }
   };
 
@@ -635,14 +669,14 @@ export default function ManageGroupPage() {
                                            padding: '4px 0', 
                                            cursor: s.already ? 'not-allowed' : 'pointer',
                                            opacity: s.already ? 0.5 : 1,
-                                           background: chk.has(s.userId) ? '#e3f2fd' : 'transparent'
+                                           background: chk.has(s.profileId) ? '#e3f2fd' : 'transparent'  // ИСПРАВЛЕНО: используем profileId
                                          }}>
                                     <input type="checkbox" disabled={s.already}
-                                           checked={chk.has(s.userId)}
+                                           checked={chk.has(s.profileId)}  // ИСПРАВЛЕНО: используем profileId
                                            onChange={e=>{
                                              setChk(prev=>{
                                                const out=new Set(prev);
-                                               e.target.checked?out.add(s.userId):out.delete(s.userId);
+                                               e.target.checked?out.add(s.profileId):out.delete(s.profileId);  // ИСПРАВЛЕНО: используем profileId
                                                return out;
                                              });
                                            }}

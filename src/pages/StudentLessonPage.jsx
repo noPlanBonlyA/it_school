@@ -63,9 +63,13 @@ export default function StudentLessonPage() {
   }, [courseId, lessonId]);
 
   const handleSubmit = async () => {
+    console.log('[StudentLessonPage] === SUBMIT DEBUG START ===');
+    
     // ИСПРАВЛЕНО: Более строгая валидация
     const hasText = text && text.trim().length > 0;
     const hasFile = file && file instanceof File;
+    
+    console.log('[StudentLessonPage] Validation:', { hasText, hasFile, textValue: text, fileValue: file });
     
     if (!hasText && !hasFile) {
       alert('Введите текст домашнего задания или выберите файл');
@@ -74,20 +78,27 @@ export default function StudentLessonPage() {
     
     try {
       setSubmitting(true);
-      console.log('[StudentLessonPage] Submitting homework:', { 
+      console.log('[StudentLessonPage] Submitting homework with params:', { 
         courseId, 
         lessonId, 
         hasText,
         hasFile,
         textLength: text?.length || 0,
+        textPreview: text?.substring(0, 100),
         fileName: file?.name,
-        fileSize: file?.size
+        fileSize: file?.size,
+        fileType: file?.type
       });
       
-      const result = await submitHomework(courseId, lessonId, { 
-        text: hasText ? text.trim() : null, 
+      // ВРЕМЕННО: Попробуем отправить только текст для отладки
+      const submissionData = {
+        text: hasText ? text.trim() : (hasFile ? 'Выполнено (см. прикрепленный файл)' : ''),
         file: hasFile ? file : null
-      });
+      };
+      
+      console.log('[StudentLessonPage] Final submission data:', submissionData);
+      
+      const result = await submitHomework(courseId, lessonId, submissionData);
       
       console.log('[StudentLessonPage] Homework submission result:', result);
       
@@ -107,19 +118,33 @@ export default function StudentLessonPage() {
       
       let errorMessage = 'Ошибка отправки домашнего задания.';
       
-      if (error.response?.data?.detail) {
-        if (Array.isArray(error.response.data.detail)) {
-          errorMessage = error.response.data.detail.map(err => err.msg).join(', ');
-        } else if (typeof error.response.data.detail === 'string') {
-          errorMessage = error.response.data.detail;
+      // Более детальная обработка ошибок
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        console.log('[StudentLessonPage] Error data structure:', errorData);
+        
+        if (errorData.detail) {
+          if (Array.isArray(errorData.detail)) {
+            const errorMessages = errorData.detail.map(err => {
+              const location = err.loc ? err.loc.join('.') : 'unknown field';
+              return `${location}: ${err.msg}`;
+            });
+            errorMessage = `Ошибки валидации:\n${errorMessages.join('\n')}`;
+          } else if (typeof errorData.detail === 'string') {
+            errorMessage = errorData.detail;
+          }
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
         }
       } else if (error.message) {
         errorMessage = error.message;
       }
       
-      alert(`${errorMessage} Попробуйте еще раз.`);
+      console.log('[StudentLessonPage] Final error message:', errorMessage);
+      alert(`${errorMessage}\n\nПроверьте консоль разработчика для подробностей.`);
     } finally {
       setSubmitting(false);
+      console.log('[StudentLessonPage] === SUBMIT DEBUG END ===');
     }
   };
 

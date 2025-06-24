@@ -3,116 +3,150 @@
  * (CRUD групп + прикрепление студентов/преподавателей/курсов)
  */
 import api from '../api/axiosInstance';
-import { createNotificationForGroup } from './notificationService';
-
-/*────────────────────── CRUD групп ──────────────────────*/
-export const getAllGroups = (limit = 100, offset = 0) =>
-  api.get('/groups', { params: { limit, offset } }).then(r => r.data);
-
-export const createGroup = async (body) => {
-  const { data } = await api.post('/groups', body);
-  
-  // Отправляем уведомление о создании группы
-  if (data.id) {
-    try {
-      await createNotificationForGroup(
-        data.id, 
-        `Создана новая группа "${data.name}". Добро пожаловать!`
-      );
-    } catch (error) {
-      console.warn('Failed to send group creation notification:', error);
-    }
-  }
-  
-  return data;
-};
-
-export const updateGroup  = (id, body) => api.put(`/groups/${id}`, body).then(r => r.data);
-export const deleteGroup  = id => api.delete(`/groups/${id}`);
-
-/*───────────────── Студенты / Преподаватель ─────────────*/
 
 /**
- * Добавить студентов в группу
+ * Получение всех групп
  */
-export const addStudentsToGroup = async (groupId, studentIds) => {
-  console.log('[GroupService] addStudentsToGroup - START');
-  console.log('[GroupService] addStudentsToGroup - groupId:', groupId);
-  console.log('[GroupService] addStudentsToGroup - Raw studentIds:', studentIds);
-  
-  // Обрабатываем разные форматы входных данных
-  let idsArray = [];
-  
-  if (Array.isArray(studentIds)) {
-    idsArray = studentIds;
-  } else if (studentIds && typeof studentIds === 'object' && studentIds.students_id) {
-    idsArray = studentIds.students_id;
-  } else if (studentIds && typeof studentIds === 'object' && studentIds.student_ids) {
-    idsArray = studentIds.student_ids;
-  } else {
-    throw new Error('Invalid studentIds format. Expected array or object with students_id/student_ids field');
-  }
-  
-  console.log('[GroupService] addStudentsToGroup - Processed idsArray:', idsArray);
-  
-  if (!Array.isArray(idsArray) || idsArray.length === 0) {
-    throw new Error('Student IDs array is required and cannot be empty');
-  }
-  
-  // Проверяем, что все ID валидные
-  const validIds = idsArray.filter(id => id && typeof id === 'string');
-  console.log('[GroupService] addStudentsToGroup - Valid IDs:', validIds);
-  
-  if (validIds.length === 0) {
-    throw new Error('No valid student IDs provided');
-  }
-  
-  if (!groupId) {
-    console.error('[GroupService] addStudentsToGroup - groupId is missing!');
-    throw new Error('Group ID is required to add students.');
-  }
-  
-  // Используем правильный API endpoint из документации
-  const payload = { students_id: validIds };
-  const url = `/groups/${groupId}/students/`;
-  
-  console.log('[GroupService] Making request to:', url);
-  console.log('[GroupService] Payload:', payload);
+export const getAllGroups = async (limit = 100, offset = 0) => {
+  console.log('[GroupService] Getting all groups:', { limit, offset });
   
   try {
-    const response = await api.post(url, payload);
-    console.log('[GroupService] ✅ SUCCESS - Students added to group:', response.data);
-    
-    // Отправляем уведомление о добавлении в группу
-    try {
-      await createNotificationForGroup(
-        groupId, 
-        `В группу добавились новые студенты!`
-      );
-    } catch (notificationError) {
-      console.warn('Failed to send student addition notification:', notificationError);
-    }
-    
-    return response.data;
-    
-  } catch (error) {
-    console.error('[GroupService] ❌ FAILED to add students:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
+    const response = await api.get('/groups/', {
+      params: { limit, offset }
     });
     
-    // Показываем детали ошибки для отладки
-    if (error.response?.data?.detail) {
-      console.error('[GroupService] Error details:', error.response.data.detail);
-    }
-    
+    console.log('[GroupService] Groups loaded:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[GroupService] Error getting groups:', error);
     throw error;
   }
 };
 
-export async function removeStudentFromGroup(groupId, studentId) {
-  await api.delete(`/groups/${groupId}/students/${studentId}`);
+/**
+ * Получение групп для преподавателя
+ */
+export const getTeacherGroups = async () => {
+  console.log('[GroupService] Getting teacher groups...');
+  
+  try {
+    const response = await api.get('/groups/teacher');
+    
+    console.log('[GroupService] Teacher groups loaded:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[GroupService] Error getting teacher groups:', error);
+    throw error;
+  }
+};
+
+/**
+ * Получение группы по ID
+ */
+export const getGroupById = async (groupId) => {
+  console.log('[GroupService] Getting group by ID:', groupId);
+  
+  try {
+    const response = await api.get(`/groups/${groupId}`);
+    
+    console.log('[GroupService] Group loaded:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[GroupService] Error getting group:', error);
+    throw error;
+  }
+};
+
+/**
+ * Создание группы
+ */
+export const createGroup = async (groupData) => {
+  console.log('[GroupService] Creating group:', groupData);
+  
+  try {
+    const response = await api.post('/groups/', groupData);
+    
+    console.log('[GroupService] Group created:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[GroupService] Error creating group:', error);
+    throw error;
+  }
+};
+
+/**
+ * Обновление группы
+ */
+export const updateGroup = async (groupId, groupData) => {
+  console.log('[GroupService] Updating group:', { groupId, groupData });
+  
+  try {
+    const response = await api.put(`/groups/${groupId}`, groupData);
+    
+    console.log('[GroupService] Group updated:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[GroupService] Error updating group:', error);
+    throw error;
+  }
+};
+
+/**
+ * Удаление группы
+ */
+export const deleteGroup = async (groupId) => {
+  console.log('[GroupService] Deleting group:', groupId);
+  
+  try {
+    await api.delete(`/groups/${groupId}`);
+    
+    console.log('[GroupService] Group deleted successfully');
+  } catch (error) {
+    console.error('[GroupService] Error deleting group:', error);
+    throw error;
+  }
+};
+
+/**
+ * ИСПРАВЛЕНО: Добавление студентов в группу с правильными ID
+ */
+export const addStudentsToGroup = async (groupId, studentIds) => {
+  console.log('[GroupService] Adding students to group:', { groupId, studentIds });
+  
+  try {
+    // Убеждаемся, что передаем именно student profile IDs, а не user IDs
+    const response = await api.post(`/groups/${groupId}/students/`, {
+      students_id: studentIds  // API ожидает массив student profile IDs
+    });
+    
+    console.log('[GroupService] Students added to group successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[GroupService] Error adding students to group:', {
+      groupId,
+      studentIds,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    throw error;
+  }
+};
+
+/**
+ * Удаление студента из группы
+ */
+export const removeStudentFromGroup = async (groupId, studentId) => {
+  console.log('[GroupService] Removing student from group:', { groupId, studentId });
+  
+  try {
+    await api.delete(`/groups/${groupId}/students/${studentId}`);
+    
+    console.log('[GroupService] Student removed from group successfully');
+  } catch (error) {
+    console.error('[GroupService] Error removing student from group:', error);
+    throw error;
+  }
 }
 
 export async function addTeacherToGroup(groupId, teacherProfileId) {

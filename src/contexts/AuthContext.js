@@ -1,21 +1,17 @@
 // src/contexts/AuthContext.js
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import api from '../api/axiosInstance';
 
-const API_BASE = 'http://localhost:8080/api';
 const AuthContext = createContext();
+
+export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(undefined); // undefined — ещё не загрузили, null — не аутентифицирован
-  // создаём инстанс axios, который автоматически шлёт куки и базовый URL
-  const api = axios.create({
-    baseURL: API_BASE,
-    withCredentials: true,
-  });
 
-  // 1) При монтировании — пробуем подгрузить /users/me
+  // 1) При монтировании — пробуем подгрузить профиль пользователя
   useEffect(() => {
-    api.get('/users/me')
+    api.get('/users/me')  // ✅ Правильный эндпоинт согласно API
       .then(({ data }) => setUser(data))
       .catch(() => setUser(null));
   }, []);
@@ -24,7 +20,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (user) {
       const id = setInterval(() => {
-        api.post('/users/refresh')
+        api.post('/users/refresh')  // ✅ Правильный эндпоинт согласно API
           .then(({ data }) => setUser(data))
           .catch(() => setUser(null));
       }, 4 * 60 * 1000);
@@ -32,27 +28,30 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  // 3) Функция логина
+  // 3) login - ИСПРАВЛЕНО: отправляем обычный JSON объект
   const login = async (username, password) => {
-    const { data } = await api.post('/users/auth', { username, password });
-    // бэкенд в ответ кидает HttpOnly-куку, и возвращает user
+    const { data } = await api.post('/users/auth', {
+      username,
+      password
+    });
     setUser(data);
     return data;
   };
 
-  // 4) Функция логаута
+  // 4) logout
   const logout = async () => {
-    await api.post('/users/logout');
-    setUser(null);
+    try {
+      await api.post('/users/logout');  // ✅ Правильный эндпоинт согласно API
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setUser(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, api }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  return useContext(AuthContext);
 }

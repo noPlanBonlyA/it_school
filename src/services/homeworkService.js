@@ -20,55 +20,93 @@ export function getStudentMaterials(courseId, lessonId) {
 }
 
 /**
- * ИСПРАВЛЕНО: Правильная отправка домашнего задания
+ * ИСПРАВЛЕНО: Отправка домашнего задания с правильными заголовками
  */
 export function submitHomework(courseId, lessonId, { text, file }) {
-  console.log('[HomeworkService] Submitting homework:', { courseId, lessonId, hasText: !!text, hasFile: !!file });
+  console.log('[HomeworkService] === HOMEWORK SUBMISSION DEBUG ===');
+  console.log('[HomeworkService] Input params:', { 
+    courseId, 
+    lessonId, 
+    text: text ? `"${text.substring(0, 50)}..."` : null,
+    hasFile: !!file,
+    fileName: file?.name,
+    fileSize: file?.size,
+    fileType: file?.type
+  });
+  
+  // Проверяем что у нас есть хотя бы текст или файл
+  if (!text?.trim() && !file) {
+    const error = new Error('Необходимо указать текст домашнего задания или выбрать файл');
+    console.error('[HomeworkService] Validation error:', error.message);
+    throw error;
+  }
   
   const form = new FormData();
   
-  // ИСПРАВЛЕНО: Проверяем что у нас есть хотя бы текст или файл
-  if (!text?.trim() && !file) {
-    throw new Error('Необходимо указать текст домашнего задания или выбрать файл');
-  }
+  // Всегда добавляем текст
+  const homeworkText = text?.trim() || (file ? 'Выполнено (см. прикрепленный файл)' : '');
+  form.append('homework_data', homeworkText);
+  console.log('[HomeworkService] Added homework_data:', `"${homeworkText}"`);
   
-  // Добавляем текст как homework_data (обязательное поле)
-  form.append('homework_data', text?.trim() || 'Выполнено (см. прикрепленный файл)');
-  
-  // ИСПРАВЛЕНО: Добавляем файл только если он есть
+  // ИСПРАВЛЕНО: Всегда добавляем homework_file поле
   if (file && file instanceof File) {
     form.append('homework_file', file);
-    console.log('[HomeworkService] Added file to form:', file.name, file.size);
+    console.log('[HomeworkService] Added real file:', {
+      name: file.name,
+      size: file.size,
+      type: file.type
+    });
+  } else {
+    // Создаем пустой файл если файл не был выбран
+    const emptyFile = new File([''], '', { type: 'text/plain' });
+    form.append('homework_file', emptyFile);
+    console.log('[HomeworkService] Added empty file placeholder');
   }
 
-  // Логируем содержимое FormData для отладки
-  console.log('[HomeworkService] FormData contents:');
+  // Детальное логирование FormData
+  console.log('[HomeworkService] FormData entries:');
   for (let [key, value] of form.entries()) {
     if (value instanceof File) {
-      console.log(`  ${key}: File(${value.name}, ${value.size} bytes)`);
+      console.log(`  ${key}: File(name="${value.name}", size=${value.size}, type="${value.type}")`);
     } else {
       console.log(`  ${key}: "${value}"`);
     }
   }
 
-  return api.post(
-    `/courses/${courseId}/lessons/${lessonId}/homework`,
-    form,
-    { 
-      headers: { 
-        'Content-Type': 'multipart/form-data' 
-      } 
-    }
-  ).then(response => {
-    console.log('[HomeworkService] Homework submitted successfully:', response.data);
+  const url = `/courses/${courseId}/lessons/${lessonId}/homework`;
+  console.log('[HomeworkService] Request URL:', url);
+
+  // ИСПРАВЛЕНО: Убираем явное указание Content-Type, позволяем браузеру установить его автоматически
+  return api.post(url, form).then(response => {
+    console.log('[HomeworkService] ✅ SUCCESS! Response:', response.data);
+    console.log('[HomeworkService] Response status:', response.status);
     return response.data;
   }).catch(error => {
-    console.error('[HomeworkService] Error submitting homework:', error);
-    console.error('[HomeworkService] Error details:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
+    console.error('[HomeworkService] ❌ ERROR submitting homework:', error);
+    
+    if (error.response) {
+      console.error('[HomeworkService] Error response status:', error.response.status);
+      console.error('[HomeworkService] Error response data:', error.response.data);
+      
+      // Детально логируем ошибку валидации
+      if (error.response.status === 422 && error.response.data?.detail) {
+        console.error('[HomeworkService] Validation errors:');
+        if (Array.isArray(error.response.data.detail)) {
+          error.response.data.detail.forEach((err, index) => {
+            console.error(`  ${index + 1}. ${err.loc ? err.loc.join('.') : 'unknown'}: ${err.msg} (type: ${err.type})`);
+          });
+        } else {
+          console.error('  Detail:', error.response.data.detail);
+        }
+      }
+    } else if (error.request) {
+      console.error('[HomeworkService] Request was made but no response received');
+      console.error('[HomeworkService] Request details:', error.request);
+    } else {
+      console.error('[HomeworkService] Error in request configuration:', error.message);
+    }
+    
+    console.log('[HomeworkService] === END DEBUG ===');
     throw error;
   });
 }

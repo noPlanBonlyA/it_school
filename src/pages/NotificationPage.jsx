@@ -1,233 +1,437 @@
 // src/pages/NotificationPage.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate }                from 'react-router-dom';
-
-import Sidebar   from '../components/Sidebar';
-import Topbar    from '../components/TopBar';
+import { useNavigate } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
+import Topbar from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
-import api        from '../api/axiosInstance';
-
-import '../styles/NotificationsPage.css';
+import { 
+  createNotificationForAllStudents, 
+  createNotificationForStudent,
+  createNotificationForGroup,
+  debugAllStudents
+} from '../services/notificationService';
+import { getAllGroups } from '../services/groupService';
+import api from '../api/axiosInstance';
 
 export default function NotificationPage() {
-  const navigate   = useNavigate();
-  const { user }   = useAuth();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // текст уведомления
-  const [content, setContent] = useState('');
-
-  // тип и цель рассылки
-  const [recipientType, setRecipientType] = useState('all'); // all, group, course, student
-  const [targetId, setTargetId]           = useState('');
-
-  // справочники
-  const [groups, setGroups]   = useState([]);
-  const [courses, setCourses] = useState([]);
+  // Состояния формы
+  const [message, setMessage] = useState('');
+  const [sendType, setSendType] = useState('all'); // 'all', 'student', 'group'
+  const [selectedStudentId, setSelectedStudentId] = useState('');
+  const [selectedGroupId, setSelectedGroupId] = useState('');
+  
+  // Данные для выбора
   const [students, setStudents] = useState([]);
+  const [groups, setGroups] = useState([]);
+  
+  // Состояния UI
+  const [sending, setSending] = useState(false);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // ui
-  const [error,   setError]   = useState('');
-  const [success, setSuccess] = useState('');
+  // Функция для получения студентов
+  const loadStudents = async (limit = 100, offset = 0) => {
+    try {
+      const response = await api.get('/students/', {
+        params: { limit, offset }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('[NotificationPage] Error loading students:', error);
+      throw error;
+    }
+  };
 
-  // ─── загрузка справочников ─────────────────────────
+  // Загрузка данных
   useEffect(() => {
-    // группы
-    api.get('/groups/', { params:{ limit:100, offset:0 } })
-      .then(r => setGroups(r.data.objects || []))
-      .catch(() => {/* silent */});
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        
+        // Загружаем студентов и группы параллельно
+        const [studentsResponse, groupsResponse] = await Promise.all([
+          loadStudents(100, 0),
+          getAllGroups(100, 0)
+        ]);
+        
+        setStudents(studentsResponse.objects || []);
+        setGroups(groupsResponse.objects || []);
+        
+        console.log('[NotificationPage] Data loaded:', {
+          students: studentsResponse.objects?.length || 0,
+          groups: groupsResponse.objects?.length || 0
+        });
+        
+      } catch (error) {
+        console.error('[NotificationPage] Error loading data:', error);
+        alert('Ошибка загрузки данных: ' + error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // курсы
-    api.get('/courses/', { params:{ limit:100, offset:0 } })
-      .then(r => setCourses(r.data.objects || []))
-      .catch(() => {/* silent */});
-
-    // студенты (пользователи с ролью student)
-    api.get('/users/', {
-      params:{ role:'student', limit:100, offset:0 }
-    })
-      .then(r => setStudents(r.data.objects || []))
-      .catch(() => {/* silent */});
+    loadData();
   }, []);
 
-  // ─── отправка уведомления ──────────────────────────
-  const handleSubmit = async () => {
-    setError(''); 
-    setSuccess('');
+  // Отправка уведомления
+  const handleSendNotification = async () => {
+    if (!message.trim()) {
+      alert('Введите текст уведомления');
+      return;
+    }
 
-    if (!content.trim()) {
-      setError('Текст уведомления не может быть пустым.');
+    if (sendType === 'student' && !selectedStudentId) {
+      alert('Выберите студента');
+      return;
+    }
+
+    if (sendType === 'group' && !selectedGroupId) {
+      alert('Выберите группу');
       return;
     }
 
     try {
-      if (recipientType === 'all') {
-        // всем сразу
-        await api.post('/notifications/', { content }, {
-          params:{
-            recipient_type: 'group',
-            recipient_id:   'all',
-            create_notification_use_case: 'createNotificationUseCase'
-          }
-        });
-      }
-      else if (recipientType === 'group') {
-        if (!targetId) { setError('Выберите группу.'); return; }
-        await api.post('/notifications/', { content }, {
-          params:{
-            recipient_type: 'group',
-            recipient_id:   targetId,
-            create_notification_use_case: 'createNotificationUseCase'
-          }
-        });
-      }
-      else if (recipientType === 'student') {
-        if (!targetId) { setError('Выберите студента.'); return; }
-        await api.post('/notifications/', { content }, {
-          params:{
-            recipient_type: 'student',
-            recipient_id:   targetId,
-            create_notification_use_case: 'createNotificationUseCase'
-          }
-        });
-      }
-      else if (recipientType === 'course') {
-        if (!targetId) { setError('Выберите курс.'); return; }
+      setSending(true);
+      setResult(null);
 
-        // 1) получить все группы
-        const { data: grPage } = await api.get('/groups/', {
-          params:{ limit:100, offset:0 }
-        });
-        const brief = grPage.objects || [];
+      console.log('[NotificationPage] Sending notification:', {
+        type: sendType,
+        message: message,
+        studentId: selectedStudentId,
+        groupId: selectedGroupId
+      });
 
-        // 2) получить детали у каждой группы
-        const details = await Promise.all(
-          brief.map(g =>
-            api.get(`/groups/${g.id}`)
-               .then(r => r.data)
-               .catch(() => null)
-          )
-        );
+      let response;
 
-        // 3) отфильтровать группы, где есть наш курс
-        const courseGroups = details.filter(g =>
-          g && Array.isArray(g.courses) &&
-          g.courses.some(c => c.id === targetId)
-        );
+      switch (sendType) {
+        case 'all':
+          response = await createNotificationForAllStudents(message.trim());
+          setResult({
+            type: 'success',
+            title: 'Уведомление отправлено всем студентам',
+            details: `Успешно отправлено: ${response.successful}/${response.total}`,
+            data: response
+          });
+          break;
 
-        // 4) отправить одно уведомление на каждую группу
-        await Promise.all(courseGroups.map(g =>
-          api.post('/notifications/', { content }, {
-            params:{
-              recipient_type: 'group',
-              recipient_id:   g.id,
-              create_notification_use_case: 'createNotificationUseCase'
-            }
-          })
-        ));
+        case 'student':
+          response = await createNotificationForStudent(selectedStudentId, message.trim());
+          const student = students.find(s => s.id === selectedStudentId);
+          setResult({
+            type: 'success',
+            title: 'Уведомление отправлено студенту',
+            details: `Отправлено: ${student?.user?.first_name || ''} ${student?.user?.surname || ''}`,
+            data: response
+          });
+          break;
+
+        case 'group':
+          response = await createNotificationForGroup(selectedGroupId, message.trim());
+          setResult({
+            type: 'success',
+            title: 'Уведомление отправлено группе',
+            details: `Группа: ${response.groupName}, отправлено: ${response.successful}/${response.total}`,
+            data: response
+          });
+          break;
+
+        default:
+          throw new Error('Неизвестный тип отправки');
       }
 
-      setSuccess('Уведомление(я) успешно отправлены.');
-      setContent('');
-      setRecipientType('all');
-      setTargetId('');
-    } catch (e) {
-      console.error(e);
-      setError('Ошибка при отправке. Проверьте консоль.');
+      // Очищаем форму после успешной отправки
+      setMessage('');
+      setSelectedStudentId('');
+      setSelectedGroupId('');
+
+    } catch (error) {
+      console.error('[NotificationPage] Error sending notification:', error);
+      setResult({
+        type: 'error',
+        title: 'Ошибка отправки уведомления',
+        details: error.message,
+        data: null
+      });
+    } finally {
+      setSending(false);
     }
   };
 
-  return (
-    <div className="manage-notifications app-layout">
-      <Sidebar activeItem="notifications" userRole={user.role}/>
-      <div className="main-content">
-        <Topbar userName={`${user.first_name} ${user.surname}`}
-                userRole={user.role}
-                onProfileClick={() => navigate('/profile')} />
+  // Отладочная функция
+  const handleDebugStudents = async () => {
+    try {
+      const students = await debugAllStudents();
+      console.log('[NotificationPage] Debug - all students:', students);
+      alert(`Найдено студентов: ${students.length}. Смотрите консоль для деталей.`);
+    } catch (error) {
+      console.error('[NotificationPage] Debug error:', error);
+      alert('Ошибка отладки: ' + error.message);
+    }
+  };
 
-        <h1>Рассылка уведомлений</h1>
-        <div className="block notifications-block">
+  const fullName = [user.first_name, user.surname, user.patronymic]
+    .filter(Boolean).join(' ');
 
-          <div className="field">
-            <label>Текст уведомления</label>
-            <textarea
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              placeholder="Введите сообщение..."
-            />
+  if (loading) {
+    return (
+      <div className="app-layout">
+        <Sidebar activeItem="broadcast" userRole={user.role} />
+        <div className="main-content">
+          <Topbar
+            userName={fullName}
+            userRole={user.role}
+            onProfileClick={() => navigate('/profile')}
+          />
+          <div style={{ padding: '40px', textAlign: 'center' }}>
+            <div>Загрузка данных...</div>
           </div>
+        </div>
+      </div>
+    );
+  }
 
-          <div className="field">
-            <label>Кому отправить</label>
-            <select
-              value={recipientType}
-              onChange={e => {
-                setRecipientType(e.target.value);
-                setTargetId('');
-                setError('');
-                setSuccess('');
+  return (
+    <div className="app-layout">
+      <Sidebar activeItem="broadcast" userRole={user.role} />
+      <div className="main-content">
+        <Topbar
+          userName={fullName}
+          userRole={user.role}
+          onProfileClick={() => navigate('/profile')}
+        />
+
+        <div style={{ padding: '24px', maxWidth: '800px' }}>
+          <h1>Отправка уведомлений</h1>
+
+          {/* Отладочная кнопка */}
+          <div style={{ marginBottom: '20px' }}>
+            <button
+              onClick={handleDebugStudents}
+              style={{
+                padding: '8px 16px',
+                background: '#6f42c1',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
               }}
             >
-              <option value="all">Всем пользователям</option>
-              <option value="group">Конкретной группе</option>
-              <option value="course">Всем студентам курса</option>
-              <option value="student">Конкретному студенту</option>
-            </select>
+              🔍 Отладка студентов
+            </button>
           </div>
 
-          {recipientType === 'group' && (
-            <div className="field">
-              <label>Группа</label>
-              <select
-                value={targetId}
-                onChange={e => setTargetId(e.target.value)}
-              >
-                <option value="">— выберите группу —</option>
-                {groups.map(g =>
-                  <option key={g.id} value={g.id}>{g.name}</option>
-                )}
-              </select>
+          <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+            
+            {/* Тип отправки */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+                Кому отправить:
+              </label>
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="radio"
+                    value="all"
+                    checked={sendType === 'all'}
+                    onChange={(e) => setSendType(e.target.value)}
+                  />
+                  Всем студентам
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="radio"
+                    value="student"
+                    checked={sendType === 'student'}
+                    onChange={(e) => setSendType(e.target.value)}
+                  />
+                  Конкретному студенту
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="radio"
+                    value="group"
+                    checked={sendType === 'group'}
+                    onChange={(e) => setSendType(e.target.value)}
+                  />
+                  Группе
+                </label>
+              </div>
             </div>
-          )}
 
-          {recipientType === 'course' && (
-            <div className="field">
-              <label>Курс</label>
-              <select
-                value={targetId}
-                onChange={e => setTargetId(e.target.value)}
-              >
-                <option value="">— выберите курс —</option>
-                {courses.map(c =>
-                  <option key={c.id} value={c.id}>{c.name}</option>
+            {/* Выбор студента */}
+            {sendType === 'student' && (
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+                  Выберите студента:
+                </label>
+                <select
+                  value={selectedStudentId}
+                  onChange={(e) => setSelectedStudentId(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px'
+                  }}
+                >
+                  <option value="">-- Выберите студента --</option>
+                  {students.map(student => (
+                    <option key={student.id} value={student.id}>
+                      {`${student.user?.first_name || ''} ${student.user?.surname || ''}`.trim() || student.user?.username || 'Без имени'}
+                      {student.user?.username && ` (${student.user.username})`}
+                    </option>
+                  ))}
+                </select>
+                {students.length === 0 && (
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                    Студенты не найдены
+                  </div>
                 )}
-              </select>
-            </div>
-          )}
+              </div>
+            )}
 
-          {recipientType === 'student' && (
-            <div className="field">
-              <label>Студент</label>
-              <select
-                value={targetId}
-                onChange={e => setTargetId(e.target.value)}
-              >
-                <option value="">— выберите студента —</option>
-                {students.map(u =>
-                  <option key={u.id} value={u.id}>
-                    {u.username} — {u.first_name} {u.surname}
-                  </option>
+            {/* Выбор группы */}
+            {sendType === 'group' && (
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+                  Выберите группу:
+                </label>
+                <select
+                  value={selectedGroupId}
+                  onChange={(e) => setSelectedGroupId(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px'
+                  }}
+                >
+                  <option value="">-- Выберите группу --</option>
+                  {groups.map(group => (
+                    <option key={group.id} value={group.id}>
+                      {group.name}
+                    </option>
+                  ))}
+                </select>
+                {groups.length === 0 && (
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                    Группы не найдены
+                  </div>
                 )}
-              </select>
+              </div>
+            )}
+
+            {/* Текст уведомления */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+                Текст уведомления:
+              </label>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Введите текст уведомления..."
+                style={{
+                  width: '100%',
+                  minHeight: '120px',
+                  padding: '12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  resize: 'vertical',
+                  fontFamily: 'inherit'
+                }}
+              />
+              <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                Символов: {message.length}
+              </div>
             </div>
-          )}
 
-          {error   && <div className="error-text">{error}</div>}
-          {success && <div className="success-text">{success}</div>}
-
-          <div className="buttons-notif">
-            <button className="btn-primary" onClick={handleSubmit}>
-              Отправить уведомление
+            {/* Кнопка отправки */}
+            <button
+              onClick={handleSendNotification}
+              disabled={sending || !message.trim()}
+              style={{
+                padding: '12px 24px',
+                background: sending ? '#ccc' : '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: sending ? 'not-allowed' : 'pointer',
+                fontSize: '16px',
+                fontWeight: '500'
+              }}
+            >
+              {sending ? 'Отправка...' : 'Отправить уведомление'}
             </button>
+
+            {/* Результат отправки */}
+            {result && (
+              <div style={{
+                marginTop: '20px',
+                padding: '16px',
+                borderRadius: '4px',
+                background: result.type === 'success' ? '#d4edda' : '#f8d7da',
+                border: `1px solid ${result.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`,
+                color: result.type === 'success' ? '#155724' : '#721c24'
+              }}>
+                <h4 style={{ margin: '0 0 8px 0' }}>{result.title}</h4>
+                <p style={{ margin: '0 0 8px 0' }}>{result.details}</p>
+                
+                {result.data && result.data.errors && result.data.errors.length > 0 && (
+                  <details style={{ marginTop: '12px' }}>
+                    <summary style={{ cursor: 'pointer', fontWeight: '500' }}>
+                      Ошибки отправки ({result.data.errors.length})
+                    </summary>
+                    <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+                      {result.data.errors.map((error, index) => (
+                        <li key={index}>
+                          {error.studentName}: {error.error}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+
+                {result.data && result.data.notifications && result.data.notifications.length > 0 && (
+                  <details style={{ marginTop: '12px' }}>
+                    <summary style={{ cursor: 'pointer', fontWeight: '500' }}>
+                      Успешно отправлено ({result.data.notifications.length})
+                    </summary>
+                    <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+                      {result.data.notifications.slice(0, 10).map((notification, index) => (
+                        <li key={index}>
+                          {notification.studentName}
+                        </li>
+                      ))}
+                      {result.data.notifications.length > 10 && (
+                        <li>... и ещё {result.data.notifications.length - 10}</li>
+                      )}
+                    </ul>
+                  </details>
+                )}
+              </div>
+            )}
+
+            {/* Статистика */}
+            <div style={{
+              marginTop: '24px',
+              padding: '16px',
+              background: '#f8f9fa',
+              borderRadius: '4px',
+              border: '1px solid #dee2e6'
+            }}>
+              <h4 style={{ margin: '0 0 12px 0' }}>Статистика:</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <div>
+                  <strong>Студентов в системе:</strong> {students.length}
+                </div>
+                <div>
+                  <strong>Групп в системе:</strong> {groups.length}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

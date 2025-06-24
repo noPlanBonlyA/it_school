@@ -1,20 +1,17 @@
-// src/pages/HomeworkPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
-import '../styles/HomeworkPage.css';
+import '../styles/LessonsPage.css';
 import {
   getTeacherGroups,
   getLessonGroupsByGroup,
   getLessonStudents,
-  getLessonStudentDetails,
-  updateLessonStudent,
-  addCommentToLessonStudent
+  updateLessonStudent
 } from '../services/homeworkService';
 
-export default function HomeworkPage() {
+export default function LessonsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -25,7 +22,7 @@ export default function HomeworkPage() {
   
   const [selectedGroupId, setSelectedGroupId] = useState(null);
   const [selectedLessonGroupId, setSelectedLessonGroupId] = useState(null);
-  const [expandedSubmission, setExpandedSubmission] = useState(null);
+  const [expandedStudent, setExpandedStudent] = useState(null);
   
   const [loading, setLoading] = useState(true);
   const [loadingLessons, setLoadingLessons] = useState(false);
@@ -47,11 +44,11 @@ export default function HomeworkPage() {
       setError(null);
       
       const groupsData = await getTeacherGroups();
-      console.log('[Homework] Loaded groups:', groupsData);
+      console.log('[Lessons] Loaded groups:', groupsData);
       
       setGroups(groupsData || []);
     } catch (error) {
-      console.error('[Homework] Error loading initial data:', error);
+      console.error('[Lessons] Error loading initial data:', error);
       setError('Ошибка загрузки данных');
     } finally {
       setLoading(false);
@@ -64,7 +61,7 @@ export default function HomeworkPage() {
     
     setSelectedGroupId(groupId);
     setSelectedLessonGroupId(null);
-    setExpandedSubmission(null);
+    setExpandedStudent(null);
     setStudents([]);
     
     try {
@@ -72,11 +69,11 @@ export default function HomeworkPage() {
       setError(null);
       
       const lessonGroupsData = await getLessonGroupsByGroup(groupId);
-      console.log('[Homework] Loaded lesson groups:', lessonGroupsData);
+      console.log('[Lessons] Loaded lesson groups:', lessonGroupsData);
       
       setLessonGroups(lessonGroupsData || []);
     } catch (error) {
-      console.error('[Homework] Error loading lesson groups:', error);
+      console.error('[Lessons] Error loading lesson groups:', error);
       setError('Ошибка загрузки уроков');
     } finally {
       setLoadingLessons(false);
@@ -88,52 +85,47 @@ export default function HomeworkPage() {
     if (selectedLessonGroupId === lessonGroupId) return;
     
     setSelectedLessonGroupId(lessonGroupId);
-    setExpandedSubmission(null);
+    setExpandedStudent(null);
     
     try {
       setLoadingStudents(true);
       setError(null);
       
       const studentsData = await getLessonStudents(lessonGroupId);
-      console.log('[Homework] Loaded students:', studentsData);
+      console.log('[Lessons] Loaded students:', studentsData);
       
-      // Фильтруем только студентов с домашками
-      const studentsWithHomework = studentsData.filter(student => student.is_sent_homework);
-      setStudents(studentsWithHomework || []);
+      setStudents(studentsData || []);
     } catch (error) {
-      console.error('[Homework] Error loading students:', error);
+      console.error('[Lessons] Error loading students:', error);
       setError('Ошибка загрузки студентов');
     } finally {
       setLoadingStudents(false);
     }
   };
 
-  // Развернуть/свернуть детали домашки
-  const handleToggleSubmission = async (studentId) => {
-    if (expandedSubmission === studentId) {
-      setExpandedSubmission(null);
-      return;
-    }
-
-    try {
-      const studentDetails = await getLessonStudentDetails(studentId);
-      console.log('[Homework] Student details:', studentDetails);
-      
-      setStudents(prev => prev.map(student => 
-        student.id === studentId 
-          ? { ...student, details: studentDetails }
-          : student
-      ));
-      
-      setExpandedSubmission(studentId);
-    } catch (error) {
-      console.error('[Homework] Error loading student details:', error);
-      alert('Ошибка загрузки деталей студента');
-    }
+  // Развернуть/свернуть детали студента
+  const handleToggleStudent = (studentId) => {
+    setExpandedStudent(expandedStudent === studentId ? null : studentId);
   };
 
-  // Обработчики изменения оценок за ДЗ
-  const handleHomeworkGradeChange = (studentId, field, value) => {
+  // Обработчики изменения данных урока
+  const handleAttendanceChange = (studentId, isVisited) => {
+    setStudents(prev => prev.map(student => 
+      student.id === studentId 
+        ? { ...student, is_visited: isVisited }
+        : student
+    ));
+  };
+
+  const handleExcusedChange = (studentId, isExcused) => {
+    setStudents(prev => prev.map(student => 
+      student.id === studentId 
+        ? { ...student, is_excused_absence: isExcused }
+        : student
+    ));
+  };
+
+  const handleLessonGradeChange = (studentId, field, value) => {
     setStudents(prev => prev.map(student => 
       student.id === studentId 
         ? { ...student, [field]: value }
@@ -141,71 +133,36 @@ export default function HomeworkPage() {
     ));
   };
 
-  const handleCommentChange = (studentId, value) => {
-    setStudents(prev => prev.map(student => 
-      student.id === studentId 
-        ? { 
-            ...student, 
-            newComment: value 
-          }
-        : student
-    ));
-  };
-
-  // Сохранение оценок за ДЗ и комментариев
-  const handleSaveHomework = async (studentId) => {
+  // Сохранение данных урока
+  const handleSaveLesson = async (studentId) => {
     const student = students.find(s => s.id === studentId);
     if (!student) return;
 
     try {
-      // Обновляем только оценки за ДЗ
       const updateData = {
-        // Сохраняем существующие данные по уроку
         is_visited: student.is_visited,
         is_excused_absence: student.is_excused_absence,
-        coins_for_visit: student.coins_for_visit || 0,
-        grade_for_visit: student.grade_for_visit || 0,
-        // Обновляем данные по ДЗ
+        coins_for_visit: parseInt(student.coins_for_visit) || 0,
+        grade_for_visit: parseInt(student.grade_for_visit) || 0,
+        // Сохраняем существующие данные по ДЗ
         is_sent_homework: student.is_sent_homework,
-        is_graded_homework: true,
-        coins_for_homework: parseInt(student.coins_for_homework) || 0,
-        grade_for_homework: parseInt(student.grade_for_homework) || 0
+        is_graded_homework: student.is_graded_homework,
+        coins_for_homework: student.coins_for_homework || 0,
+        grade_for_homework: student.grade_for_homework || 0
       };
 
       await updateLessonStudent(studentId, updateData);
 
-      // Добавляем комментарий если есть
-      if (student.newComment && student.newComment.trim()) {
-        const lessonGroup = lessonGroups.find(lg => lg.id === selectedLessonGroupId);
-        if (lessonGroup) {
-          await addCommentToLessonStudent(
-            lessonGroup.lesson.course_id,
-            lessonGroup.lesson.id,
-            {
-              text: student.newComment.trim(),
-              lesson_student_id: studentId
-            }
-          );
-        }
-      }
-
-      // Перезагружаем детали студента
-      const updatedDetails = await getLessonStudentDetails(studentId);
       setStudents(prev => prev.map(s => 
         s.id === studentId 
-          ? { 
-              ...s, 
-              ...updateData,
-              details: updatedDetails,
-              newComment: '' 
-            }
+          ? { ...s, ...updateData }
           : s
       ));
 
-      setExpandedSubmission(null);
-      alert('Оценка за ДЗ и комментарий сохранены!');
+      setExpandedStudent(null);
+      alert('Данные урока сохранены!');
     } catch (error) {
-      console.error('[Homework] Error saving:', error);
+      console.error('[Lessons] Error saving:', error);
       alert('Ошибка сохранения данных');
     }
   };
@@ -229,7 +186,7 @@ export default function HomeworkPage() {
   if (loading) {
     return (
       <div className="app-layout">
-        <Sidebar activeItem="homework" userRole="teacher" />
+        <Sidebar activeItem="lessons" userRole="teacher" />
         <div className="main-content">
           <Topbar 
             userName={`${user?.first_name || ''} ${user?.surname || ''}`.trim() || user?.username}
@@ -247,7 +204,7 @@ export default function HomeworkPage() {
 
   return (
     <div className="app-layout">
-      <Sidebar activeItem="homework" userRole="teacher" />
+      <Sidebar activeItem="lessons" userRole="teacher" />
 
       <div className="main-content">
         <Topbar
@@ -257,12 +214,12 @@ export default function HomeworkPage() {
           onProfileClick={() => {}}
         />
 
-        <div className="content-area homework-page">
-          <h1>Проверка домашних заданий</h1>
+        <div className="content-area lessons-page">
+          <h1>Управление уроками</h1>
           
           {error && <div className="error">{error}</div>}
           
-          <div className="homework-grid">
+          <div className="lessons-grid">
             {/* Колонка 1: Список групп */}
             <div className="column groups-col">
               <h2>Группы ({groups.length})</h2>
@@ -320,22 +277,22 @@ export default function HomeworkPage() {
               )}
             </div>
 
-            {/* Колонка 3: Список студентов с домашками */}
-            <div className="column submissions-col">
-              <h2>Домашние задания {selectedLessonGroup && `(${students.length})`}</h2>
+            {/* Колонка 3: Список студентов */}
+            <div className="column students-col">
+              <h2>Студенты {selectedLessonGroup && `(${students.length})`}</h2>
               {!selectedLessonGroup ? (
                 <div className="placeholder">Выберите урок</div>
               ) : loadingStudents ? (
-                <div className="loading">Загрузка домашних заданий...</div>
+                <div className="loading">Загрузка студентов...</div>
               ) : students.length === 0 ? (
-                <div className="placeholder">Нет сданных домашних заданий</div>
+                <div className="placeholder">Нет студентов на уроке</div>
               ) : (
-                <div className="submissions-content">
+                <div className="students-content">
                   {students.map(student => (
-                    <div key={student.id} className="submission-item">
+                    <div key={student.id} className="student-item">
                       <div
-                        className={`submission-header ${expandedSubmission === student.id ? 'expanded' : ''}`}
-                        onClick={() => handleToggleSubmission(student.id)}
+                        className={`student-header ${expandedStudent === student.id ? 'expanded' : ''}`}
+                        onClick={() => handleToggleStudent(student.id)}
                       >
                         <div className="student-info">
                           <div className="student-name">
@@ -343,113 +300,84 @@ export default function HomeworkPage() {
                              student.student?.user?.username || 'Неизвестный студент'}
                           </div>
                           <div className="student-meta">
-                            <span>ДЗ сдано: ✅</span>
-                            <span>Оценено: {student.is_graded_homework ? '✅' : '❌'}</span>
+                            <span>Присутствие: {student.is_visited ? '✅' : '❌'}</span>
+                            {student.is_excused_absence && <span>Уважительная причина</span>}
                           </div>
                         </div>
-                        <div className="homework-status">
-                          {student.grade_for_homework > 0 && (
+                        <div className="lesson-status">
+                          {student.grade_for_visit > 0 && (
                             <span className="grade-display">
-                              Оценка: {student.grade_for_homework}
+                              Оценка: {student.grade_for_visit}
                             </span>
                           )}
-                          <span className={`status-badge ${student.is_graded_homework ? 'graded' : 'submitted'}`}>
-                            {student.is_graded_homework ? 'Оценено' : 'Сдано'}
-                          </span>
-                          <span className={`expand-icon ${expandedSubmission === student.id ? 'rotated' : ''}`}>
+                          <span className={`expand-icon ${expandedStudent === student.id ? 'rotated' : ''}`}>
                             ▼
                           </span>
                         </div>
                       </div>
                       
-                      {expandedSubmission === student.id && (
-                        <div className="submission-details">
-                          {/* Файлы домашки */}
-                          {student.details?.passed_homeworks && student.details.passed_homeworks.length > 0 && (
-                            <div className="homework-files">
-                              <h4>Сданные файлы:</h4>
-                              <div className="file-list">
-                                {student.details.passed_homeworks.map((hw, index) => (
-                                  <div key={hw.id || index} className="file-item">
-                                    <span className="file-icon">📎</span>
-                                    <span className="file-name">{hw.homework?.name || `Файл ${index + 1}`}</span>
-                                    {hw.homework?.url && (
-                                      <a 
-                                        href={hw.homework.url} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="file-link"
-                                      >
-                                        Скачать
-                                      </a>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
+                      {expandedStudent === student.id && (
+                        <div className="student-details">
+                          {/* Посещаемость */}
+                          <div className="attendance-section">
+                            <div className="attendance-field">
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  checked={student.is_visited || false}
+                                  onChange={e => handleAttendanceChange(student.id, e.target.checked)}
+                                />
+                                Присутствовал на уроке
+                              </label>
                             </div>
-                          )}
+                            <div className="attendance-field">
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  checked={student.is_excused_absence || false}
+                                  onChange={e => handleExcusedChange(student.id, e.target.checked)}
+                                />
+                                Уважительная причина отсутствия
+                              </label>
+                            </div>
+                          </div>
 
-                          {/* Оценки за ДЗ */}
-                          <div className="homework-grading-section">
+                          {/* Оценки за урок */}
+                          <div className="lesson-grading-section">
                             <div className="grade-field">
-                              <label>Баллы за ДЗ:</label>
+                              <label>Баллы за посещение:</label>
                               <input
                                 type="number"
                                 min="0"
                                 max="10"
-                                value={student.coins_for_homework || ''}
-                                onChange={e => handleHomeworkGradeChange(student.id, 'coins_for_homework', e.target.value)}
+                                value={student.coins_for_visit || ''}
+                                onChange={e => handleLessonGradeChange(student.id, 'coins_for_visit', e.target.value)}
                               />
                             </div>
                             <div className="grade-field">
-                              <label>Оценка за ДЗ:</label>
+                              <label>Оценка за урок:</label>
                               <input
                                 type="number"
                                 min="0"
                                 max="5"
-                                value={student.grade_for_homework || ''}
-                                onChange={e => handleHomeworkGradeChange(student.id, 'grade_for_homework', e.target.value)}
+                                value={student.grade_for_visit || ''}
+                                onChange={e => handleLessonGradeChange(student.id, 'grade_for_visit', e.target.value)}
                               />
                             </div>
                           </div>
 
-                          {/* Комментарий */}
-                          <div className="comment-field">
-                            <label>Комментарий к домашнему заданию:</label>
-                            <textarea
-                              placeholder="Введите комментарий к домашнему заданию..."
-                              value={student.newComment || ''}
-                              onChange={e => handleCommentChange(student.id, e.target.value)}
-                            />
-                          </div>
-
-                          {/* Существующие комментарии */}
-                          {student.details?.comments && student.details.comments.length > 0 && (
-                            <div className="existing-comments">
-                              <h4>Предыдущие комментарии:</h4>
-                              {student.details.comments.map((comment, index) => (
-                                <div key={comment.id || index} className="comment-item">
-                                  <div className="comment-meta">
-                                    {formatDate(comment.created_at)}
-                                  </div>
-                                  <div className="comment-text">{comment.text}</div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
                           <div className="details-buttons">
                             <button
                               className="btn-primary"
-                              onClick={() => handleSaveHomework(student.id)}
+                              onClick={() => handleSaveLesson(student.id)}
                             >
-                              Сохранить оценку
+                              Сохранить
                             </button>
                             <button
                               className="btn-secondary"
-                              onClick={() => setExpandedSubmission(null)}
+                              onClick={() => setExpandedStudent(null)}
                             >
-                              Закрыть
+                              Отменить
                             </button>
                           </div>
                         </div>

@@ -25,6 +25,7 @@ export default function LoginPage() {
     e.preventDefault();
     setToast({ message: '', type: 'error' });
     try {
+      // ИСПРАВЛЕНО: передаем username и password как отдельные параметры
       await login(username, password);
       navigate('/home', { replace: true });
     } catch (err) {

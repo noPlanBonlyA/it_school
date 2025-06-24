@@ -1,27 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Toast from '../components/Toast';
 import '../styles/PasswordReset.css';
+import api from '../api/axiosInstance';
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [email, setEmail]       = useState('');
   const [toast, setToast]       = useState({ message: '', type: 'info' });
-  const API_BASE = 'http://localhost:8080';
 
   const handleSubmit = async e => {
     e.preventDefault();
     setToast({ message: '', type: 'info' });
     try {
-      await axios.post(`${API_BASE}/api/users/reset_password`, { username, email });
+      await api.post('/users/reset_password', { username, email });  // ✅ Правильный эндпоинт согласно API
       setToast({
         message: 'Если пользователь существует, ссылка для сброса пароля отправлена на почту.',
         type: 'info'
       });
-      // По желанию — переходим на логин через 3 секунды
-      // setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
       const msg =
         err.response?.status === 422
