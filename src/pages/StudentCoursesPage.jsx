@@ -5,28 +5,39 @@ import Sidebar   from '../components/Sidebar';
 import Topbar    from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
 
-import { listStudentCourses } from '../services/courseService';
+import { listStudentCourses, getAllCourses } from '../services/courseService';
 import '../styles/CourseCard.css';
 
 export default function StudentCoursesPage() {
   const navigate      = useNavigate();
   const { user }      = useAuth();
 
-  const [myCourses,   setMyCourses]   = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [myCourses,      setMyCourses]      = useState([]);
+  const [otherCourses,   setOtherCourses]   = useState([]);
+  const [loading,        setLoading]        = useState(true);
+  const [error,          setError]          = useState(null);
 
-  /* ───── загрузка курсов из групп пользователя ───── */
+  /* ───── загрузка курсов ───── */
   useEffect(() => { (async () => {
     try {
       setLoading(true);
-      // Используем API /courses/student - возвращает только курсы из групп пользователя
-      const courses = await listStudentCourses();
-      console.log('[StudentCoursesPage] Loaded courses:', courses);
-      setMyCourses(courses || []);
+      
+      // 1. Загружаем доступные курсы студента
+      const availableCourses = await listStudentCourses();
+      const availableIds = new Set(availableCourses.map(c => c.id));
+      setMyCourses(availableCourses || []);
+      
+      // 2. Загружаем все курсы и фильтруем недоступные
+      const allCoursesResponse = await getAllCourses(100, 0);
+      const allCourses = allCoursesResponse.objects || [];
+      const unavailableCourses = allCourses.filter(c => !availableIds.has(c.id));
+      setOtherCourses(unavailableCourses);
+      
+      console.log('[StudentCoursesPage] Available courses:', availableCourses);
+      console.log('[StudentCoursesPage] Other courses:', unavailableCourses);
     } catch (err) {
       console.error('[StudentCoursesPage] Error loading courses:', err);
-      setError('Не удалось загрузить ваши курсы. Пожалуйста, попробуйте позже.');
+      setError('Не удалось загрузить курсы. Пожалуйста, попробуйте позже.');
     } finally {
       setLoading(false);
     }
@@ -37,10 +48,14 @@ export default function StudentCoursesPage() {
     navigate(`/courses/${id}/student`);
   };
 
+  const openDisabled = () => {
+    alert('У вас нет доступа к этому курсу. Обратитесь к администратору для добавления в группу.');
+  };
+
   const fullName = [user.first_name, user.surname, user.patronymic]
                     .filter(Boolean).join(' ');
 
-  const renderCourseCard = (course) => {
+  const renderCourseCard = (course, disabled = false) => {
     let imageUrl = '';
     if (course.photo?.url) {
       imageUrl = course.photo.url.startsWith('http')
@@ -51,8 +66,9 @@ export default function StudentCoursesPage() {
     return (
       <div 
         key={course.id} 
-        className="course-card" 
-        onClick={() => openCourse(course.id)}
+        className={`course-card ${disabled ? 'disabled' : ''}`}
+        onClick={disabled ? openDisabled : () => openCourse(course.id)}
+        style={disabled ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
       >
         {imageUrl ? (
           <img src={imageUrl} alt={course.name} />
@@ -67,6 +83,7 @@ export default function StudentCoursesPage() {
           <div className="course-info-footer">
             {course.author_name && <span className="author">👩‍🏫 {course.author_name}</span>}
             {course.age_category && <span className="age">👥 {course.age_category}</span>}
+            {disabled && <span className="status" style={{color: '#dc3545'}}>🔒 Недоступно</span>}
           </div>
         </div>
       </div>
@@ -104,7 +121,7 @@ export default function StudentCoursesPage() {
           onProfileClick={() => navigate('/profile')}
         />
 
-        <h1>Мои курсы</h1>
+        <h1>Курсы</h1>
 
         {error && (
           <div className="error-message">
@@ -112,20 +129,40 @@ export default function StudentCoursesPage() {
           </div>
         )}
 
+        {/* Доступные курсы */}
         <section className="courses-section">
           <div className="section-header">
-            <h2 className="section-label">Доступные курсы</h2>
+            <h2 className="section-label">Мои доступные курсы</h2>
             <span className="course-count">{myCourses.length} курс(ов)</span>
           </div>
           {myCourses.length ? (
             <div className="courses-grid">
-              {myCourses.map(course => renderCourseCard(course))}
+              {myCourses.map(course => renderCourseCard(course, false))}
             </div>
           ) : (
             <div className="empty-state">
               <div className="empty-icon">📚</div>
               <h3>У вас пока нет доступных курсов</h3>
               <p>Курсы появятся после добавления вас в группу с курсами</p>
+            </div>
+          )}
+        </section>
+
+        {/* Недоступные курсы */}
+        <section className="courses-section" style={{ marginTop: '2rem' }}>
+          <div className="section-header">
+            <h2 className="section-label">Другие курсы</h2>
+            <span className="course-count">{otherCourses.length} курс(ов)</span>
+          </div>
+          {otherCourses.length ? (
+            <div className="courses-grid">
+              {otherCourses.map(course => renderCourseCard(course, true))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <div className="empty-icon">🎯</div>
+              <h3>Вы имеете доступ ко всем курсам!</h3>
+              <p>Все доступные курсы отображены в разделе выше</p>
             </div>
           )}
         </section>
@@ -137,12 +174,12 @@ export default function StudentCoursesPage() {
               <li>Курсы доступны только через группы</li>
               <li>Администратор должен добавить вас в группу</li>
               <li>К группе должен быть привязан курс</li>
-              <li>После этого курс появится в вашем списке</li>
+              <li>После этого курс появится в разделе "Мои доступные курсы"</li>
             </ol>
             <p>
               <strong>Текущий статус:</strong> {myCourses.length > 0 
-                ? `У вас есть доступ к ${myCourses.length} курс(ам)` 
-                : 'Доступных курсов нет'}
+                ? `У вас есть доступ к ${myCourses.length} из ${myCourses.length + otherCourses.length} курс(ам)` 
+                : `Нет доступных курсов из ${otherCourses.length} всего`}
             </p>
           </div>
         </section>
