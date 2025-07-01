@@ -1,12 +1,12 @@
 // src/pages/StudentCoursePage.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
-import { getCourse } from '../services/courseService';
-import { getCourseLessons } from '../services/courseService';
-import { getUserSchedule } from '../services/scheduleService';
+import { getCourse, getCourseLessons } from '../services/courseService';
+import { getUserScheduleOptimized } from '../services/scheduleService';
 import '../styles/CourseDetailPage.css';
 
 export default function StudentCoursePage() {
@@ -24,44 +24,28 @@ export default function StudentCoursePage() {
     (async () => {
       try {
         setLoading(true);
-        setError(null);
         
-        console.log('[StudentCourse] Loading course data for courseId:', courseId);
-        
-        // УПРОЩЕНО: Просто загружаем курс без проверки доступа
-        try {
-          const courseData = await getCourse(courseId);
-          setCourse(courseData);
-          console.log('[StudentCourse] Course loaded successfully:', courseData);
-        } catch (courseError) {
-          console.error('[StudentCourse] Error loading course:', courseError);
-          setError('Не удалось загрузить курс. Попробуйте позже.');
-          return;
-        }
+        // Загружаем курс
+        const courseData = await getCourse(courseId);
+        setCourse(courseData);
         
         // Загружаем уроки курса
-        try {
-          const lessonsData = await getCourseLessons(courseId);
-          setLessons(lessonsData || []);
-          console.log('[StudentCourse] Lessons loaded:', lessonsData?.length || 0);
-        } catch (lessonsError) {
-          console.error('[StudentCourse] Error loading lessons:', lessonsError);
-          setLessons([]);
-        }
+        const lessonsData = await getCourseLessons(courseId);
+        setLessons(lessonsData);
         
-        // Загружаем расписание для получения дат и статусов уроков
-        try {
-          const scheduleData = await getUserSchedule(user);
-          setSchedule(scheduleData || []);
-          console.log('[StudentCourse] Schedule loaded:', scheduleData?.length || 0);
-        } catch (scheduleError) {
-          console.error('[StudentCourse] Error loading schedule:', scheduleError);
-          setSchedule([]);
-        }
+        // Загружаем расписание для проверки доступа к урокам
+        const scheduleData = await getUserScheduleOptimized(user);
+        setSchedule(scheduleData || []);
+        
+        console.log('[StudentCourse] Loaded data:', {
+          course: courseData,
+          lessons: lessonsData,
+          schedule: scheduleData
+        });
         
       } catch (error) {
-        console.error('[StudentCourse] Critical error loading course data:', error);
-        setError('Произошла ошибка при загрузке данных курса. Пожалуйста, попробуйте позже.');
+        console.error('[StudentCourse] Error loading data:', error);
+        setError('Не удалось загрузить данные курса');
       } finally {
         setLoading(false);
       }
@@ -76,22 +60,32 @@ export default function StudentCoursePage() {
   // Проверяем, открыт ли урок для изучения
   const isLessonOpened = (lessonId) => {
     const scheduleItem = getLessonScheduleInfo(lessonId);
-    // По умолчанию считаем урок открытым
-    return scheduleItem ? scheduleItem.is_opened : true;
+    // ИСПРАВЛЕНО: Теперь проверяем is_opened из расписания
+    return scheduleItem ? scheduleItem.is_opened : false;
   };
 
   // Получаем статус урока для отображения
   const getLessonStatus = (lessonId) => {
     const scheduleItem = getLessonScheduleInfo(lessonId);
     
-    if (!scheduleItem) return { text: 'Доступен', class: 'available' };
-    if (!scheduleItem.is_opened) return { text: 'Закрыт', class: 'closed' };
-    if (scheduleItem.is_completed) return { text: 'Завершен', class: 'completed' };
+    if (!scheduleItem) {
+      return { text: 'Не запланирован', class: 'not-scheduled' };
+    }
+    
+    if (!scheduleItem.is_opened) {
+      return { text: 'Закрыт преподавателем', class: 'unavailable' };
+    }
     
     return { text: 'Доступен', class: 'available' };
   };
 
   const handleLessonClick = (lessonId) => {
+    // Проверяем доступ перед переходом
+    if (!isLessonOpened(lessonId)) {
+      alert('Урок пока закрыт преподавателем. Дождитесь его открытия.');
+      return;
+    }
+    
     console.log('[StudentCourse] Opening lesson:', lessonId);
     navigate(`/courses/${courseId}/lessons/${lessonId}`);
   };
@@ -207,33 +201,29 @@ export default function StudentCoursePage() {
                 return (
                   <div 
                     key={lesson.id} 
-                    className="lesson-item"
+                    className={`lesson-item ${!isOpen ? 'disabled' : ''}`}
                     onClick={() => handleLessonClick(lesson.id)}
                   >
                     <div className="lesson-left">
-                      <div className="lesson-number">
-                        {index + 1}
+                      <div className={`lesson-number ${!isOpen ? 'locked' : ''}`}>
+                        {isOpen ? (index + 1) : '🔒'}
                       </div>
                       <div className="lesson-info">
                         <h3 className="lesson-title">{lesson.name}</h3>
-                        {lesson.description && (
-                          <p className="lesson-description">{lesson.description}</p>
-                        )}
                         <div className="lesson-meta">
                           <span className={`lesson-status ${status.class}`}>
                             {status.text}
                           </span>
-                          {lesson.holding_date && (
-                            <span className="lesson-date">
-                              {new Date(lesson.holding_date).toLocaleDateString()}
-                            </span>
-                          )}
                         </div>
                       </div>
                     </div>
                     
                     <div className="lesson-right">
-                      <div className="lesson-arrow">→</div>
+                      {isOpen ? (
+                        <div className="lesson-arrow">→</div>
+                      ) : (
+                        <div className="lesson-locked">🔒</div>
+                      )}
                     </div>
                   </div>
                 );

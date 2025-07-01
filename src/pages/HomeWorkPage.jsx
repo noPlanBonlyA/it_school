@@ -1,5 +1,6 @@
 // src/pages/HomeworkPage.jsx
 import React, { useState, useEffect } from 'react';
+import api from '../api/axiosInstance';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
@@ -10,9 +11,9 @@ import {
   getLessonGroupsByGroup,
   getLessonStudents,
   getLessonStudentDetails,
-  updateLessonStudent,
-  addCommentToLessonStudent
+  updateLessonStudent
 } from '../services/homeworkService';
+import { createNotificationForStudent } from '../services/notificationService';
 
 export default function HomeworkPage() {
   const { user } = useAuth();
@@ -27,10 +28,18 @@ export default function HomeworkPage() {
   const [selectedLessonGroupId, setSelectedLessonGroupId] = useState(null);
   const [expandedSubmission, setExpandedSubmission] = useState(null);
   
+  // ===== НОВОЕ: Состояния для архива =====
+  const [showArchive, setShowArchive] = useState(false);
+  const [expandedArchiveStudent, setExpandedArchiveStudent] = useState(null);
+  
   const [loading, setLoading] = useState(true);
   const [loadingLessons, setLoadingLessons] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [error, setError] = useState(null);
+
+  // ===== НОВОЕ: Разделение студентов на активных и архивных =====
+  const ungraded = students.filter(student => !student.is_graded_homework && student.is_sent_homework);
+  const archived = students.filter(student => student.is_graded_homework && student.is_sent_homework);
 
   // Загрузка данных при монтировании
   useEffect(() => {
@@ -65,6 +74,7 @@ export default function HomeworkPage() {
     setSelectedGroupId(groupId);
     setSelectedLessonGroupId(null);
     setExpandedSubmission(null);
+    setExpandedArchiveStudent(null);
     setStudents([]);
     
     try {
@@ -85,30 +95,48 @@ export default function HomeworkPage() {
 
   // Выбор урока
   const handleSelectLesson = async (lessonGroupId) => {
-    if (selectedLessonGroupId === lessonGroupId) return;
-    
-    setSelectedLessonGroupId(lessonGroupId);
-    setExpandedSubmission(null);
-    
     try {
       setLoadingStudents(true);
-      setError(null);
+      setSelectedLessonGroupId(lessonGroupId);
+      setStudents([]);
+      setExpandedSubmission(null);
+      setExpandedArchiveStudent(null);
+
+      console.log('[Homework] Loading students for lesson group:', lessonGroupId);
       
       const studentsData = await getLessonStudents(lessonGroupId);
-      console.log('[Homework] Loaded students:', studentsData);
+      console.log('[Homework] Students data received:', studentsData);
       
-      // Фильтруем только студентов с домашками
-      const studentsWithHomework = studentsData.filter(student => student.is_sent_homework);
-      setStudents(studentsWithHomework || []);
+      const normalizedStudents = studentsData.map(student => {
+        console.log('[Homework] Processing student:', student);
+        
+        const studentProfileId = student.student?.id || student.student_id;
+        const studentUserId = student.student?.user_id || student.student?.user?.id;
+        
+        console.log('[Homework] Student IDs - Profile:', studentProfileId, 'User:', studentUserId);
+        
+        return {
+          ...student,
+          student_id: studentProfileId,
+          lesson_group_id: student.lesson_group_id || lessonGroupId,
+          coins_for_homework: student.coins_for_homework || 0,
+          grade_for_homework: 0,
+          newComment: ''
+        };
+      });
+      
+      console.log('[Homework] Normalized students:', normalizedStudents);
+      setStudents(normalizedStudents);
+      
     } catch (error) {
       console.error('[Homework] Error loading students:', error);
-      setError('Ошибка загрузки студентов');
+      alert('Ошибка загрузки студентов');
     } finally {
       setLoadingStudents(false);
     }
   };
 
-  // Развернуть/свернуть детали домашки
+  // Развернуть/свернуть детали домашки (для активных)
   const handleToggleSubmission = async (studentId) => {
     if (expandedSubmission === studentId) {
       setExpandedSubmission(null);
@@ -132,11 +160,147 @@ export default function HomeworkPage() {
     }
   };
 
-  // Обработчики изменения оценок за ДЗ
-  const handleHomeworkGradeChange = (studentId, field, value) => {
+  // ===== НОВОЕ: Развернуть/свернуть архивную запись =====
+  const handleToggleArchiveStudent = async (studentId) => {
+    if (expandedArchiveStudent === studentId) {
+      setExpandedArchiveStudent(null);
+      return;
+    }
+
+    try {
+      const studentDetails = await getLessonStudentDetails(studentId);
+      console.log('[Homework] Archive student details:', studentDetails);
+      
+      setStudents(prev => prev.map(student => 
+        student.id === studentId 
+          ? { ...student, details: studentDetails }
+          : student
+      ));
+      
+      setExpandedArchiveStudent(studentId);
+    } catch (error) {
+      console.error('[Homework] Error loading archive student details:', error);
+      alert('Ошибка загрузки деталей студента из архива');
+    }
+  };
+
+  // ===== НОВОЕ: Отменить оценку и вернуть в активные =====
+  const handleUngradHomework = async (studentId) => {
+    const student = students.find(s => s.id === studentId);
+    if (!student) return;
+
+    if (!window.confirm('Отменить оценку и вернуть домашку в активные? Студент потеряет полученные бесткоины.')) {
+      return;
+    }
+
+    try {
+      console.log('[Homework] Ungrading homework for student:', studentId);
+      
+      // 1. Убираем бесткоины из общего счета студента
+      if (student.coins_for_homework > 0) {
+        try {
+          const studentProfileId = student.student?.id || student.student_id;
+          
+          if (studentProfileId) {
+            // Получаем текущие данные студента
+            const studentResponse = await api.get(`/students/${studentProfileId}`);
+            const currentPoints = studentResponse.data.points || 0;
+            const newPoints = Math.max(0, currentPoints - student.coins_for_homework);
+
+            // Обновляем баланс студента
+            await api.patch(`/students/${studentProfileId}`, {
+              points: newPoints
+            });
+
+            console.log(`[Homework] Removed ${student.coins_for_homework} coins from student ${studentProfileId}. Total: ${newPoints}`);
+          }
+        } catch (pointsError) {
+          console.error('[Homework] Error updating student points:', pointsError);
+          alert('Ошибка обновления баланса студента');
+          return;
+        }
+      }
+
+      // 2. Сбрасываем оценку в базе данных
+      const updateData = {
+        student_id: student.student_id || student.student?.id,
+        lesson_group_id: student.lesson_group_id,
+        is_visited: student.is_visited || false,
+        is_excused_absence: student.is_excused_absence || false,
+        coins_for_visit: parseInt(student.coins_for_visit) || 0,
+        grade_for_visit: parseInt(student.grade_for_visit) || 0,
+        is_sent_homework: student.is_sent_homework || false,
+        is_graded_homework: false, // Сбрасываем флаг оценки
+        coins_for_homework: 0, // Обнуляем бесткоины
+        grade_for_homework: 0
+      };
+
+      await updateLessonStudent(studentId, updateData);
+      console.log(`[Homework] Ungraded homework for student ${studentId}`);
+
+      // 3. Отправляем уведомление об отмене
+      try {
+        const studentProfileId = student.student?.id || student.student_id;
+        const lessonGroup = lessonGroups.find(lg => lg.id === selectedLessonGroupId);
+        
+        if (studentProfileId && lessonGroup) {
+          const notificationText = `Оценка за ДЗ "${lessonGroup.lesson?.name || 'Урок'}" была отменена преподавателем. Домашка возвращена на проверку.`;
+          
+          await api.post('/notifications/', 
+            {
+              content: notificationText
+            },
+            {
+              params: {
+                recipient_type: 'student',
+                recipient_id: studentProfileId
+              }
+            }
+          );
+          
+          console.log('[Homework] Sent ungrade notification to student:', studentProfileId);
+        }
+      } catch (notificationError) {
+        console.error('[Homework] Error sending ungrade notification:', notificationError);
+        // Не показываем ошибку пользователю, так как основная операция прошла успешно
+      }
+
+      // 4. Обновляем локальное состояние
+      setStudents(prev => prev.map(s => 
+        s.id === studentId 
+          ? { 
+              ...s, 
+              ...updateData,
+              newComment: '' 
+            }
+          : s
+      ));
+
+      setExpandedArchiveStudent(null);
+      
+      alert(`Оценка отменена! ${student.coins_for_homework > 0 ? `Убрано ${student.coins_for_homework} бесткоинов. ` : ''}Домашка возвращена в активные.`);
+      
+    } catch (error) {
+      console.error('[Homework] Error ungrading homework:', error);
+      
+      let errorMessage = 'Ошибка отмены оценки';
+      if (error.response?.data?.detail) {
+        if (Array.isArray(error.response.data.detail)) {
+          errorMessage += ': ' + error.response.data.detail.map(e => e.msg).join(', ');
+        } else {
+          errorMessage += ': ' + error.response.data.detail;
+        }
+      }
+      
+      alert(errorMessage);
+    }
+  };
+
+  // Обработчики изменения бесткоинов за ДЗ
+  const handleHomeworkCoinsChange = (studentId, value) => {
     setStudents(prev => prev.map(student => 
       student.id === studentId 
-        ? { ...student, [field]: value }
+        ? { ...student, coins_for_homework: value }
         : student
     ));
   };
@@ -152,61 +316,162 @@ export default function HomeworkPage() {
     ));
   };
 
-  // Сохранение оценок за ДЗ и комментариев
+  // Сохранение бесткоинов за ДЗ и отправка уведомления
   const handleSaveHomework = async (studentId) => {
     const student = students.find(s => s.id === studentId);
     if (!student) return;
 
     try {
-      // Обновляем только оценки за ДЗ
+      const coinsToAdd = parseInt(student.coins_for_homework) || 0;
+      
+      console.log('[Homework] === SAVING HOMEWORK DEBUG ===');
+      console.log('[Homework] Student object:', student);
+      console.log('[Homework] Student ID (lesson_student):', studentId);
+      console.log('[Homework] Student profile ID:', student.student?.id);
+      console.log('[Homework] Coins to add:', coinsToAdd);
+      console.log('[Homework] Comment:', student.newComment);
+      
+      // 1. Подготавливаем правильные данные для API
       const updateData = {
-        // Сохраняем существующие данные по уроку
-        is_visited: student.is_visited,
-        is_excused_absence: student.is_excused_absence,
-        coins_for_visit: student.coins_for_visit || 0,
-        grade_for_visit: student.grade_for_visit || 0,
-        // Обновляем данные по ДЗ
-        is_sent_homework: student.is_sent_homework,
+        student_id: student.student_id || student.student?.id,
+        lesson_group_id: student.lesson_group_id,
+        is_visited: student.is_visited || false,
+        is_excused_absence: student.is_excused_absence || false,
+        coins_for_visit: parseInt(student.coins_for_visit) || 0,
+        grade_for_visit: parseInt(student.grade_for_visit) || 0,
+        is_sent_homework: student.is_sent_homework || false,
         is_graded_homework: true,
-        coins_for_homework: parseInt(student.coins_for_homework) || 0,
-        grade_for_homework: parseInt(student.grade_for_homework) || 0
+        coins_for_homework: coinsToAdd,
+        grade_for_homework: 0
       };
 
-      await updateLessonStudent(studentId, updateData);
+      console.log('[Homework] Update data prepared:', updateData);
 
-      // Добавляем комментарий если есть
-      if (student.newComment && student.newComment.trim()) {
-        const lessonGroup = lessonGroups.find(lg => lg.id === selectedLessonGroupId);
-        if (lessonGroup) {
-          await addCommentToLessonStudent(
-            lessonGroup.lesson.course_id,
-            lessonGroup.lesson.id,
-            {
-              text: student.newComment.trim(),
-              lesson_student_id: studentId
-            }
-          );
+      await updateLessonStudent(studentId, updateData);
+      console.log(`[Homework] Updated lesson student ${studentId} with ${coinsToAdd} coins`);
+
+      // 2. Прибавляем бесткоины к общему счету студента
+      if (coinsToAdd > 0) {
+        try {
+          const studentProfileId = student.student?.id || student.student_id;
+          
+          if (!studentProfileId) {
+            console.error('[Homework] Student profile ID not found:', student);
+            throw new Error('Student profile ID not found');
+          }
+
+          // Получаем текущие данные студента
+          const studentResponse = await api.get(`/students/${studentProfileId}`);
+          const currentPoints = studentResponse.data.points || 0;
+          const newPoints = currentPoints + coinsToAdd;
+
+          // Обновляем баланс студента
+          await api.patch(`/students/${studentProfileId}`, {
+            points: newPoints
+          });
+
+          console.log(`[Homework] Added ${coinsToAdd} coins to student ${studentProfileId}. Total: ${newPoints}`);
+        } catch (pointsError) {
+          console.error('[Homework] Error updating student points:', pointsError);
         }
       }
 
-      // Перезагружаем детали студента
-      const updatedDetails = await getLessonStudentDetails(studentId);
-      setStudents(prev => prev.map(s => 
-        s.id === studentId 
-          ? { 
-              ...s, 
-              ...updateData,
-              details: updatedDetails,
-              newComment: '' 
+      // 3. Отправляем уведомление с правильным student ID
+      if (student.newComment && student.newComment.trim()) {
+        const lessonGroup = lessonGroups.find(lg => lg.id === selectedLessonGroupId);
+        if (lessonGroup) {
+          try {
+            const studentProfileId = student.student?.id || student.student_id;
+            
+            if (!studentProfileId) {
+              console.error('[Homework] Cannot send notification - student profile ID not found:', student);
+              alert('Ошибка: не удалось найти ID студента для отправки уведомления');
+            } else {
+              const notificationText = `ДЗ "${lessonGroup.lesson?.name || 'Урок'}" оценено! ${coinsToAdd > 0 ? `Получено ${coinsToAdd} бесткоинов. ` : ''}Комментарий: ${student.newComment.trim()}`;
+              
+              console.log('[Homework] === NOTIFICATION DEBUG ===');
+              console.log('[Homework] Sending notification to student profile ID:', studentProfileId);
+              console.log('[Homework] Notification text:', notificationText);
+              
+              const response = await api.post('/notifications/', 
+                {
+                  content: notificationText
+                },
+                {
+                  params: {
+                    recipient_type: 'student',
+                    recipient_id: studentProfileId
+                  }
+                }
+              );
+              
+              console.log('[Homework] Notification API response:', response.data);
+              console.log('[Homework] Notification sent successfully to student profile:', studentProfileId);
             }
-          : s
-      ));
+          } catch (notificationError) {
+            console.error('[Homework] Error sending notification:', {
+              error: notificationError,
+              status: notificationError.response?.status,
+              data: notificationError.response?.data,
+              studentId: student.student?.id || student.student_id
+            });
+            
+            const errorMsg = notificationError.response?.data?.detail || notificationError.message;
+            alert(`Ошибка отправки уведомления: ${errorMsg}`);
+          }
+        }
+      }
+
+      // 4. Перезагружаем детали студента
+      try {
+        const updatedDetails = await getLessonStudentDetails(studentId);
+        setStudents(prev => prev.map(s => 
+          s.id === studentId 
+            ? { 
+                ...s, 
+                ...updateData,
+                details: updatedDetails,
+                newComment: '' 
+              }
+            : s
+        ));
+      } catch (detailsError) {
+        console.error('[Homework] Error reloading student details:', detailsError);
+        setStudents(prev => prev.map(s => 
+          s.id === studentId 
+            ? { 
+                ...s, 
+                ...updateData,
+                newComment: '' 
+              }
+            : s
+        ));
+      }
 
       setExpandedSubmission(null);
-      alert('Оценка за ДЗ и комментарий сохранены!');
+      
+      // Уведомляем об успехе
+      const successMessage = [
+        'Домашка оценена и отправлена в архив!',
+        coinsToAdd > 0 ? `Добавлено ${coinsToAdd} бесткоинов` : '',
+        student.newComment?.trim() ? 'Уведомление отправлено студенту' : ''
+      ].filter(Boolean).join('\n');
+      
+      alert(successMessage);
+      
     } catch (error) {
-      console.error('[Homework] Error saving:', error);
-      alert('Ошибка сохранения данных');
+      console.error('[Homework] Error saving homework:', error);
+      
+      let errorMessage = 'Ошибка сохранения данных';
+      if (error.response?.data?.detail) {
+        if (Array.isArray(error.response.data.detail)) {
+          errorMessage += ': ' + error.response.data.detail.map(e => e.msg).join(', ');
+        } else {
+          errorMessage += ': ' + error.response.data.detail;
+        }
+      }
+      
+      alert(errorMessage);
     }
   };
 
@@ -320,142 +585,255 @@ export default function HomeworkPage() {
               )}
             </div>
 
-            {/* Колонка 3: Список студентов с домашками */}
+            {/* Колонка 3: Активные домашки + Архив */}
             <div className="column submissions-col">
-              <h2>Домашние задания {selectedLessonGroup && `(${students.length})`}</h2>
-              {!selectedLessonGroup ? (
-                <div className="placeholder">Выберите урок</div>
-              ) : loadingStudents ? (
-                <div className="loading">Загрузка домашних заданий...</div>
-              ) : students.length === 0 ? (
-                <div className="placeholder">Нет сданных домашних заданий</div>
-              ) : (
-                <div className="submissions-content">
-                  {students.map(student => (
-                    <div key={student.id} className="submission-item">
-                      <div
-                        className={`submission-header ${expandedSubmission === student.id ? 'expanded' : ''}`}
-                        onClick={() => handleToggleSubmission(student.id)}
-                      >
-                        <div className="student-info">
-                          <div className="student-name">
-                            {`${student.student?.user?.first_name || ''} ${student.student?.user?.surname || ''}`.trim() || 
-                             student.student?.user?.username || 'Неизвестный студент'}
+              {/* ===== АКТИВНЫЕ ДОМАШКИ ===== */}
+              <div className="submissions-section">
+                <h2>
+                  На проверке {selectedLessonGroup && `(${ungraded.length})`}
+                  {archived.length > 0 && (
+                    <button 
+                      className="archive-toggle"
+                      onClick={() => setShowArchive(!showArchive)}
+                    >
+                      {showArchive ? '📂 Скрыть архив' : `📁 Архив (${archived.length})`}
+                    </button>
+                  )}
+                </h2>
+                
+                {!selectedLessonGroup ? (
+                  <div className="placeholder">Выберите урок</div>
+                ) : loadingStudents ? (
+                  <div className="loading">Загрузка домашних заданий...</div>
+                ) : ungraded.length === 0 ? (
+                  <div className="placeholder">
+                    {archived.length > 0 
+                      ? 'Все домашние задания оценены' 
+                      : 'Нет сданных домашних заданий'
+                    }
+                  </div>
+                ) : (
+                  <div className="submissions-content">
+                    {ungraded.map(student => (
+                      <div key={student.id} className="submission-item">
+                        <div
+                          className={`submission-header ${expandedSubmission === student.id ? 'expanded' : ''}`}
+                          onClick={() => handleToggleSubmission(student.id)}
+                        >
+                          <div className="student-info">
+                            <div className="student-name">
+                              {`${student.student?.user?.first_name || ''} ${student.student?.user?.surname || ''}`.trim() || 
+                               student.student?.user?.username || 'Неизвестный студент'}
+                            </div>
+                            <div className="student-meta">
+                              <span className="status-new">🆕 Требует проверки</span>
+                            </div>
                           </div>
-                          <div className="student-meta">
-                            <span>ДЗ сдано: ✅</span>
-                            <span>Оценено: {student.is_graded_homework ? '✅' : '❌'}</span>
-                          </div>
-                        </div>
-                        <div className="homework-status">
-                          {student.grade_for_homework > 0 && (
-                            <span className="grade-display">
-                              Оценка: {student.grade_for_homework}
+                          <div className="homework-status">
+                            <span className="status-badge submitted">Сдано</span>
+                            <span className={`expand-icon ${expandedSubmission === student.id ? 'rotated' : ''}`}>
+                              ▼
                             </span>
-                          )}
-                          <span className={`status-badge ${student.is_graded_homework ? 'graded' : 'submitted'}`}>
-                            {student.is_graded_homework ? 'Оценено' : 'Сдано'}
-                          </span>
-                          <span className={`expand-icon ${expandedSubmission === student.id ? 'rotated' : ''}`}>
-                            ▼
-                          </span>
+                          </div>
                         </div>
-                      </div>
-                      
-                      {expandedSubmission === student.id && (
-                        <div className="submission-details">
-                          {/* Файлы домашки */}
-                          {student.details?.passed_homeworks && student.details.passed_homeworks.length > 0 && (
-                            <div className="homework-files">
-                              <h4>Сданные файлы:</h4>
-                              <div className="file-list">
-                                {student.details.passed_homeworks.map((hw, index) => (
-                                  <div key={hw.id || index} className="file-item">
-                                    <span className="file-icon">📎</span>
-                                    <span className="file-name">{hw.homework?.name || `Файл ${index + 1}`}</span>
-                                    {hw.homework?.url && (
-                                      <a 
-                                        href={hw.homework.url} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="file-link"
-                                      >
-                                        Скачать
-                                      </a>
-                                    )}
-                                  </div>
-                                ))}
+                        
+                        {expandedSubmission === student.id && (
+                          <div className="submission-details">
+                            {/* Файлы домашки */}
+                            {student.details?.passed_homeworks && student.details.passed_homeworks.length > 0 && (
+                              <div className="homework-files">
+                                <h4>Сданные файлы:</h4>
+                                <div className="file-list">
+                                  {student.details.passed_homeworks.map((hw, index) => (
+                                    <div key={hw.id || index} className="file-item">
+                                      <span className="file-icon">📎</span>
+                                      <span className="file-name">{hw.homework?.name || `Файл ${index + 1}`}</span>
+                                      {hw.homework?.url && (
+                                        <a 
+                                          href={hw.homework.url} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="file-link"
+                                        >
+                                          Скачать
+                                        </a>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Бесткоины за ДЗ */}
+                            <div className="homework-grading-section">
+                              <div className="coins-field">
+                                <label>Бесткоины за ДЗ:</label>
+                                <div className="coins-input-group">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max="10"
+                                    value={student.coins_for_homework || ''}
+                                    onChange={e => handleHomeworkCoinsChange(student.id, e.target.value)}
+                                    placeholder="0"
+                                  />
+                                  <span className="coins-icon">🪙</span>
+                                </div>
+                                <div className="coins-hint">
+                                  Максимум 10 бесткоинов за домашнее задание
+                                </div>
                               </div>
                             </div>
-                          )}
 
-                          {/* Оценки за ДЗ */}
-                          <div className="homework-grading-section">
-                            <div className="grade-field">
-                              <label>Баллы за ДЗ:</label>
-                              <input
-                                type="number"
-                                min="0"
-                                max="10"
-                                value={student.coins_for_homework || ''}
-                                onChange={e => handleHomeworkGradeChange(student.id, 'coins_for_homework', e.target.value)}
+                            {/* Комментарий для уведомления */}
+                            <div className="comment-field">
+                              <label>Комментарий студенту (отправится как уведомление):</label>
+                              <textarea
+                                placeholder={`Напишите комментарий к ДЗ "${selectedLessonGroup?.lesson?.name || 'Урок'}". Студент получит его как уведомление.`}
+                                value={student.newComment || ''}
+                                onChange={e => handleCommentChange(student.id, e.target.value)}
+                                rows={3}
                               />
-                            </div>
-                            <div className="grade-field">
-                              <label>Оценка за ДЗ:</label>
-                              <input
-                                type="number"
-                                min="0"
-                                max="5"
-                                value={student.grade_for_homework || ''}
-                                onChange={e => handleHomeworkGradeChange(student.id, 'grade_for_homework', e.target.value)}
-                              />
-                            </div>
-                          </div>
-
-                          {/* Комментарий */}
-                          <div className="comment-field">
-                            <label>Комментарий к домашнему заданию:</label>
-                            <textarea
-                              placeholder="Введите комментарий к домашнему заданию..."
-                              value={student.newComment || ''}
-                              onChange={e => handleCommentChange(student.id, e.target.value)}
-                            />
-                          </div>
-
-                          {/* Существующие комментарии */}
-                          {student.details?.comments && student.details.comments.length > 0 && (
-                            <div className="existing-comments">
-                              <h4>Предыдущие комментарии:</h4>
-                              {student.details.comments.map((comment, index) => (
-                                <div key={comment.id || index} className="comment-item">
-                                  <div className="comment-meta">
-                                    {formatDate(comment.created_at)}
+                              {student.newComment?.trim() && (
+                                <div className="comment-preview">
+                                  <strong>Превью уведомления:</strong>
+                                  <div className="notification-preview">
+                                    ДЗ "{selectedLessonGroup?.lesson?.name || 'Урок'}" оценено! {student.coins_for_homework > 0 ? `Получено ${student.coins_for_homework} бесткоинов. ` : ''}Комментарий: {student.newComment.trim()}
                                   </div>
-                                  <div className="comment-text">{comment.text}</div>
                                 </div>
-                              ))}
+                              )}
                             </div>
-                          )}
 
-                          <div className="details-buttons">
+                            <div className="details-buttons">
+                              <button
+                                className="btn-primary"
+                                onClick={() => handleSaveHomework(student.id)}
+                                disabled={!student.coins_for_homework && !student.newComment?.trim()}
+                              >
+                                {student.coins_for_homework > 0 && student.newComment?.trim() 
+                                  ? `✅ Оценить на ${student.coins_for_homework} 🪙 и отправить уведомление`
+                                  : student.coins_for_homework > 0 
+                                    ? `✅ Оценить на ${student.coins_for_homework} 🪙`
+                                    : student.newComment?.trim()
+                                      ? '✅ Оценить и отправить уведомление'
+                                      : 'Введите бесткоины или комментарий'
+                                }
+                              </button>
+                              <button
+                                className="btn-secondary"
+                                onClick={() => setExpandedSubmission(null)}
+                              >
+                                Закрыть
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* ===== АРХИВ ОЦЕНЕННЫХ ДОМАШЕК ===== */}
+              {showArchive && archived.length > 0 && (
+                <div className="archive-section">
+                  <h3>📁 Архив оцененных ({archived.length})</h3>
+                  <div className="archive-content">
+                    {archived.map(student => (
+                      <div key={`archive-${student.id}`} className="archive-item">
+                        <div
+                          className={`archive-header ${expandedArchiveStudent === student.id ? 'expanded' : ''}`}
+                          onClick={() => handleToggleArchiveStudent(student.id)}
+                        >
+                          <div className="student-info">
+                            <div className="student-name">
+                              {`${student.student?.user?.first_name || ''} ${student.student?.user?.surname || ''}`.trim() || 
+                               student.student?.user?.username || 'Неизвестный студент'}
+                            </div>
+                            <div className="student-meta">
+                              <span className="status-graded">✅ Оценено</span>
+                              {student.coins_for_homework > 0 && (
+                                <span className="coins-display">🪙 {student.coins_for_homework}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="archive-actions">
                             <button
-                              className="btn-primary"
-                              onClick={() => handleSaveHomework(student.id)}
+                              className="btn-ungrade"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUngradHomework(student.id);
+                              }}
+                              title="Отменить оценку и вернуть в активные"
                             >
-                              Сохранить оценку
+                              ↩️
                             </button>
-                            <button
-                              className="btn-secondary"
-                              onClick={() => setExpandedSubmission(null)}
-                            >
-                              Закрыть
-                            </button>
+                            <span className={`expand-icon ${expandedArchiveStudent === student.id ? 'rotated' : ''}`}>
+                              ▼
+                            </span>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
+                        
+                        {expandedArchiveStudent === student.id && (
+                          <div className="archive-details">
+                            {/* Информация об оценке */}
+                            <div className="grade-info">
+                              <div className="grade-summary">
+                                <strong>Результат оценки:</strong>
+                                <div className="grade-details">
+                                  {student.coins_for_homework > 0 && (
+                                    <span className="coins-earned">🪙 Получено: {student.coins_for_homework} бесткоинов</span>
+                                  )}
+                                  <span className="graded-date">📅 Оценено: {formatDate(student.updated_at || student.created_at)}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Файлы домашки */}
+                            {student.details?.passed_homeworks && student.details.passed_homeworks.length > 0 && (
+                              <div className="homework-files">
+                                <h4>Сданные файлы:</h4>
+                                <div className="file-list">
+                                  {student.details.passed_homeworks.map((hw, index) => (
+                                    <div key={hw.id || index} className="file-item">
+                                      <span className="file-icon">📎</span>
+                                      <span className="file-name">{hw.homework?.name || `Файл ${index + 1}`}</span>
+                                      {hw.homework?.url && (
+                                        <a 
+                                          href={hw.homework.url} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="file-link"
+                                        >
+                                          Скачать
+                                        </a>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Кнопки для архива */}
+                            <div className="archive-buttons">
+                              <button
+                                className="btn-warning"
+                                onClick={() => handleUngradHomework(student.id)}
+                              >
+                                ↩️ Отменить оценку и вернуть на проверку
+                              </button>
+                              <button
+                                className="btn-secondary"
+                                onClick={() => setExpandedArchiveStudent(null)}
+                              >
+                                Закрыть
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

@@ -87,15 +87,25 @@ export async function getCourseLessons(courseId, limit = 100, offset = 0) {
 }
 
 /**
- * Получить материалы урока для студента
+ * ИСПРАВЛЕНО: Получить материалы урока для студента через правильный эндпоинт
  */
 export async function getStudentLessonMaterials(courseId, lessonId) {
   console.log('[CourseService] Getting student lesson materials:', { courseId, lessonId });
   
   try {
+    // ИСПРАВЛЕНО: Используем правильный эндпоинт согласно API
     const response = await api.get(`/courses/${courseId}/lessons/${lessonId}/student-materials`);
     console.log('[CourseService] Student lesson materials loaded:', response.data);
-    return response.data;
+    
+    // Добавляем URL для материалов
+    const materialsData = response.data;
+    
+    // ИСПРАВЛЕНО: Формируем правильные URL для iframe
+    if (materialsData.id) {
+      materialsData.student_material_url = `${window.location.protocol}//${window.location.hostname}:8080/courses/material/${materialsData.id}`;
+    }
+    
+    return materialsData;
   } catch (error) {
     console.error('[CourseService] Error loading student lesson materials:', error.response?.data || error.message);
     throw error;

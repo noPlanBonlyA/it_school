@@ -9,7 +9,6 @@ import coursesIcon    from '../images/sidebar_icon3.png';
 import chartIcon      from '../images/sidebar_icon4.png';
 import usersIcon      from '../images/sidebar_icon1.png';
 import homeworkIcon   from '../images/sidebar_icon1.png';
-import lessonsIcon    from '../images/sidebar_icon2.png'; // Добавляем иконку для уроков
 import cogIcon        from '../images/sidebar_icon7.png';
 import powerOffIcon   from '../images/sidebar_icon8.png';
 import broadcastIcon  from '../images/sidebar_icon4.png';
@@ -30,7 +29,6 @@ export default function Sidebar({ activeItem, userRole }) {
     studentCourses:  '/courses',
     rating:          '/rating',
     teacherCourses:  '/teacher-courses',
-    lessons:         '/lessons',        // Добавляем маршрут для уроков
     homework:        '/homework',
     manageStudents:  '/manage-users',
     notifications:   '/broadcast',
@@ -60,7 +58,6 @@ export default function Sidebar({ activeItem, userRole }) {
         { key: 'settings',       label: 'Мой профиль', icon: cogIcon },
         { key: 'schedule',       label: 'Расписание',  icon: calendarIcon },
         { key: 'teacherCourses', label: 'Курсы',       icon: coursesIcon },
-        { key: 'lessons',        label: 'Уроки',       icon: lessonsIcon },     // Добавляем пункт "Уроки"
         { key: 'homework',       label: 'Дом. задания',icon: homeworkIcon }
       ];
       break;

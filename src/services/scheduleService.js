@@ -266,3 +266,29 @@ export const getUserScheduleOptimized = async (user) => {
     throw error;
   }
 };
+
+// Функция для обновления lesson-group
+export const updateLessonGroup = async (lessonGroupId, updateData) => {
+  try {
+    console.log('[ScheduleService] Updating lesson group:', { lessonGroupId, updateData });
+    
+    const response = await api.put(`/courses/lesson-group/${lessonGroupId}`, updateData);
+    
+    console.log('[ScheduleService] Lesson group updated:', response.data);
+    return response.data;
+    
+  } catch (error) {
+    console.error('[ScheduleService] Error updating lesson group:', error);
+    
+    // Обработка специфичных ошибок
+    if (error.response?.status === 403) {
+      throw new Error('Недостаточно прав для изменения урока');
+    } else if (error.response?.status === 404) {
+      throw new Error('Урок не найден');
+    } else if (error.response?.status === 422) {
+      throw new Error('Неверные данные для обновления');
+    }
+    
+    throw error;
+  }
+};

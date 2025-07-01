@@ -19,13 +19,55 @@ export const getCourse = async (courseId) => {
 };
 
 /**
- * Создание урока с материалами (только текст)
+ * Создание урока с материалами (с файлами)
  */
-export const createLessonWithMaterials = async (courseId, lessonData) => {
+export const createLessonWithMaterials = async (courseId, formData) => {
   try {
-    console.log('[LessonService] Creating lesson with materials:', { courseId, lessonData });
+    console.log('[LessonService] Creating lesson with materials (files):', { courseId });
+    console.log('[LessonService] FormData type:', formData.constructor.name);
     
-    const response = await api.post(`/courses/${courseId}/lessons-with-materials`, lessonData);
+    // Проверяем, что это действительно FormData
+    if (!(formData instanceof FormData)) {
+      console.error('[LessonService] Expected FormData, but got:', typeof formData, formData);
+      throw new Error('Expected FormData object for file upload');
+    }
+    
+    // Логируем содержимое FormData для отладки
+    for (let [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(`[LessonService] FormData[${key}]:`, value.name, value.size, 'bytes');
+      } else {
+        console.log(`[LessonService] FormData[${key}]:`, value);
+      }
+    }
+    
+    const response = await api.post(`/courses/${courseId}/lessons-with-materials`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    console.log('[LessonService] Lesson created successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[LessonService] Error creating lesson:', error);
+    console.error('[LessonService] Error response:', error.response?.data);
+    throw error;
+  }
+};
+
+/**
+ * Создание урока с материалами (с текстом)
+ */
+export const createLessonWithMaterialsText = async (courseId, textData) => {
+  try {
+    console.log('[LessonService] Creating lesson with materials (text):', { courseId });
+    
+    const response = await api.post(`/courses/${courseId}/lessons-with-materials-text`, textData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     
     console.log('[LessonService] Lesson created successfully:', response.data);
     return response.data;
@@ -36,13 +78,55 @@ export const createLessonWithMaterials = async (courseId, lessonData) => {
 };
 
 /**
- * Обновление урока с материалами
+ * Обновление урока с материалами (с файлами)
  */
-export const updateLessonWithMaterials = async (courseId, lessonId, lessonData) => {
+export const updateLessonWithMaterials = async (courseId, lessonId, formData) => {
   try {
-    console.log('[LessonService] Updating lesson with materials:', { courseId, lessonId, lessonData });
+    console.log('[LessonService] Updating lesson with materials (files):', { courseId, lessonId });
+    console.log('[LessonService] FormData type:', formData.constructor.name);
     
-    const response = await api.put(`/courses/${courseId}/lessons-with-materials/${lessonId}`, lessonData);
+    // Проверяем, что это действительно FormData
+    if (!(formData instanceof FormData)) {
+      console.error('[LessonService] Expected FormData, but got:', typeof formData, formData);
+      throw new Error('Expected FormData object for file upload');
+    }
+    
+    // Логируем содержимое FormData для отладки
+    for (let [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(`[LessonService] FormData[${key}]:`, value.name, value.size, 'bytes');
+      } else {
+        console.log(`[LessonService] FormData[${key}]:`, value);
+      }
+    }
+    
+    const response = await api.put(`/courses/${courseId}/lessons-with-materials/${lessonId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    console.log('[LessonService] Lesson updated successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[LessonService] Error updating lesson:', error);
+    console.error('[LessonService] Error response:', error.response?.data);
+    throw error;
+  }
+};
+
+/**
+ * Обновление урока с материалами (с текстом)
+ */
+export const updateLessonWithMaterialsText = async (courseId, lessonId, textData) => {
+  try {
+    console.log('[LessonService] Updating lesson with materials (text):', { courseId, lessonId });
+    
+    const response = await api.put(`/courses/${courseId}/lessons-with-materials-text/${lessonId}`, textData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     
     console.log('[LessonService] Lesson updated successfully:', response.data);
     return response.data;

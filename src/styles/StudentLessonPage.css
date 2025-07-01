@@ -1,122 +1,183 @@
 /* Стили для страницы урока */
+.student-lesson-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.breadcrumb-link {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.breadcrumb-link:hover {
+  color: #2563eb;
+}
+
+.breadcrumb-separator {
+  color: #6b7280;
+}
+
+.breadcrumb-current {
+  color: #374151;
+  font-weight: 500;
+}
+
 .lesson-header {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   gap: 20px;
 }
 
 .lesson-header h1 {
   margin: 0;
-  font-size: 2rem;
-}
-
-.lesson-content {
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.lesson-info, .lesson-materials, .homework-submission {
-  margin-bottom: 32px;
-}
-
-.lesson-info h2, .lesson-materials h2, .homework-submission h2 {
-  font-size: 1.5rem;
-  margin-top: 0;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #e5e7eb;
+  font-size: 2.5rem;
   color: #1f2937;
 }
 
-.materials-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+.lesson-meta {
+  display: flex;
   gap: 16px;
 }
 
-.material-item {
+.lesson-status {
+  padding: 8px 16px;
+  background: #dbeafe;
+  color: #1e40af;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.lesson-content {
   display: flex;
-  align-items: center;
-  padding: 16px;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* Секция материалов */
+.material-section {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.material-section h2 {
+  font-size: 1.5rem;
+  margin: 0 0 24px 0;
+  color: #1f2937;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 12px;
+}
+
+.material-content {
+  margin-bottom: 20px;
+}
+
+.material-iframe {
+  width: 100%;
+  min-height: 500px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  transition: all 0.2s ease;
 }
 
-.material-item:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.material-actions {
+  display: flex;
+  gap: 12px;
 }
 
-.material-icon {
-  font-size: 28px;
-  margin-right: 16px;
+/* Секция домашнего задания */
+.homework-section {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.material-info h3 {
-  margin: 0 0 8px 0;
-  font-size: 1rem;
+.homework-section h2 {
+  font-size: 1.5rem;
+  margin: 0 0 24px 0;
+  color: #1f2937;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 12px;
 }
 
-.material-info a {
-  color: #3b82f6;
-  text-decoration: none;
+.homework-description {
+  margin-bottom: 32px;
 }
 
-.material-info a:hover {
-  text-decoration: underline;
+.homework-description h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.2rem;
+  color: #374151;
 }
 
-/* Homework submission styles */
+.homework-iframe {
+  width: 100%;
+  min-height: 300px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Статус сдачи */
 .hw-submitted {
   text-align: center;
-  padding: 24px;
-  background-color: #f0fdf4;
-  border-radius: 8px;
-  border: 1px solid #86efac;
+  padding: 40px;
+  background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+  border-radius: 12px;
+  border: 2px solid #22c55e;
 }
 
 .submitted-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 64px;
+  margin-bottom: 20px;
 }
 
 .hw-submitted h3 {
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
   color: #16a34a;
+  font-size: 1.5rem;
 }
 
 .hw-submitted p {
-  color: #4b5563;
+  color: #15803d;
   margin: 0;
+  font-size: 1.1rem;
 }
 
+/* Форма загрузки */
 .hw-form {
-  padding: 0;
+  max-width: 600px;
+}
+
+.hw-form > p {
+  font-size: 1.1rem;
+  color: #374151;
+  margin-bottom: 24px;
 }
 
 .submission-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
   margin-bottom: 24px;
 }
 
 .submission-option h3 {
   margin: 0 0 12px 0;
   font-size: 1.1rem;
-}
-
-.text-homework {
-  width: 100%;
-  height: 150px;
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  resize: vertical;
+  color: #374151;
 }
 
 .file-upload {
@@ -135,51 +196,112 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 12px;
-  background-color: #f3f4f6;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  min-height: 60px;
+  padding: 16px;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 1rem;
+  color: #475569;
+  font-weight: 500;
 }
 
 .file-upload label:hover {
-  background-color: #e5e7eb;
+  background: #f1f5f9;
+  border-color: #94a3b8;
 }
 
 .file-upload label.disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
+/* Кнопки */
 .btn-primary {
-  background-color: #3b82f6;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   border: none;
   padding: 12px 24px;
   border-radius: 8px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-.btn-primary:hover {
-  background-color: #2563eb;
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-1px);
 }
 
 .btn-primary:disabled {
-  background-color: #93c5fd;
+  background: #94a3b8;
   cursor: not-allowed;
+  transform: none;
 }
 
-/* Error and loading containers */
+.btn-secondary {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #334155;
+}
+
+/* Нет домашнего задания */
+.no-homework {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Загрузка и ошибки */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .error-container {
   text-align: center;
-  padding: 40px 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .error-container h2 {
@@ -192,24 +314,29 @@
   margin-bottom: 24px;
 }
 
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 50vh;
-}
-
-.loader {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3b82f6;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* Адаптивность */
+@media (max-width: 768px) {
+  .student-lesson-page {
+    padding: 16px;
+  }
+  
+  .lesson-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .lesson-header h1 {
+    font-size: 2rem;
+  }
+  
+  .material-section,
+  .homework-section {
+    padding: 20px;
+  }
+  
+  .material-iframe,
+  .homework-iframe {
+    min-height: 300px;
+  }
 }

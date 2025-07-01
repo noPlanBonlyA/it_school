@@ -7,6 +7,13 @@ export const createNotificationForStudent = async (studentId, content) => {
   console.log('[NotificationService] Creating notification for student:', { studentId, content });
   
   try {
+    // ИСПРАВЛЕНО: Добавляем более детальное логирование
+    console.log('[NotificationService] Sending POST to /notifications/ with params:', {
+      recipient_type: 'student',
+      recipient_id: studentId
+    });
+    console.log('[NotificationService] Request body:', { content });
+    
     const response = await api.post('/notifications/', 
       {
         content: content
@@ -22,7 +29,21 @@ export const createNotificationForStudent = async (studentId, content) => {
     console.log('[NotificationService] Notification created successfully:', response.data);
     return response.data;
   } catch (error) {
-    console.error('[NotificationService] Error creating notification for student:', error);
+    console.error('[NotificationService] Error creating notification for student:', {
+      studentId,
+      content,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message
+    });
+    
+    // Детальное логирование ошибки
+    if (error.response) {
+      console.error('[NotificationService] Response headers:', error.response.headers);
+      console.error('[NotificationService] Request config:', error.config);
+    }
+    
     throw error;
   }
 };

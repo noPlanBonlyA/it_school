@@ -244,6 +244,34 @@ export const debugAllStudents = async () => {
   }
 };
 
+/**
+ * Создать уведомление для студента
+ */
+export const createNotificationForStudent = async (studentId, message) => {
+  try {
+    console.log(`[StudentService] Creating notification for student ${studentId}:`, message);
+    
+    const response = await api.post('/notifications/', {
+      student: studentId,
+      message: message,
+      is_read: false
+    });
+    
+    console.log('[StudentService] Notification created:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[StudentService] Error creating notification:', error);
+    
+    // Дополнительная информация об ошибке
+    if (error.response) {
+      console.error('Response error:', error.response.data);
+      console.error('Status code:', error.response.status);
+    }
+    
+    throw new Error(`Не удалось создать уведомление: ${error.message}`);
+  }
+};
+
 // Экспорт по умолчанию
 const studentServiceDefault = {
   findStudentByUser,
@@ -257,7 +285,8 @@ const studentServiceDefault = {
   getStudentsByGroup,
   addStudentToGroup,
   removeStudentFromGroup,
-  debugAllStudents
+  debugAllStudents,
+  createNotificationForStudent
 };
 
 export default studentServiceDefault;

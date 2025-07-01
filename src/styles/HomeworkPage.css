@@ -339,59 +339,76 @@
   
   .comment-field label {
     display: block;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 5px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
   }
   
   .comment-field textarea {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 0.9rem;
+    min-height: 80px;
+    padding: 12px 16px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.5;
     resize: vertical;
-    min-height: 100px;
-    font-family: inherit;
     transition: border-color 0.2s ease;
   }
   .comment-field textarea:focus {
     outline: none;
-    border-color: #1976d2;
-    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
   
   .details-buttons {
     display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
   }
   
-  .btn-primary, .btn-secondary {
-    padding: 10px 20px;
+  .btn-primary {
+    flex: 1;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
     border: none;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
   }
-  .btn-primary {
-    background-color: #1976d2;
-    color: white;
-  }
-  .btn-primary:hover {
-    background-color: #1565c0;
+  .btn-primary:hover:not(:disabled) {
     transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  }
+  
+  .btn-primary:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
   
   .btn-secondary {
-    background-color: #f5f5f5;
-    color: #666;
+    padding: 12px 20px;
+    background: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
   }
   .btn-secondary:hover {
-    background-color: #eeeeee;
+    background: #e5e7eb;
+    color: #374151;
   }
   
   /* Плейсхолдер при отсутствии выбора */
@@ -449,51 +466,354 @@
     line-height: 1.4;
   }
   
-  /* Responsive */
-  @media (max-width: 1200px) {
-    .homework-grid {
-      grid-template-columns: 200px 250px 1fr;
-    }
+  /* Новые стили для градации */
+  .homework-grading-section {
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    margin-bottom: 20px;
   }
   
-  @media (max-width: 992px) {
-    .homework-grid {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto auto 1fr;
-      height: auto;
-      min-height: none;
-    }
-    
-    .column {
-      max-height: 400px;
-    }
-    
-    .grading-section {
-      grid-template-columns: 1fr;
-    }
+  .coins-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
   
+  .coins-field label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.95rem;
+  }
+  
+  .coins-input-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    padding: 12px 16px;
+    transition: border-color 0.2s ease;
+  }
+  
+  .coins-input-group:focus-within {
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+  }
+  
+  .coins-input-group input {
+    border: none;
+    outline: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #374151;
+    flex: 1;
+    background: transparent;
+  }
+  
+  .coins-input-group input::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+  }
+  
+  .coins-icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  }
+  
+  .coins-hint {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-style: italic;
+  }
+  
+  .comment-preview {
+    margin-top: 12px;
+    padding: 12px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+  }
+  
+  .comment-preview strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #1e40af;
+    font-size: 0.9rem;
+  }
+  
+  .notification-preview {
+    background: white;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border-left: 4px solid #3b82f6;
+    font-size: 0.9rem;
+    color: #374151;
+    line-height: 1.4;
+  }
+  
+  /* Обновляем отображение статуса */
+  .homework-status .grade-display {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .homework-status .grade-display::before {
+    content: '🪙';
+    font-size: 0.9rem;
+  }
+  
+  /* Адаптивность для мобильных */
   @media (max-width: 768px) {
-    .homework-page {
-      padding: 10px;
+    .coins-input-group {
+      padding: 10px 14px;
     }
     
-    .homework-grid {
-      gap: 10px;
-    }
-    
-    .column h2 {
-      padding: 12px 15px;
+    .coins-input-group input {
       font-size: 1rem;
     }
     
-    .submission-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
+    .coins-icon {
+      font-size: 1.3rem;
     }
     
     .details-buttons {
       flex-direction: column;
     }
+    
+    .btn-primary,
+    .btn-secondary {
+      padding: 14px 16px;
+      font-size: 0.9rem;
+    }
+    
+    .comment-field textarea {
+      min-height: 100px;
+    }
+    
+    .notification-preview {
+      font-size: 0.85rem;
+    }
   }
+  
+  /* ===== НОВОЕ: Стили для архива ===== */
+.archive-toggle {
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.archive-toggle:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+}
+
+.submissions-section {
+  margin-bottom: 20px;
+}
+
+.archive-section {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 15px;
+  border: 2px dashed #dee2e6;
+}
+
+.archive-section h3 {
+  margin: 0 0 15px 0;
+  color: #6c757d;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.archive-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.archive-item {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.archive-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.archive-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  cursor: pointer;
+  background: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.archive-header:hover {
+  background: #e9ecef;
+}
+
+.archive-header.expanded {
+  background: #e9ecef;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.archive-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-ungrade {
+  background: #fd7e14;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-ungrade:hover {
+  background: #e8590c;
+  transform: scale(1.1);
+}
+
+.status-graded {
+  background: #d1edff;
+  color: #0d6efd;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.status-new {
+  background: #fff3cd;
+  color: #856404;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.coins-display {
+  background: #fff9c4;
+  color: #a16207;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.archive-details {
+  padding: 15px;
+  background: white;
+}
+
+.grade-info {
+  background: #e7f3ff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-left: 4px solid #0d6efd;
+}
+
+.grade-summary strong {
+  color: #0d6efd;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.grade-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.coins-earned {
+  color: #a16207;
+  font-weight: 600;
+  background: #fff9c4;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  font-size: 12px;
+}
+
+.graded-date {
+  color: #6c757d;
+  font-size: 12px;
+}
+
+.archive-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e9ecef;
+}
+
+.btn-warning {
+  background: #fd7e14;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.btn-warning:hover {
+  background: #e8590c;
+  transform: translateY(-1px);
+}
+
+/* Обновляем статус для активных домашек */
+.submission-header .student-meta .status-new {
+  animation: pulse 2s infinite;
+}
+
+/* Улучшаем кнопку оценки */
+.btn-primary:disabled {
+  background: #adb5bd !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}

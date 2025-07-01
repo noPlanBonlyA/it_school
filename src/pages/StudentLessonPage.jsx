@@ -1,13 +1,12 @@
 // src/pages/StudentLessonPage.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../api/axiosInstance';
 import '../styles/StudentLessonPage.css';
-
-import { getStudentMaterials, submitHomework } from '../services/homeworkService';
 
 export default function StudentLessonPage() {
   const { courseId, lessonId } = useParams();
@@ -27,201 +26,138 @@ export default function StudentLessonPage() {
         setLoading(true);
         setError(null);
         
-        console.log('[StudentLessonPage] Loading lesson materials:', { courseId, lessonId });
+        console.log('[StudentLessonPage] Loading lesson materials for:', { courseId, lessonId });
         
-        // ИСПРАВЛЕНО: Загружаем материалы через правильный endpoint
-        try {
-          const materialsResponse = await getStudentMaterials(courseId, lessonId);
-          console.log('[StudentLessonPage] Materials loaded:', materialsResponse);
-          
-          // Устанавливаем данные урока из материалов
-          setLesson({
-            id: materialsResponse.id,
-            name: materialsResponse.name,
-            // Пока что ставим заглушки для URL-ов, они будут из других endpoints
-            student_material_url: null,
-            homework_material_url: null
-          });
-        } catch (materialsError) {
-          console.error('[StudentLessonPage] Error loading materials:', materialsError);
-          setError('Не удалось загрузить материалы урока');
-          return;
-        }
+        // Загружаем материалы студента
+        const studentMaterialsResponse = await api.get(`/courses/${courseId}/lessons/${lessonId}/student-materials`);
+        console.log('[StudentLessonPage] Student materials loaded:', studentMaterialsResponse.data);
         
-        // Проверяем, отправлял ли студент домашнее задание
-        // Это проверим через lesson-student endpoint
-        try {
-          // Получаем расписание для этого урока
-          const scheduleResponse = await fetch('http://localhost:8080/api/schedule/', {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-          });
+        // Загружаем также информацию об уроке
+        const lessonResponse = await api.get(`/courses/${courseId}/lessons/${lessonId}`);
+        console.log('[StudentLessonPage] Lesson info loaded:', lessonResponse.data);
+        
+        if (studentMaterialsResponse.data && lessonResponse.data) {
+          // ИСПРАВЛЕНО: Универсальное формирование URL материалов
+          let studentMaterialUrl = null;
+          let homeworkMaterialUrl = null;
           
-          if (scheduleResponse.ok) {
-            const schedule = await scheduleResponse.json();
-            const lessonGroups = schedule.filter(item => item.lesson_id === lessonId);
-            
-            // Для каждой группы проверяем lesson-students
-            for (const lessonGroup of lessonGroups) {
-              try {
-                const response = await fetch(`http://localhost:8080/api/courses/lesson-student?lesson_group_id=${lessonGroup.id}`, {
-                  headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                  }
-                });
-                
-                if (response.ok) {
-                  const lessonStudents = await response.json();
-                  const currentStudent = lessonStudents.find(ls => ls.student.user_id === user.id);
-                  
-                  if (currentStudent && currentStudent.is_sent_homework) {
-                    setSubmitted(true);
-                    break;
-                  }
-                }
-              } catch (error) {
-                console.warn('[StudentLessonPage] Could not check lesson students:', error);
-              }
-            }
+          // Материал для студента
+          if (studentMaterialsResponse.data.id) {
+            studentMaterialUrl = `${window.location.protocol}//${window.location.hostname}:8080/courses/material/${studentMaterialsResponse.data.id}`;
           }
-        } catch (error) {
-          console.warn('[StudentLessonPage] Could not check homework status:', error);
+          
+          // Домашнее задание  
+          if (lessonResponse.data.homework_id) {
+            homeworkMaterialUrl = `${window.location.protocol}//${window.location.hostname}:8080/courses/material/${lessonResponse.data.homework_id}`;
+          }
+
+          setLesson({
+            id: lessonId,
+            name: lessonResponse.data.name,
+            course_id: courseId,
+            // Материалы для студента (могут быть как файлами, так и HTML)
+            student_material_url: studentMaterialUrl,
+            student_material_name: studentMaterialsResponse.data.name,
+            // Домашнее задание (может быть как файлом, так и HTML)
+            homework_material_url: homeworkMaterialUrl
+          });
+          
+        } else {
+          setError('Материалы урока не найдены');
         }
         
-      } catch (err) {
-        console.error('[StudentLessonPage] Error loading lesson:', err);
-        setError('Не удалось загрузить информацию об уроке');
+      } catch (error) {
+        console.error('[StudentLessonPage] Error loading lesson:', error);
+        setError('Ошибка загрузки урока: ' + (error.response?.data?.detail || error.message));
       } finally {
         setLoading(false);
       }
     })();
-  }, [courseId, lessonId, user.id]);
+  }, [courseId, lessonId]);
 
-  const handleSubmit = async () => {
-    console.log('[StudentLessonPage] === SUBMIT DEBUG START ===');
-    
-    // ИСПРАВЛЕНО: Только файл обязателен
-    const hasFile = file && file instanceof File;
-    
-    console.log('[StudentLessonPage] Validation:', { hasFile, fileValue: file });
-    
-    if (!hasFile) {
-      alert('Выберите файл для отправки домашнего задания');
-      return;
-    }
-    
-    try {
-      setSubmitting(true);
-      console.log('[StudentLessonPage] Submitting homework with params:', { 
-        courseId, 
-        lessonId, 
-        hasFile,
-        fileName: file?.name,
-        fileSize: file?.size,
-        fileType: file?.type
-      });
-      
-      // ИСПРАВЛЕНО: Формируем FormData согласно API
-      const formData = new FormData();
-      
-      // homework_data с именем файла (согласно API документации)
-      formData.append('homework_data', JSON.stringify({
-        name: file.name
-      }));
-      
-      // Файл как homework_file (согласно API)
-      formData.append('homework_file', file);
-      
-      console.log('[StudentLessonPage] FormData prepared:', {
-        homework_data: JSON.stringify({ name: file.name }),
-        homework_file_name: file.name
-      });
-      
-      // Отправляем через правильный endpoint
-      const result = await submitHomework(courseId, lessonId, formData);
-      
-      console.log('[StudentLessonPage] Homework submission result:', result);
-      
-      setSubmitted(true);
-      setFile(null);
-      
-      // Очищаем input файла
-      const fileInput = document.getElementById('homework-file');
-      if (fileInput) {
-        fileInput.value = '';
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      // Проверяем размер файла (максимум 10MB)
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        alert('Файл слишком большой. Максимальный размер: 10MB');
+        return;
       }
-      
-      alert('Домашнее задание успешно отправлено!');
-    } catch (error) {
-      console.error('[StudentLessonPage] Error submitting homework:', error);
-      
-      let errorMessage = 'Ошибка отправки домашнего задания.';
-      
-      // Более детальная обработка ошибок
-      if (error.response?.data) {
-        const errorData = error.response.data;
-        console.log('[StudentLessonPage] Error data structure:', errorData);
-        
-        if (errorData.detail) {
-          if (Array.isArray(errorData.detail)) {
-            const errorMessages = errorData.detail.map(err => {
-              const location = err.loc ? err.loc.join('.') : 'unknown field';
-              return `${location}: ${err.msg}`;
-            });
-            errorMessage = `Ошибки валидации:\n${errorMessages.join('\n')}`;
-          } else if (typeof errorData.detail === 'string') {
-            errorMessage = errorData.detail;
-          }
-        } else if (errorData.message) {
-          errorMessage = errorData.message;
-        }
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      console.log('[StudentLessonPage] Final error message:', errorMessage);
-      alert(`${errorMessage}\n\nПроверьте консоль разработчика для подробностей.`);
-    } finally {
-      setSubmitting(false);
-      console.log('[StudentLessonPage] === SUBMIT DEBUG END ===');
+      setFile(selectedFile);
     }
   };
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      // ДОБАВЛЕНО: Проверяем размер файла (например, макс 10MB)
-      const maxSize = 10 * 1024 * 1024; // 10MB
-      if (selectedFile.size > maxSize) {
-        alert('Файл слишком большой. Максимальный размер: 10MB');
-        e.target.value = ''; // Очищаем input
-        return;
-      }
+  const handleSubmit = async () => {
+    if (!file) {
+      alert('Выберите файл для отправки');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
       
-      console.log('[StudentLessonPage] File selected:', {
-        name: selectedFile.name,
-        size: selectedFile.size,
-        type: selectedFile.type
+      const formData = new FormData();
+      formData.append('homework_file', file);
+      formData.append('homework_data', JSON.stringify({
+        name: file.name,
+        lesson_student_id: lessonId // или другой ID, если нужен
+      }));
+
+      console.log('[StudentLessonPage] Submitting homework:', {
+        fileName: file.name,
+        fileSize: file.size,
+        courseId,
+        lessonId
       });
-      setFile(selectedFile);
-    } else {
+
+      // ИСПРАВЛЕНО: Используем правильный эндпоинт для отправки ДЗ
+      const response = await api.post(
+        `/courses/${courseId}/lessons/${lessonId}/homework`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      console.log('[StudentLessonPage] Homework submitted successfully:', response.data);
+      
+      setSubmitted(true);
       setFile(null);
+      alert('Домашнее задание успешно отправлено!');
+      
+    } catch (error) {
+      console.error('[StudentLessonPage] Error submitting homework:', error);
+      
+      const errorMessage = error.response?.data?.detail || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          'Неизвестная ошибка';
+      
+      alert('Ошибка отправки домашнего задания: ' + errorMessage);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const fullName = [user.first_name, user.surname, user.patronymic]
-    .filter(Boolean).join(' ');
+    .filter(Boolean).join(' ') || user.username || 'Пользователь';
 
   if (loading) {
     return (
       <div className="app-layout">
-        <Sidebar activeItem="studentCourses" userRole={user.role} />
+        <Sidebar activeItem="courses" userRole={user?.role} />
         <div className="main-content">
-          <Topbar userName={fullName} userRole={user.role} onProfileClick={() => navigate('/profile')} />
-          <div className="loading-container">
-            <div className="loader"></div>
-            <p>Загрузка урока...</p>
+          <Topbar 
+            userName={fullName}
+            userRole={user?.role}
+          />
+          <div className="content-area">
+            <div className="loading-container">
+              <div className="loader"></div>
+              <p>Загрузка урока...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -231,157 +167,252 @@ export default function StudentLessonPage() {
   if (error) {
     return (
       <div className="app-layout">
-        <Sidebar activeItem="studentCourses" userRole={user.role} />
+        <Sidebar activeItem="courses" userRole={user?.role} />
         <div className="main-content">
-          <Topbar userName={fullName} userRole={user.role} onProfileClick={() => navigate('/profile')} />
-          <div className="error-container">
-            <h2>Ошибка</h2>
-            <p>{error}</p>
-            <button 
-              onClick={() => navigate(`/courses/${courseId}/student`)} 
-              className="btn-back"
-            >
-              Вернуться к курсу
-            </button>
+          <Topbar 
+            userName={fullName}
+            userRole={user?.role}
+          />
+          <div className="content-area">
+            <div className="error-container">
+              <h2>Ошибка загрузки</h2>
+              <p>{error}</p>
+              <button 
+                onClick={() => navigate(`/courses/${courseId}/student`)}
+                className="btn-primary"
+              >
+                Вернуться к курсу
+              </button>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  if (!lesson) {
+  // В рендере добавляем универсальное отображение материалов
+  const renderMaterial = (materialUrl, materialName, title) => {
+    if (!materialUrl) return null;
+    
     return (
-      <div className="app-layout">
-        <Sidebar activeItem="studentCourses" userRole={user.role} />
-        <div className="main-content">
-          <Topbar userName={fullName} userRole={user.role} onProfileClick={() => navigate('/profile')} />
-          <div className="error-container">
-            <h2>Урок не найден</h2>
-            <p>Запрашиваемый урок не существует или был удален</p>
-            <button 
-              onClick={() => navigate(`/courses/${courseId}/student`)} 
-              className="btn-back"
-            >
-              Вернуться к курсу
-            </button>
-          </div>
+      <div className="material-section">
+        <h3>{title}</h3>
+        <div className="material-name">{materialName}</div>
+        <div className="material-content">
+          <iframe
+            src={materialUrl}
+            title={title}
+            width="100%"
+            height="600"
+            style={{ border: '1px solid #ddd', borderRadius: '4px' }}
+            onError={(e) => {
+              // Если iframe не загружается, показываем ссылку для скачивания
+              e.target.style.display = 'none';
+              const link = e.target.nextElementSibling;
+              if (link && link.tagName === 'A') {
+                link.style.display = 'block';
+              }
+            }}
+          />
+          <a 
+            href={materialUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary"
+            style={{ display: 'none', marginTop: '10px' }}
+          >
+            Открыть материал в новой вкладке
+          </a>
         </div>
       </div>
     );
-  }
+  };
 
   return (
     <div className="app-layout">
-      <Sidebar activeItem="studentCourses" userRole={user.role} />
+      <Sidebar activeItem="courses" userRole={user?.role} />
+      
       <div className="main-content">
-        <Topbar userName={fullName} userRole={user.role} onProfileClick={() => navigate('/profile')} />
-
-        <div className="lesson-header">
-          <button 
-            className="btn-back"
-            onClick={() => navigate(`/courses/${courseId}/student`)}
-          >
-            ← Вернуться к курсу
-          </button>
-          <h1>{lesson.name}</h1>
-        </div>
-
-        <div className="lesson-content">
-          <div className="lesson-info">
-            <h2>Информация об уроке</h2>
-            <p><strong>Урок:</strong> {lesson.name}</p>
-            <p><em>Материалы загружаются через API endpoints</em></p>
+        <Topbar 
+          userName={fullName}
+          userRole={user?.role}
+        />
+        
+        <div className="content-area student-lesson-page">
+          {/* Хлебные крошки */}
+          <div className="breadcrumb">
+            <button 
+              onClick={() => navigate('/courses')}
+              className="breadcrumb-link"
+            >
+              Курсы
+            </button>
+            <span className="breadcrumb-separator">›</span>
+            <button 
+              onClick={() => navigate(`/courses/${courseId}/student`)}
+              className="breadcrumb-link"
+            >
+              Курс
+            </button>
+            <span className="breadcrumb-separator">›</span>
+            <span className="breadcrumb-current">{lesson?.name || 'Урок'}</span>
           </div>
 
-          <div className="lesson-materials">
-            <h2>Учебные материалы</h2>
-            <div className="materials-list">
-              {/* ВРЕМЕННО: Показываем что материалы будут загружены через API */}
-              <div className="material-item">
-                <div className="material-icon">📄</div>
-                <div className="material-info">
-                  <h3>Материалы урока</h3>
-                  <p>Материалы будут загружены через endpoint /student-materials</p>
-                </div>
-              </div>
-              
-              <div className="material-item">
-                <div className="material-icon">📝</div>
-                <div className="material-info">
-                  <h3>Домашнее задание</h3>
-                  <p>Задание будет загружено через endpoint /student-materials</p>
-                </div>
-              </div>
+          {/* Заголовок урока */}
+          <div className="lesson-header">
+            <h1>{lesson?.name || 'Урок'}</h1>
+            <div className="lesson-meta">
+              <span className="lesson-status">
+                📚 Материалы урока
+              </span>
             </div>
           </div>
 
-          <div className="homework-submission">
-            <h2>Сдача домашнего задания</h2>
-            
-            {submitted ? (
-              <div className="hw-submitted">
-                <div className="submitted-icon">✅</div>
-                <h3>Вы уже сдали домашнее задание</h3>
-                <p>Преподаватель скоро его проверит</p>
-              </div>
-            ) : (
-              <div className="hw-form">
-                <p>Загрузите файл с выполненным домашним заданием:</p>
-                
-                <div className="submission-options">
-                  <div className="submission-option">
-                    <h3>Загрузить файл</h3>
-                    <div className="file-upload">
-                      <input
-                        type="file"
-                        id="homework-file"
-                        onChange={handleFileChange}
-                        disabled={submitting}
-                        accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.txt,.zip,.rar"
-                        required
-                      />
-                      <label 
-                        htmlFor="homework-file" 
-                        className={submitting ? "disabled" : ""}
-                      >
-                        {file ? `📎 ${file.name}` : "📁 Выберите файл"}
-                      </label>
-                    </div>
-                    {file && (
-                      <div style={{ marginTop: '8px' }}>
-                        <div style={{ fontSize: '12px', color: '#666' }}>
-                          Размер: {Math.round(file.size / 1024)} KB
-                        </div>
-                        <button 
-                          type="button" 
-                          onClick={() => {
-                            setFile(null);
-                            const fileInput = document.getElementById('homework-file');
-                            if (fileInput) fileInput.value = '';
-                          }}
-                          style={{ marginTop: '5px', padding: '5px 10px', fontSize: '12px' }}
-                        >
-                          Удалить файл
-                        </button>
-                      </div>
-                    )}
-                  </div>
+          {/* Содержимое урока */}
+          <div className="lesson-content">
+            {/* Материалы для студента */}
+            {lesson?.student_material_url && (
+              <div className="material-section">
+                <h2>📖 Материалы урока</h2>
+                <div className="material-content">
+                  <iframe
+                    src={lesson.student_material_url}
+                    title="Материалы урока"
+                    className="material-iframe"
+                    frameBorder="0"
+                    style={{
+                      width: '100%',
+                      minHeight: '500px',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px'
+                    }}
+                  />
                 </div>
-                
-                <button 
-                  className="btn-primary"
-                  onClick={handleSubmit}
-                  disabled={!file || submitting}
-                  style={{
-                    marginTop: '20px',
-                    width: '100%',
-                    padding: '12px'
-                  }}
-                >
-                  {submitting ? 'Отправка...' : 'Отправить домашнее задание'}
-                </button>
+                <div className="material-actions">
+                  <a 
+                    href={lesson.student_material_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="btn-secondary"
+                  >
+                    🔗 Открыть в новом окне
+                  </a>
+                </div>
               </div>
             )}
+
+            {/* Домашнее задание */}
+            <div className="homework-section">
+              <h2>📝 Домашнее задание</h2>
+              
+              {/* Показываем задание, если есть */}
+              {lesson?.homework_material_url && (
+                <div className="homework-description">
+                  <h3>Задание:</h3>
+                  <iframe
+                    src={lesson.homework_material_url}
+                    title="Домашнее задание"
+                    className="homework-iframe"
+                    frameBorder="0"
+                    style={{
+                      width: '100%',
+                      minHeight: '300px',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      marginBottom: '20px'
+                    }}
+                  />
+                  <div className="material-actions">
+                    <a 
+                      href={lesson.homework_material_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="btn-secondary"
+                    >
+                      🔗 Открыть задание в новом окне
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {/* Форма отправки домашнего задания */}
+              {submitted ? (
+                <div className="hw-submitted">
+                  <div className="submitted-icon">✅</div>
+                  <h3>Вы уже сдали домашнее задание</h3>
+                  <p>Преподаватель скоро его проверит</p>
+                </div>
+              ) : (
+                <div className="hw-form">
+                  <p>Загрузите файл с выполненным домашним заданием:</p>
+                  
+                  <div className="submission-options">
+                    <div className="submission-option">
+                      <h3>Загрузить файл</h3>
+                      <div className="file-upload">
+                        <input
+                          type="file"
+                          id="homework-file"
+                          onChange={handleFileChange}
+                          disabled={submitting}
+                          accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.txt,.zip,.rar"
+                          required
+                        />
+                        <label 
+                          htmlFor="homework-file" 
+                          className={submitting ? "disabled" : ""}
+                        >
+                          {file ? `📎 ${file.name}` : "📁 Выберите файл"}
+                        </label>
+                      </div>
+                      {file && (
+                        <div style={{ marginTop: '8px' }}>
+                          <div style={{ fontSize: '12px', color: '#666' }}>
+                            Размер: {Math.round(file.size / 1024)} KB
+                          </div>
+                          <button 
+                            type="button" 
+                            onClick={() => { setFile(null); }}
+                            style={{ 
+                              marginTop: '5px', 
+                              padding: '5px 10px', 
+                              fontSize: '12px',
+                              background: '#dc3545',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Удалить файл
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <button 
+                    className="btn-primary"
+                    onClick={handleSubmit}
+                    disabled={!file || submitting}
+                    style={{
+                      marginTop: '20px',
+                      width: '100%',
+                      padding: '12px'
+                    }}
+                  >
+                    {submitting ? 'Отправка...' : 'Отправить домашнее задание'}
+                  </button>
+                </div>
+              )}
+
+              {/* Если нет домашнего задания */}
+              {!lesson?.homework_material_url && !submitted && (
+                <div className="no-homework">
+                  <p>Для этого урока домашнее задание не предусмотрено</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

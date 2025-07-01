@@ -6,9 +6,10 @@ import Topbar from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/CourseDetailPage.css';
 
-import { getCourse, getCourseLessons, createLessonWithMaterials, updateLessonWithMaterials, deleteLessonWithMaterials } from '../services/lessonService';
+import { getCourse, getCourseLessons, createLessonWithMaterials, updateLessonWithMaterials, deleteLessonWithMaterials, getLessonWithMaterials } from '../services/lessonService';
 
 import { getAllGroups } from '../services/groupService';
+import LessonEditor from '../components/LessonEditor';
 
 export default function CourseDetailPage() {
   const { courseId } = useParams();
@@ -32,6 +33,7 @@ export default function CourseDetailPage() {
   const [creating, setCreating] = useState(false);
 
   // ───── редактирование ───── */
+  const [showLessonEditor, setShowLessonEditor] = useState(false);
   const [editingLesson, setEditingLesson] = useState(null);
   const [editLessonName, setEditLessonName] = useState('');
   const [editLessonDateTime, setEditLessonDateTime] = useState('');
@@ -94,8 +96,65 @@ export default function CourseDetailPage() {
 
   useEffect(() => { loadEverything(); }, [loadEverything]);
 
-  // ───── создание урока + lesson-groups ───── */
-  const handleCreateLesson = async () => {
+  // ───── МОДАЛЬНОЕ ОКНО для продвинутого создания урока ───── */
+  const handleOpenLessonEditor = async () => {
+    setEditingLesson(null);
+    setShowLessonEditor(true);
+  };
+
+  const handleEditLesson = async (lesson) => {
+    try {
+      setLoading(true);
+      console.log('[CourseDetailPage] Loading lesson for editing:', lesson.id);
+      
+      const lessonData = await getLessonWithMaterials(courseId, lesson.id);
+      setEditingLesson(lessonData);
+      setShowLessonEditor(true);
+    } catch (error) {
+      console.error('[CourseDetailPage] Error loading lesson:', error);
+      alert('Ошибка загрузки урока для редактирования');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveLessonFromEditor = async () => {
+    setShowLessonEditor(false);
+    setEditingLesson(null);
+    await reloadLessons(); // Перезагружаем данные курса
+  };
+
+  const handleCancelLessonEdit = () => {
+    setShowLessonEditor(false);
+    setEditingLesson(null);
+  };
+
+  // ───── БЫСТРОЕ создание урока + lesson-groups ───── */
+  const createLessonData = () => ({
+    name: lessonName,
+    teacher_material_name: teacherMaterialName || 'Материал для преподавателя',
+    teacher_material_text: teacherMaterialText || '<p>Материал не добавлен</p>',
+    student_material_name: studentMaterialName || 'Учебный материал',
+    student_material_text: studentMaterialText || '<p>Материал не добавлен</p>',
+    homework_material_name: homeworkMaterialName || 'Домашнее задание',
+    homework_material_text: homeworkMaterialText || '<p>Домашнее задание не добавлено</p>'
+  });
+
+  const updateLessonData = () => ({
+    name: editLessonName,
+    teacher_material_name: '',
+    teacher_material_text: '',
+    student_material_name: '',
+    student_material_text: '',
+    homework_material_name: '',
+    homework_material_text: '',
+    id: editingLesson.id,
+    teacher_material_id: editingLesson.teacher_material_id,
+    student_material_id: editingLesson.student_material_id,
+    homework_material_id: editingLesson.homework_id
+  });
+
+  const handleQuickCreateLesson = async () => {
     if (!lessonName.trim()) {
       alert('Введите название урока.');
       return;
@@ -105,17 +164,7 @@ export default function CourseDetailPage() {
       setCreating(true);
       console.log('[CourseDetail] Creating lesson with materials...');
       
-      // ИСПРАВЛЕНО: Создаем урок с HTML-материалами
-      const lessonData = {
-        name: lessonName,
-        teacher_material_name: teacherMaterialName || 'Материал для преподавателя',
-        teacher_material_text: teacherMaterialText || '<p>Материал не добавлен</p>',
-        student_material_name: studentMaterialName || 'Учебный материал',
-        student_material_text: studentMaterialText || '<p>Материал не добавлен</p>',
-        homework_material_name: homeworkMaterialName || 'Домашнее задание',
-        homework_material_text: homeworkMaterialText || '<p>Домашнее задание не добавлено</p>'
-      };
-
+      const lessonData = createLessonData();
       console.log('[CourseDetail] Lesson data:', lessonData);
 
       const lesson = await createLessonWithMaterials(courseId, lessonData);
@@ -246,7 +295,7 @@ export default function CourseDetailPage() {
     }
   };
 
-  const handleSaveLesson = async () => {
+  const handleSaveEditedLesson = async () => {
     if (!editLessonName.trim()) {
       alert('Введите название урока');
       return;
@@ -256,19 +305,7 @@ export default function CourseDetailPage() {
       setUpdating(true);
       
       // ИСПРАВЛЕНО: Обновляем урок с пустыми материалами (только название)
-      await updateLessonWithMaterials(courseId, editingLesson.id, {
-        name: editLessonName,
-        teacher_material_name: '',
-        teacher_material_text: '',
-        student_material_name: '',
-        student_material_text: '',
-        homework_material_name: '',
-        homework_material_text: '',
-        id: editingLesson.id,
-        teacher_material_id: editingLesson.teacher_material_id,
-        student_material_id: editingLesson.student_material_id,
-        homework_material_id: editingLesson.homework_id
-      });
+      await updateLessonWithMaterials(courseId, editingLesson.id, updateLessonData());
 
       // Обновляем даты через schedule API
       if (editLessonDateTime) {
@@ -388,19 +425,27 @@ export default function CourseDetailPage() {
               </button>
               <h1>{course.name}</h1>
               {(user.role === 'admin' || user.role === 'superadmin') && (
-                <button 
-                  className="btn-primary"
-                  onClick={() => navigate(`/courses/${courseId}/lessons/manage`)}
-                >
-                  Управление уроками
-                </button>
+                <div className="course-actions">
+                  <button 
+                    className="btn-primary"
+                    onClick={handleOpenLessonEditor}
+                  >
+                    📝 Создать урок с файлами
+                  </button>
+                  <button 
+                    className="btn-secondary"
+                    onClick={() => navigate(`/courses/${courseId}/lessons/manage`)}
+                  >
+                    ⚙️ Управление уроками
+                  </button>
+                </div>
               )}
             </div>
 
-            {/* ───── форма создания ───── */}
+            {/* ───── форма быстрого создания ───── */}
             {(user.role === 'admin' || user.role === 'superadmin') && (
               <div className="block">
-                <h2>Быстрое создание урока</h2>
+                <h2>⚡ Быстрое создание урока</h2>
 
                 <div className="user-form form-grid">
                   <div className="field">
@@ -479,10 +524,10 @@ export default function CourseDetailPage() {
                   <div className="buttons" style={{ gridColumn:'1 / -1' }}>
                     <button 
                       className="btn-primary" 
-                      onClick={handleCreateLesson}
+                      onClick={handleQuickCreateLesson}
                       disabled={creating}
                     >
-                      {creating ? 'Создание...' : 'Создать урок'}
+                      {creating ? 'Создание...' : '⚡ Быстро создать урок'}
                     </button>
                   </div>
                 </div>
@@ -490,40 +535,34 @@ export default function CourseDetailPage() {
             )}
 
             {/* ───── модальное окно редактирования ───── */}
-            {editingLesson && (
-              <div className="modal-overlay" onClick={cancelEdit}>
-                <div className="modal-content" onClick={e => e.stopPropagation()}>
-                  <h3>Редактировать урок</h3>
-                  
-                  <div className="field">
-                    <label>Название урока</label>
-                    <input
-                      value={editLessonName}
-                      onChange={e => setEditLessonName(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="field">
-                    <label>Дата и время проведения</label>
-                    <input
-                      type="datetime-local"
-                      value={editLessonDateTime}
-                      onChange={e => setEditLessonDateTime(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="buttons">
-                    <button 
-                      className="btn-primary" 
-                      onClick={handleSaveLesson}
-                      disabled={updating}
-                    >
-                      {updating ? 'Сохранение...' : 'Сохранить'}
-                    </button>
-                    <button className="btn-secondary" onClick={cancelEdit}>
-                      Отмена
-                    </button>
-                  </div>
+            {showLessonEditor && (
+              <div className="modal-overlay" style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000
+              }}>
+                <div style={{
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  maxWidth: '800px',
+                  width: '90%',
+                  maxHeight: '90vh',
+                  overflow: 'auto'
+                }}>
+                  <LessonEditor
+                    courseId={courseId}
+                    lesson={editingLesson}
+                    onSave={handleSaveLessonFromEditor}
+                    onCancel={handleCancelLessonEdit}
+                  />
                 </div>
               </div>
             )}

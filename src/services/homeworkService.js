@@ -154,12 +154,36 @@ export const updateLessonStudent = async (lessonStudentId, updateData) => {
   try {
     console.log('[HomeworkService] Updating lesson student:', lessonStudentId, updateData);
     
-    const response = await api.put(`/courses/lesson-student/${lessonStudentId}`, updateData);
+    // ИСПРАВЛЕНО: Формируем правильную структуру данных согласно API схеме
+    const apiData = {
+      student_id: updateData.student_id,
+      lesson_group_id: updateData.lesson_group_id,
+      is_visited: updateData.is_visited || false,
+      is_excused_absence: updateData.is_excused_absence || false,
+      is_sent_homework: updateData.is_sent_homework || false,
+      is_graded_homework: updateData.is_graded_homework || false,
+      coins_for_visit: parseInt(updateData.coins_for_visit) || 0,
+      grade_for_visit: parseInt(updateData.grade_for_visit) || 0,
+      coins_for_homework: parseInt(updateData.coins_for_homework) || 0,
+      grade_for_homework: parseInt(updateData.grade_for_homework) || 0,
+      id: lessonStudentId
+    };
+    
+    console.log('[HomeworkService] Formatted API data:', apiData);
+    
+    const response = await api.put(`/courses/lesson-student/${lessonStudentId}`, apiData);
     
     console.log('[HomeworkService] Lesson student updated:', response.data);
     return response.data;
   } catch (error) {
     console.error('[HomeworkService] Error updating lesson student:', error);
+    
+    // Логируем детали ошибки для отладки
+    if (error.response) {
+      console.error('[HomeworkService] Response error data:', error.response.data);
+      console.error('[HomeworkService] Response status:', error.response.status);
+    }
+    
     throw error;
   }
 };
@@ -301,5 +325,32 @@ export const listComments = async (courseId, lessonId) => {
   } catch (error) {
     console.error('[HomeworkService] Error listing comments:', error);
     return [];
+  }
+};
+
+/**
+ * ДОБАВЛЕНО: Создать уведомление для студента при проверке ДЗ
+ */
+export const createNotificationForStudent = async (studentId, message) => {
+  try {
+    console.log('[HomeworkService] Creating notification for student:', studentId, message);
+    
+    const response = await api.post('/notifications/', 
+      {
+        content: message
+      },
+      {
+        params: {
+          recipient_type: 'student',
+          recipient_id: studentId
+        }
+      }
+    );
+    
+    console.log('[HomeworkService] Notification created:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[HomeworkService] Error creating notification:', error);
+    throw error;
   }
 };
