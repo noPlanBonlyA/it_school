@@ -266,6 +266,71 @@
   animation: pulse 2s infinite;
 }
 
+/* Стили для формы загрузки домашнего задания */
+.homework-upload-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.homework-upload-section h3 {
+  margin: 0 0 16px 0;
+  color: #495057;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.homework-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.homework-form input[type="text"] {
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.homework-content-section,
+.homework-file-section {
+  margin: 12px 0;
+}
+
+.homework-content-section h4,
+.homework-file-section h4 {
+  margin: 0 0 8px 0;
+  color: #6c757d;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.homework-content-section textarea {
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.homework-file-section input[type="file"] {
+  padding: 8px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  width: 100%;
+}
+
+.homework-form .btn-secondary {
+  align-self: flex-start;
+  margin-top: 8px;
+}
+
 /* Модальное окно проведения урока */
 .modal-overlay {
   position: fixed;
@@ -273,7 +338,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -291,22 +356,26 @@
 }
 
 .modal-content.large {
-  max-width: 1000px;
   width: 90vw;
+  max-width: 1000px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .modal-header h2 {
   margin: 0;
-  color: #1f2937;
+  color: #495057;
 }
 
 .close-modal {
@@ -314,85 +383,57 @@
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #6b7280;
+  color: #6c757d;
   padding: 4px;
+  line-height: 1;
 }
 
 .close-modal:hover {
-  color: #374151;
+  color: #495057;
 }
 
-/* Контент проведения урока */
+.modal-body {
+  padding: 24px;
+}
+
 .conduct-lesson-content {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.homework-upload-section {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-}
-
-.homework-upload-section h3 {
-  margin: 0 0 16px 0;
-  color: #1f2937;
-}
-
-.homework-form {
-  display: flex;
-  gap: 12px;
-  align-items: end;
-  flex-wrap: wrap;
-}
-
-.homework-form input[type="text"] {
-  flex: 1;
-  min-width: 200px;
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-}
-
-.homework-form input[type="file"] {
-  padding: 8px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  background: white;
-}
-
-/* Секция студентов */
+/* Стили для секции студентов */
 .students-grades-section h3 {
   margin: 0 0 16px 0;
-  color: #1f2937;
+  color: #495057;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .students-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-height: 400px;
-  overflow-y: auto;
 }
 
 .student-grade-item {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
   padding: 16px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  background: white;
 }
 
 .student-grade-item .student-info h4 {
   margin: 0 0 12px 0;
-  color: #1f2937;
+  color: #495057;
+  font-size: 16px;
 }
 
 .grade-controls {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
+  align-items: start;
 }
 
 .grade-controls label {
@@ -400,7 +441,7 @@
   flex-direction: column;
   gap: 4px;
   font-size: 14px;
-  color: #374151;
+  color: #6c757d;
 }
 
 .grade-controls input[type="checkbox"] {
@@ -410,135 +451,51 @@
 
 .grade-controls input[type="number"] {
   padding: 6px 8px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #ced4da;
   border-radius: 4px;
+  font-size: 14px;
 }
 
 .grade-controls textarea {
   padding: 8px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #ced4da;
   border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
   resize: vertical;
   min-height: 60px;
 }
 
-/* Действия модального окна */
 .modal-actions {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
   margin-top: 24px;
   padding-top: 16px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #e9ecef;
 }
 
-/* Кнопки действий в виджете события */
-.event-actions {
+.loading-container {
   display: flex;
-  gap: 8px;
-  margin-top: 16px;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-}
-
-.btn-primary {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  white-space: nowrap;
+  justify-content: center;
+  padding: 40px;
+  gap: 16px;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: #2563eb;
-  transform: translateY(-1px);
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e9ecef;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
-.btn-primary:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-secondary {
-  background: #e5e7eb;
-  color: #374151;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: #d1d5db;
-}
-
-/* Статус в info-item */
-.info-item strong {
-  min-width: 100px;
-  flex-shrink: 0;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-  .schedule-item {
-    padding: 8px;
-    gap: 8px;
-  }
-  
-  .schedule-time-block {
-    width: 60px;
-    padding: 6px;
-  }
-  
-  .schedule-time {
-    font-size: 14px;
-  }
-  
-  .schedule-lesson-name {
-    font-size: 13px;
-  }
-  
-  .schedule-course-name {
-    font-size: 11px;
-  }
-  
-  .schedule-auditorium {
-    font-size: 10px;
-  }
-  
-  .modal-content.large {
-    width: 95vw;
-    padding: 16px;
-  }
-  
-  .homework-form {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .grade-controls {
-    grid-template-columns: 1fr;
-  }
-  
-  .modal-actions {
-    flex-direction: column;
-  }
-  
-  .event-actions {
-    flex-direction: column;
-  }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Дополнительные стили для особых состояний */

@@ -7,6 +7,7 @@ import { useAuth }                    from '../contexts/AuthContext';
 import {
   getAllUsers,
   createUser,
+  createAdminWithUser,
   updateUser,
   deleteUser
 } from '../services/userService';
@@ -62,13 +63,20 @@ export default function ManageAdminsPage() {
     if (creating) return;
     setCreating(true); setErrors({});
     try{
-      const newUser = await createUser({
-        first_name:form.first_name,surname:form.surname,patronymic:form.patronymic,
-        birth_date:form.birth_date||null,email:form.email,phone_number:form.phone_number,
-        password:form.password,role:'admin'
+      // Используем новый метод создания администратора с form-data
+      const result = await createAdminWithUser({
+        first_name: form.first_name,
+        surname: form.surname,
+        patronymic: form.patronymic,
+        birth_date: form.birth_date || null,
+        email: form.email,
+        phone_number: form.phone_number,
+        password: form.password,
+        role: 'admin'
       });
+      
       alert('Администратор создан');
-      setAdmins(prev=>[...prev,newUser]);
+      setAdmins(prev=>[...prev, result.user]);
       setForm({ first_name:'',surname:'',patronymic:'',birth_date:'',
                 email:'',phone_number:'',password:'' });
     }catch(e){

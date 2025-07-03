@@ -20,11 +20,37 @@ export const getUserSchedule = async (user) => {
 
     // Дополняем данные информацией о группах и преподавателях
     const enhancedSchedule = await Promise.all(scheduleData.map(async (item) => {
+      // Получаем информацию о группе
+      let groupInfo = null;
+      let teacherInfo = null;
+      let courseId = item.course_id; // Пытаемся использовать course_id из исходных данных
+      
+      // ИСПРАВЛЕНО: Если course_id отсутствует, пытаемся получить его из lesson-group
+      if (!courseId && item.lesson_id && item.group_id) {
+        try {
+          console.log('[ScheduleService] Course ID missing for lesson', item.lesson_id, ', trying to get from lesson-group...');
+          const lessonGroupResponse = await api.get('/courses/lesson-group', {
+            params: { 
+              group_id: item.group_id
+            }
+          });
+          const lessonGroups = lessonGroupResponse.data;
+          
+          // Ищем подходящий lesson-group для данного урока
+          const matchingLessonGroup = Array.isArray(lessonGroups) ? 
+            lessonGroups.find(lg => lg.lesson_id === item.lesson_id) : 
+            lessonGroups;
+            
+          if (matchingLessonGroup && matchingLessonGroup.lesson && matchingLessonGroup.lesson.course_id) {
+            courseId = matchingLessonGroup.lesson.course_id;
+            console.log('[ScheduleService] Retrieved course_id from lesson-group:', courseId);
+          }
+        } catch (lgError) {
+          console.warn('[ScheduleService] Could not get course_id from lesson-group:', lgError);
+        }
+      }
+      
       try {
-        // Получаем информацию о группе
-        let groupInfo = null;
-        let teacherInfo = null;
-        
         if (item.group_id) {
           try {
             const groupResponse = await api.get(`/groups/${item.group_id}`);
@@ -43,6 +69,7 @@ export const getUserSchedule = async (user) => {
           id: item.id,
           lesson_id: item.lesson_id,
           lesson_name: item.lesson_name,
+          course_id: courseId, // ИСПРАВЛЕНО: используем правильно полученный course_id
           course_name: item.course_name,
           group_id: item.group_id,
           group_name: groupInfo?.name || 'Группа не найдена',
@@ -67,6 +94,7 @@ export const getUserSchedule = async (user) => {
           id: item.id,
           lesson_id: item.lesson_id,
           lesson_name: item.lesson_name,
+          course_id: courseId, // ИСПРАВЛЕНО: используем правильно полученный course_id
           course_name: item.course_name,
           group_id: item.group_id,
           group_name: 'Группа не найдена',
@@ -129,6 +157,7 @@ export const getScheduleByDateRange = async (startDate, endDate) => {
           id: item.id,
           lesson_id: item.lesson_id,
           lesson_name: item.lesson_name,
+          course_id: item.course_id, // ДОБАВЛЕНО: course_id из исходных данных
           course_name: item.course_name,
           group_id: item.group_id,
           group_name: groupInfo?.name || 'Группа не найдена',
@@ -151,6 +180,7 @@ export const getScheduleByDateRange = async (startDate, endDate) => {
           id: item.id,
           lesson_id: item.lesson_id,
           lesson_name: item.lesson_name,
+          course_id: item.course_id, // ДОБАВЛЕНО: course_id из исходных данных
           course_name: item.course_name,
           group_id: item.group_id,
           group_name: 'Группа не найдена',
@@ -232,14 +262,41 @@ export const getUserScheduleOptimized = async (user) => {
     });
 
     // Обогащаем данные расписания
-    const enhancedSchedule = scheduleData.map(item => {
+    const enhancedSchedule = await Promise.all(scheduleData.map(async (item) => {
       const groupInfo = groupsMap.get(item.group_id);
       const teacherInfo = groupInfo?.teacher;
+      let courseId = item.course_id; // Используем course_id из исходных данных
+      
+      // ИСПРАВЛЕНО: Если course_id отсутствует, пытаемся получить его из lesson-group
+      if (!courseId && item.lesson_id && item.group_id) {
+        try {
+          console.log('[ScheduleService] Course ID missing for lesson', item.lesson_id, ', trying to get from lesson-group...');
+          const lessonGroupResponse = await api.get('/courses/lesson-group', {
+            params: { 
+              group_id: item.group_id
+            }
+          });
+          const lessonGroups = lessonGroupResponse.data;
+          
+          // Ищем подходящий lesson-group для данного урока
+          const matchingLessonGroup = Array.isArray(lessonGroups) ? 
+            lessonGroups.find(lg => lg.lesson_id === item.lesson_id) : 
+            lessonGroups;
+            
+          if (matchingLessonGroup && matchingLessonGroup.lesson && matchingLessonGroup.lesson.course_id) {
+            courseId = matchingLessonGroup.lesson.course_id;
+            console.log('[ScheduleService] Retrieved course_id from lesson-group:', courseId);
+          }
+        } catch (lgError) {
+          console.warn('[ScheduleService] Could not get course_id from lesson-group:', lgError);
+        }
+      }
 
       return {
         id: item.id,
         lesson_id: item.lesson_id,
         lesson_name: item.lesson_name,
+        course_id: courseId, // ИСПРАВЛЕНО: используем правильно полученный course_id
         course_name: item.course_name,
         group_id: item.group_id,
         group_name: groupInfo?.name || 'Группа не найдена',
@@ -256,7 +313,7 @@ export const getUserScheduleOptimized = async (user) => {
         start: item.start_datetime,
         end: item.end_datetime
       };
-    });
+    }));
 
     console.log('[ScheduleService] Optimized enhanced schedule:', enhancedSchedule);
     return enhancedSchedule;

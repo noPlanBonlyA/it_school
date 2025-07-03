@@ -89,15 +89,62 @@ export const getAllStudents = async (limit = 100, offset = 0) => {
 export const listStudents = getAllStudents;
 
 /**
- * Создать нового студента
+ * Создать нового студента с пользователем
  */
-export const createStudent = async (studentData) => {
-  console.log('[StudentService] Creating student:', studentData);
+export const createStudent = async (studentData, imageFile = null) => {
+  console.log('[StudentService] Creating student with user:', studentData);
   
   try {
-    const response = await api.post('/students/', studentData);
-    console.log('[StudentService] Student created:', response.data);
-    return response.data;
+    // Создаем FormData для пользователя
+    const formData = new FormData();
+    
+    // Подготавливаем данные пользователя
+    const userData = {
+      first_name: studentData.first_name,
+      surname: studentData.surname,
+      patronymic: studentData.patronymic || '',
+      email: studentData.email,
+      birth_date: studentData.birth_date,
+      phone_number: studentData.phone_number,
+      password: studentData.password,
+      role: 'student' // Устанавливаем роль студента
+    };
+    
+    // Добавляем данные пользователя как JSON строку
+    formData.append('user_data', JSON.stringify(userData));
+    
+    // Добавляем изображение если есть
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+    
+    // Сначала создаем пользователя
+    console.log('[StudentService] Creating user first...');
+    const userResponse = await api.post('/users/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    console.log('[StudentService] User created:', userResponse.data);
+    
+    // Затем создаем профиль студента
+    const studentProfile = {
+      user_id: userResponse.data.id,
+      points: studentData.points || 0
+    };
+    
+    console.log('[StudentService] Creating student profile:', studentProfile);
+    const studentResponse = await api.post('/students/', studentProfile);
+    
+    console.log('[StudentService] Student profile created:', studentResponse.data);
+    
+    // Возвращаем объединенные данные
+    return {
+      user: userResponse.data,
+      student: studentResponse.data
+    };
+    
   } catch (error) {
     console.error('[StudentService] Error creating student:', error.response?.data || error.message);
     throw error;
@@ -272,6 +319,49 @@ export const createNotificationForStudent = async (studentId, message) => {
   }
 };
 
+/**
+ * Создать нового студента с существующим пользователем
+ */
+export const createStudentProfile = async (userId, studentData = {}) => {
+  console.log('[StudentService] Creating student profile for user:', userId);
+  
+  try {
+    const studentProfile = {
+      user_id: userId,
+      points: studentData.points || 0
+    };
+    
+    const response = await api.post('/students/', studentProfile);
+    console.log('[StudentService] Student profile created:', response.data);
+    return response.data;
+    
+  } catch (error) {
+    console.error('[StudentService] Error creating student profile:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+/**
+ * Создать нового учителя с существующим пользователем  
+ */
+export const createTeacherProfile = async (userId) => {
+  console.log('[StudentService] Creating teacher profile for user:', userId);
+  
+  try {
+    const teacherProfile = {
+      user_id: userId
+    };
+    
+    const response = await api.post('/teachers/', teacherProfile);
+    console.log('[StudentService] Teacher profile created:', response.data);
+    return response.data;
+    
+  } catch (error) {
+    console.error('[StudentService] Error creating teacher profile:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 // Экспорт по умолчанию
 const studentServiceDefault = {
   findStudentByUser,
@@ -286,7 +376,9 @@ const studentServiceDefault = {
   addStudentToGroup,
   removeStudentFromGroup,
   debugAllStudents,
-  createNotificationForStudent
+  createNotificationForStudent,
+  createStudentProfile,
+  createTeacherProfile
 };
 
 export default studentServiceDefault;

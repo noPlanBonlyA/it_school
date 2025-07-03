@@ -99,6 +99,9 @@ export default function SchedulePage() {
   // ───── при клике на событие открываем мини-виджет ─────
   const handleEventClick = ({ event }) => {
     console.log('[SchedulePage] Event clicked:', event.extendedProps.originalEvent);
+    console.log('[SchedulePage] Event course_id:', event.extendedProps.originalEvent.course_id);
+    console.log('[SchedulePage] Event lesson_id:', event.extendedProps.originalEvent.lesson_id);
+    console.log('[SchedulePage] Event extendedProps:', event.extendedProps);
     setSelectedEvent(event.extendedProps.originalEvent);
   };
 

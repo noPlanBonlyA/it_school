@@ -16,6 +16,7 @@ import {
 import {
   listTeachers,
   createTeacher,
+  createTeacherWithUser,
   updateTeacher,
   deleteTeacher
 } from '../services/teacherService';
@@ -85,14 +86,19 @@ export default function ManageTeachersPage() {
     if(busyCreate) return;
     setBusyCreate(true); setErrors({});
     try{
-      const newU = await createUser({
-        first_name:form.first_name,surname:form.surname,patronymic:form.patronymic,
-        birth_date:form.birth_date||null,email:form.email,phone_number:form.phone_number,
-        password:form.password,role:'teacher'
+      // Используем новый метод создания учителя с form-data
+      const result = await createTeacherWithUser({
+        first_name: form.first_name,
+        surname: form.surname,
+        patronymic: form.patronymic,
+        birth_date: form.birth_date || null,
+        email: form.email,
+        phone_number: form.phone_number,
+        password: form.password
       });
-      const newT = await createTeacher({ user_id:newU.id });
+      
       alert('Преподаватель создан');
-      setTeachers(t=>[...t,{ teacher:newT, user:newU }]);
+      setTeachers(t=>[...t,{ teacher: result.teacher, user: result.user }]);
       setForm({ first_name:'',surname:'',patronymic:'',birth_date:'',
                 email:'',phone_number:'',password:'' });
     }catch(e){

@@ -11,12 +11,33 @@ import { getUserScheduleOptimized, updateLessonGroup } from '../services/schedul
 export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  
+  // Логируем структуру событий для отладки
+  console.log('[Schedule] Component received events:', events);
+  if (events && events.length > 0) {
+    console.log('[Schedule] First event structure:', events[0]);
+    console.log('[Schedule] First event course_id:', events[0].course_id);
+    console.log('[Schedule] First event lesson_id:', events[0].lesson_id);
+    console.log('[Schedule] Event keys:', Object.keys(events[0]));
+  }
+  
+  // Логируем selectedEvent при изменении
+  console.log('[Schedule] selectedEvent:', selectedEvent);
+  if (selectedEvent) {
+    console.log('[Schedule] selectedEvent course_id:', selectedEvent.course_id);
+    console.log('[Schedule] selectedEvent lesson_id:', selectedEvent.lesson_id);
+  }
+  
   const [conductingLesson, setConductingLesson] = useState(null);
   const [students, setStudents] = useState([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [studentGrades, setStudentGrades] = useState({});
   const [studentComments, setStudentComments] = useState({});
-  const [homeworkData, setHomeworkData] = useState({ name: '', file: null });
+  const [homeworkData, setHomeworkData] = useState({ 
+    name: '', 
+    file: null, 
+    textContent: '' 
+  });
   const [uploadingHomework, setUploadingHomework] = useState(false);
   const [toggleLoading, setToggleLoading] = useState(false);
 
@@ -206,11 +227,75 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
   // Обработчик "Провести урок"
   const handleConductLesson = async (event) => {
     console.log('[Schedule] Conducting lesson:', event);
+    console.log('[Schedule] Event course_id:', event.course_id);
+    console.log('[Schedule] Event lesson_id:', event.lesson_id);
+    
+    // Если course_id отсутствует, пытаемся получить его из полного расписания
+    let courseId = event.course_id;
+    
+    if (!courseId && event.lesson_id) {
+      try {
+        console.log('[Schedule] Course ID missing, trying to get from full schedule...');
+        const scheduleResponse = await api.get('/schedule/');
+        const scheduleData = scheduleResponse.data;
+        
+        // Ищем событие в полном расписании по ID или lesson_id + group_id
+        const matchingEvent = scheduleData.find(item => 
+          item.id === event.id || 
+          (item.lesson_id === event.lesson_id && item.group_id === event.group_id)
+        );
+        
+        if (matchingEvent && matchingEvent.course_id) {
+          courseId = matchingEvent.course_id;
+          console.log('[Schedule] Retrieved course_id from full schedule:', courseId);
+        } else {
+          console.log('[Schedule] No matching event with course_id found in schedule');
+          
+          // Попытка 3: Если все еще нет course_id, используем lesson-group API с group_id
+          if (event.group_id) {
+            try {
+              console.log('[Schedule] Trying lesson-group API with group_id parameter...');
+              const lessonGroupsResponse = await api.get('/courses/lesson-group', {
+                params: { group_id: event.group_id }
+              });
+              const lessonGroups = lessonGroupsResponse.data;
+              
+              if (Array.isArray(lessonGroups) && lessonGroups.length > 0) {
+                // Находим lesson-group с нужным lesson_id
+                const targetLessonGroup = lessonGroups.find(lg => lg.lesson_id === event.lesson_id);
+                if (targetLessonGroup && targetLessonGroup.lesson && targetLessonGroup.lesson.course_id) {
+                  courseId = targetLessonGroup.lesson.course_id;
+                  console.log('[Schedule] Retrieved course_id from lesson-group API:', courseId);
+                }
+              }
+            } catch (lgError) {
+              console.warn('[Schedule] Could not get course_id from lesson-group API:', lgError);
+            }
+          }
+        }
+      } catch (scheduleError) {
+        console.error('[Schedule] Error getting course_id from schedule:', scheduleError);
+      }
+    }
+    
+    // Проверяем наличие обязательных полей
+    if (!courseId || !event.lesson_id) {
+      console.error('[Schedule] Missing course_id or lesson_id:', {
+        course_id: courseId,
+        lesson_id: event.lesson_id,
+        originalEvent: event
+      });
+      alert('Ошибка: не удалось определить курс или урок. Обратитесь к администратору.');
+      return;
+    }
     
     // Находим lesson_group_id из расписания
     const lessonGroupId = event.id; // ID из расписания - это lesson_group_id
     
-    setConductingLesson({ ...event, lesson_group_id: lessonGroupId });
+    // Обновляем событие с правильным course_id
+    const updatedEvent = { ...event, course_id: courseId };
+    
+    setConductingLesson({ ...updatedEvent, lesson_group_id: lessonGroupId });
     await loadLessonStudents(lessonGroupId);
   };
 
@@ -301,37 +386,90 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
 
   // Обработка загрузки домашнего задания
   const handleHomeworkUpload = async () => {
-    if (!homeworkData.name || !homeworkData.file) {
-      alert('Заполните название и выберите файл');
+    if (!homeworkData.name || (!homeworkData.file && !homeworkData.textContent)) {
+      alert('Заполните название и выберите файл или введите текстовое задание');
+      return;
+    }
+    
+    // Проверяем наличие обязательных данных урока
+    if (!conductingLesson.course_id || !conductingLesson.lesson_id) {
+      console.error('[Schedule] Missing lesson data for homework upload:', {
+        course_id: conductingLesson.course_id,
+        lesson_id: conductingLesson.lesson_id,
+        conductingLesson
+      });
+      alert('Ошибка: не удалось определить курс или урок. Попробуйте заново открыть урок.');
       return;
     }
     
     try {
       setUploadingHomework(true);
       
-      const formData = new FormData();
-      formData.append('homework_data', JSON.stringify({
-        name: homeworkData.name
-      }));
-      formData.append('homework_file', homeworkData.file);
+      console.log('[Schedule] Uploading homework with:', {
+        course_id: conductingLesson.course_id,
+        lesson_id: conductingLesson.lesson_id,
+        name: homeworkData.name,
+        hasText: !!homeworkData.textContent,
+        hasFile: !!homeworkData.file
+      });
       
-      // Загружаем домашнее задание через API
-      await api.post(
-        `/courses/${conductingLesson.course_id}/lessons/${conductingLesson.lesson_id}/homework`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+      let uploadedSuccessfully = 0;
+      let errors = [];
+      
+      // Загружаем текстовое домашнее задание, если есть
+      if (homeworkData.textContent && homeworkData.textContent.trim()) {
+        try {
+          const textEndpoint = `/courses/${conductingLesson.course_id}/lessons/${conductingLesson.lesson_id}/homework-material-text`;
+          console.log('[Schedule] Text homework endpoint:', textEndpoint);
+          
+          await api.post(textEndpoint, {
+            name: homeworkData.name,
+            html_text: homeworkData.textContent.trim()
+          });
+          uploadedSuccessfully++;
+          console.log('[Schedule] Text homework uploaded successfully');
+        } catch (error) {
+          console.error('[Schedule] Error uploading text homework:', error);
+          errors.push('текстовое задание');
         }
-      );
+      }
       
-      alert('Домашнее задание загружено!');
-      setHomeworkData({ name: '', file: null });
+      // Загружаем файл домашнего задания, если есть
+      if (homeworkData.file) {
+        try {
+          const fileEndpoint = `/courses/${conductingLesson.course_id}/lessons/${conductingLesson.lesson_id}/homework-material`;
+          console.log('[Schedule] File homework endpoint:', fileEndpoint);
+          
+          const formData = new FormData();
+          formData.append('homework_material_name', homeworkData.name);
+          formData.append('homework_material_file', homeworkData.file);
+          
+          await api.post(fileEndpoint, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          uploadedSuccessfully++;
+          console.log('[Schedule] File homework uploaded successfully');
+        } catch (error) {
+          console.error('[Schedule] Error uploading file homework:', error);
+          errors.push('файл');
+        }
+      }
+      
+      // Показываем результат
+      if (uploadedSuccessfully > 0 && errors.length === 0) {
+        alert('Домашнее задание загружено успешно!');
+        setHomeworkData({ name: '', file: null, textContent: '' });
+      } else if (uploadedSuccessfully > 0 && errors.length > 0) {
+        alert(`Частично загружено. Ошибка загрузки: ${errors.join(', ')}`);
+      } else {
+        alert(`Ошибка загрузки домашнего задания: ${errors.join(', ')}`);
+      }
       
     } catch (error) {
       console.error('[Schedule] Error uploading homework:', error);
-      alert('Ошибка загрузки домашнего задания');
+      alert('Общая ошибка загрузки домашнего задания');
     } finally {
       setUploadingHomework(false);
     }
@@ -344,6 +482,9 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
         <div className="modal-content large">
           <div className="modal-header">
             <h2>Провести урок: {conductingLesson.lesson_name}</h2>
+            <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+              Курс ID: {conductingLesson.course_id || 'НЕ ОПРЕДЕЛЕН'} | Урок ID: {conductingLesson.lesson_id || 'НЕ ОПРЕДЕЛЕН'}
+            </div>
             <button className="close-modal" onClick={() => setConductingLesson(null)}>×</button>
           </div>
           
@@ -365,14 +506,30 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
                       value={homeworkData.name}
                       onChange={(e) => setHomeworkData(prev => ({ ...prev, name: e.target.value }))}
                     />
-                    <input
-                      type="file"
-                      onChange={(e) => setHomeworkData(prev => ({ ...prev, file: e.target.files[0] }))}
-                      accept=".pdf,.doc,.docx,.txt"
-                    />
+                    
+                    <div className="homework-content-section">
+                      <h4>Текстовое задание (опционально):</h4>
+                      <textarea
+                        placeholder="Введите текст домашнего задания..."
+                        value={homeworkData.textContent}
+                        onChange={(e) => setHomeworkData(prev => ({ ...prev, textContent: e.target.value }))}
+                        rows={4}
+                        style={{ width: '100%', marginBottom: '10px' }}
+                      />
+                    </div>
+                    
+                    <div className="homework-file-section">
+                      <h4>Файл задания (опционально):</h4>
+                      <input
+                        type="file"
+                        onChange={(e) => setHomeworkData(prev => ({ ...prev, file: e.target.files[0] }))}
+                        accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                      />
+                    </div>
+                    
                     <button 
                       onClick={handleHomeworkUpload}
-                      disabled={uploadingHomework || !homeworkData.name || !homeworkData.file}
+                      disabled={uploadingHomework || !homeworkData.name || (!homeworkData.file && !homeworkData.textContent)}
                       className="btn-secondary"
                     >
                       {uploadingHomework ? 'Загрузка...' : 'Загрузить ДЗ'}

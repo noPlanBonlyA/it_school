@@ -85,17 +85,21 @@ export default function ManageStudentsPage() {
     if(busyCreate) return;
     setBusyCreate(true); setErrors({});
     try{
-      // 1) создаём пользователя
-      const newU=await createUser({
-        first_name:form.first_name, surname:form.surname, patronymic:form.patronymic,
-        birth_date:form.birth_date||null, email:form.email, phone_number:form.phone_number,
-        password  :form.password, role:'student'
+      // Используем новый метод создания студента с form-data
+      const result = await createStudent({
+        first_name: form.first_name,
+        surname: form.surname,
+        patronymic: form.patronymic,
+        birth_date: form.birth_date || null,
+        email: form.email,
+        phone_number: form.phone_number,
+        password: form.password,
+        points: +form.points || 0
       });
-      // 2) сразу создаём student-профиль
-      const newS=await createStudent({ user_id:newU.id, points:+form.points });
+      
       alert('Студент создан');
 
-      setStudents(prev=>[...prev,{ user:newU, student:newS }]);
+      setStudents(prev=>[...prev,{ user: result.user, student: result.student }]);
       setForm({ first_name:'',surname:'',patronymic:'',birth_date:'',
                 email:'',phone_number:'',password:'',points:0 });
     }catch(e){

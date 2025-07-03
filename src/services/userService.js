@@ -38,18 +38,98 @@ export async function getById(id) {
   return data;
 }
 
-export async function createUser(payload) {
-  const { data } = await api.post('/users', payload);
+export async function createUser(payload, imageFile = null) {
+  console.log('[UserService] Creating user:', payload);
+  
+  // Создаем FormData
+  const formData = new FormData();
+  
+  // Добавляем данные пользователя как JSON строку
+  formData.append('user_data', JSON.stringify(payload));
+  
+  // Добавляем изображение если есть
+  if (imageFile) {
+    formData.append('image', imageFile);
+  }
+  
+  const { data } = await api.post('/users/', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return data;
 }
 
 export async function updateUser(id, payload) {
-  const { data } = await api.put(`/users/${id}`, payload);
+  console.log('[UserService] Updating user:', { id, payload });
+  
+  // Создаем FormData для обновления
+  const formData = new FormData();
+  
+  // Добавляем данные пользователя как JSON строку
+  formData.append('user_data', JSON.stringify(payload));
+  
+  const { data } = await api.put(`/users/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return data;
 }
 
 export async function deleteUser(id) {
   await api.delete(`/users/${id}`);
+}
+
+/**
+ * Создать нового администратора с пользователем
+ */
+export async function createAdminWithUser(adminData, imageFile = null) {
+  console.log('[UserService] Creating admin with user:', adminData);
+  
+  try {
+    // Создаем FormData для пользователя
+    const formData = new FormData();
+    
+    // Подготавливаем данные пользователя
+    const userData = {
+      first_name: adminData.first_name,
+      surname: adminData.surname,
+      patronymic: adminData.patronymic || '',
+      email: adminData.email,
+      birth_date: adminData.birth_date,
+      phone_number: adminData.phone_number,
+      password: adminData.password,
+      role: adminData.role || 'admin' // admin или superadmin
+    };
+    
+    // Добавляем данные пользователя как JSON строку
+    formData.append('user_data', JSON.stringify(userData));
+    
+    // Добавляем изображение если есть
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+    
+    // Создаем пользователя
+    console.log('[UserService] Creating admin user...');
+    const userResponse = await api.post('/users/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    console.log('[UserService] Admin user created:', userResponse.data);
+    
+    // Для администраторов дополнительного профиля не нужно - роль определяется в user
+    return {
+      user: userResponse.data
+    };
+    
+  } catch (error) {
+    console.error('[UserService] Error creating admin:', error.response?.data || error.message);
+    throw error;
+  }
 }
 
 /* default export — чтобы HomePage мог импортировать одним именем */
@@ -60,5 +140,6 @@ const userService = {
   createUser,
   updateUser,
   deleteUser,
+  createAdminWithUser,
 };
 export default userService;

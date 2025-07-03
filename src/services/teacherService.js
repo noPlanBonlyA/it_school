@@ -34,8 +34,10 @@ export async function getMyTeacher() {
 }
 
 export async function updateTeacher(id, payload) {
-  // PUT /api/teachers/{teacher_id} ожидает хотя бы пустой объект {}
-  await api.put(`/teachers/${id}`, payload);
+  console.log('[TeacherService] Updating teacher:', { id, payload });
+  // PUT /api/teachers/{teacher_id} принимает JSON данные для обновления профиля учителя
+  const { data } = await api.put(`/teachers/${id}`, payload);
+  return data;
 }
 
 // Удаляет сущность teacher
@@ -48,24 +50,26 @@ export const listTeachers = (limit=100, offset=0)=>
 
 export async function findTeacherByUser(user_id) {
   try {
-    // Получаем всех преподавателей и ищем по user_id
+    console.log(`[findTeacherByUser] Searching for teacher with user_id: ${user_id}`);
+    
+    // Получаем всех преподавателей
     const { data } = await api.get('/teachers', {
-      params: { user_id, limit: 100, offset: 0 } // Увеличиваем лимит и добавляем фильтр
+      params: { limit: 100, offset: 0 }
     });
     
     const teachers = data.objects || data;
+    console.log(`[findTeacherByUser] All teachers response:`, data);
+    console.log(`[findTeacherByUser] Teachers array:`, teachers);
     
-    // Если API не поддерживает фильтрацию, делаем это вручную
+    // Ищем преподавателя по user_id
     if (Array.isArray(teachers)) {
-      const teacher = teachers.find(t => t.user_id === user_id);
-      console.log(`[findTeacherByUser] Found teacher for userId ${user_id}:`, teacher);
-      return teacher;
-    }
-    
-    // Если возвращается один объект, проверяем что это нужный преподаватель
-    if (teachers && teachers.user_id === user_id) {
-      console.log(`[findTeacherByUser] Found teacher for userId ${user_id}:`, teachers);
-      return teachers;
+      console.log(`[findTeacherByUser] Searching for user_id: ${user_id}`);
+      const teacher = teachers.find(t => {
+        console.log(`[findTeacherByUser] Checking teacher:`, t);
+        return t.user_id === user_id;
+      });
+      console.log(`[findTeacherByUser] Found teacher:`, teacher);
+      return teacher || null;
     }
     
     console.log(`[findTeacherByUser] No teacher found for userId ${user_id}`);
@@ -77,66 +81,76 @@ export async function findTeacherByUser(user_id) {
 }
 
 /**
- * Найти студента по user_id
+ * Создать нового учителя с пользователем
  */
-export async function findStudentByUser(userId) {
-  console.log('[StudentService] Finding student by user ID:', userId);
+export async function createTeacherWithUser(teacherData, imageFile = null) {
+  console.log('[TeacherService] Creating teacher with user:', teacherData);
   
   try {
-    // ИСПРАВЛЕНО: Для студентов используем /students/me вместо общего списка
-    const currentUser = JSON.parse(localStorage.getItem('user'));
-    if (currentUser?.role === 'student' && currentUser?.id === userId) {
-      console.log('[StudentService] Using /students/me for current student');
-      const { data } = await api.get('/students/me');
-      console.log('[StudentService] Current student found:', data);
-      return data;
+    // Создаем FormData для пользователя
+    const formData = new FormData();
+    
+    // Подготавливаем данные пользователя
+    const userData = {
+      first_name: teacherData.first_name,
+      surname: teacherData.surname,
+      patronymic: teacherData.patronymic || '',
+      email: teacherData.email,
+      birth_date: teacherData.birth_date,
+      phone_number: teacherData.phone_number,
+      password: teacherData.password,
+      role: 'teacher' // Устанавливаем роль учителя
+    };
+    
+    // Добавляем данные пользователя как JSON строку
+    formData.append('user_data', JSON.stringify(userData));
+    
+    // Добавляем изображение если есть
+    if (imageFile) {
+      formData.append('image', imageFile);
     }
     
-    // Для администраторов и преподавателей - поиск в общем списке
-    const { data } = await api.get('/students/', { 
-      params: { limit: 100, offset: 0 } 
+    // Сначала создаем пользователя
+    console.log('[TeacherService] Creating user first...');
+    const userResponse = await api.post('/users/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
     
-    const student = data.objects?.find(s => s.user_id === userId);
-    console.log('[StudentService] Student found in list:', student);
-    return student || null;
+    console.log('[TeacherService] User created:', userResponse.data);
+    
+    // Затем создаем профиль учителя
+    const teacherProfile = {
+      user_id: userResponse.data.id
+    };
+    
+    console.log('[TeacherService] Creating teacher profile:', teacherProfile);
+    const teacherResponse = await api.post('/teachers/', teacherProfile);
+    
+    console.log('[TeacherService] Teacher profile created:', teacherResponse.data);
+    
+    // Возвращаем объединенные данные
+    return {
+      user: userResponse.data,
+      teacher: teacherResponse.data
+    };
     
   } catch (error) {
-    console.error('[StudentService] Error finding student:', {
-      userId,
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
-    
-    // Если это 403 ошибка и текущий пользователь - студент, пробуем /students/me
-    if (error.response?.status === 403) {
-      try {
-        console.log('[StudentService] Trying /students/me as fallback...');
-        const { data } = await api.get('/students/me');
-        console.log('[StudentService] Fallback successful:', data);
-        return data;
-      } catch (fallbackError) {
-        console.error('[StudentService] Fallback also failed:', fallbackError);
-        return null;
-      }
-    }
-    
-    return null;
-  }
-}
-
-/**
- * Получить информацию о текущем студенте
- */
-export async function getCurrentStudent() {
-  console.log('[StudentService] Getting current student info...');
-  try {
-    const { data } = await api.get('/students/me');
-    console.log('[StudentService] Current student:', data);
-    return data;
-  } catch (error) {
-    console.error('[StudentService] Error getting current student:', error);
+    console.error('[TeacherService] Error creating teacher:', error.response?.data || error.message);
     throw error;
   }
 }
+
+// Экспорт по умолчанию
+const teacherService = {
+  createTeacher,
+  createTeacherWithUser,
+  getMyTeacher,
+  updateTeacher,
+  deleteTeacher,
+  listTeachers,
+  findTeacherByUser
+};
+
+export default teacherService;
