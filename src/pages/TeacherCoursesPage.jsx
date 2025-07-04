@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Sidebar from '../components/Sidebar';
-import Topbar  from '../components/TopBar';
+import SmartTopBar from '../components/SmartTopBar';
 import { useAuth } from '../contexts/AuthContext';
 
 import { getTeacherCourses } from '../services/courseService';
@@ -39,10 +39,6 @@ export default function TeacherCoursesPage() {
   /* ───── переходы ───── */
   const openCourse = id => navigate(`/courses/${id}/teacher`);
 
-  /* ФИО в шапке */
-  const fullName = [user.first_name, user.surname, user.patronymic]
-                    .filter(Boolean).join(' ');
-
   /* ───── UI карточка ───── */
   const Card = ({ course }) => {
     const img = course.photo?.url
@@ -75,11 +71,7 @@ export default function TeacherCoursesPage() {
       <div className="courses-page app-layout">
         <Sidebar activeItem="teacherCourses" userRole={user.role} />
         <div className="main-content">
-          <Topbar
-            userName={fullName}
-            userRole={user.role}
-            onProfileClick={() => navigate('/profile')}
-          />
+          <SmartTopBar pageTitle="Мои курсы" />
           <div className="loading-container">
             <div className="loader"></div>
             <p>Загрузка курсов...</p>
@@ -95,14 +87,7 @@ export default function TeacherCoursesPage() {
       <Sidebar activeItem="teacherCourses" userRole={user.role} />
 
       <div className="main-content">
-        <Topbar
-          userName={fullName}
-          userRole={user.role}
-          onBellClick={() => {}}
-          onProfileClick={() => navigate('/profile')}
-        />
-
-        <h1>Мои курсы</h1>
+        <SmartTopBar pageTitle="Мои курсы" />
 
         {error && (
           <div className="error-message">

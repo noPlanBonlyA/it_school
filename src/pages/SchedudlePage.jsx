@@ -71,7 +71,7 @@ export default function SchedulePage() {
     if (!events.length) return null;
     
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setHours(8, 0, 0, 0); // Начинаем поиск с 8:00 утра, а не с 00:00
     
     const upcomingEvents = events
       .filter(e => new Date(e.start_datetime || e.start) >= today)
@@ -129,11 +129,9 @@ export default function SchedulePage() {
       <Sidebar activeItem="schedule" userRole={user.role} />
       
       <div className="main-content">
-        <Topbar userName={fio} userRole={user.role} onProfileClick={() => navigate('/profile')} />
+        <Topbar userName={fio} userRole={user.role} pageTitle="Расписание" onProfileClick={() => navigate('/profile')} />
         
         <div className="schedule-page">
-          <h1>Расписание занятий</h1>
-          
           <div className="schedule-layout">
             {/* Виджет ближайших занятий */}
             <div className="widget nearest-lessons">
@@ -163,6 +161,26 @@ export default function SchedulePage() {
                 eventDisplay="block"
                 dayMaxEvents={3}
                 moreLinkText="ещё"
+                slotMinTime="08:00:00" /* Начинаем показ с 8:00 утра */
+                slotMaxTime="22:00:00" /* Заканчиваем в 22:00 */
+                scrollTime="08:00:00" /* Автоматическая прокрутка к 8:00 */
+                businessHours={{
+                  daysOfWeek: [1, 2, 3, 4, 5, 6], // Пн-Сб
+                  startTime: '08:00',
+                  endTime: '20:00'
+                }}
+                allDaySlot={false} /* Убираем строку "Весь день" */
+                slotDuration="00:30:00" /* 30-минутные интервалы */
+                slotLabelInterval="01:00:00" /* Показываем метки времени каждый час */
+                expandRows={true} /* Растягиваем строки */
+                nowIndicator={true} /* Показываем текущее время */
+                
+                /* Настройки формата времени */
+                slotLabelFormat={{
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false
+                }}
               />
             </div>
           </div>

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Sidebar from '../components/Sidebar';
-import Topbar  from '../components/TopBar';
+import SmartTopBar from '../components/SmartTopBar';
 import { useAuth } from '../contexts/AuthContext';
 
 import {
@@ -460,16 +460,10 @@ export default function ManageGroupPage() {
     <div className="groups-page app-layout manage-users">
       <Sidebar activeItem="manage-groups" userRole={user.role}/>
       <div className="main-content">
-        <Topbar
-          userName={fio}
-          userRole={user.role}
-          onBellClick={()=>{}}
-          onProfileClick={()=>nav('/profile')}
-        />
+        <SmartTopBar pageTitle="Управление группами" />
 
         <div className="content-area">
-          {/*— header —*/}
-          <h1>Управление группами</h1>
+          {/*— убираем дублирующий заголовок, так как он теперь в TopBar —*/}
 
           {/*— create group —*/}
           <div className="block">

@@ -26,6 +26,8 @@ import HomeWorkPage         from './pages/HomeWorkPage';
 import ForgotPasswordPage   from './pages/ForgotPassword';
 import ResetPasswordPage    from './pages/ResetPassword';
 import ManageNewsPage       from './pages/ManageNewsPage';
+import ManageProductsPage   from './pages/ManageProductsPage';
+import ShopPage             from './pages/ShopPage';
 import NotificationPage     from './pages/NotificationPage';
 import RatingPage          from './pages/RatingPage';
 
@@ -60,6 +62,7 @@ export default function App() {
           <Route path="/courses/:courseId/student" element={<PrivateRoute><StudentCoursePage /></PrivateRoute>} />
           <Route path="/courses/:courseId/lessons/:lessonId" element={<PrivateRoute><StudentLessonPage /></PrivateRoute>} />
           <Route path="/rating" element={<PrivateRoute><RatingPage /></PrivateRoute>} />
+          <Route path="/shop" element={<PrivateRoute><ShopPage /></PrivateRoute>} />
 
           {/* ───────────────────── TEACHER ───────────────────── */}
           <Route path="/teacher-courses" element={<PrivateRoute><TeacherCoursesPage /></PrivateRoute>} />
@@ -78,6 +81,7 @@ export default function App() {
           <Route path="/manage-teachers" element={<PrivateRoute><ManageTeachersPage /></PrivateRoute>} />
           <Route path="/manage-admins" element={<PrivateRoute><ManageAdminsPage /></PrivateRoute>} />
           <Route path="/manage-courses" element={<PrivateRoute><ManageCoursePage /></PrivateRoute>} />
+          <Route path="/manage-products" element={<PrivateRoute><ManageProductsPage /></PrivateRoute>} />
           <Route path="/news" element={<PrivateRoute><ManageNewsPage /></PrivateRoute>} />
           <Route path="/broadcast" element={<PrivateRoute><NotificationPage /></PrivateRoute>} />
 

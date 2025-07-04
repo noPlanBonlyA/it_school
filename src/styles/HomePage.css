@@ -12,28 +12,78 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  margin: 0;
+  padding: 0;
+  padding-top: 20px !important; /* Минимальный отступ от TopBar */
+  background: 
+    linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%),
+    url('../images/image.png') center/cover no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
 }
 
 /* Убираем возможный внешний отступ у Topbar, чтобы он прилегал к верху */
 .topbar {
-  margin-top: 0;
+  margin: 0;
+  padding: 0;
 }
 
-/* Сетка карточек */
+/* Сетка карточек - гибкая структура */
 .cards {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 1fr; /* Две равные колонки на десктопе */
+  grid-template-rows: auto auto; /* Автоматические строки */
   gap: 24px;
-  padding: 24px;
+  padding: 24px !important;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 40px !important;
+}
+
+/* Расписание - первая карточка в левой колонке */
+.card.schedule {
+  grid-column: 1; /* Левая колонка */
+  grid-row: 1; /* Первая строка */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Новости - занимают всю правую колонку */
+.card.news {
+  grid-column: 2; /* Правая колонка */
+  grid-row: 1 / span 2; /* Занимает обе строки - во всю высоту */
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+  min-height: 400px; /* Минимальная высота для скролла */
+}
+
+/* Бесткоины - вторая карточка в левой колонке */
+.card.coins {
+  grid-column: 1; /* Левая колонка */
+  grid-row: 2; /* Вторая строка */
+  flex-shrink: 0;
+  min-height: auto; /* Убираем фиксированную высоту */
+  height: auto; /* Автоматическая высота */
+  max-height: none; /* Убираем ограничение высоты */
 }
 
 /* Общие стили для всех карточек */
 .card {
-  background: #FFFFFF;
+  background: rgba(255, 255, 255, 0.3); /* Очень прозрачные карточки */
+  backdrop-filter: blur(10px); /* Размытие для glassmorphism эффекта */
   border-radius: 24px;
-  box-shadow: 6px 6px 54px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  position: relative;
+  z-index: 1;
 }
 
 .card h3 {
@@ -43,15 +93,208 @@
   margin-bottom: 16px;
 }
 
-/* Дополнительный класс для карточки с расписанием (опционально) */
-.card.schedule {
-  display: flex;
-  flex-direction: column;
-}
-
+/* Карточка расписания */
 .card.schedule h3 {
   font-size: 18px;
   margin-bottom: 12px;
+}
+
+/* Карточка новостей */
+.card.news {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Контейнер для новостей с прокруткой */
+.card.news > h3 {
+  flex-shrink: 0; /* Заголовок не сжимается */
+  margin-bottom: 16px;
+}
+
+/* Контейнер для списка новостей */
+.news-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px; /* Отступ для скроллбара */
+}
+
+/* Красивый скроллбар для новостей */
+.card.news::-webkit-scrollbar,
+.news-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.card.news::-webkit-scrollbar-track,
+.news-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.card.news::-webkit-scrollbar-thumb,
+.news-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+.card.news::-webkit-scrollbar-thumb:hover,
+.news-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Красивый скроллбар для виджета события */
+.event-details::-webkit-scrollbar {
+  width: 8px;
+}
+
+.event-details::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.event-details::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.event-details::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+}
+
+/* Стили для заголовка монет */
+.bestcoins-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.coins-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.coins-loading {
+  font-size: 12px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.coins-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.coins-source, .coins-updated {
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+/* Стили для новостей в правой колонке */
+.news-row {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  min-width: 0; /* Позволяет сжиматься */
+  max-width: 100%;
+}
+
+.news-row:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.news-row.pinned {
+  border: 2px solid #ffc107;
+  box-shadow: 0 0 0 1px rgba(255, 193, 7, 0.3);
+}
+
+.news-row.pinned:hover {
+  box-shadow: 0 8px 25px rgba(255, 193, 7, 0.2);
+}
+
+.news-thumb {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  flex-shrink: 0;
+}
+
+.news-content {
+  padding: 16px;
+  min-width: 0; /* Позволяет сжиматься */
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.news-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  word-wrap: break-word; /* Переносим длинные слова */
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.news-date {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.news-description {
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.5;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  opacity: 0;
+  word-wrap: break-word; /* Переносим длинные слова */
+  overflow-wrap: break-word;
+  hyphens: auto;
+  white-space: pre-wrap; /* Сохраняем абзацы */
+}
+
+.news-row.expanded .news-description {
+  max-height: 500px;
+  opacity: 1;
+  margin-top: 12px;
+}
+
+.news-expand-btn {
+  font-size: 12px;
+  color: #3b82f6;
+  font-weight: 500;
+  text-align: center;
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.news-expand-btn:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.empty-text {
+  color: #9ca3af;
+  font-style: italic;
+  text-align: center;
+  padding: 40px 0;
 }
 
 /* Стили для выпадашки уведомлений, если понадобится */
@@ -92,59 +335,84 @@
 
 /* Стили для мини-виджета события */
 .event-details {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  padding: 24px;
-  width: 400px;
-  max-width: 90vw;
-  max-height: 80vh;
-  overflow-y: auto;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-}
-
-.event-details::before {
-  content: '';
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: -1;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  padding: 24px;
+  overflow-y: auto;
+  z-index: 10;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: slideInFromBottom 0.4s ease-out;
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Убираем серый фон - теперь виджет не закрывает весь экран */
+.event-details::before {
+  display: none;
 }
 
 .close-btn {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  background: none;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.8);
   border: none;
-  font-size: 24px;
+  font-size: 16px;
   cursor: pointer;
   color: #6b7280;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .close-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .event-header {
   margin-bottom: 20px;
-  padding-right: 40px;
+  padding-right: 35px;
+  position: relative;
+}
+
+.event-header::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+  border-radius: 2px;
 }
 
 .event-header h2 {
@@ -152,32 +420,47 @@
   font-size: 20px;
   color: #1f2937;
   line-height: 1.3;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1f2937 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .status-badge.opened {
-  background: #dcfce7;
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
   color: #166534;
+  border-color: rgba(22, 101, 52, 0.2);
 }
 
 .status-badge.closed {
-  background: #fee2e2;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
   color: #991b1b;
+  border-color: rgba(153, 27, 27, 0.2);
 }
 
 .event-info {
   margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .info-item {
@@ -186,12 +469,28 @@
   align-items: flex-start;
   margin-bottom: 12px;
   gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.info-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .info-item strong {
   flex-shrink: 0;
   font-weight: 600;
   color: #374151;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.info-item strong::before {
+  content: '•';
+  color: #3b82f6;
   font-size: 14px;
 }
 
@@ -199,67 +498,426 @@
   flex: 1;
   text-align: right;
   color: #6b7280;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.4;
+  font-weight: 500;
 }
 
 .event-description {
   margin-bottom: 20px;
   padding: 16px;
-  background: #f9fafb;
-  border-radius: 8px;
-  border-left: 4px solid #3b82f6;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.event-description::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(180deg, #3b82f6 0%, #8b5cf6 100%);
+  border-radius: 0 2px 2px 0;
 }
 
 .event-description strong {
   display: block;
   margin-bottom: 8px;
-  font-weight: 600;
-  color: #374151;
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 14px;
 }
 
 .event-description p {
   margin: 0;
-  color: #6b7280;
+  color: #4b5563;
   line-height: 1.5;
+  font-size: 13px;
 }
 
 .event-actions {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
+  margin-top: 20px;
 }
 
 .btn-primary {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 10px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 3px 12px rgba(59, 130, 246, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
 }
 
 .btn-primary:hover {
-  background: #2563eb;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
   transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 /* Адаптивность для мобильных */
 @media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+  
+  .main-content {
+    padding-top: 80px !important;
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .cards {
+    grid-template-columns: 1fr; /* Одна колонка на мобильных */
+    gap: 16px;
+    padding: 16px !important;
+    margin-top: 0px !important;
+  }
+  
+  /* Новый порядок карточек на мобильных */
+  .card.schedule {
+    grid-column: 1;
+    grid-row: 1; /* Расписание первое */
+    order: 1;
+  }
+  
+  .card.news {
+    grid-column: 1;
+    grid-row: 2; /* Новости второе */
+    order: 2;
+    max-height: 60vh !important;
+    min-height: 300px;
+  }
+  
+  .card.coins {
+    grid-column: 1;
+    grid-row: 3; /* Бесткоины третье */
+    order: 3;
+    min-height: 150px !important;
+    max-height: 200px;
+  }
+  
+  .card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  
+  .card h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .news-thumb {
+    height: 120px;
+  }
+  
+  .news-title {
+    font-size: 14px;
+  }
+  
+  .news-content {
+    padding: 12px;
+  }
+  
   .event-details {
-    width: 95vw;
-    padding: 20px;
+    padding: 16px;
+    border-radius: 16px;
+  }
+  
+  .event-header h2 {
+    font-size: 16px;
   }
   
   .info-item {
     flex-direction: column;
     gap: 4px;
+    align-items: flex-start;
   }
   
   .info-item span {
     text-align: left;
+  }
+  
+  .status-badge {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  
+  .btn-primary {
+    padding: 8px 16px;
+    font-size: 12px;
+    width: 100%;
+  }
+  
+  /* Дополнительные стили для компактных бесткоинов на мобильных */
+  .bestcoins-header {
+    margin-bottom: 8px;
+  }
+  
+  .bestcoins-header h3 {
+    font-size: 14px !important;
+  }
+  
+  .coins-info {
+    gap: 2px;
+  }
+  
+  .coins-loading,
+  .coins-source,
+  .coins-updated {
+    font-size: 9px;
+  }
+  
+  /* Компактный дизайн для самого компонента BestCoins */
+  .card.coins .bestcoins-container {
+    padding: 8px;
+  }
+}
+
+/* Адаптивность для планшетов */
+@media (max-width: 1200px) and (min-width: 769px) {
+  .main-content {
+    padding-top: 25px !important; /* Немного увеличиваем отступ для планшетов */
+  }
+  
+  .cards {
+    padding: 20px !important;
+    gap: 20px;
+  }
+  
+  .card {
+    padding: 20px;
+  }
+  
+  .event-details {
+    padding: 20px;
+  }
+}
+
+/* Адаптивность для очень маленьких экранов */
+@media (max-width: 480px) {
+  .main-content {
+    padding-top: 85px !important; /* Еще больше отступ для очень маленьких экранов */
+  }
+  
+  .cards {
+    padding: 12px !important;
+    gap: 12px;
+  }
+  
+  .card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+  
+  .card h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  /* Дополнительные настройки для карточек на маленьких экранах */
+  .card.coins {
+    min-height: 120px !important; /* Еще меньше на маленьких экранах */
+    max-height: 150px;
+  }
+  
+  .card.news {
+    max-height: 50vh !important; /* Еще меньше высота новостей */
+    min-height: 250px;
+  }
+  
+  .news-thumb {
+    height: 100px;
+  }
+  
+  .news-title {
+    font-size: 13px;
+  }
+  
+  .news-content {
+    padding: 10px;
+  }
+  
+  .event-details {
+    padding: 12px;
+    border-radius: 12px;
+  }
+  
+  .event-header h2 {
+    font-size: 14px;
+  }
+  
+  .info-item {
+    padding: 6px 0;
+  }
+  
+  .info-item strong,
+  .info-item span {
+    font-size: 12px;
+  }
+  
+  .status-badge {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  
+  .btn-primary {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  
+  .close-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    top: 8px;
+    right: 8px;
+  }
+}
+
+/* Дополнительные правила для мобильной адаптивности */
+@media (max-width: 768px) {
+  /* Улучшаем видимость на мобильных */
+  .news-row:hover {
+    transform: none; /* Убираем hover эффекты на мобильных */
+  }
+  
+  .news-expand-btn {
+    padding: 12px 0; /* Увеличиваем область клика */
+    font-size: 13px;
+  }
+  
+  /* Адаптивность для временных кнопок тестирования */
+  .app-layout div[style*="position: fixed"] {
+    bottom: 10px !important;
+    right: 10px !important;
+  }
+  
+  .app-layout div[style*="position: fixed"] button {
+    padding: 8px 12px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* Дополнительные правила для очень маленьких экранов */
+@media (max-width: 480px) {
+  /* Убираем эффекты blur для производительности */
+  .card {
+    backdrop-filter: blur(5px); /* Уменьшаем blur */
+  }
+  
+  .event-details {
+    backdrop-filter: blur(10px); /* Уменьшаем blur */
+  }
+  
+  /* Увеличиваем области клика для мобильных */
+  .news-row {
+    margin-bottom: 12px;
+  }
+  
+  .news-expand-btn {
+    padding: 14px 0;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  /* Адаптивность для скроллбара */
+  .card.news::-webkit-scrollbar,
+  .news-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .event-details::-webkit-scrollbar {
+    width: 4px;
+  }
+}
+
+/* Правила для альбомной ориентации на мобильных */
+@media (max-width: 768px) and (orientation: landscape) {
+  .main-content {
+    padding-top: 70px !important;
+  }
+  
+  .cards {
+    grid-template-columns: 1fr 1fr; /* Две колонки в альбомной ориентации */
+    gap: 12px;
+    padding: 12px !important;
+  }
+  
+  /* В альбомной ориентации возвращаем обычное расположение */
+  .left-column {
+    order: 1;
+  }
+  
+  .right-column {
+    order: 2;
+  }
+  
+  .card.schedule {
+    order: 1;
+  }
+  
+  .card.coins {
+    order: 2;
+    min-height: 120px !important;
+  }
+  
+  .card.news {
+    max-height: calc(100vh - 120px);
+    min-height: 200px;
+  }
+}
+
+/* Правила для улучшения доступности на мобильных */
+@media (max-width: 768px) {
+  /* Увеличиваем минимальный размер интерактивных элементов */
+  .close-btn {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+  }
+  
+  .btn-primary {
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+  
+  .news-row {
+    min-height: 60px; /* Минимальная высота для удобного нажатия */
   }
 }

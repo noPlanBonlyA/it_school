@@ -2,12 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate }                from 'react-router-dom';
 import Sidebar                        from '../components/Sidebar';
-import Topbar                         from '../components/TopBar';
+import SmartTopBar from '../components/SmartTopBar';
 import { useAuth }                    from '../contexts/AuthContext';
 
 import {
   getAllUsers,
-  createUser,
   updateUser,
   deleteUser
 } from '../services/userService';
@@ -36,7 +35,7 @@ export default function ManageStudentsPage() {
     birth_date:'', email:'',  phone_number:'',
     password:'',   points:0
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({}); // eslint-disable-line no-unused-vars
   const [edit  , setEdit  ] = useState(null);
 
   const [showCreate, setShowCreate] = useState(false);
@@ -179,11 +178,7 @@ export default function ManageStudentsPage() {
     <div className="manage-users app-layout">
       <Sidebar activeItem="manage-students" userRole={user.role}/>
       <div className="main-content">
-        <Topbar userName={fullName} userRole={user.role}
-                notifications={0} onBellClick={()=>{}}
-                onProfileClick={()=>navigate('/profile')}/>
-
-        <h1>Управление студентами</h1>
+        <SmartTopBar pageTitle="Управление студентами" />
 
         {/* ---------- создать ---------- */}
         <div className="block">

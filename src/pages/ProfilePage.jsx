@@ -138,13 +138,12 @@ export default function ProfilePage() {
         <Topbar
           userName={fullName}
           userRole={user.role}
+          pageTitle="Профиль"
           onBellClick={() => {}}
           onProfileClick={() => {}}
         />
 
         <div className="profile-page">
-          <h1 className="page-title">Персональная информация</h1>
-
           <div className="profile-form">
             {/* аватар + username */}
             <div className="avatar-block">
@@ -198,11 +197,11 @@ export default function ProfilePage() {
 
             {/* статичные поля */}
             <div className="fields-grid">
-              <ReadOnlyField label="ФИО"           value={fullName}   />
-              <ReadOnlyField label="Дата рождения" value={birthDate}  />
-              <ReadOnlyField label="Почта"         value={user.email || '—'} />
-              <ReadOnlyField label="Телефон"       value={user.phone_number || '—'} />
-              <ReadOnlyField label="Роль"          value={user.role || '—'} />
+              <ReadOnlyField label="👤 ФИО"           value={fullName}   />
+              <ReadOnlyField label="🎂 Дата рождения" value={birthDate}  />
+              <ReadOnlyField label="📧 Почта"         value={user.email || '—'} />
+              <ReadOnlyField label="📱 Телефон"       value={user.phone_number || '—'} />
+              <ReadOnlyField label="🎭 Роль"          value={user.role || '—'} />
             </div>
           </div>
         </div>

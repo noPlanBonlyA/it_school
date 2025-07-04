@@ -4,7 +4,7 @@ import api from '../api/axiosInstance';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import Topbar from '../components/TopBar';
+import SmartTopBar from '../components/SmartTopBar';
 import '../styles/HomeworkPage.css';
 import {
   getTeacherGroups,
@@ -496,12 +496,7 @@ export default function HomeworkPage() {
       <div className="app-layout">
         <Sidebar activeItem="homework" userRole="teacher" />
         <div className="main-content">
-          <Topbar 
-            userName={`${user?.first_name || ''} ${user?.surname || ''}`.trim() || user?.username}
-            userRole="teacher"
-            onBellClick={() => {}}
-            onProfileClick={() => {}}
-          />
+          <SmartTopBar pageTitle="Домашние задания" />
           <div className="content-area">
             <div className="loading">Загрузка...</div>
           </div>
@@ -515,15 +510,10 @@ export default function HomeworkPage() {
       <Sidebar activeItem="homework" userRole="teacher" />
 
       <div className="main-content">
-        <Topbar
-          userName={`${user?.first_name || ''} ${user?.surname || ''}`.trim() || user?.username}
-          userRole="teacher"
-          onBellClick={() => {}}
-          onProfileClick={() => {}}
-        />
+        <SmartTopBar pageTitle="Домашние задания" />
 
         <div className="content-area homework-page">
-          <h1>Проверка домашних заданий</h1>
+          {/* Убираем дублирующий заголовок, так как он теперь в TopBar */}
           
           {error && <div className="error">{error}</div>}
           

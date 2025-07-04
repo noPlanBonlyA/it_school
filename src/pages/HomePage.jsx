@@ -28,6 +28,7 @@ export default function HomePage() {
   const [selEvent,     setSel]         = useState(null);
   const [news,         setNews]        = useState([]);
   const [modalItem,    setModalItem]   = useState(null);
+  const [expandedNews, setExpandedNews] = useState(new Set()); // Для отслеживания развернутых новостей
   const [coinsLoading, setCoinsLoading] = useState(true);
 
   // Загрузка профиля
@@ -143,6 +144,20 @@ export default function HomePage() {
     return fullUser?.points ?? 0;
   };
 
+  // Функция для разворачивания/сворачивания новостей
+  const toggleNewsExpansion = (newsId, event) => {
+    event.stopPropagation();
+    setExpandedNews(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(newsId)) {
+        newSet.delete(newsId);
+      } else {
+        newSet.add(newsId);
+      }
+      return newSet;
+    });
+  };
+
   // Прелоадер
   if (!fullUser) return <div className="loading">Загрузка…</div>;
   const fio = [fullUser.first_name, fullUser.surname]
@@ -218,6 +233,7 @@ export default function HomePage() {
         <Topbar
           userName={fio}
           userRole={fullUser.role}
+          pageTitle="Главная"
           onBellClick={() => {}}
           onProfileClick={() => navigate('/profile')}
         />
@@ -293,34 +309,178 @@ export default function HomePage() {
         )}
 
         <section className="cards">
-          {/* Расписание */}
+          {/* Расписание - всегда первое */}
           <div className="card schedule">
             <h3>Пары на {labelNextDay}</h3>
-            <Schedule events={dayEvents} onSelect={e => setSel(e)} />
+            <Schedule events={dayEvents} onSelect={e => {
+              // Если кликнули на то же событие - закрываем виджет
+              if (selEvent && selEvent.id === e.id) {
+                setSel(null);
+              } else {
+                setSel(e);
+              }
+            }} />
+            
+            {/* Мини-виджет пары - теперь внутри карточки расписания */}
+            {selEvent && (
+              <div className="event-details">
+                <button className="close-btn" onClick={() => setSel(null)}>×</button>
+                
+                <div className="event-header">
+                  <h2>{selEvent.lesson_name}</h2>
+                  <div className={`status-badge ${selEvent.is_opened ? 'opened' : 'closed'}`}>
+                    {selEvent.is_opened ? '🟢 Открыт' : '🔴 Закрыт'}
+                  </div>
+                </div>
+
+                <div className="event-info">
+                  <div className="info-item">
+                    <strong>Курс:</strong> 
+                    <span>{selEvent.course_name}</span>
+                  </div>
+                  
+                  {selEvent.group_name && (
+                    <div className="info-item">
+                      <strong>Группа:</strong> 
+                      <span>👥 {selEvent.group_name}</span>
+                    </div>
+                  )}
+                  
+                  {selEvent.teacher_name && (
+                    <div className="info-item">
+                      <strong>Преподаватель:</strong> 
+                      <span>👩‍🏫 {selEvent.teacher_name}</span>
+                    </div>
+                  )}
+                  
+                  {selEvent.auditorium && (
+                    <div className="info-item">
+                      <strong>Аудитория:</strong> 
+                      <span>📍 {selEvent.auditorium}</span>
+                    </div>
+                  )}
+                  
+                  <div className="info-item">
+                    <strong>Время:</strong>
+                    <span>
+                      {new Date(selEvent.start_datetime || selEvent.start).toLocaleString('ru-RU',{
+                        day:'2-digit', month:'2-digit', year:'numeric',
+                        hour:'2-digit', minute:'2-digit'
+                      })}
+                      {' - '}
+                      {new Date(selEvent.end_datetime || selEvent.end).toLocaleTimeString('ru-RU',{
+                        hour:'2-digit', minute:'2-digit'
+                      })}
+                    </span>
+                  </div>
+                  
+                  <div className="info-item">
+                    <strong>Продолжительность:</strong>
+                    <span>
+                      {(() => {
+                        const start = new Date(selEvent.start_datetime || selEvent.start);
+                        const end = new Date(selEvent.end_datetime || selEvent.end);
+                        const diffMinutes = Math.round((end - start) / (1000 * 60));
+                        return `${diffMinutes} минут`;
+                      })()}
+                    </span>
+                  </div>
+                </div>
+
+                {selEvent.description && (
+                  <div className="event-description">
+                    <strong>Описание:</strong>
+                    <p>{selEvent.description}</p>
+                  </div>
+                )}
+
+                {selEvent.is_opened && fullUser.role === 'student' && (
+                  <div className="event-actions">
+                    <button 
+                      className="btn-primary"
+                      onClick={() => {
+                        // ИСПРАВЛЕНО: правильная навигация к уроку
+                        if (selEvent.lesson_id && selEvent.course_id) {
+                          navigate(`/courses/${selEvent.course_id}/lessons/${selEvent.lesson_id}`);
+                        } else {
+                          alert('Информация об уроке недоступна');
+                        }
+                      }}
+                    >
+                      Перейти к уроку
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Новости */}
+          {/* Новости - второе на мобильных */}
           <div className="card news">
             <h3>Новости</h3>
-            {news.length === 0
-              ? <p className="empty-text">Нет актуальных новостей</p>
-              : news.map(n => (
-                  <div 
-                    key={n.id} 
-                    className={`news-row ${n.is_pinned ? 'pinned' : ''}`}
-                    onClick={() => setModalItem(n)}
-                  >
-                    {n.image_url && (
-                      <img src={n.image_url} alt="" className="news-thumb"/>
-                    )}
-                    <span className="news-title">{n.name}</span>
-                  </div>
-                ))
-            }
+            <div className="news-list">
+              {news.length === 0
+                ? <p className="empty-text">Нет актуальных новостей</p>
+                : news.map(n => (
+                    <div 
+                      key={n.id} 
+                      className={`news-row ${n.is_pinned ? 'pinned' : ''} ${expandedNews.has(n.id) ? 'expanded' : ''}`}
+                      onClick={(event) => toggleNewsExpansion(n.id, event)}
+                    >
+                      {/* Изображение новости */}
+                      {n.image_url ? (
+                        <img src={n.image_url} alt={n.name} className="news-thumb"/>
+                      ) : (
+                        <div className="news-thumb" style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          color: 'white',
+                          fontSize: '14px',
+                          fontWeight: '600'
+                        }}>
+                          📰
+                        </div>
+                      )}
+                      
+                      {/* Контент новости */}
+                      <div className="news-content">
+                        <h4 className="news-title">{n.name}</h4>
+                        <div className="news-date">
+                          {new Date(n.created_at).toLocaleDateString('ru-RU', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                        </div>
+                        
+                        {/* Описание (показывается только при разворачивании) */}
+                        {n.description && (
+                          <div className="news-description">
+                            {n.description.split('\n').map((paragraph, index) => (
+                              paragraph.trim() && (
+                                <p key={index} style={{ margin: '0 0 8px 0' }}>
+                                  {paragraph}
+                                </p>
+                              )
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* Кнопка разворачивания */}
+                        <div className="news-expand-btn">
+                          {expandedNews.has(n.id) ? '▲ Свернуть' : '▼ Подробнее'}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+              }
+            </div>
           </div>
 
-          {/* Бесткоины */}
-          <div className="card events">
+          {/* Бесткоины - третье на мобильных */}
+          <div className="card coins">
             <div className="bestcoins-header">
               <h3>Бесткоины</h3>
               {user?.role === 'student' && (
@@ -347,99 +507,6 @@ export default function HomePage() {
 
         {/* Модалка новости */}
         <NewsModal item={modalItem} onClose={() => setModalItem(null)} />
-
-        {/* Мини-виджет пары */}
-        {selEvent && (
-          <aside className="event-details">
-            <button className="close-btn" onClick={() => setSel(null)}>×</button>
-            
-            <div className="event-header">
-              <h2>{selEvent.lesson_name}</h2>
-              <div className={`status-badge ${selEvent.is_opened ? 'opened' : 'closed'}`}>
-                {selEvent.is_opened ? '🟢 Открыт' : '🔴 Закрыт'}
-              </div>
-            </div>
-
-            <div className="event-info">
-              <div className="info-item">
-                <strong>Курс:</strong> 
-                <span>{selEvent.course_name}</span>
-              </div>
-              
-              {selEvent.group_name && (
-                <div className="info-item">
-                  <strong>Группа:</strong> 
-                  <span>👥 {selEvent.group_name}</span>
-                </div>
-              )}
-              
-              {selEvent.teacher_name && (
-                <div className="info-item">
-                  <strong>Преподаватель:</strong> 
-                  <span>👩‍🏫 {selEvent.teacher_name}</span>
-                </div>
-              )}
-              
-              {selEvent.auditorium && (
-                <div className="info-item">
-                  <strong>Аудитория:</strong> 
-                  <span>📍 {selEvent.auditorium}</span>
-                </div>
-              )}
-              
-              <div className="info-item">
-                <strong>Время:</strong>
-                <span>
-                  {new Date(selEvent.start_datetime || selEvent.start).toLocaleString('ru-RU',{
-                    day:'2-digit', month:'2-digit', year:'numeric',
-                    hour:'2-digit', minute:'2-digit'
-                  })}
-                  {' - '}
-                  {new Date(selEvent.end_datetime || selEvent.end).toLocaleTimeString('ru-RU',{
-                    hour:'2-digit', minute:'2-digit'
-                  })}
-                </span>
-              </div>
-              
-              <div className="info-item">
-                <strong>Продолжительность:</strong>
-                <span>
-                  {(() => {
-                    const start = new Date(selEvent.start_datetime || selEvent.start);
-                    const end = new Date(selEvent.end_datetime || selEvent.end);
-                    const diffMinutes = Math.round((end - start) / (1000 * 60));
-                    return `${diffMinutes} минут`;
-                  })()}
-                </span>
-              </div>
-            </div>
-
-            {selEvent.description && (
-              <div className="event-description">
-                <strong>Описание:</strong>
-                <p>{selEvent.description}</p>
-              </div>
-            )}
-
-            {selEvent.is_opened && fullUser.role === 'student' && (
-              <div className="event-actions">
-                <button 
-                  className="btn-primary"
-                  onClick={() => {
-                    // ИСПРАВЛЕНО: правильная навигация к уроку
-                    if (selEvent.lesson_id && selEvent.course_id) {
-                      navigate(`/courses/${selEvent.course_id}/lessons/${selEvent.lesson_id}`);
-                    } else {
-                      alert('Информация об уроке недоступна');
-                    }
-                  }}
-                >
-                  Перейти к уроку
-                </button>
-              </div>
-            )}
-          </aside>
-        )}
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Sidebar from '../components/Sidebar';
-import Topbar  from '../components/TopBar';
+import SmartTopBar from '../components/SmartTopBar';
 import { useAuth } from '../contexts/AuthContext';
 
 import {
@@ -158,14 +158,9 @@ export default function ManageTeachersPage() {
   <div className="manage-users app-layout">
     <Sidebar activeItem="manage-teachers" userRole={user.role}/>
     <div className="main-content">
-      <Topbar 
-        userName={fio} 
-        userRole={user.role}
-        onBellClick={() => {}} 
-        onProfileClick={() => nav('/profile')}
-      />
+      <SmartTopBar pageTitle="Управление преподавателями" />
 
-      <h1>Управление преподавателями</h1>
+      {/* Убираем дублирующий заголовок, так как он теперь в TopBar */}
 
       {/* ───── создать ───── */}
       <div className="block">

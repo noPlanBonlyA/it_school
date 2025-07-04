@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import Topbar from '../components/TopBar';
+import SmartTopBar from '../components/SmartTopBar';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   createNotificationForAllStudents, 
@@ -180,11 +180,7 @@ export default function NotificationPage() {
       <div className="app-layout">
         <Sidebar activeItem="broadcast" userRole={user.role} />
         <div className="main-content">
-          <Topbar
-            userName={fullName}
-            userRole={user.role}
-            onProfileClick={() => navigate('/profile')}
-          />
+          <SmartTopBar pageTitle="Рассылка уведомлений" />
           <div style={{ padding: '40px', textAlign: 'center' }}>
             <div>Загрузка данных...</div>
           </div>
@@ -197,14 +193,10 @@ export default function NotificationPage() {
     <div className="app-layout">
       <Sidebar activeItem="broadcast" userRole={user.role} />
       <div className="main-content">
-        <Topbar
-          userName={fullName}
-          userRole={user.role}
-          onProfileClick={() => navigate('/profile')}
-        />
+        <SmartTopBar pageTitle="Рассылка уведомлений" />
 
         <div style={{ padding: '24px', maxWidth: '800px' }}>
-          <h1>Отправка уведомлений</h1>
+          {/* Убираем дублирующий заголовок, так как он теперь в TopBar */}
 
           {/* Отладочная кнопка */}
           <div style={{ marginBottom: '20px' }}>

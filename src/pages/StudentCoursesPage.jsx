@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Sidebar   from '../components/Sidebar';
-import Topbar    from '../components/TopBar';
+import SmartTopBar from '../components/SmartTopBar';
 import { useAuth } from '../contexts/AuthContext';
 
 import { listStudentCourses, getAllCourses } from '../services/courseService';
@@ -95,11 +95,7 @@ export default function StudentCoursesPage() {
       <div className="courses-page app-layout">
         <Sidebar activeItem="studentCourses" userRole={user.role} />
         <div className="main-content">
-          <Topbar
-            userName={fullName}
-            userRole={user.role}
-            onProfileClick={() => navigate('/profile')}
-          />
+          <SmartTopBar pageTitle="Мои курсы" />
           <div className="loading-container">
             <div className="loader"></div>
             <p>Загрузка курсов...</p>
@@ -115,13 +111,7 @@ export default function StudentCoursesPage() {
       <Sidebar activeItem="studentCourses" userRole={user.role} />
 
       <div className="main-content">
-        <Topbar
-          userName={fullName}
-          userRole={user.role}
-          onProfileClick={() => navigate('/profile')}
-        />
-
-        <h1>Курсы</h1>
+        <SmartTopBar pageTitle="Мои курсы" />
 
         {error && (
           <div className="error-message">

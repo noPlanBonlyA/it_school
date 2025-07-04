@@ -12,7 +12,7 @@ import {
 } from '../services/notificationService';
 import { findStudentByUser, getCurrentStudent } from '../services/studentService';
 
-export default function Topbar({ userName, userRole, onBellClick, onProfileClick }) {
+export default function Topbar({ userName, userRole, pageTitle, onBellClick, onProfileClick }) {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -154,8 +154,12 @@ export default function Topbar({ userName, userRole, onBellClick, onProfileClick
   return (
     <div className="topbar">
       <div className="topbar-content">
-        {/* Левая часть - пустая */}
-        <div className="topbar-left"></div>
+        {/* Левая часть - название страницы */}
+        <div className="topbar-left">
+          {pageTitle && (
+            <h1 className="page-title">{pageTitle}</h1>
+          )}
+        </div>
         
         {/* Правая часть - уведомления и профиль */}
         <div className="topbar-right">
@@ -255,11 +259,13 @@ export default function Topbar({ userName, userRole, onBellClick, onProfileClick
 Topbar.propTypes = {
   userName: PropTypes.string.isRequired,
   userRole: PropTypes.string.isRequired,
+  pageTitle: PropTypes.string,
   onBellClick: PropTypes.func,
   onProfileClick: PropTypes.func
 };
 
 Topbar.defaultProps = {
+  pageTitle: null,
   onBellClick: () => {},
   onProfileClick: () => {}
 };

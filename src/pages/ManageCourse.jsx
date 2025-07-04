@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Sidebar      from '../components/Sidebar';
-import Topbar       from '../components/TopBar';
+import SmartTopBar  from '../components/SmartTopBar';
 import CourseCard   from '../components/CourseCard';
 import { useAuth }  from '../contexts/AuthContext';
 
@@ -232,12 +232,7 @@ export default function ManageCoursesPage() {
       <Sidebar activeItem="manage-courses" userRole={user.role} />
 
       <div className="main-content">
-        <Topbar
-          userName={fullName}
-          userRole={user.role}
-          onBellClick={() => {}}
-          onProfileClick={() => navigate('/profile')}
-        />
+        <SmartTopBar pageTitle="Управление курсами" />
 
         {/* ---------------- CREATE COURSE ---------------- */}
         <div className="block">

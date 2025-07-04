@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate }                from 'react-router-dom';
 import Sidebar                        from '../components/Sidebar';
-import Topbar                         from '../components/TopBar';
+import SmartTopBar                    from '../components/SmartTopBar';
 import { useAuth }                    from '../contexts/AuthContext';
 
 import {
@@ -128,14 +128,9 @@ export default function ManageAdminsPage() {
     <div className="manage-users app-layout">
       <Sidebar activeItem="manage-admins" userRole={user.role}/>
       <div className="main-content">
-        <Topbar
-          userName={fullName}
-          userRole={user.role}
-          onBellClick={() => {}}
-          onProfileClick={() => navigate('/profile')}
-        />
+        <SmartTopBar pageTitle="Управление администраторами" />
 
-        <h1>Управление администраторами</h1>
+        {/* Убираем дублирующий заголовок, так как он теперь в TopBar */}
 
         {/* СОЗДАТЬ */}
         <div className="block">

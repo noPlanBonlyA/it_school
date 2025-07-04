@@ -10,13 +10,6 @@
     margin: 0 auto;
   }
   
-  .homework-page h1 {
-    color: #2c3e50;
-    margin-bottom: 30px;
-    font-size: 2rem;
-    font-weight: 600;
-  }
-  
   /* Сетка трёх колонок */
   .homework-grid {
     display: grid;

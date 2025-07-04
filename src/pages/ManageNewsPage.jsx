@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import Topbar from '../components/TopBar';
+import SmartTopBar from '../components/SmartTopBar';
 import api from '../api/axiosInstance';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/ManageNewsPage.css';
@@ -230,13 +230,9 @@ export default function ManageNewsPage() {
     <div className="manage-news app-layout">
       <Sidebar activeItem="news" userRole={user.role} />
       <div className="main-content">
-        <Topbar
-          userName={fullName}
-          userRole={user.role}
-          onProfileClick={() => navigate('/profile')}
-        />
+        <SmartTopBar pageTitle="Управление новостями" />
 
-        <h1>Управление новостями</h1>
+        {/* Убираем дублирующий заголовок, так как он теперь в TopBar */}
 
         {/* Создание */}
         <div className="block">

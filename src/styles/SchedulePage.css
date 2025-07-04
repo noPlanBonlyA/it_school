@@ -11,8 +11,16 @@
   flex: 1;
   overflow: visible;
   padding: 0 24px 24px 24px; /* добавляем нижний отступ */
+  padding-top: 80px !important; /* Отступ сверху от TopBar */
+  padding-bottom: 40px !important; /* Отступ снизу */
   min-height: 100vh;
   box-sizing: border-box;
+}
+
+/* Основная страница расписания */
+.schedule-page {
+  padding-top: 20px !important; /* Дополнительный отступ сверху */
+  padding-bottom: 40px !important; /* Дополнительный отступ снизу */
 }
 
 /* ---------- Loading ---------- */
@@ -82,7 +90,9 @@
 .schedule-layout {
   display: flex;
   gap: 24px;
-  margin-top: 24px;
+  margin-top: 24px !important;
+  margin-bottom: 40px !important; /* Отступ снизу */
+  padding-bottom: 40px !important; /* Дополнительный отступ снизу */
   /* УБИРАЕМ фиксированную высоту */
   min-height: calc(100vh - 200px);
   align-items: flex-start; /* выравниваем по верху */
@@ -107,8 +117,14 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 24px;
+  margin-bottom: 24px !important;
+  padding-bottom: 16px !important; /* Дополнительный отступ снизу в карточках */
   overflow: hidden;
+}
+
+.widget.nearest-lessons {
+  margin-bottom: 40px !important; /* Отступ снизу для виджета ближайших занятий */
+  padding-bottom: 24px !important;
 }
 
 .widget-header {
@@ -198,6 +214,22 @@
   overflow: visible; /* делаем прокрутку видимой */
 }
 
+/* Календарь расписания */
+.calendar-widget {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px !important;
+  margin-top: 20px !important; /* Отступ сверху */
+  margin-bottom: 40px !important; /* Отступ снизу */
+  overflow: hidden;
+}
+
+/* Дополнительные отступы для самого календарного компонента */
+.fc {
+  margin-top: 10px !important;
+}
+
 /* Стили FullCalendar */
 .fc-toolbar-title {
   font-size: 24px !important;
@@ -253,6 +285,30 @@
 
 .fc .fc-timegrid-slot {
   height: 30px !important; /* Уменьшили высоту для компактности */
+}
+
+/* Прокрутка календаря в режимах Week/Day */
+.fc .fc-scroller {
+  overflow-y: auto !important;
+  max-height: calc(100vh - 300px) !important; /* Ограничиваем высоту для прокрутки */
+}
+
+/* Убираем лишние отступы в timeGrid режимах */
+.fc-timegrid {
+  margin-top: 10px !important;
+}
+
+/* Стили для корректного отображения временных слотов */
+.fc .fc-timegrid-slot-label-frame {
+  min-height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Стили для заголовка времени */
+.fc .fc-timegrid-axis {
+  width: 60px !important; /* Ширина колонки времени */
 }
 
 .fc .fc-timegrid-slot-minor {
@@ -446,8 +502,19 @@
 
 /* Адаптивность */
 @media (max-width: 1024px) {
+  .main-content {
+    padding-top: 90px !important; /* Больше отступ на планшетах */
+    padding-bottom: 50px !important;
+  }
+  
+  .schedule-page {
+    padding-bottom: 50px !important;
+  }
+  
   .schedule-layout {
     flex-direction: column;
+    margin-bottom: 50px !important;
+    padding-bottom: 50px !important;
   }
   
   .schedule-sidebar {
@@ -468,12 +535,34 @@
     height: calc(100vh - 350px);
   }
   
+  .calendar-widget {
+    margin-bottom: 50px !important;
+  }
+  
   .fc .fc-timegrid-slot {
     height: 25px !important;
   }
 }
 
 @media (max-width: 768px) {
+  .main-content {
+    padding-top: 100px !important; /* Еще больше отступ на мобильных */
+    padding-bottom: 60px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  .schedule-page {
+    padding-bottom: 60px !important;
+  }
+  
+  .schedule-layout {
+    gap: 16px;
+    margin-top: 16px !important;
+    margin-bottom: 60px !important;
+    padding-bottom: 60px !important;
+  }
+  
   .schedule-header {
     flex-direction: column;
     gap: 16px;
@@ -483,6 +572,16 @@
   .calendar-container {
     height: calc(100vh - 400px);
     padding: 12px;
+  }
+  
+  .calendar-widget {
+    margin-bottom: 60px !important;
+    padding: 16px !important;
+  }
+  
+  .widget.nearest-lessons {
+    margin-bottom: 50px !important;
+    padding-bottom: 30px !important;
   }
   
   .event-details-overlay {
