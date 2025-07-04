@@ -6,9 +6,8 @@ import Topbar from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/CourseDetailPage.css';
 
-import { getCourse, getCourseLessons, createLessonWithMaterials, updateLessonWithMaterials, deleteLessonWithMaterials, getLessonWithMaterials } from '../services/lessonService';
+import { getCourse, getCourseLessons, deleteLessonWithMaterials, getLessonWithMaterials, updateLessonWithMaterials } from '../services/lessonService';
 
-import { getAllGroups } from '../services/groupService';
 import LessonEditor from '../components/LessonEditor';
 
 export default function CourseDetailPage() {
@@ -20,17 +19,6 @@ export default function CourseDetailPage() {
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // ───── форма ───── */
-  const [lessonName, setLessonName] = useState('');
-  const [teacherMaterialName, setTeacherMaterialName] = useState('');
-  const [teacherMaterialText, setTeacherMaterialText] = useState('');
-  const [studentMaterialName, setStudentMaterialName] = useState('');
-  const [studentMaterialText, setStudentMaterialText] = useState('');
-  const [homeworkMaterialName, setHomeworkMaterialName] = useState('');
-  const [homeworkMaterialText, setHomeworkMaterialText] = useState('');
-  const [lessonDateTime, setLessonDateTime] = useState('');
-  const [creating, setCreating] = useState(false);
 
   // ───── редактирование ───── */
   const [showLessonEditor, setShowLessonEditor] = useState(false);
@@ -129,154 +117,6 @@ export default function CourseDetailPage() {
     setEditingLesson(null);
   };
 
-  // ───── БЫСТРОЕ создание урока + lesson-groups ───── */
-  const createLessonData = () => ({
-    name: lessonName,
-    teacher_material_name: teacherMaterialName || 'Материал для преподавателя',
-    teacher_material_text: teacherMaterialText || '<p>Материал не добавлен</p>',
-    student_material_name: studentMaterialName || 'Учебный материал',
-    student_material_text: studentMaterialText || '<p>Материал не добавлен</p>',
-    homework_material_name: homeworkMaterialName || 'Домашнее задание',
-    homework_material_text: homeworkMaterialText || '<p>Домашнее задание не добавлено</p>'
-  });
-
-  const updateLessonData = () => ({
-    name: editLessonName,
-    teacher_material_name: '',
-    teacher_material_text: '',
-    student_material_name: '',
-    student_material_text: '',
-    homework_material_name: '',
-    homework_material_text: '',
-    id: editingLesson.id,
-    teacher_material_id: editingLesson.teacher_material_id,
-    student_material_id: editingLesson.student_material_id,
-    homework_material_id: editingLesson.homework_id
-  });
-
-  const handleQuickCreateLesson = async () => {
-    if (!lessonName.trim()) {
-      alert('Введите название урока.');
-      return;
-    }
-
-    try {
-      setCreating(true);
-      console.log('[CourseDetail] Creating lesson with materials...');
-      
-      const lessonData = createLessonData();
-      console.log('[CourseDetail] Lesson data:', lessonData);
-
-      const lesson = await createLessonWithMaterials(courseId, lessonData);
-      console.log('[CourseDetail] Lesson created:', lesson);
-
-      // ДОБАВЛЕНО: Автоматически добавляем урок во ВСЕ группы этого курса
-      if (lessonDateTime) {
-        // Получаем ВСЕ группы
-        const allGroupsResponse = await getAllGroups(100, 0);
-        const allGroups = allGroupsResponse.objects || [];
-        
-        // Получаем полную информацию о группах (включая курсы)
-        const groupsWithCourses = await Promise.all(
-          allGroups.map(async g => {
-            try {
-              const response = await fetch(`http://localhost:8080/api/groups/${g.id}`, {
-                headers: {
-                  'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                  'Content-Type': 'application/json'
-                }
-              });
-              return response.ok ? await response.json() : null;
-            } catch (error) {
-              console.error('[CourseDetail] Error fetching group:', error);
-              return null;
-            }
-          })
-        );
-
-        // Находим группы, которые содержат наш курс
-        const targetGroups = groupsWithCourses.filter(
-          g => g && (g.courses || []).some(c => c.id === parseInt(courseId))
-        );
-
-        console.log(`[CourseDetail] Found ${targetGroups.length} groups with this course:`, 
-          targetGroups.map(g => g.name));
-
-        if (targetGroups.length === 0) {
-          alert('⚠️ Внимание: Урок создан, но не назначен ни одной группе!\nДобавьте курс к группам, чтобы студенты увидели урок в расписании.');
-        } else {
-          // Создаем lesson-groups для всех найденных групп
-          const isoDate = new Date(lessonDateTime).toISOString();
-          console.log('[CourseDetail] Adding lesson to', targetGroups.length, 'groups...');
-
-          const results = await Promise.allSettled(
-            targetGroups.map(async g => {
-              try {
-                const lessonGroupData = {
-                  lesson_id: lesson.id,
-                  group_id: g.id,
-                  holding_date: isoDate,
-                  is_opened: false
-                };
-                
-                const response = await fetch('http://localhost:8080/api/courses/lesson-group', {
-                  method: 'POST',
-                  headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(lessonGroupData)
-                });
-
-                if (response.ok) {
-                  console.log(`[CourseDetail] ✅ Урок добавлен в группу "${g.name}"`);
-                  return { success: true, groupName: g.name };
-                } else if (response.status === 409) {
-                  console.log(`[CourseDetail] ⚠️ Урок уже существует в группе "${g.name}"`);
-                  return { success: true, groupName: g.name, exists: true };
-                } else {
-                  throw new Error(`HTTP ${response.status}`);
-                }
-              } catch (e) {
-                console.error(`[CourseDetail] ❌ Ошибка добавления в группу "${g.name}":`, e);
-                return { success: false, groupName: g.name, error: e.message };
-              }
-            })
-          );
-
-          // Анализируем результат
-          const successful = results.filter(r => r.value?.success).length;
-          const failed = results.filter(r => !r.value?.success).length;
-          
-          if (failed === 0) {
-            alert(`✅ Урок успешно создан и добавлен в ${successful} групп(ы)!`);
-          } else {
-            alert(`⚠️ Урок создан. Добавлен в ${successful} групп(ы), ошибки: ${failed}`);
-          }
-        }
-      } else {
-        alert('✅ Урок успешно создан! Установите дату проведения для добавления в расписание групп.');
-      }
-
-      // Очищаем формы
-      setLessonName(''); 
-      setLessonDateTime('');
-      setTeacherMaterialName('');
-      setTeacherMaterialText(''); 
-      setStudentMaterialName('');
-      setStudentMaterialText(''); 
-      setHomeworkMaterialName('');
-      setHomeworkMaterialText('');
-
-      await reloadLessons();
-    } catch (e) {
-      console.error(e);
-      alert('❌ Не удалось создать урок: ' + (e.message || 'Неизвестная ошибка'));
-    } finally {
-      setCreating(false);
-    }
-  };
-
   // ───── редактирование урока ───── */
   const startEditLesson = (lesson) => {
     setEditingLesson(lesson);
@@ -304,8 +144,22 @@ export default function CourseDetailPage() {
     try {
       setUpdating(true);
       
-      // ИСПРАВЛЕНО: Обновляем урок с пустыми материалами (только название)
-      await updateLessonWithMaterials(courseId, editingLesson.id, updateLessonData());
+      // Обновляем урок с пустыми материалами (только название)
+      const updateData = {
+        name: editLessonName,
+        teacher_material_name: '',
+        teacher_material_text: '',
+        student_material_name: '',
+        student_material_text: '',
+        homework_material_name: '',
+        homework_material_text: '',
+        id: editingLesson.id,
+        teacher_material_id: editingLesson.teacher_material_id,
+        student_material_id: editingLesson.student_material_id,
+        homework_material_id: editingLesson.homework_id
+      };
+      
+      await updateLessonWithMaterials(courseId, editingLesson.id, updateData);
 
       // Обновляем даты через schedule API
       if (editLessonDateTime) {
@@ -423,7 +277,39 @@ export default function CourseDetailPage() {
               >
                 ← Вернуться к курсам
               </button>
-              <h1>{course.name}</h1>
+              
+              <div className="course-overview">
+                <div className="course-info">
+                  <h1>{course.name}</h1>
+                  {course.description && (
+                    <p className="course-description">{course.description}</p>
+                  )}
+                  <div className="course-meta">
+                    {course.author_name && (
+                      <span className="course-author">👨‍🏫 {course.author_name}</span>
+                    )}
+                    {course.age_category && (
+                      <span className="course-category">🎯 {course.age_category}</span>
+                    )}
+                    {course.price && (
+                      <span className="course-price">💰 {course.price} ₽</span>
+                    )}
+                  </div>
+                </div>
+                
+                {course.photo?.url && (
+                  <div className="course-image">
+                    <img 
+                      src={course.photo.url.startsWith('http') 
+                        ? course.photo.url 
+                        : `${window.location.protocol}//${window.location.hostname}:8080${course.photo.url}`
+                      } 
+                      alt={course.name} 
+                    />
+                  </div>
+                )}
+              </div>
+              
               {(user.role === 'admin' || user.role === 'superadmin') && (
                 <div className="course-actions">
                   <button 
@@ -442,176 +328,159 @@ export default function CourseDetailPage() {
               )}
             </div>
 
-            {/* ───── форма быстрого создания ───── */}
-            {(user.role === 'admin' || user.role === 'superadmin') && (
-              <div className="block">
-                <h2>⚡ Быстрое создание урока</h2>
 
-                <div className="user-form form-grid">
-                  <div className="field">
-                    <label>Название урока *</label>
-                    <input
-                      value={lessonName}
-                      onChange={e => setLessonName(e.target.value)}
-                      placeholder="Введите название урока"
-                      required
-                    />
+
+            {/* ───── модальное окно быстрого редактирования ───── */}
+            {editingLesson && (
+              <div className="modal-overlay">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h3>Редактирование урока</h3>
+                    <button className="modal-close" onClick={cancelEdit}>×</button>
                   </div>
-
-                  <div className="field">
-                    <label>Дата и время проведения</label>
-                    <input
-                      type="datetime-local"
-                      value={lessonDateTime}
-                      onChange={e => setLessonDateTime(e.target.value)}
-                    />
+                  
+                  <div className="modal-body">
+                    <div className="field">
+                      <label>Название урока</label>
+                      <input
+                        value={editLessonName}
+                        onChange={e => setEditLessonName(e.target.value)}
+                        placeholder="Введите название урока"
+                      />
+                    </div>
+                    
+                    <div className="field">
+                      <label>Дата и время проведения</label>
+                      <input
+                        type="datetime-local"
+                        value={editLessonDateTime}
+                        onChange={e => setEditLessonDateTime(e.target.value)}
+                      />
+                    </div>
                   </div>
-
-                  {/* Материал преподавателя */}
-                  <div className="field" style={{gridColumn:'1 / -1'}}>
-                    <h4>Материал для преподавателя</h4>
-                    <label>Название материала</label>
-                    <input
-                      value={teacherMaterialName}
-                      onChange={e => setTeacherMaterialName(e.target.value)}
-                      placeholder="Например: Конспект урока"
-                    />
-                    <label>Содержимое (HTML)</label>
-                    <textarea
-                      rows={4}
-                      value={teacherMaterialText}
-                      onChange={e => setTeacherMaterialText(e.target.value)}
-                      placeholder="<h1>Заголовок</h1><p>Текст материала...</p>"
-                    />
-                  </div>
-
-                  {/* Материал студента */}
-                  <div className="field" style={{gridColumn:'1 / -1'}}>
-                    <h4>Учебный материал</h4>
-                    <label>Название материала</label>
-                    <input
-                      value={studentMaterialName}
-                      onChange={e => setStudentMaterialName(e.target.value)}
-                      placeholder="Например: Теория и примеры"
-                    />
-                    <label>Содержимое (HTML)</label>
-                    <textarea
-                      rows={4}
-                      value={studentMaterialText}
-                      onChange={e => setStudentMaterialText(e.target.value)}
-                      placeholder="<h1>Заголовок</h1><p>Учебный материал...</p>"
-                    />
-                  </div>
-
-                  {/* Домашнее задание */}
-                  <div className="field" style={{gridColumn:'1 / -1'}}>
-                    <h4>Домашнее задание</h4>
-                    <label>Название задания</label>
-                    <input
-                      value={homeworkMaterialName}
-                      onChange={e => setHomeworkMaterialName(e.target.value)}
-                      placeholder="Например: Практическое задание"
-                    />
-                    <label>Содержимое задания (HTML)</label>
-                    <textarea
-                      rows={4}
-                      value={homeworkMaterialText}
-                      onChange={e => setHomeworkMaterialText(e.target.value)}
-                      placeholder="<h1>Задание</h1><p>Описание задания...</p>"
-                    />
-                  </div>
-
-                  <div className="buttons" style={{ gridColumn:'1 / -1' }}>
+                  
+                  <div className="modal-footer">
+                    <button className="btn-secondary" onClick={cancelEdit}>
+                      Отмена
+                    </button>
                     <button 
                       className="btn-primary" 
-                      onClick={handleQuickCreateLesson}
-                      disabled={creating}
+                      onClick={handleSaveEditedLesson}
+                      disabled={updating}
                     >
-                      {creating ? 'Создание...' : '⚡ Быстро создать урок'}
+                      {updating ? 'Сохранение...' : 'Сохранить'}
                     </button>
                   </div>
                 </div>
               </div>
             )}
-
-            {/* ───── модальное окно редактирования ───── */}
+            
+            {/* ───── модальное окно создания урока ───── */}
             {showLessonEditor && (
-              <div className="modal-overlay" style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000
-              }}>
-                <div style={{
-                  backgroundColor: 'white',
-                  borderRadius: '8px',
-                  padding: '20px',
-                  maxWidth: '800px',
-                  width: '90%',
-                  maxHeight: '90vh',
-                  overflow: 'auto'
-                }}>
-                  <LessonEditor
-                    courseId={courseId}
-                    lesson={editingLesson}
-                    onSave={handleSaveLessonFromEditor}
-                    onCancel={handleCancelLessonEdit}
-                  />
+              <div className="modal-overlay">
+                <div className="modal-content-large">
+                  <div className="modal-header">
+                    <h3>{editingLesson ? 'Редактирование урока' : 'Создание урока с файлами'}</h3>
+                    <button className="modal-close" onClick={handleCancelLessonEdit}>×</button>
+                  </div>
+                  <div className="modal-body">
+                    <LessonEditor
+                      courseId={courseId}
+                      lesson={editingLesson}
+                      onSave={handleSaveLessonFromEditor}
+                      onCancel={handleCancelLessonEdit}
+                    />
+                  </div>
                 </div>
               </div>
             )}
 
             {/* ───── список уроков ───── */}
-            {lessons.length > 0 ? (
-              <div className="block">
-                <h2>Уроки курса ({lessons.length})</h2>
-                <ul className="lessons-list">
-                  {lessons.map((l, index) => (
-                    <li key={l.id} className="lesson-item">
-                      <div className="lesson-info">
-                        <strong>#{index + 1}. {l.name}</strong>
-                        <br />
-                        <small>
-                          Дата проведения: {l.holding_date
-                            ? new Date(l.holding_date).toLocaleString('ru-RU',{
-                                day:'2-digit',month:'2-digit',year:'numeric',
-                                hour:'2-digit',minute:'2-digit'
-                              })
-                            : 'не назначена'}
-                        </small>
-                      </div>
-                      
-                      <div className="lesson-actions">
-                        {(user.role === 'admin' || user.role === 'superadmin') && (
-                          <button
-                            className="btn-mini btn-edit"
-                            onClick={() => startEditLesson(l)}
-                          >
-                            Изменить
-                          </button>
-                        )}
-                        {(user.role === 'admin' || user.role === 'superadmin') && (
-                          <button
-                            className="btn-mini btn-danger"
-                            onClick={() => handleDeleteLesson(l)}
-                          >
-                            Удалить
-                          </button>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+            <div className="lessons-section">
+              <div className="lessons-header">
+                <h2>Уроки курса</h2>
+                <div className="lessons-count">
+                  {lessons.length} {lessons.length === 1 ? 'урок' : lessons.length < 5 ? 'урока' : 'уроков'}
+                </div>
               </div>
-            ) : (
-              <p className="empty-text">Уроков пока нет</p>
-            )}
+              
+              {lessons.length > 0 ? (
+                <div className="lessons-grid">
+                  {lessons.map((lesson, index) => (
+                    <div key={lesson.id} className="lesson-card">
+                      <div className="lesson-number">
+                        {index + 1}
+                      </div>
+                      <div className="lesson-content">
+                        <div className="lesson-header">
+                          <h3 className="lesson-title">{lesson.name}</h3>
+                          <div className="lesson-actions">
+                            {(user.role === 'admin' || user.role === 'superadmin') && (
+                              <>
+                                <button
+                                  className="btn-icon btn-edit"
+                                  onClick={() => handleEditLesson(lesson)}
+                                  title="Редактировать урок"
+                                >
+                                  ✏️
+                                </button>
+                                <button
+                                  className="btn-icon btn-quick-edit"
+                                  onClick={() => startEditLesson(lesson)}
+                                  title="Быстрое редактирование"
+                                >
+                                  📝
+                                </button>
+                                <button
+                                  className="btn-icon btn-danger"
+                                  onClick={() => handleDeleteLesson(lesson)}
+                                  title="Удалить урок"
+                                >
+                                  🗑️
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="lesson-meta">
+                          <div className="lesson-date">
+                            <span className="meta-label">📅</span>
+                            <span className="meta-value">
+                              {lesson.holding_date
+                                ? new Date(lesson.holding_date).toLocaleString('ru-RU', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })
+                                : 'Дата не назначена'}
+                            </span>
+                          </div>
+                          
+                          <div className="lesson-materials">
+                            <span className="meta-label">📚</span>
+                            <span className="meta-value">
+                              {lesson.teacher_material_id ? 'Материал преподавателя' : ''}
+                              {lesson.student_material_id ? (lesson.teacher_material_id ? ' • ' : '') + 'Учебный материал' : ''}
+                              {lesson.homework_id ? ((lesson.teacher_material_id || lesson.student_material_id) ? ' • ' : '') + 'Домашнее задание' : ''}
+                              {!lesson.teacher_material_id && !lesson.student_material_id && !lesson.homework_id && 'Материалы не добавлены'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-lessons">
+                  <div className="empty-icon">📚</div>
+                  <h3>В этом курсе пока нет уроков</h3>
+                  <p>Создайте первый урок, используя кнопку "Создать урок с файлами"</p>
+                </div>
+              )}
+            </div>
           </>
         ) : (
           <p>Загрузка курса...</p>

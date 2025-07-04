@@ -30,6 +30,7 @@ import ManageProductsPage   from './pages/ManageProductsPage';
 import ShopPage             from './pages/ShopPage';
 import NotificationPage     from './pages/NotificationPage';
 import RatingPage          from './pages/RatingPage';
+import ImpersonatePage      from './pages/ImpersonatePage';
 
 import { useAuth }          from './contexts/AuthContext';
 import { NotificationsProvider } from './contexts/NotificationsContext';
@@ -84,6 +85,7 @@ export default function App() {
           <Route path="/manage-products" element={<PrivateRoute><ManageProductsPage /></PrivateRoute>} />
           <Route path="/news" element={<PrivateRoute><ManageNewsPage /></PrivateRoute>} />
           <Route path="/broadcast" element={<PrivateRoute><NotificationPage /></PrivateRoute>} />
+          <Route path="/impersonate" element={<PrivateRoute><ImpersonatePage /></PrivateRoute>} />
 
           {/* ───── fallback ───── */}
           <Route path="*" element={<Navigate to="/home" />} />

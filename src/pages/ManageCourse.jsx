@@ -32,9 +32,8 @@ export default function ManageCoursesPage() {
   const [form, setForm] = useState({
     name: '',
     description: '',
-    age_category: '',
-    price: '',
-    author_name: ''
+    age_category: 'All',
+    price: ''
   });
   const [formImage, setFormImage] = useState(null);
   const [formPreviewUrl, setFormPreviewUrl] = useState(null);
@@ -124,13 +123,16 @@ export default function ManageCoursesPage() {
     try {
       const fd = new FormData();
       
+      // Определяем имя автора из текущего пользователя
+      const authorName = [user.first_name, user.surname].filter(Boolean).join(' ') || user.username || 'Неизвестный автор';
+      
       // Данные курса
       const courseData = {
         name:         form.name,
         description:  form.description,
         age_category: form.age_category,
         price:        Number(form.price),
-        author_name:  form.author_name
+        author_name:  authorName
       };
       
       // Если есть изображение, добавляем поле photo с именем
@@ -142,7 +144,7 @@ export default function ManageCoursesPage() {
       fd.append('course_data', JSON.stringify(courseData));
 
       await createCourse(fd);
-      setForm({ name:'', description:'', age_category:'', price:'', author_name:'' });
+      setForm({ name:'', description:'', age_category:'All', price:'' });
       setFormImage(null);
       setFormPreviewUrl(null);
       setShowConfirmCreate(false);
@@ -162,9 +164,9 @@ export default function ManageCoursesPage() {
       id:           c.id,
       name:         c.name || '',
       description:  c.description || '',
-      age_category: c.age_category || '',
+      age_category: c.age_category || 'All',
       price:        c.price != null ? c.price.toString() : '',
-      author_name:  c.author_name || ''
+      author_name:  c.author_name || ''  // только для отображения, не для редактирования
     });
     setEditImage(null);
     setEditPreviewUrl(null);
@@ -176,13 +178,13 @@ export default function ManageCoursesPage() {
     try {
       const fd = new FormData();
       
-      // Данные курса
+      // Данные курса (author_name не изменяем)
       const courseData = {
         name:         edit.name,
         description:  edit.description,
         age_category: edit.age_category,
-        price:        Number(edit.price),
-        author_name:  edit.author_name
+        price:        Number(edit.price)
+        // author_name исключен - не изменяем автора курса
       };
       
       // Если заменяем изображение, добавляем поле photo с именем
@@ -239,28 +241,62 @@ export default function ManageCoursesPage() {
           <h2>Создать курс</h2>
 
           <div className="user-form form-grid">
-            {[
-              { key:'name',         label:'Название' },
-              { key:'description',  label:'Описание' },
-              { key:'age_category', label:'Возрастная категория' },
-              { key:'price',        label:'Цена' },
-              { key:'author_name',  label:'Автор' }
-            ].map(({ key, label }) => (
-              <div className="field" key={key}>
-                <label>{label}</label>
-                {key === 'description'
-                  ? <textarea
-                      value={form[key]}
-                      onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-                    />
-                  : <input
-                      type={key === 'price' ? 'number' : 'text'}
-                      value={form[key]}
-                      onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-                    />
-                }
-              </div>
-            ))}
+            <div className="field">
+              <label>Название</label>
+              <input
+                type="text"
+                value={form.name}
+                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                placeholder="Введите название курса"
+              />
+            </div>
+
+            <div className="field">
+              <label>Возрастная категория</label>
+              <select
+                value={form.age_category}
+                onChange={e => setForm(f => ({ ...f, age_category: e.target.value }))}
+                className="age-category-select"
+              >
+                <option value="All">Все возрасты</option>
+                <option value="SixPlus">6+</option>
+                <option value="TwelvePlus">12+</option>
+              </select>
+            </div>
+
+            <div className="field" style={{ gridColumn: '1 / -1' }}>
+              <label>Описание</label>
+              <textarea
+                value={form.description}
+                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                placeholder="Описание курса"
+                rows={4}
+              />
+            </div>
+
+            <div className="field">
+              <label>Цена (₽)</label>
+              <input
+                type="number"
+                value={form.price}
+                onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
+                placeholder="0"
+                min="0"
+              />
+            </div>
+
+            <div className="field">
+              <label>Автор курса</label>
+              <input
+                type="text"
+                value={[user.first_name, user.surname].filter(Boolean).join(' ') || user.username || 'Неизвестный автор'}
+                disabled
+                className="disabled-field"
+              />
+              <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                Автор определяется автоматически
+              </small>
+            </div>
 
             <div className="field">
               <label>Изображение (опционально)</label>
@@ -335,28 +371,59 @@ export default function ManageCoursesPage() {
           {/* edit form */}
           {edit && (
             <div className="user-form form-grid" style={{ marginTop:20 }}>
-              {[
-                { key:'name',         label:'Название' },
-                { key:'description',  label:'Описание' },
-                { key:'age_category', label:'Возрастная категория' },
-                { key:'price',        label:'Цена' },
-                { key:'author_name',  label:'Автор' }
-              ].map(({ key, label }) => (
-                <div className="field" key={key}>
-                  <label>{label}</label>
-                  {key === 'description'
-                    ? <textarea
-                        value={edit[key]}
-                        onChange={e => setEdit(p => ({ ...p, [key]: e.target.value }))}
-                      />
-                    : <input
-                        type={key === 'price' ? 'number' : 'text'}
-                        value={edit[key]}
-                        onChange={e => setEdit(p => ({ ...p, [key]: e.target.value }))}
-                      />
-                  }
-                </div>
-              ))}
+              <div className="field">
+                <label>Название</label>
+                <input
+                  type="text"
+                  value={edit.name}
+                  onChange={e => setEdit(p => ({ ...p, name: e.target.value }))}
+                />
+              </div>
+
+              <div className="field">
+                <label>Возрастная категория</label>
+                <select
+                  value={edit.age_category}
+                  onChange={e => setEdit(p => ({ ...p, age_category: e.target.value }))}
+                  className="age-category-select"
+                >
+                  <option value="All">Все возрасты</option>
+                  <option value="SixPlus">6+</option>
+                  <option value="TwelvePlus">12+</option>
+                </select>
+              </div>
+
+              <div className="field" style={{ gridColumn: '1 / -1' }}>
+                <label>Описание</label>
+                <textarea
+                  value={edit.description}
+                  onChange={e => setEdit(p => ({ ...p, description: e.target.value }))}
+                  rows={4}
+                />
+              </div>
+
+              <div className="field">
+                <label>Цена (₽)</label>
+                <input
+                  type="number"
+                  value={edit.price}
+                  onChange={e => setEdit(p => ({ ...p, price: e.target.value }))}
+                  min="0"
+                />
+              </div>
+
+              <div className="field">
+                <label>Автор курса</label>
+                <input
+                  type="text"
+                  value={edit.author_name || 'Не указан'}
+                  disabled
+                  className="disabled-field"
+                />
+                <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                  Автор курса не может быть изменен
+                </small>
+              </div>
 
               <div className="field">
                 <label>Изображение</label>
@@ -440,13 +507,18 @@ export default function ManageCoursesPage() {
         {showConfirmCreate && (
           <div className="modal-overlay">
             <div className="modal-content">
-              <p>Создать курс?</p>
+              <p>
+                🎯 Создать новый курс<br />
+                <span style={{ fontSize: '14px', fontWeight: '400', color: '#6b7280' }}>
+                  "{form.name}"
+                </span>
+              </p>
               <div className="modal-buttons">
                 <button className="btn-primary" onClick={handleCreate} disabled={uploading}>
-                  {uploading ? 'Создание...' : 'Да'}
+                  {uploading ? 'Создание...' : '✨ Создать'}
                 </button>
                 <button className="btn-secondary" onClick={() => setShowConfirmCreate(false)}>
-                  Нет
+                  Отмена
                 </button>
               </div>
             </div>
@@ -456,13 +528,18 @@ export default function ManageCoursesPage() {
         {showConfirmUpdate && (
           <div className="modal-overlay">
             <div className="modal-content">
-              <p>Сохранить изменения?</p>
+              <p>
+                📝 Сохранить изменения<br />
+                <span style={{ fontSize: '14px', fontWeight: '400', color: '#6b7280' }}>
+                  Курс "{edit.name}" будет обновлен
+                </span>
+              </p>
               <div className="modal-buttons">
                 <button className="btn-primary" onClick={handleUpdate} disabled={uploading}>
-                  {uploading ? 'Сохранение...' : 'Да'}
+                  {uploading ? 'Сохранение...' : '💾 Сохранить'}
                 </button>
                 <button className="btn-secondary" onClick={() => setShowConfirmUpdate(false)}>
-                  Нет
+                  Отмена
                 </button>
               </div>
             </div>
@@ -472,10 +549,19 @@ export default function ManageCoursesPage() {
         {showConfirmDelete && (
           <div className="modal-overlay">
             <div className="modal-content">
-              <p>Удалить курс?</p>
+              <p>
+                🗑️ Удалить курс<br />
+                <span style={{ fontSize: '14px', fontWeight: '400', color: '#ef4444' }}>
+                  Курс "{edit.name}" будет удален безвозвратно
+                </span>
+              </p>
               <div className="modal-buttons">
-                <button className="btn-primary" onClick={handleDelete}>Да</button>
-                <button className="btn-secondary" onClick={() => setShowConfirmDelete(false)}>Нет</button>
+                <button className="btn-primary" onClick={handleDelete} style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
+                  🗑️ Удалить
+                </button>
+                <button className="btn-secondary" onClick={() => setShowConfirmDelete(false)}>
+                  Отмена
+                </button>
               </div>
             </div>
           </div>

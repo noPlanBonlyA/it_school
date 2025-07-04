@@ -116,6 +116,7 @@ export default function RatingPage() {
   if (loading) {
     return (
       <div className="app-layout">
+        <div className="rating-page-background"></div>
         <Sidebar activeItem="rating" userRole={user.role} />
         <div className="main-content">
           <Topbar
@@ -135,6 +136,7 @@ export default function RatingPage() {
   if (error) {
     return (
       <div className="app-layout">
+        <div className="rating-page-background"></div>
         <Sidebar activeItem="rating" userRole={user.role} />
         <div className="main-content">
           <Topbar
@@ -156,6 +158,7 @@ export default function RatingPage() {
 
   return (
     <div className="app-layout">
+      <div className="rating-page-background"></div>
       <Sidebar activeItem="rating" userRole={user.role} />
       
       <div className="main-content">
@@ -399,13 +402,71 @@ export default function RatingPage() {
 
           <div className="rating-footer">
             <div className="info-card">
-              <h3>💡 Как заработать монеты?</h3>
-              <ul>
-                <li>Посещайте занятия вовремя</li>
-                <li>Выполняйте домашние задания</li>
-                <li>Активно участвуйте в уроках</li>
-                <li>Помогайте одногруппникам</li>
-              </ul>
+              <div className="info-card-header">
+                <h3>� Как заработать бесткоины?</h3>
+                <p className="info-card-subtitle">Выполняйте задания и получайте награды за активность</p>
+              </div>
+              <div className="info-card-body">
+                <div className="basic-tasks">
+                  <div className="section-subtitle">🎯 Основные задания</div>
+                  <div className="tasks-grid">
+                    <div className="task-card">
+                      <span className="task-icon">📚</span>
+                      <div className="task-title">Посещение занятий</div>
+                      <div className="task-description">Приходите на занятия вовремя и не пропускайте уроки</div>
+                      <div className="task-reward">+10 🪙 за урок</div>
+                    </div>
+                    <div className="task-card">
+                      <span className="task-icon">✍️</span>
+                      <div className="task-title">Домашние задания</div>
+                      <div className="task-description">Выполняйте домашние задания качественно и в срок</div>
+                      <div className="task-reward">+15 🪙 за задание</div>
+                    </div>
+                    <div className="task-card">
+                      <span className="task-icon">🙋</span>
+                      <div className="task-title">Активность на уроках</div>
+                      <div className="task-description">Участвуйте в обсуждениях и отвечайте на вопросы</div>
+                      <div className="task-reward">+5 🪙 за активность</div>
+                    </div>
+                    <div className="task-card">
+                      <span className="task-icon">💯</span>
+                      <div className="task-title">Контрольные работы</div>
+                      <div className="task-description">Успешно сдавайте тесты и экзамены</div>
+                      <div className="task-reward">+25 🪙 за тест</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bonus-tasks">
+                  <div className="section-subtitle">🌟 Бонусные задания</div>
+                  <div className="tasks-grid">
+                    <div className="task-card">
+                      <span className="task-icon">🤝</span>
+                      <div className="task-title">Помощь одногруппникам</div>
+                      <div className="task-description">Помогайте другим студентам с заданиями и вопросами</div>
+                      <div className="task-reward">+20 🪙 за помощь</div>
+                    </div>
+                    <div className="task-card">
+                      <span className="task-icon">🎨</span>
+                      <div className="task-title">Творческие проекты</div>
+                      <div className="task-description">Создавайте собственные проекты и презентуйте их</div>
+                      <div className="task-reward">+50 🪙 за проект</div>
+                    </div>
+                    <div className="task-card">
+                      <span className="task-icon">📖</span>
+                      <div className="task-title">Дополнительное обучение</div>
+                      <div className="task-description">Изучайте материалы сверх программы</div>
+                      <div className="task-reward">+30 🪙 за курс</div>
+                    </div>
+                    <div className="task-card">
+                      <span className="task-icon">🏆</span>
+                      <div className="task-title">Участие в конкурсах</div>
+                      <div className="task-description">Принимайте участие в олимпиадах и хакатонах</div>
+                      <div className="task-reward">+100 🪙 за участие</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

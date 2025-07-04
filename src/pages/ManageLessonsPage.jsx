@@ -6,6 +6,7 @@ import LessonEditor from '../components/LessonEditor';
 import { useAuth } from '../contexts/AuthContext';
 import { getCourseLessons, deleteLessonWithMaterials } from '../services/lessonService';
 import { getCourse } from '../services/courseService';
+import '../styles/LessonEditor.css';
 
 export default function ManageLessonsPage() {
   const { courseId } = useParams();
@@ -50,7 +51,7 @@ export default function ManageLessonsPage() {
   };
 
   const handleDeleteLesson = async (lesson) => {
-    if (!confirm('Удалить урок? Это действие нельзя отменить.')) return;
+    if (!window.confirm('❌ Удалить урок? Это действие нельзя отменить.')) return;
     
     try {
       await deleteLessonWithMaterials(courseId, lesson.id, {
@@ -60,10 +61,9 @@ export default function ManageLessonsPage() {
       });
       
       await loadData();
-      alert('Урок удален');
     } catch (error) {
       console.error('Error deleting lesson:', error);
-      alert('Ошибка удаления урока');
+      alert('❌ Ошибка удаления урока');
     }
   };
 
@@ -71,7 +71,6 @@ export default function ManageLessonsPage() {
     setShowEditor(false);
     setEditingLesson(null);
     await loadData();
-    alert(editingLesson ? 'Урок обновлен' : 'Урок создан');
   };
 
   const fullName = [user.first_name, user.surname, user.patronymic]
@@ -110,6 +109,18 @@ export default function ManageLessonsPage() {
 
         {showEditor ? (
           <div className="block">
+            <div className="editor-header">
+              <h2>{editingLesson ? 'Редактирование урока' : 'Создание нового урока'}</h2>
+              <button 
+                className="btn-secondary"
+                onClick={() => {
+                  setShowEditor(false);
+                  setEditingLesson(null);
+                }}
+              >
+                ← Назад к списку
+              </button>
+            </div>
             <LessonEditor
               courseId={courseId}
               lesson={editingLesson}
@@ -121,50 +132,74 @@ export default function ManageLessonsPage() {
             />
           </div>
         ) : (
-          <>
-            <div className="block">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2>Уроки курса</h2>
+          <div className="block">
+            <div className="lessons-header">
+              <h2>Уроки курса</h2>
+              <button className="btn-primary create-lesson-btn" onClick={handleCreateLesson}>
+                ✨ Создать урок
+              </button>
+            </div>
+
+            {lessons.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">📚</div>
+                <h3>Уроки не созданы</h3>
+                <p>Создайте первый урок для этого курса</p>
                 <button className="btn-primary" onClick={handleCreateLesson}>
-                  Создать урок
+                  Создать первый урок
                 </button>
               </div>
-
-              {lessons.length === 0 ? (
-                <p>Уроки не созданы</p>
-              ) : (
-                <div className="lessons-list">
-                  {lessons.map((lesson, index) => (
-                    <div key={lesson.id} className="lesson-item">
-                      <div className="lesson-info">
-                        <h3>{index + 1}. {lesson.name}</h3>
-                        <div className="lesson-actions">
-                          <button 
-                            className="btn-secondary"
-                            onClick={() => handleEditLesson(lesson)}
-                          >
-                            Редактировать
-                          </button>
-                          <button 
-                            className="btn-primary"
-                            onClick={() => navigate(`/courses/${courseId}/lessons/${lesson.id}/teacher`)}
-                          >
-                            Открыть урок
-                          </button>
-                          <button 
-                            className="btn-danger"
-                            onClick={() => handleDeleteLesson(lesson)}
-                          >
-                            Удалить
-                          </button>
+            ) : (
+              <div className="lessons-grid">
+                {lessons.map((lesson, index) => (
+                  <div key={lesson.id} className="lesson-card">
+                    <div className="lesson-number">
+                      {index + 1}
+                    </div>
+                    <div className="lesson-content">
+                      <h3 className="lesson-title">{lesson.name}</h3>
+                      <div className="lesson-meta">
+                        <div className="lesson-materials">
+                          {lesson.teacher_material && (
+                            <span className="material-badge teacher">📚 Преподаватель</span>
+                          )}
+                          {lesson.student_material && (
+                            <span className="material-badge student">👨‍🎓 Студент</span>
+                          )}
+                          {lesson.homework && (
+                            <span className="material-badge homework">📝 Задание</span>
+                          )}
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </>
+                    <div className="lesson-actions">
+                      <button 
+                        className="btn-secondary btn-sm"
+                        onClick={() => handleEditLesson(lesson)}
+                        title="Редактировать"
+                      >
+                        ✏️
+                      </button>
+                      <button 
+                        className="btn-primary btn-sm"
+                        onClick={() => navigate(`/courses/${courseId}/lessons/${lesson.id}/teacher`)}
+                        title="Открыть урок"
+                      >
+                        🚀
+                      </button>
+                      <button 
+                        className="btn-danger btn-sm"
+                        onClick={() => handleDeleteLesson(lesson)}
+                        title="Удалить"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

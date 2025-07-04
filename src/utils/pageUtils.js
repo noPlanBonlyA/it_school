@@ -22,7 +22,8 @@ export const getPageTitles = (userRole) => {
     'manage-products': 'Товары',
     courses: 'Мои курсы',
     'teacher-courses': 'Мои курсы',
-    'student-courses': 'Мои курсы'
+    'student-courses': 'Мои курсы',
+    impersonate: 'Магия'
   };
 
   // Дополнительные названия для разных ролей

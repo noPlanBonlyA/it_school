@@ -424,24 +424,12 @@ export default function HomePage() {
                 : news.map(n => (
                     <div 
                       key={n.id} 
-                      className={`news-row ${n.is_pinned ? 'pinned' : ''} ${expandedNews.has(n.id) ? 'expanded' : ''}`}
+                      className={`news-row ${n.is_pinned ? 'pinned' : ''} ${expandedNews.has(n.id) ? 'expanded' : ''} ${!n.image_url ? 'no-image' : ''}`}
                       onClick={(event) => toggleNewsExpansion(n.id, event)}
                     >
-                      {/* Изображение новости */}
-                      {n.image_url ? (
+                      {/* Изображение новости - только если есть */}
+                      {n.image_url && (
                         <img src={n.image_url} alt={n.name} className="news-thumb"/>
-                      ) : (
-                        <div className="news-thumb" style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                          color: 'white',
-                          fontSize: '14px',
-                          fontWeight: '600'
-                        }}>
-                          📰
-                        </div>
                       )}
                       
                       {/* Контент новости */}

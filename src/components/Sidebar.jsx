@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate }      from 'react-router-dom';
 import '../styles/SideBar.css';
+import ConfirmModal from './ConfirmModal';
+import { useConfirm } from '../hooks/useConfirm';
 
-import clockIcon      from '../images/sidebar_icon1.png';
 import calendarIcon   from '../images/sidebar_icon2.png';
 import coursesIcon    from '../images/sidebar_icon3.png';
 import chartIcon      from '../images/sidebar_icon4.png';
@@ -16,13 +17,14 @@ import broadcastIcon  from '../images/sidebar_icon4.png';
 import shopIcon       from '../images/sidebar_icon5.png';
 import moderationIcon from '../images/sidebar_icon3.png';
 import adminIcon      from '../images/sidebar_icon1.png';
+import magicIcon      from '../images/sidebar_icon7.png'; // Иконка для магии
 
 import { useAuth }    from '../contexts/AuthContext';
 
 export default function Sidebar({ activeItem, userRole }) {
   const navigate     = useNavigate();
   const { logout }   = useAuth();
-  const [showLogout, setShowLogout] = useState(false);
+  const { confirmState, showConfirm } = useConfirm();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -45,6 +47,25 @@ export default function Sidebar({ activeItem, userRole }) {
     navigate(route);
     if (isMobile) {
       setIsMobileMenuOpen(false);
+    }
+  };
+
+  // Функция для обработки выхода
+  const handleLogout = async () => {
+    const confirmed = await showConfirm({
+      title: "🚪 Выход",
+      message: "Уверены, что хотите выйти?",
+      confirmText: "Да, выйти",
+      cancelText: "Отмена",
+      type: "warning"
+    });
+
+    if (confirmed) {
+      await logout();
+      navigate(routes.logout, { replace: true });
+      if (isMobile) {
+        setIsMobileMenuOpen(false);
+      }
     }
   };
 
@@ -71,6 +92,7 @@ export default function Sidebar({ activeItem, userRole }) {
     manageProducts:   '/manage-products',
     'manage-products': '/manage-products',
     shop:             '/shop',
+    impersonate:      '/impersonate',
     settings:         '/profile',
     logout:           '/login'
   };
@@ -120,7 +142,8 @@ export default function Sidebar({ activeItem, userRole }) {
         { key: 'moderateCourses', label: 'Модерация курсов', icon: moderationIcon },
         { key: 'groups',          label: 'Группы',           icon: usersIcon },
         { key: 'manageProducts',  label: 'Товары',           icon: shopIcon },
-        { key: 'news',            label: 'Новости',          icon: coursesIcon }
+        { key: 'news',            label: 'Новости',          icon: coursesIcon },
+        { key: 'impersonate',     label: 'Магия',            icon: magicIcon }
       ];
       break;
     default:
@@ -177,40 +200,23 @@ export default function Sidebar({ activeItem, userRole }) {
         <hr className="divider" />
 
         <ul className="sidebar-list bottom">
-          <li className="sidebar-item" onClick={() => setShowLogout(true)}>
+          <li className="sidebar-item" onClick={handleLogout}>
             <img src={powerOffIcon} alt="" className="icon" />
             <span className="label">Выйти</span>
           </li>
         </ul>
       </nav>
 
-      {showLogout && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <p className="modal-text">Уверены, что хотите выйти?</p>
-            <div className="modal-buttons">
-              <button
-                className="btn-primary"
-                onClick={async () => {
-                  await logout();
-                  navigate(routes.logout, { replace: true });
-                  if (isMobile) {
-                    setIsMobileMenuOpen(false);
-                  }
-                }}
-              >
-                Да
-              </button>
-              <button
-                className="btn-secondary"
-                onClick={() => setShowLogout(false)}
-              >
-                Нет
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal 
+        isOpen={confirmState.isOpen}
+        onClose={confirmState.onCancel}
+        onConfirm={confirmState.onConfirm}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText={confirmState.confirmText}
+        cancelText={confirmState.cancelText}
+        type={confirmState.type}
+      />
     </>
   );
 }
