@@ -19,6 +19,7 @@ import { findTeacherByUser } from '../services/teacherService';
 import { getAllCourses }     from '../services/courseService';
 
 import api from '../api/axiosInstance';
+import '../styles/ManageUserPage.css';
 import '../styles/ManageGroupPage.css';
 
 /* ─────────────────── helpers ────────────────────────*/
@@ -74,7 +75,7 @@ export default function ManageGroupPage() {
   const [teachers, setTeachers] = useState([]); const [teaLoaded, setTL] = useState(false);
   const [courses,  setCourses]  = useState([]); const [couLoaded, setCL] = useState(false);
 
-  const [newF, setNewF] = useState({ name:'', description:'', start_date:'', end_date:'' });
+  const [newF, setNewF] = useState({ name:'', description:'' });
   const [errs, setErrs] = useState({});
 
   const [sel , setSel ] = useState(null);
@@ -192,16 +193,22 @@ export default function ManageGroupPage() {
   const createGrp = async () => {
     if (!newF.name.trim()) { setErrs({ name:'Название обязательно' }); return; }
     try {
+      // Добавляем обязательные поля start_date и end_date со значениями по умолчанию
+      const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const futureDate = new Date();
+      futureDate.setFullYear(futureDate.getFullYear() + 1);
+      const endDate = futureDate.toISOString().split('T')[0];
+      
       const g   = await createGroup({
         ...newF,
-        start_date: newF.start_date || null,
-        end_date  : newF.end_date   || null
+        start_date: currentDate,
+        end_date: endDate
       });
       const obj = await refresh(g.id);
       if (obj) {
         setGroups(gs => [...gs, obj]);
       }
-      setNewF({ name:'', description:'', start_date:'', end_date:'' });
+      setNewF({ name:'', description:'' });
       setErrs({});
     } catch (error) { 
       console.error('Error creating group:', error);
@@ -225,9 +232,7 @@ export default function ManageGroupPage() {
     setSel(g);
     setEdit({
       name       : g.name,
-      description: g.description || '',
-      start_date : g.start_date  || '',
-      end_date   : g.end_date    || ''
+      description: g.description || ''
     });
     setAddStu(false); setAddTea(false); setAddCou(false);
     setShow(true);
@@ -238,7 +243,7 @@ export default function ManageGroupPage() {
   const save = async () => {
     if (!sel) return;
     const body = {};
-    ['name','description','start_date','end_date'].forEach(f=>{
+    ['name','description'].forEach(f=>{
       if ((sel[f]||'') !== (edit[f]||'')) body[f] = edit[f] || null;
     });
     if (!Object.keys(body).length) return;
@@ -261,7 +266,7 @@ export default function ManageGroupPage() {
     }
   };
   
-  const changed = sel && ['name','description','start_date','end_date']
+  const changed = sel && ['name','description']
     .some(f => (sel[f]||'') !== (edit[f]||''));
 
   /* ────────────── filters ───────────────────*/
@@ -469,7 +474,7 @@ export default function ManageGroupPage() {
           <div className="block">
             <h2>Создать группу</h2>
             <div className="user-form form-grid">
-              {['name','description','start_date','end_date'].map(f=>(
+              {['name','description'].map(f=>(
                 <div className="field" key={f}>
                   <label>{f.replace('_',' ')}</label>
                   {f==='description'
@@ -534,9 +539,9 @@ export default function ManageGroupPage() {
               {/* header */}
               <div className="modal-header">
                 <h2>{sel.name}</h2>
-                <button className="close-modal" onClick={close} style={{
-                  background: 'none',
-                  border: 'none',
+                <button className="btn-secondary" onClick={close} style={{
+                  background: 'transparent',
+                  border: '1px solid rgba(0, 177, 143, 0.3)',
                   fontSize: '24px',
                   cursor: 'pointer',
                   color: '#6b7280'
@@ -557,7 +562,7 @@ export default function ManageGroupPage() {
                 <div className="panel">
                   <h3 style={{ marginTop: 0 }}>Параметры</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    {['name','description','start_date','end_date'].map(f=>(
+                    {['name','description'].map(f=>(
                       <div className="field" key={f}>
                         <label>{f.replace('_',' ')}</label>
                         {f==='description'

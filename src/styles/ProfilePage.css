@@ -2,14 +2,14 @@
 .app-layout {
   display: flex;
   height: 100vh;
-  font-family: 'Inter', 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Mont', 'Inter', 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #F5F6FA;
+  background: #F8FCFB;
   min-height: 100vh;
   padding-top: 80px; /* Отступ от TopBar */
 }
@@ -18,11 +18,12 @@
 .page-title {
   font-size: 36px;
   font-weight: 800;
-  color: #1e293b;
+  color: #1A1A1A;
   margin: 24px 0;
   text-align: center;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-shadow: 0 2px 4px rgba(0, 177, 143, 0.1);
   letter-spacing: -1px;
+  font-family: 'Mont', sans-serif;
 }
 
 /* --------------- контейнер формы --------------- */
@@ -36,15 +37,14 @@
 }
 
 .profile-form {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 24px;
+  background: #FFFFFF;
+  border-radius: 16px;
   padding: 48px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 177, 143, 0.1);
   width: 100%;
   max-width: 900px;
   box-sizing: border-box;
+  border: 1px solid rgba(0, 177, 143, 0.1);
   animation: slideUp 0.6s ease-out;
 }
 
@@ -73,9 +73,9 @@
   height: 150px;
   border-radius: 50%;
   object-fit: cover;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  border: 6px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #E8F8F5 0%, #D1F2EB 100%);
+  border: 6px solid #FFFFFF;
+  box-shadow: 0 12px 24px rgba(0, 177, 143, 0.2);
   transition: transform 0.2s ease;
 }
 
@@ -87,8 +87,9 @@
   margin-top: 20px;
   font-size: 24px;
   font-weight: 700;
-  color: #1e293b;
+  color: #1A1A1A;
   letter-spacing: -0.5px;
+  font-family: 'Mont', sans-serif;
 }
 
 /* ---------------- сетка полей ---------------- */
@@ -130,10 +131,14 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 177, 143, 0.3), transparent);
   border-radius: 12px 12px 0 0;
   opacity: 0;
   transition: opacity 0.2s ease;
+}
+
+.field:hover::before {
+  background: linear-gradient(90deg, transparent, rgba(0, 177, 143, 0.4), transparent);
 }
 
 .field:hover::before {
@@ -148,37 +153,39 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-size: 12px;
+  font-family: 'Mont', sans-serif;
 }
 
 .input {
-  background: rgba(248, 250, 252, 0.8);
-  border: 2px solid rgba(226, 232, 240, 0.5);
+  background: rgba(248, 252, 251, 0.8);
+  border: 2px solid rgba(0, 177, 143, 0.2);
   border-radius: 12px;
   padding: 20px 24px;
   font-size: 18px;
   font-weight: 500;
-  color: #1e293b;
+  color: #1A1A1A;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2px 4px rgba(0, 177, 143, 0.05);
+  font-family: 'Mont', sans-serif;
 }
 
 .input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #00B18F;
+  box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1);
   transform: translateY(-2px);
 }
 
 .input.read-only {
   cursor: default;
   user-select: text;
-  background: rgba(248, 250, 252, 0.6);
-  border-color: rgba(226, 232, 240, 0.3);
+  background: rgba(248, 252, 251, 0.6);
+  border-color: rgba(0, 177, 143, 0.15);
 }
 
 .input.read-only:hover {
-  border-color: rgba(102, 126, 234, 0.3);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 177, 143, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 177, 143, 0.1);
 }
 
 .avatar-container {
@@ -198,21 +205,23 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #00B18F;
+  box-shadow: 4px 4px 0.3px #03836A;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  font-family: 'Mont', sans-serif;
 }
 
 .upload-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  background: #00A081;
+  box-shadow: 2px 2px 0.3px #03836A;
+  transform: translate(2px, 2px);
 }
 
 .upload-controls {
@@ -223,20 +232,22 @@
 
 .save-button {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: #00B18F;
+  box-shadow: 2px 2px 0.3px #03836A;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   transition: all 0.2s ease;
-  box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
+  font-family: 'Mont', sans-serif;
 }
 
 .save-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  background: #00A081;
+  box-shadow: 1px 1px 0.3px #03836A;
+  transform: translate(1px, 1px);
 }
 
 .save-button:disabled {
@@ -248,20 +259,50 @@
 
 .cancel-button {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: #EF4444;
+  box-shadow: 2px 2px 0.3px #DC2626;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   transition: all 0.2s ease;
-  box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
+  font-family: 'Mont', sans-serif;
 }
 
 .cancel-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  background: #DC2626;
+  box-shadow: 1px 1px 0.3px #B91C1C;
+  transform: translate(1px, 1px);
+}
+
+/* Стили для loading состояния */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 18px;
+  font-weight: 600;
+  color: #00B18F;
+  font-family: 'Mont', sans-serif;
+}
+
+.loading::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(0, 177, 143, 0.3);
+  border-top: 3px solid #00B18F;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Адаптивные стили */

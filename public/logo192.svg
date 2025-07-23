@@ -1,0 +1,25 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Фон -->
+  <rect width="192" height="192" fill="#f8f9fa" rx="24"/>
+  
+  <!-- Глаз-логотип в центре -->
+  <g transform="translate(96,60)">
+    <!-- Зеленое тело глаза -->
+    <ellipse cx="0" cy="0" rx="45" ry="35" fill="#2E8B57"/>
+    <!-- Белок глаза -->
+    <ellipse cx="0" cy="-7" rx="30" ry="25" fill="white"/>
+    <!-- Зрачок -->
+    <circle cx="5" cy="-7" r="15" fill="#333"/>
+    <!-- Блик -->
+    <circle cx="10" cy="-12" r="5" fill="white"/>
+    <!-- Ножки -->
+    <rect x="-12" y="35" width="8" height="30" fill="#2E8B57" rx="4"/>
+    <rect x="5" y="35" width="8" height="30" fill="#2E8B57" rx="4"/>
+    <!-- Ручки -->
+    <rect x="-60" y="10" width="20" height="8" fill="#2E8B57" rx="4"/>
+    <rect x="40" y="10" width="20" height="8" fill="#2E8B57" rx="4"/>
+  </g>
+  
+  <!-- Текст ПК внизу -->
+  <text x="96" y="150" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#FF6B35" text-anchor="middle">ПК</text>
+</svg>

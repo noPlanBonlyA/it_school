@@ -16,6 +16,13 @@ import {
 import '../styles/ManageUserPage.css';   // старая сетка + модалки
 import '../styles/CourseGrid.css';       // сетка карточек
 
+/*
+ * ИСПРАВЛЕНО: age_category теперь передается как массив в API
+ * - При создании курса: [form.age_category]
+ * - При обновлении курса: [edit.age_category]
+ * - При получении курса: Array.isArray проверка для отображения
+ */
+
 export default function ManageCoursesPage() {
   const navigate = useNavigate();
   const { user }  = useAuth();
@@ -32,8 +39,7 @@ export default function ManageCoursesPage() {
   const [form, setForm] = useState({
     name: '',
     description: '',
-    age_category: 'All',
-    price: ''
+    age_category: 'Все возрасты'
   });
   const [formImage, setFormImage] = useState(null);
   const [formPreviewUrl, setFormPreviewUrl] = useState(null);
@@ -130,8 +136,7 @@ export default function ManageCoursesPage() {
       const courseData = {
         name:         form.name,
         description:  form.description,
-        age_category: form.age_category,
-        price:        Number(form.price),
+        age_category: [form.age_category], // Передаем как массив
         author_name:  authorName
       };
       
@@ -144,7 +149,7 @@ export default function ManageCoursesPage() {
       fd.append('course_data', JSON.stringify(courseData));
 
       await createCourse(fd);
-      setForm({ name:'', description:'', age_category:'All', price:'' });
+      setForm({ name:'', description:'', age_category:'Все возрасты' });
       setFormImage(null);
       setFormPreviewUrl(null);
       setShowConfirmCreate(false);
@@ -160,12 +165,23 @@ export default function ManageCoursesPage() {
   };
 
   const handleSelect = c => {
+    // Если age_category приходит как массив, берем первый элемент
+    const ageCategory = Array.isArray(c.age_category) ? c.age_category[0] : c.age_category;
+    
+    // Маппинг старых значений на новые
+    let mappedAgeCategory = ageCategory;
+    if (ageCategory === 'All') mappedAgeCategory = 'Все возрасты';
+    else if (ageCategory === 'SixPlus') mappedAgeCategory = '5-7';
+    else if (ageCategory === 'TwelvePlus') mappedAgeCategory = '12-14';
+    else if (!['Все возрасты', '5-7', '8-10', '12-14'].includes(ageCategory)) {
+      mappedAgeCategory = 'Все возрасты'; // дефолт для неизвестных значений
+    }
+    
     setEdit({
       id:           c.id,
       name:         c.name || '',
       description:  c.description || '',
-      age_category: c.age_category || 'All',
-      price:        c.price != null ? c.price.toString() : '',
+      age_category: mappedAgeCategory,
       author_name:  c.author_name || ''  // только для отображения, не для редактирования
     });
     setEditImage(null);
@@ -182,8 +198,7 @@ export default function ManageCoursesPage() {
       const courseData = {
         name:         edit.name,
         description:  edit.description,
-        age_category: edit.age_category,
-        price:        Number(edit.price)
+        age_category: [edit.age_category] // Передаем как массив
         // author_name исключен - не изменяем автора курса
       };
       
@@ -258,9 +273,10 @@ export default function ManageCoursesPage() {
                 onChange={e => setForm(f => ({ ...f, age_category: e.target.value }))}
                 className="age-category-select"
               >
-                <option value="All">Все возрасты</option>
-                <option value="SixPlus">6+</option>
-                <option value="TwelvePlus">12+</option>
+                <option value="Все возрасты">Все возрасты</option>
+                <option value="5-7">5-7</option>
+                <option value="8-10">8-10</option>
+                <option value="12-14">12-14</option>
               </select>
             </div>
 
@@ -271,17 +287,6 @@ export default function ManageCoursesPage() {
                 onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                 placeholder="Описание курса"
                 rows={4}
-              />
-            </div>
-
-            <div className="field">
-              <label>Цена (₽)</label>
-              <input
-                type="number"
-                value={form.price}
-                onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
-                placeholder="0"
-                min="0"
               />
             </div>
 
@@ -387,9 +392,10 @@ export default function ManageCoursesPage() {
                   onChange={e => setEdit(p => ({ ...p, age_category: e.target.value }))}
                   className="age-category-select"
                 >
-                  <option value="All">Все возрасты</option>
-                  <option value="SixPlus">6+</option>
-                  <option value="TwelvePlus">12+</option>
+                  <option value="Все возрасты">Все возрасты</option>
+                  <option value="5-7">5-7</option>
+                  <option value="8-10">8-10</option>
+                  <option value="12-14">12-14</option>
                 </select>
               </div>
 
@@ -399,16 +405,6 @@ export default function ManageCoursesPage() {
                   value={edit.description}
                   onChange={e => setEdit(p => ({ ...p, description: e.target.value }))}
                   rows={4}
-                />
-              </div>
-
-              <div className="field">
-                <label>Цена (₽)</label>
-                <input
-                  type="number"
-                  value={edit.price}
-                  onChange={e => setEdit(p => ({ ...p, price: e.target.value }))}
-                  min="0"
                 />
               </div>
 

@@ -1,39 +1,240 @@
-/* Стили для управления уроками */
+/* Стили для редактора уроков - обновлены под фирменный дизайн */
 
-/* Заголовок редактора */
-.editor-header {
+/* Основной контейнер редактора */
+.lesson-editor {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 177, 143, 0.1);
+  padding: 24px;
+  margin: 20px 0;
+  border: 1px solid rgba(0, 177, 143, 0.1);
+}
+
+/* Форма урока */
+.lesson-form {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.editor-header h2 {
-  margin: 0;
-  color: #1f2937;
-  font-size: 24px;
-  font-weight: 600;
-}
-
-/* Заголовок списка уроков */
-.lessons-header {
+/* Секции формы */
+.form-section {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.lessons-header h2 {
-  margin: 0;
-  color: #1f2937;
+.section-title {
+  color: #03836A;
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 2px solid rgba(0, 177, 143, 0.2);
+  padding-bottom: 8px;
 }
 
-.create-lesson-btn {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+/* Секция материалов */
+.materials-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Категории материалов */
+.material-category {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.05), rgba(3, 131, 106, 0.03));
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(0, 177, 143, 0.1);
+}
+
+.category-title {
+  color: #03836A;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Блоки материалов */
+.material-block {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(0, 177, 143, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 177, 143, 0.08);
+  transition: all 0.3s ease;
+}
+
+.material-block:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 177, 143, 0.15);
+}
+
+/* Заголовки материалов */
+.material-header {
+  margin-bottom: 16px;
+}
+
+.material-title {
+  color: #03836A;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.material-subtitle {
+  color: #6b7280;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* Лейблы форм */
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.label-text {
+  color: #374151;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Поля ввода */
+.form-input,
+.form-textarea {
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: #ffffff;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #00B18F;
+  box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1);
+  background: rgba(0, 177, 143, 0.02);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Строки и колонки формы */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.form-col {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Текстовые области */
+.text-area {
+  flex: 1;
+}
+
+/* Загрузка файлов */
+.file-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border: 2px dashed rgba(0, 177, 143, 0.3);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.05), rgba(3, 131, 106, 0.02));
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #03836A;
+  font-weight: 500;
+}
+
+.file-label:hover {
+  border-color: #00B18F;
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.1), rgba(3, 131, 106, 0.05));
+  transform: translateY(-1px);
+}
+
+.file-icon {
+  font-size: 20px;
+}
+
+.file-text {
+  flex: 1;
+  text-align: left;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.file-size {
+  background: rgba(0, 177, 143, 0.1);
+  color: #03836A;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* Текущие материалы */
+.current-material {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.1), rgba(3, 131, 106, 0.05));
+  border: 1px solid rgba(0, 177, 143, 0.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #03836A;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+/* Действия формы */
+.form-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 177, 143, 0.1);
+}
+
+/* Кнопки */
+.btn-save {
+  background: linear-gradient(135deg, #00B18F, #03836A);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -41,16 +242,82 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 140px;
+  justify-content: center;
 }
 
-.create-lesson-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+.btn-save:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 177, 143, 0.3);
+  background: linear-gradient(135deg, #00B18F, #007A67);
 }
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: #f9fafb;
+  color: #374151;
+  border: 2px solid #e5e7eb;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .lesson-editor {
+    padding: 16px;
+    margin: 10px 0;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .btn-save,
+  .btn-secondary {
+    width: 100%;
+  }
+  
+  .material-category {
+    padding: 16px;
+  }
+  
+  .material-block {
+    padding: 16px;
+  }
+}
+
 
 /* Состояние когда нет уроков */
 .empty-state {
@@ -443,6 +710,66 @@
   box-shadow: none;
 }
 
+/* Новые стили для двухколоночной формы */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.form-col {
+  min-width: 0; /* Позволяет колонкам сжиматься */
+}
+
+.material-category {
+  margin-bottom: 32px;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border-left: 4px solid #00b18f;
+}
+
+.category-title {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e1e2f;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.material-block {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.material-block:last-child {
+  margin-bottom: 0;
+}
+
+.material-title {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.material-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.form-textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
   .lessons-grid {
@@ -470,5 +797,19 @@
   
   .form-actions {
     flex-direction: column;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .material-category {
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .material-block {
+    padding: 12px;
   }
 }

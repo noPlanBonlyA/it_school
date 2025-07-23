@@ -1,10 +1,107 @@
 import api from '../api/axiosInstance';
 import { createNotificationForCourse } from './notificationService';
 
+/**
+ * Вычисляет возраст по дате рождения
+ */
+function calculateAge(birthDate) {
+  if (!birthDate) return null;
+  
+  const today = new Date();
+  const birth = new Date(birthDate);
+  let age = today.getFullYear() - birth.getFullYear();
+  
+  // Проверяем, прошел ли день рождения в этом году
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  
+  return age;
+}
+
+/**
+ * Проверяет, подходит ли курс студенту по возрасту
+ */
+function isCourseSuitableForAge(course, studentAge) {
+  if (!course.age_category || !Array.isArray(course.age_category) || course.age_category.length === 0 || studentAge === null) {
+    return true; // Если возраст не указан или категория не задана, показываем курс
+  }
+  
+  // Проверяем каждую возрастную категорию в массиве
+  for (const category of course.age_category) {
+    const ageCategory = category.toLowerCase();
+    
+    // Обрабатываем различные варианты возрастных категорий
+    if (ageCategory.includes('все') || ageCategory === 'all') {
+      return true; // Курсы "All" показываем всем
+    }
+    
+    // Парсим диапазоны возрастов
+    if (ageCategory.includes('-')) {
+      const [minAge, maxAge] = ageCategory.split('-').map(age => parseInt(age.trim()));
+      if (!isNaN(minAge) && !isNaN(maxAge) && studentAge >= minAge && studentAge <= maxAge) {
+        return true;
+      }
+    }
+    
+    // Обрабатываем категории типа "6+", "12+"
+    if (ageCategory.includes('+')) {
+      const minAge = parseInt(ageCategory.replace('+', ''));
+      if (!isNaN(minAge) && studentAge >= minAge) {
+        return true;
+      }
+    }
+    
+    // Обрабатываем старые категории
+    if (ageCategory === 'sixplus' && studentAge >= 6) {
+      return true;
+    }
+    if (ageCategory === 'twelveplus' && studentAge >= 12) {
+      return true;
+    }
+  }
+  
+  // Если ни одна категория не подошла, не показываем курс
+  return false;
+}
+
 // GET /api/courses/ - все курсы (для админов)
 export async function getAllCourses(limit = 100, offset = 0) {
   const { data } = await api.get('/courses/', { params: { limit, offset } });
   return data;
+}
+
+// GET /api/courses/ - курсы с фильтрацией по возрасту для студентов
+export async function getAllCoursesFiltered(studentUser = null, limit = 100, offset = 0) {
+  const { data } = await api.get('/courses/', { params: { limit, offset } });
+  
+  // Если пользователь не передан, возвращаем все курсы
+  if (!studentUser) {
+    return data;
+  }
+  
+  // Вычисляем возраст студента
+  const studentAge = calculateAge(studentUser.birth_date);
+  
+  console.log('[CourseService] Student age:', studentAge, 'from birth_date:', studentUser.birth_date);
+  
+  // Фильтруем курсы по возрасту
+  const filteredCourses = (data.objects || data || []).filter(course => {
+    const suitable = isCourseSuitableForAge(course, studentAge);
+    console.log('[CourseService] Course:', course.name, 
+                'age_category:', course.age_category, 
+                'student age:', studentAge, 
+                'suitable:', suitable);
+    return suitable;
+  });
+  
+  console.log('[CourseService] Filtered courses:', filteredCourses.length, 'out of', (data.objects || data || []).length);
+  
+  return {
+    ...data,
+    objects: filteredCourses
+  };
 }
 
 // GET /api/courses/student - ТОЛЬКО курсы из групп студента
@@ -14,9 +111,14 @@ export async function listStudentCourses() {
     const { data } = await api.get('/courses/student');
     console.log('[CourseService] Student courses response:', data);
     
-    // API возвращает массив объектов с полем course
+    // API возвращает массив объектов с полем course и progress
     const courses = Array.isArray(data) 
-      ? data.map(item => item.course || item) 
+      ? data.map(item => ({
+          ...item.course,
+          progress: item.progress || 0,
+          student_id: item.student_id,
+          course_id: item.course_id
+        }))
       : [];
     
     console.log('[CourseService] Processed student courses:', courses);
@@ -114,3 +216,16 @@ export async function getStudentLessonMaterials(courseId, lessonId) {
 
 // Псевдонимы для совместимости
 export const getStudentCourses = listStudentCourses;
+
+// GET /api/courses/student/lesson-student - получить детальный прогресс по урокам для студента
+export async function getStudentLessonProgress() {
+  console.log('[CourseService] Fetching student lesson progress...');
+  try {
+    const { data } = await api.get('/courses/student/lesson-student');
+    console.log('[CourseService] Student lesson progress response:', data);
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('[CourseService] Error fetching student lesson progress:', error);
+    return [];
+  }
+}

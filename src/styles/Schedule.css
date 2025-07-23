@@ -1,3 +1,4 @@
+
 /* общий список занятий (и на главной, и на странице расписания) */
 .schedule-list{
   margin:0;
@@ -27,6 +28,20 @@
   font-size:12px;
   color:#7d7d7d;
 }
+
+/* мини-виджет с деталями урока */
+.event-details{
+  position:fixed;              /* "прилипает" справа */
+  top:80px;                    /* ниже Topbar'а */
+  right:24px;
+  width:300px;                 /* Увеличена ширина для лучшего размещения кнопок */
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 6px 24px rgba(0,0,0,.1);
+  padding:18px 22px 22px;
+  z-index:999;                 /* поверх всего */
+}
+
 
 /* мини-виджет с деталями урока */
 .event-details{
@@ -268,12 +283,12 @@
 
 /* Стили для формы загрузки домашнего задания */
 .homework-upload-section {
-  padding: 20px;
-  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  border: 1px solid #e0e7ff;
-  position: relative;
-  overflow: hidden;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .homework-upload-section::before {
@@ -308,23 +323,23 @@
 }
 
 .homework-form input[type="text"] {
-  padding: 12px 16px;
-  border: 2px solid #e0e7ff;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 14px;
   transition: all 0.2s ease;
-  background: white;
+  background: #ffffff;
 }
 
 .homework-form input[type="text"]:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .homework-content-section,
 .homework-file-section {
-  background: white;
+  background: #ffffff;
   padding: 16px;
   border-radius: 8px;
   border: 1px solid #e0e7ff;
@@ -339,11 +354,10 @@
 }
 
 .homework-content-section textarea {
-  padding: 12px 16px;
-  border: 2px solid #e5e7eb;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 14px;
-  font-family: inherit;
   resize: vertical;
   min-height: 80px;
   transition: all 0.2s ease;
@@ -353,10 +367,11 @@
 
 .homework-content-section textarea:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
+/* Стили для старого input[type="file"] (если используется) */
 .homework-file-section input[type="file"] {
   padding: 12px;
   border: 2px dashed #d1d5db;
@@ -369,8 +384,102 @@
 }
 
 .homework-file-section input[type="file"]:hover {
-  border-color: #6366f1;
-  background: #f0f4ff;
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+/* Современные стили для загрузки файла ДЗ */
+.file-upload-zone {
+  margin-top: 12px;
+  position: relative;
+}
+
+.file-input {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+  width: 0;
+  height: 0;
+}
+
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border: 3px dashed #10b981;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+  min-height: 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-upload-label:hover {
+  border-color: #059669;
+  background: linear-gradient(135deg, #dcfce7, #d1fae5);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+}
+
+.file-upload-label:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.file-upload-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  z-index: 1;
+  position: relative;
+}
+
+.file-icon {
+  font-size: 32px;
+  min-width: 32px;
+  transition: transform 0.3s ease;
+}
+
+.file-upload-label:hover .file-icon {
+  transform: scale(1.1);
+}
+
+.file-text {
+  color: #065f46;
+  font-size: 16px;
+  font-weight: 600;
+  flex: 1;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.file-upload-label:hover .file-text {
+  color: #047857;
+}
+
+.file-size {
+  color: #059669;
+  font-size: 14px;
+  font-weight: 500;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+  min-width: fit-content;
+}
+
+/* Дополнительная анимация для загруженного файла */
+.file-upload-label:has(.file-size) {
+  border-color: #059669;
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+}
+
+.file-upload-label:has(.file-size):hover {
+  background: linear-gradient(135deg, #d1fae5, #bbf7d0);
 }
 
 .homework-form .btn-secondary {
@@ -399,7 +508,7 @@
 }
 
 /* Модальное окно проведения урока */
-.modal-overlay {
+.modal-overlay.conduct-lesson-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -409,28 +518,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 9999999 !important; /* Гарантированно поверх всего, включая сайдбар */
   backdrop-filter: blur(4px);
   padding: 20px;
+  /* Компенсируем ширину сайдбара + небольшой запас */
+  padding-left: 300px;
+}
+
+@media (max-width: 768px) {
+  .modal-overlay.conduct-lesson-modal {
+    padding: 12px;
+    padding-left: 12px !important; /* На мобильных сайдбар скрыт, принудительно переопределяем */
+  }
 }
 
 .modal-content {
   background: white;
   border-radius: 16px;
   padding: 0;
-  max-width: 700px;
+  max-width: 500px; /* Еще больше уменьшена ширина */
   width: 100%;
-  max-height: 85vh;
+  max-height: 90vh; /* Увеличена высота для лучшего использования пространства */
   overflow: hidden;
   position: relative;
+  z-index: 10000000 !important; /* Еще выше чем overlay */
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
   animation: modalSlideIn 0.3s ease;
 }
 
 .modal-content.large {
-  max-width: 900px;
-  width: 95%;
-  max-height: 90vh;
+  max-width: 650px; /* Еще больше уменьшена для узких экранов */
+  width: 80%; /* Уменьшена с 85% */
+  max-height: 85vh;
 }
 
 @keyframes modalSlideIn {
@@ -448,7 +567,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 24px 28px 20px;
+  padding: 20px 24px 16px; /* Уменьшен padding */
   border-bottom: 1px solid #e9ecef;
   background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
   border-radius: 16px 16px 0 0;
@@ -488,9 +607,9 @@
 }
 
 .modal-body {
-  padding: 24px 28px;
+  padding: 20px 24px; /* Уменьшен padding */
   overflow-y: auto;
-  max-height: calc(90vh - 140px);
+  max-height: calc(90vh - 120px); /* Скорректирована под новую высоту */
 }
 
 .conduct-lesson-content {
@@ -625,32 +744,40 @@
 
 .modal-actions {
   display: flex;
-  gap: 12px;
+  gap: 8px; /* Уменьшен gap */
   justify-content: flex-end;
-  margin-top: 32px;
-  padding-top: 20px;
+  margin-top: 24px; /* Уменьшен margin */
+  padding-top: 16px; /* Уменьшен padding */
   border-top: 1px solid #e9ecef;
+  flex-wrap: wrap; /* Добавлено для лучшей адаптивности */
+  flex-direction: column; /* Кнопки вертикально по умолчанию */
+  align-items: stretch; /* Кнопки на всю ширину */
 }
 
 .modal-actions .btn-primary {
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #10b981, #059669);
+  padding: 8px 16px; /* Уменьшен padding */
+  background: #00B18F;
   color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 14px;
+  font-size: 12px; /* Уменьшен размер шрифта */
+  box-shadow: 4px 4px 0.3px #03836A;
+  white-space: nowrap; /* Предотвращает перенос текста */
+  width: 100%; /* На всю ширину */
+  text-align: center; /* Центрируем текст */
 }
 
 .modal-actions .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  background: #03836A;
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0.3px #03836A;
 }
 
 .modal-actions .btn-secondary {
-  padding: 12px 24px;
+  padding: 8px 16px; /* Уменьшен padding */
   background: #6b7280;
   color: white;
   border: none;
@@ -658,7 +785,10 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 14px;
+  font-size: 12px; /* Уменьшен размер шрифта */
+  white-space: nowrap; /* Предотвращает перенос текста */
+  width: 100%; /* На всю ширину */
+  text-align: center; /* Центрируем текст */
 }
 
 .modal-actions .btn-secondary:hover {
@@ -702,16 +832,58 @@
 }
 
 /* Адаптивные стили для модального окна */
-@media (max-width: 768px) {
-  .modal-overlay {
-    padding: 10px;
+@media (max-width: 1200px) and (min-width: 769px) {
+  .modal-overlay.conduct-lesson-modal {
+    padding-left: 260px; /* Немного уменьшен отступ */
   }
   
-  .modal-content,
+  .modal-content {
+    max-width: 500px; /* Еще больше уменьшена ширина */
+  }
+  
   .modal-content.large {
+    max-width: 580px;
+    width: 75%;
+  }
+  
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+    align-items: stretch;
+  }
+  
+  .modal-actions .btn-primary,
+  .modal-actions .btn-secondary {
     width: 100%;
-    max-width: none;
-    max-height: 95vh;
+    text-align: center;
+    padding: 10px 16px; /* Уменьшен padding для компактности */
+    font-size: 13px; /* Уменьшен размер шрифта */
+  }
+}
+
+@media (max-width: 1024px) {
+  .modal-content.large {
+    max-width: 95%;
+    width: 95%;
+  }
+  
+  .modal-body {
+    padding: 20px 24px;
+    max-height: calc(85vh - 120px);
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-overlay.conduct-lesson-modal {
+    padding: 12px;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+  
+  .modal-content.large {
+    max-width: 100%;
+    width: 100%;
+    max-height: calc(100vh - 80px);
     border-radius: 12px;
   }
   
@@ -719,12 +891,7 @@
     padding: 16px 20px;
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
-  }
-  
-  .modal-header h2 {
-    font-size: 18px;
-    margin-right: 0;
+    gap: 8px;
   }
   
   .close-modal {
@@ -736,39 +903,43 @@
   
   .modal-body {
     padding: 16px 20px;
-    max-height: calc(95vh - 120px);
+    max-height: calc(100vh - 160px);
   }
   
-  .homework-upload-section,
-  .students-grades-section {
-    padding: 16px;
+  .section-title {
+    font-size: 16px;
   }
   
-  .grade-controls {
-    grid-template-columns: 1fr;
-    gap: 12px;
+  .homework-upload-btn {
+    padding: 14px 20px;
+    font-size: 16px;
   }
   
-  .modal-actions {
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 20px;
-    padding-top: 16px;
+  /* Адаптивные стили для кнопки загрузки файла на планшетах */
+  .file-upload-label {
+    padding: 16px 20px;
+    min-height: 70px;
   }
   
-  .modal-actions .btn-primary,
-  .modal-actions .btn-secondary {
-    width: 100%;
-    justify-content: center;
+  .file-icon {
+    font-size: 28px;
+    min-width: 28px;
+  }
+  
+  .file-text {
+    font-size: 15px;
   }
 }
 
 @media (max-width: 480px) {
-  .modal-content,
+  .modal-overlay.conduct-lesson-modal {
+    padding: 8px;
+    padding-top: 20px;
+  }
+  
   .modal-content.large {
-    margin: 10px;
-    width: calc(100% - 20px);
-    max-height: calc(100vh - 20px);
+    max-height: calc(100vh - 40px);
+    border-radius: 8px;
   }
   
   .modal-header {
@@ -777,11 +948,269 @@
   
   .modal-body {
     padding: 12px 16px;
-    max-height: calc(100vh - 100px);
+    max-height: calc(100vh - 120px);
   }
   
-  .homework-upload-section,
-  .students-grades-section {
+  .homework-content-block {
     padding: 12px;
+  }
+  
+  .form-input,
+  .form-textarea {
+    padding: 12px;
+    font-size: 16px; /* Предотвращает zoom на iOS */
+  }
+  
+  /* Адаптивные стили для кнопки загрузки файла на мобильных */
+  .file-upload-label {
+    padding: 14px 16px;
+    min-height: 60px;
+    gap: 12px;
+  }
+  
+  .file-icon {
+    font-size: 24px;
+    min-width: 24px;
+  }
+  
+  .file-text {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .file-size {
+    font-size: 12px;
+    padding: 3px 6px;
+  }
+}
+
+/* Дополнительная адаптивность для узких экранов в desktop режиме */
+@media (max-width: 1000px) and (min-width: 769px) {
+  .modal-overlay.conduct-lesson-modal {
+    padding-left: 220px; /* Еще больше уменьшен отступ */
+  }
+  
+  .modal-content {
+    max-width: 500px;
+  }
+  
+  .modal-content.large {
+    max-width: 600px;
+    width: 75%;
+  }
+}
+
+/* ===== ДОПОЛНИТЕЛЬНЫЕ ИСПРАВЛЕНИЯ ДЛЯ САЙДБАРА И КНОПОК ===== */
+
+/* Специальные компактные стили для кнопок на узких экранах */
+@media (max-width: 1100px) and (min-width: 769px) {
+  .modal-actions .btn-primary,
+  .modal-actions .btn-secondary {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+  }
+  
+  .modal-actions {
+    margin-top: 20px !important;
+    padding-top: 15px !important;
+  }
+}
+
+/* Еще более компактные стили для очень узких экранов */
+@media (max-width: 950px) and (min-width: 769px) {
+  .modal-overlay.conduct-lesson-modal {
+    padding-left: 260px !important;
+  }
+  
+  .modal-content {
+    max-width: 420px !important;
+  }
+  
+  .modal-content.large {
+    max-width: 480px !important;
+    width: 65% !important;
+  }
+}
+
+/* На широких экранах кнопки могут быть горизонтально */
+@media (min-width: 1400px) {
+  .modal-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  
+  .modal-actions .btn-primary,
+  .modal-actions .btn-secondary {
+    width: auto;
+    min-width: 120px;
+  }
+}
+
+/* Стили для кнопок в виджете event-details */
+.event-actions {
+  display: flex;
+  flex-direction: column; /* Кнопки друг под другом */
+  gap: 8px;
+  margin-top: 16px;
+  align-items: stretch; /* Кнопки на всю ширину */
+}
+
+.event-actions .btn-primary {
+  padding: 8px 12px; /* Компактные кнопки */
+  background: #00B18F;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 12px; /* Маленький шрифт */
+  box-shadow: 3px 3px 0.2px #03836A;
+  white-space: nowrap;
+  width: 100%; /* На всю ширину контейнера */
+  text-align: center;
+}
+
+.event-actions .btn-primary:hover {
+  background: #03836A;
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0.2px #03836A;
+}
+
+.event-actions .btn-secondary {
+  padding: 8px 12px; /* Компактные кнопки */
+  background: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 12px; /* Маленький шрифт */
+  white-space: nowrap;
+  width: 100%; /* На всю ширину контейнера */
+  text-align: center;
+}
+
+.event-actions .btn-secondary:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+/* ===== СТИЛИ ДЛЯ МОДАЛЬНОГО ОКНА РЕДАКТИРОВАНИЯ ВРЕМЕНИ ===== */
+
+.time-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.form-control {
+  padding: 10px 12px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #00B18F;
+  box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1);
+}
+
+.form-control:invalid {
+  border-color: #ef4444;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.form-actions .btn-primary,
+.form-actions .btn-secondary {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  min-width: 140px;
+}
+
+.form-actions .btn-primary {
+  background: #00B18F;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 177, 143, 0.2);
+}
+
+.form-actions .btn-primary:hover:not(:disabled) {
+  background: #03836A;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 177, 143, 0.3);
+}
+
+.form-actions .btn-primary:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.form-actions .btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.form-actions .btn-secondary:hover:not(:disabled) {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+.form-actions .btn-secondary:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.modal-content.medium {
+  max-width: 500px;
+  width: 90%;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .btn-primary,
+  .form-actions .btn-secondary {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .modal-content.medium {
+    max-width: 95%;
+    margin: 20px auto;
   }
 }

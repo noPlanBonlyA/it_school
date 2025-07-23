@@ -49,10 +49,10 @@ export default function SchedulePage() {
     title: `${e.lesson_name} (${e.course_name})`,
     start: e.start_datetime || e.start,
     end: e.end_datetime || e.end,
-    backgroundColor: e.is_opened ? '#22c55e' : 
-                     new Date() < new Date(e.start_datetime || e.start) ? '#f59e0b' : '#ef4444',
-    borderColor: e.is_opened ? '#16a34a' : 
-                 new Date() < new Date(e.start_datetime || e.start) ? '#d97706' : '#dc2626',
+    backgroundColor: e.is_opened ? '#00B18F' : 
+                     new Date() < new Date(e.start_datetime || e.start) ? '#FFC107' : '#EF4444',
+    borderColor: e.is_opened ? '#03836A' : 
+                 new Date() < new Date(e.start_datetime || e.start) ? '#D39E00' : '#DC2626',
     extendedProps: {
       originalEvent: e,
       lesson_name: e.lesson_name,

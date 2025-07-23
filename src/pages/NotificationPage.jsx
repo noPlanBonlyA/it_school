@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import SmartTopBar from '../components/SmartTopBar';
 import { useAuth } from '../contexts/AuthContext';
+import '../styles/NotificationPage.css';
 import { 
   createNotificationForAllStudents, 
   createNotificationForStudent,
@@ -14,7 +15,6 @@ import { getAllGroups } from '../services/groupService';
 import api from '../api/axiosInstance';
 
 export default function NotificationPage() {
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   // Состояния формы
@@ -172,17 +172,14 @@ export default function NotificationPage() {
     }
   };
 
-  const fullName = [user.first_name, user.surname, user.patronymic]
-    .filter(Boolean).join(' ');
-
   if (loading) {
     return (
-      <div className="app-layout">
+      <div className="notification-app">
         <Sidebar activeItem="broadcast" userRole={user.role} />
-        <div className="main-content">
+        <div className="notification-main-content">
           <SmartTopBar pageTitle="Рассылка уведомлений" />
-          <div style={{ padding: '40px', textAlign: 'center' }}>
-            <div>Загрузка данных...</div>
+          <div className="loading-container">
+            <div className="loading-text">Загрузка данных...</div>
           </div>
         </div>
       </div>
@@ -190,237 +187,210 @@ export default function NotificationPage() {
   }
 
   return (
-    <div className="app-layout">
+    <div className="notification-app">
       <Sidebar activeItem="broadcast" userRole={user.role} />
-      <div className="main-content">
+      <div className="notification-main-content">
         <SmartTopBar pageTitle="Рассылка уведомлений" />
 
-        <div style={{ padding: '24px', maxWidth: '800px' }}>
-          {/* Убираем дублирующий заголовок, так как он теперь в TopBar */}
+        <div className="notification-page-container">
+          <div className="notification-header">
+            <h1 className="notification-title">📢 Рассылка уведомлений</h1>
+            <p className="notification-subtitle">Отправьте важные сообщения студентам, преподавателям или администраторам</p>
+          </div>
 
-          {/* Отладочная кнопка */}
-          <div style={{ marginBottom: '20px' }}>
+          <div className="notification-content">
+            {/* Отладочная кнопка */}
             <button
               onClick={handleDebugStudents}
-              style={{
-                padding: '8px 16px',
-                background: '#6f42c1',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
+              className="debug-toggle"
             >
               🔍 Отладка студентов
             </button>
-          </div>
 
-          <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            
-            {/* Тип отправки */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-                Кому отправить:
-              </label>
-              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    type="radio"
-                    value="all"
-                    checked={sendType === 'all'}
-                    onChange={(e) => setSendType(e.target.value)}
-                  />
-                  Всем студентам
+            <div className="notification-form-card">
+              {/* Тип отправки */}
+              <div className="form-section">
+                <label className="form-label">
+                  👥 Кому отправить:
                 </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    type="radio"
-                    value="student"
-                    checked={sendType === 'student'}
-                    onChange={(e) => setSendType(e.target.value)}
-                  />
-                  Конкретному студенту
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    type="radio"
-                    value="group"
-                    checked={sendType === 'group'}
-                    onChange={(e) => setSendType(e.target.value)}
-                  />
-                  Группе
-                </label>
-              </div>
-            </div>
-
-            {/* Выбор студента */}
-            {sendType === 'student' && (
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-                  Выберите студента:
-                </label>
-                <select
-                  value={selectedStudentId}
-                  onChange={(e) => setSelectedStudentId(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
-                >
-                  <option value="">-- Выберите студента --</option>
-                  {students.map(student => (
-                    <option key={student.id} value={student.id}>
-                      {`${student.user?.first_name || ''} ${student.user?.surname || ''}`.trim() || student.user?.username || 'Без имени'}
-                      {student.user?.username && ` (${student.user.username})`}
-                    </option>
-                  ))}
-                </select>
-                {students.length === 0 && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                    Студенты не найдены
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Выбор группы */}
-            {sendType === 'group' && (
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-                  Выберите группу:
-                </label>
-                <select
-                  value={selectedGroupId}
-                  onChange={(e) => setSelectedGroupId(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
-                  }}
-                >
-                  <option value="">-- Выберите группу --</option>
-                  {groups.map(group => (
-                    <option key={group.id} value={group.id}>
-                      {group.name}
-                    </option>
-                  ))}
-                </select>
-                {groups.length === 0 && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                    Группы не найдены
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Текст уведомления */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-                Текст уведомления:
-              </label>
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Введите текст уведомления..."
-                style={{
-                  width: '100%',
-                  minHeight: '120px',
-                  padding: '12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  resize: 'vertical',
-                  fontFamily: 'inherit'
-                }}
-              />
-              <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                Символов: {message.length}
-              </div>
-            </div>
-
-            {/* Кнопка отправки */}
-            <button
-              onClick={handleSendNotification}
-              disabled={sending || !message.trim()}
-              style={{
-                padding: '12px 24px',
-                background: sending ? '#ccc' : '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: sending ? 'not-allowed' : 'pointer',
-                fontSize: '16px',
-                fontWeight: '500'
-              }}
-            >
-              {sending ? 'Отправка...' : 'Отправить уведомление'}
-            </button>
-
-            {/* Результат отправки */}
-            {result && (
-              <div style={{
-                marginTop: '20px',
-                padding: '16px',
-                borderRadius: '4px',
-                background: result.type === 'success' ? '#d4edda' : '#f8d7da',
-                border: `1px solid ${result.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`,
-                color: result.type === 'success' ? '#155724' : '#721c24'
-              }}>
-                <h4 style={{ margin: '0 0 8px 0' }}>{result.title}</h4>
-                <p style={{ margin: '0 0 8px 0' }}>{result.details}</p>
-                
-                {result.data && result.data.errors && result.data.errors.length > 0 && (
-                  <details style={{ marginTop: '12px' }}>
-                    <summary style={{ cursor: 'pointer', fontWeight: '500' }}>
-                      Ошибки отправки ({result.data.errors.length})
-                    </summary>
-                    <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
-                      {result.data.errors.map((error, index) => (
-                        <li key={index}>
-                          {error.studentName}: {error.error}
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                )}
-
-                {result.data && result.data.notifications && result.data.notifications.length > 0 && (
-                  <details style={{ marginTop: '12px' }}>
-                    <summary style={{ cursor: 'pointer', fontWeight: '500' }}>
-                      Успешно отправлено ({result.data.notifications.length})
-                    </summary>
-                    <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
-                      {result.data.notifications.slice(0, 10).map((notification, index) => (
-                        <li key={index}>
-                          {notification.studentName}
-                        </li>
-                      ))}
-                      {result.data.notifications.length > 10 && (
-                        <li>... и ещё {result.data.notifications.length - 10}</li>
-                      )}
-                    </ul>
-                  </details>
-                )}
-              </div>
-            )}
-
-            {/* Статистика */}
-            <div style={{
-              marginTop: '24px',
-              padding: '16px',
-              background: '#f8f9fa',
-              borderRadius: '4px',
-              border: '1px solid #dee2e6'
-            }}>
-              <h4 style={{ margin: '0 0 12px 0' }}>Статистика:</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                <div>
-                  <strong>Студентов в системе:</strong> {students.length}
+                <div className="radio-group">
+                  <label className="radio-option">
+                    <input
+                      type="radio"
+                      value="all"
+                      checked={sendType === 'all'}
+                      onChange={(e) => setSendType(e.target.value)}
+                    />
+                    <span className="radio-custom"></span>
+                    <span className="radio-label">📚 Всем студентам</span>
+                  </label>
+                  <label className="radio-option">
+                    <input
+                      type="radio"
+                      value="student"
+                      checked={sendType === 'student'}
+                      onChange={(e) => setSendType(e.target.value)}
+                    />
+                    <span className="radio-custom"></span>
+                    <span className="radio-label">👤 Конкретному студенту</span>
+                  </label>
+                  <label className="radio-option">
+                    <input
+                      type="radio"
+                      value="group"
+                      checked={sendType === 'group'}
+                      onChange={(e) => setSendType(e.target.value)}
+                    />
+                    <span className="radio-custom"></span>
+                    <span className="radio-label">👥 Группе</span>
+                  </label>
                 </div>
-                <div>
-                  <strong>Групп в системе:</strong> {groups.length}
+              </div>
+
+              {/* Выбор студента */}
+              {sendType === 'student' && (
+                <div className="form-section">
+                  <label className="form-label">
+                    👤 Выберите студента:
+                  </label>
+                  <select
+                    value={selectedStudentId}
+                    onChange={(e) => setSelectedStudentId(e.target.value)}
+                    className="form-select"
+                  >
+                    <option value="">-- Выберите студента --</option>
+                    {students.map(student => (
+                      <option key={student.id} value={student.id}>
+                        {`${student.user?.first_name || ''} ${student.user?.surname || ''}`.trim() || student.user?.username || 'Без имени'}
+                        {student.user?.username && ` (${student.user.username})`}
+                      </option>
+                    ))}
+                  </select>
+                  {students.length === 0 && (
+                    <div className="form-help-text">
+                      Студенты не найдены
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Выбор группы */}
+              {sendType === 'group' && (
+                <div className="form-section">
+                  <label className="form-label">
+                    👥 Выберите группу:
+                  </label>
+                  <select
+                    value={selectedGroupId}
+                    onChange={(e) => setSelectedGroupId(e.target.value)}
+                    className="form-select"
+                  >
+                    <option value="">-- Выберите группу --</option>
+                    {groups.map(group => (
+                      <option key={group.id} value={group.id}>
+                        {group.name}
+                      </option>
+                    ))}
+                  </select>
+                  {groups.length === 0 && (
+                    <div className="form-help-text">
+                      Группы не найдены
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Текст уведомления */}
+              <div className="form-section">
+                <label className="form-label">
+                  💬 Текст уведомления:
+                </label>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Введите текст уведомления..."
+                  className="form-textarea"
+                  rows={6}
+                />
+                <div className="form-help-text">
+                  Символов: {message.length}
+                </div>
+              </div>
+
+              {/* Кнопка отправки */}
+              <button
+                onClick={handleSendNotification}
+                disabled={sending || !message.trim()}
+                className="send-button"
+              >
+                {sending ? (
+                  <span className="button-loading">
+                    <span className="loading-spinner"></span>
+                    Отправляем...
+                  </span>
+                ) : (
+                  <span>🚀 Отправить уведомление</span>
+                )}
+              </button>
+
+              {/* Результат отправки */}
+              {result && (
+                <div className={`result-card ${result.type === 'success' ? 'success' : 'error'}`}>
+                  <div className="result-icon">
+                    {result.type === 'success' ? '✅' : '❌'}
+                  </div>
+                  <div className="result-content">
+                    <h3 className="result-title">{result.title}</h3>
+                    <p className="result-message">{result.details}</p>
+                    
+                    {result.data && result.data.errors && result.data.errors.length > 0 && (
+                      <details className="result-details">
+                        <summary className="details-summary">
+                          Ошибки отправки ({result.data.errors.length})
+                        </summary>
+                        <ul className="details-list">
+                          {result.data.errors.map((error, index) => (
+                            <li key={index}>
+                              {error.studentName}: {error.error}
+                            </li>
+                          ))}
+                        </ul>
+                      </details>
+                    )}
+
+                    {result.data && result.data.notifications && result.data.notifications.length > 0 && (
+                      <details className="result-details">
+                        <summary className="details-summary">
+                          Успешно отправлено ({result.data.notifications.length})
+                        </summary>
+                        <ul className="details-list">
+                          {result.data.notifications.slice(0, 10).map((notification, index) => (
+                            <li key={index}>
+                              {notification.studentName}
+                            </li>
+                          ))}
+                          {result.data.notifications.length > 10 && (
+                            <li>... и ещё {result.data.notifications.length - 10}</li>
+                          )}
+                        </ul>
+                      </details>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Статистика */}
+              <div className="stats-card">
+                <h3 className="stats-title">📊 Статистика</h3>
+                <div className="stats-grid">
+                  <div className="stat-item">
+                    <span className="stat-label">Студентов в системе:</span>
+                    <span className="stat-value">{students.length}</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Групп в системе:</span>
+                    <span className="stat-value">{groups.length}</span>
+                  </div>
                 </div>
               </div>
             </div>

@@ -13,7 +13,7 @@ import {
   getLessonStudentDetails,
   updateLessonStudent
 } from '../services/homeworkService';
-import { createNotificationForStudent } from '../services/notificationService';
+import { updateStudentPoints, getAllStudents } from '../services/ratingService';
 
 export default function HomeworkPage() {
   const { user } = useAuth();
@@ -154,6 +154,9 @@ export default function HomeworkPage() {
       ));
       
       setExpandedSubmission(studentId);
+      
+      // Плавный скролл к кнопкам через небольшую задержку
+      scrollToButtons('.submission-details');
     } catch (error) {
       console.error('[Homework] Error loading student details:', error);
       alert('Ошибка загрузки деталей студента');
@@ -178,6 +181,9 @@ export default function HomeworkPage() {
       ));
       
       setExpandedArchiveStudent(studentId);
+      
+      // Плавный скролл к кнопкам архива через небольшую задержку
+      scrollToButtons('.archive-details');
     } catch (error) {
       console.error('[Homework] Error loading archive student details:', error);
       alert('Ошибка загрузки деталей студента из архива');
@@ -196,29 +202,11 @@ export default function HomeworkPage() {
     try {
       console.log('[Homework] Ungrading homework for student:', studentId);
       
-      // 1. Убираем бесткоины из общего счета студента
+      // 1. Обновляем баллы за ДЗ (убираем из системы ДЗ)
+      // ПРИМЕЧАНИЕ: Обновление общего баланса студента временно отключено 
+      // из-за ограничений API (учитель не имеет прав на прямое обновление профиля студента)
       if (student.coins_for_homework > 0) {
-        try {
-          const studentProfileId = student.student?.id || student.student_id;
-          
-          if (studentProfileId) {
-            // Получаем текущие данные студента
-            const studentResponse = await api.get(`/students/${studentProfileId}`);
-            const currentPoints = studentResponse.data.points || 0;
-            const newPoints = Math.max(0, currentPoints - student.coins_for_homework);
-
-            // Обновляем баланс студента
-            await api.patch(`/students/${studentProfileId}`, {
-              points: newPoints
-            });
-
-            console.log(`[Homework] Removed ${student.coins_for_homework} coins from student ${studentProfileId}. Total: ${newPoints}`);
-          }
-        } catch (pointsError) {
-          console.error('[Homework] Error updating student points:', pointsError);
-          alert('Ошибка обновления баланса студента');
-          return;
-        }
+        console.log(`[Homework] Removing ${student.coins_for_homework} coins from homework (general balance update disabled due to API permissions)`);
       }
 
       // 2. Сбрасываем оценку в базе данных
@@ -278,7 +266,7 @@ export default function HomeworkPage() {
 
       setExpandedArchiveStudent(null);
       
-      alert(`Оценка отменена! ${student.coins_for_homework > 0 ? `Убрано ${student.coins_for_homework} бесткоинов. ` : ''}Домашка возвращена в активные.`);
+      alert(`Оценка отменена! Домашка возвращена в активные.`);
       
     } catch (error) {
       console.error('[Homework] Error ungrading homework:', error);
@@ -350,30 +338,11 @@ export default function HomeworkPage() {
       await updateLessonStudent(studentId, updateData);
       console.log(`[Homework] Updated lesson student ${studentId} with ${coinsToAdd} coins`);
 
-      // 2. Прибавляем бесткоины к общему счету студента
+      // 2. Начисляем бесткоины за ДЗ (сохраняется в системе ДЗ)
+      // ПРИМЕЧАНИЕ: Обновление общего баланса студента временно отключено 
+      // из-за ограничений API (учитель не имеет прав на прямое обновление профиля студента)
       if (coinsToAdd > 0) {
-        try {
-          const studentProfileId = student.student?.id || student.student_id;
-          
-          if (!studentProfileId) {
-            console.error('[Homework] Student profile ID not found:', student);
-            throw new Error('Student profile ID not found');
-          }
-
-          // Получаем текущие данные студента
-          const studentResponse = await api.get(`/students/${studentProfileId}`);
-          const currentPoints = studentResponse.data.points || 0;
-          const newPoints = currentPoints + coinsToAdd;
-
-          // Обновляем баланс студента
-          await api.patch(`/students/${studentProfileId}`, {
-            points: newPoints
-          });
-
-          console.log(`[Homework] Added ${coinsToAdd} coins to student ${studentProfileId}. Total: ${newPoints}`);
-        } catch (pointsError) {
-          console.error('[Homework] Error updating student points:', pointsError);
-        }
+        console.log(`[Homework] Coins for homework saved: ${coinsToAdd} (general balance update disabled due to API permissions)`);
       }
 
       // 3. Отправляем уведомление с правильным student ID
@@ -489,6 +458,64 @@ export default function HomeworkPage() {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  // ===== НОВОЕ: useEffect для обработки индикаторов скролла =====
+  useEffect(() => {
+    const checkScrollIndicators = () => {
+      // Проверяем основные детали домашек
+      const submissionDetails = document.querySelector('.submission-details');
+      if (submissionDetails) {
+        const hasScroll = submissionDetails.scrollHeight > submissionDetails.clientHeight;
+        if (hasScroll) {
+          submissionDetails.classList.add('has-scroll');
+        } else {
+          submissionDetails.classList.remove('has-scroll');
+        }
+      }
+
+      // Проверяем архивные детали
+      const archiveDetails = document.querySelector('.archive-details');
+      if (archiveDetails) {
+        const hasScroll = archiveDetails.scrollHeight > archiveDetails.clientHeight;
+        if (hasScroll) {
+          archiveDetails.classList.add('has-scroll');
+        } else {
+          archiveDetails.classList.remove('has-scroll');
+        }
+      }
+    };
+
+    // Проверяем сразу и с небольшой задержкой для правильного рендеринга
+    checkScrollIndicators();
+    const timer = setTimeout(checkScrollIndicators, 100);
+
+    return () => clearTimeout(timer);
+  }, [expandedSubmission, expandedArchiveStudent, students]);
+
+  // ===== НОВОЕ: Функция плавного скролла к кнопкам =====
+  const scrollToButtons = (elementSelector) => {
+    setTimeout(() => {
+      const element = document.querySelector(elementSelector);
+      if (element) {
+        const buttons = element.querySelector('.details-buttons, .archive-buttons');
+        if (buttons) {
+          buttons.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'nearest',
+            inline: 'nearest'
+          });
+        }
+        
+        // Скрываем подсказку о скролле через 3 секунды
+        const scrollHint = element.querySelector('.scroll-hint');
+        if (scrollHint) {
+          setTimeout(() => {
+            scrollHint.classList.add('fade-out');
+          }, 3000);
+        }
+      }
+    }, 300); // Небольшая задержка для правильного рендеринга
   };
 
   if (loading) {
@@ -629,6 +656,9 @@ export default function HomeworkPage() {
                         
                         {expandedSubmission === student.id && (
                           <div className="submission-details">
+                            {/* Подсказка о скролле */}
+                            <div className="scroll-hint">Прокрутите до кнопок</div>
+                            
                             {/* Файлы домашки */}
                             {student.details?.passed_homeworks && student.details.passed_homeworks.length > 0 && (
                               <div className="homework-files">
@@ -766,6 +796,9 @@ export default function HomeworkPage() {
                         
                         {expandedArchiveStudent === student.id && (
                           <div className="archive-details">
+                            {/* Подсказка о скролле */}
+                            <div className="scroll-hint">Прокрутите до кнопок</div>
+                            
                             {/* Информация об оценке */}
                             <div className="grade-info">
                               <div className="grade-summary">

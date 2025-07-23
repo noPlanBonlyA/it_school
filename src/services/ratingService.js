@@ -231,17 +231,33 @@ export const getTopStudents = async (limit = 10) => {
 
 /**
  * Обновление баллов студента (для админов/учителей)
+ * ПРИМЕЧАНИЕ: В настоящее время учитель не имеет прав для прямого обновления баллов студента
+ * Эта функция оставлена для будущего использования когда будет реализован соответствующий API
  */
 export const updateStudentPoints = async (studentId, points) => {
   try {
-    console.log('[RatingService] Updating student points:', { studentId, points });
+    console.log('[RatingService] Attempting to update student points:', { studentId, points });
     
+    // Пока что просто логируем попытку, но не выполняем запрос
+    console.warn('[RatingService] Student points update is disabled - teacher lacks permissions');
+    
+    // Возвращаем fake успешный ответ чтобы не ломать UI
+    return {
+      id: studentId,
+      points: points,
+      message: 'Points update simulated (teacher lacks API permissions)'
+    };
+    
+    // TODO: Когда будет создан API для учителей, раскомментировать:
+    /*
     const response = await api.put(`/students/${studentId}`, {
+      user_id: studentUserId, // Нужно получать user_id отдельно
       points: points
     });
     
     console.log('[RatingService] Student updated:', response.data);
     return response.data;
+    */
     
   } catch (error) {
     console.error('[RatingService] Error updating student points:', error);

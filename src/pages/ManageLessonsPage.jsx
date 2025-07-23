@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { getCourseLessons, deleteLessonWithMaterials } from '../services/lessonService';
 import { getCourse } from '../services/courseService';
 import '../styles/LessonEditor.css';
+import '../styles/ManageUserPage.css'; // Фирменные стили кнопок
 
 export default function ManageLessonsPage() {
   const { courseId } = useParams();
@@ -56,8 +57,7 @@ export default function ManageLessonsPage() {
     try {
       await deleteLessonWithMaterials(courseId, lesson.id, {
         teacher_material_id: lesson.teacher_material_id,
-        student_material_id: lesson.student_material_id,
-        homework_material_id: lesson.homework_id
+        student_material_id: lesson.student_material_id
       });
       
       await loadData();
@@ -165,9 +165,6 @@ export default function ManageLessonsPage() {
                           )}
                           {lesson.student_material && (
                             <span className="material-badge student">👨‍🎓 Студент</span>
-                          )}
-                          {lesson.homework && (
-                            <span className="material-badge homework">📝 Задание</span>
                           )}
                         </div>
                       </div>

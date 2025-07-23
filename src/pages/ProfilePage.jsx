@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
+import AttendanceWidget from '../components/AttendanceWidget';
 import { getMe } from '../services/userService';
 import api from '../api/axiosInstance';
 import '../styles/ProfilePage.css';
@@ -44,33 +45,43 @@ export default function ProfilePage() {
 
   // Загрузка аватара
   const handleUploadAvatar = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || !user?.id) return;
 
     try {
       setUploading(true);
       
-      // Создаем FormData как для курсов
+      console.log('[ProfilePage] Uploading avatar for user ID:', user.id);
+      
+      // Создаем FormData по стандарту API
       const formData = new FormData();
       
-      // Добавляем файл под именем 'avatar' (или как требует API)
-      formData.append('avatar', selectedFile);
-      
-      // Также добавляем метаданные фото в JSON формате
-      const photoMetadata = {
-        name: selectedFile.name,
-        type: selectedFile.type,
-        size: selectedFile.size
+      // Создаем объект с данными пользователя (все обязательные поля)
+      const userData = {
+        username: user.username,
+        first_name: user.first_name,
+        surname: user.surname,
+        patronymic: user.patronymic || '',
+        email: user.email,
+        birth_date: user.birth_date,
+        role: user.role,
+        phone_number: user.phone_number || ''
       };
-      formData.append('photo', JSON.stringify(photoMetadata));
+      
+      // Добавляем данные пользователя как JSON
+      formData.append('user_data', JSON.stringify(userData));
+      
+      // Добавляем изображение под именем 'image' (как в API)
+      formData.append('image', selectedFile);
 
-      console.log('[ProfilePage] Uploading avatar:', {
+      console.log('[ProfilePage] Form data prepared:', {
+        userData,
         fileName: selectedFile.name,
         fileSize: selectedFile.size,
         fileType: selectedFile.type
       });
 
-      // Отправляем через api instance (который автоматически добавит токен)
-      const response = await api.patch('/users/me/avatar', formData, {
+      // Отправляем через правильный эндпоинт
+      const response = await api.put(`/users/${user.id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -108,16 +119,24 @@ export default function ProfilePage() {
   const getAvatarUrl = () => {
     if (previewUrl) return previewUrl;
     
-    if (user?.avatar?.url) {
+    // По API документации фото пользователя находится в поле 'photo'
+    if (user?.photo?.url) {
       // Если URL уже полный - используем как есть
+      if (user.photo.url.startsWith('http')) {
+        return user.photo.url;
+      }
+      // Если относительный путь - добавляем базовый URL
+      return `${window.location.protocol}//${window.location.hostname}:8080${user.photo.url}`;
+    }
+    
+    // Fallback к старым полям или дефолтной картинке
+    if (user?.avatar?.url) {
       if (user.avatar.url.startsWith('http')) {
         return user.avatar.url;
       }
-      // Если относительный путь - добавляем базовый URL
       return `${window.location.protocol}//${window.location.hostname}:8080${user.avatar.url}`;
     }
     
-    // Fallback к старому полю или дефолтной картинке
     return user?.avatar_url || '/img/default-avatar.svg';
   };
 
@@ -201,8 +220,14 @@ export default function ProfilePage() {
               <ReadOnlyField label="🎂 Дата рождения" value={birthDate}  />
               <ReadOnlyField label="📧 Почта"         value={user.email || '—'} />
               <ReadOnlyField label="📱 Телефон"       value={user.phone_number || '—'} />
-              <ReadOnlyField label="🎭 Роль"          value={user.role || '—'} />
             </div>
+
+            {/* Виджет посещаемости для студентов */}
+            {user.role === 'student' && (
+              <div className="attendance-section">
+                <AttendanceWidget userId={user.id} />
+              </div>
+            )}
           </div>
         </div>
       </div>

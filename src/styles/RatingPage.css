@@ -800,7 +800,8 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* Используем фирменный зеленый стиль из ManageUserPage.css */
+  background: #00B18F;
   color: white;
   border: none;
   padding: 14px 28px;
@@ -809,13 +810,14 @@
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  box-shadow: 4px 4px 0.3px #03836A;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  background: #03836A;
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0.3px #03836A;
 }
 
 /* Новые стили для улучшенного рейтинга */

@@ -7,6 +7,7 @@
   border-right: 1px solid #E0E0E0;
   display: flex;
   flex-direction: column;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
 }
 
 
@@ -23,8 +24,10 @@
 
 .divider {
   border: none;
-  border-top: 1px solid #E0E0E0;
+  border-top: 1px solid rgba(0, 177, 143, 0.2);
   margin: 32px 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 177, 143, 0.3) 50%, transparent 100%);
+  height: 1px;
 }
 
 .sidebar-item {
@@ -35,7 +38,9 @@
   border-left: 3px solid transparent;
   cursor: pointer;
   opacity: 0.3;
-  transition: opacity .2s, border-color .2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
+  position: relative;
 }
 
 .sidebar-item:last-child {
@@ -59,66 +64,40 @@
 
 .sidebar-item:hover {
   opacity: 0.8;
+  background: rgba(0, 177, 143, 0.08);
+  border-radius: 8px;
+  transform: translateX(2px);
 }
 
 .sidebar-item.active {
   opacity: 1;
-  border-left-color: #4880FF;
+  border-left-color: #00B18F;
+  background: linear-gradient(90deg, rgba(0, 177, 143, 0.15) 0%, rgba(0, 177, 143, 0.05) 100%);
+  border-radius: 8px;
+  box-shadow: 2px 2px 8px rgba(0, 177, 143, 0.1);
 }
 
 .sidebar-item.active .icon,
 .sidebar-item.active .label {
-  color: #202224;
+  color: #00B18F;
 }
 
-
-.sidebar-item.active .icon,
-.sidebar-item.active .label {
-  color: #4880FF;
-}
-
-.sidebar-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  border-left: 3px solid transparent;
-  cursor: pointer;
-  opacity: 0.3;
-  transition: opacity .2s, border-color .2s;
-}
-
-.sidebar-item .icon {
-  width: 22px;
-  height: 22px;
-  margin-right: 12px;
-  /* если SVG – можно оставить цвет в SVG, если PNG – он уже готовый */
-}
-
-.sidebar-item .label {
-  font-family: 'Nunito Sans', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  color: #202224;
-}
-
-/* … активный и hover … */
-
-.sidebar-item:hover {
-  opacity: 0.8;
-}
-
-.sidebar-item.active {
-  opacity: 1;
-  border-left-color: #4880FF;
-}
 .logo {
   font-family: 'Nunito Sans', sans-serif;
   font-weight: 800;
   font-size: 32px;
-  color: #4880FF;
+  background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 48px;
-  cursor: pointer; /* <-- сюда */
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 2px 4px rgba(0, 177, 143, 0.3));
 }
 
 /* Стили для мобильного бургер-меню */
@@ -151,7 +130,7 @@
 .mobile-menu-toggle span {
   width: 20px;
   height: 2px;
-  background: #4880FF;
+  background: #00B18F;
   border-radius: 1px;
   transition: all 0.3s ease;
   transform-origin: center;
@@ -221,12 +200,12 @@
   }
   
   .sidebar-item:hover {
-    background: rgba(72, 128, 255, 0.1);
+    background: rgba(0, 177, 143, 0.1);
     transform: translateX(4px);
   }
   
   .sidebar-item.active {
-    background: rgba(72, 128, 255, 0.15);
+    background: rgba(0, 177, 143, 0.15);
     border-left: none;
   }
   
@@ -238,7 +217,7 @@
     transform: translateY(-50%);
     width: 4px;
     height: 24px;
-    background: #4880FF;
+    background: #00B18F;
     border-radius: 0 2px 2px 0;
   }
   

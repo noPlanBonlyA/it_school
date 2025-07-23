@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate }                from 'react-router-dom';
 import Sidebar                        from '../components/Sidebar';
 import SmartTopBar from '../components/SmartTopBar';
+import StudentDetailView from '../components/StudentDetailView';
 import { useAuth }                    from '../contexts/AuthContext';
 
 import {
@@ -33,7 +34,7 @@ export default function ManageStudentsPage() {
   const [form, setForm] = useState({
     first_name:'', surname:'', patronymic:'',
     birth_date:'', email:'',  phone_number:'',
-    password:'',   points:0
+    password:'',   points:''
   });
   const [errors, setErrors] = useState({}); // eslint-disable-line no-unused-vars
   const [edit  , setEdit  ] = useState(null);
@@ -41,6 +42,8 @@ export default function ManageStudentsPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [busyCreate, setBusyCreate] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
   /* ---------- загрузка ---------- */
   useEffect(()=>{ load(); },[]);
@@ -93,14 +96,14 @@ export default function ManageStudentsPage() {
         email: form.email,
         phone_number: form.phone_number,
         password: form.password,
-        points: +form.points || 0
+        points: form.points === '' ? 0 : +form.points
       });
       
       alert('Студент создан');
 
       setStudents(prev=>[...prev,{ user: result.user, student: result.student }]);
       setForm({ first_name:'',surname:'',patronymic:'',birth_date:'',
-                email:'',phone_number:'',password:'',points:0 });
+                email:'',phone_number:'',password:'',points:'' });
     }catch(e){
       if(e.response?.data?.username) setErrors({ username:e.response.data.username });
       else alert('Ошибка создания');
@@ -117,6 +120,13 @@ export default function ManageStudentsPage() {
       points: o.student.points
     });
     setSearch('');
+  };
+
+  /* ---------- просмотр деталей ---------- */
+  const viewDetails = (student) => {
+    console.log('viewDetails called with:', student);
+    setSelectedStudent(student);
+    setShowDetail(true);
   };
 
   /* ---------- СОХРАНЕНИЕ ---------- */
@@ -138,7 +148,7 @@ export default function ManageStudentsPage() {
       // 2. Обновляем студенческий профиль с полными данными
       await updateStudent(edit.studentId, { 
         user_id: edit.id,        // ID пользователя
-        points: edit.points,     // Очки
+        points: edit.points === '' ? 0 : +edit.points,     // Очки
         id: edit.studentId       // ID студенческого профиля
       });
       
@@ -194,8 +204,10 @@ export default function ManageStudentsPage() {
             ))}
             <div className="field">
               <label>Очки</label>
-              <input type="number" value={form.points}
-                     onChange={e=>setForm(s=>({...s,points:+e.target.value}))}/>
+              <input type="number" 
+                     value={form.points}
+                     placeholder="0"
+                     onChange={e=>setForm(s=>({...s,points:e.target.value}))}/>
             </div>
             <div className="buttons" style={{gridColumn:'1 / -1'}}>
               <button className="btn-primary" onClick={()=>setShowCreate(true)}>Создать</button>
@@ -211,15 +223,31 @@ export default function ManageStudentsPage() {
               <input placeholder="Поиск по логину или ФИО"
                      value={search} onChange={e=>setSearch(e.target.value)}
                      onFocus={()=>setShowSug(true)}
-                     onBlur={()=>setTimeout(()=>setShowSug(false),200)}/>
+                     onBlur={()=>setTimeout(()=>setShowSug(false),300)}/>
               {showSug && filtered.length>0 && (
                 <ul className="suggestions">
                   {filtered.map(o=>{
                     const u=o.user;
                     const fio=[u.first_name,u.surname,u.patronymic].filter(Boolean).join(' ');
                     return (
-                      <li key={u.id} onClick={()=>select(o)}>
-                        {u.username||'(без логина)'} — {fio||'(ФИО не заполнено)'}
+                      <li key={u.id} className="suggestion-item">
+                        <div className="suggestion-info" onClick={()=>select(o)}>
+                          {u.username||'(без логина)'} — {fio||'(ФИО не заполнено)'}
+                        </div>
+                        <button 
+                          className="view-details-btn"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            viewDetails(o);
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          title="Подробная информация"
+                        >
+                          👁️
+                        </button>
                       </li>
                     );
                   })}
@@ -247,11 +275,16 @@ export default function ManageStudentsPage() {
               </div>
               <div className="field">
                 <label>Очки</label>
-                <input type="number" value={edit.points}
-                       onChange={e=>setEdit(s=>({...s,points:+e.target.value}))}/>
+                <input type="number" 
+                       value={edit.points}
+                       placeholder="0"
+                       onChange={e=>setEdit(s=>({...s,points:e.target.value}))}/>
               </div>
               <div className="buttons" style={{gridColumn:'1 / -1'}}>
                 <button className="btn-primary" onClick={save}>Сохранить</button>
+                <button className="btn-info" onClick={() => viewDetails({user: edit, student: {id: edit.studentId, points: edit.points}})}>
+                  Подробная информация
+                </button>
                 <button className="btn-danger"  onClick={()=>setShowDelete(true)}>Удалить</button>
               </div>
             </div>
@@ -282,6 +315,17 @@ export default function ManageStudentsPage() {
               </div>
             </div>
           </div>
+        )}
+        
+        {/* ---------- детальный просмотр студента ---------- */}
+        {showDetail && selectedStudent && (
+          <StudentDetailView 
+            student={selectedStudent} 
+            onClose={() => {
+              setShowDetail(false);
+              setSelectedStudent(null);
+            }} 
+          />
         )}
       </div>
     </div>

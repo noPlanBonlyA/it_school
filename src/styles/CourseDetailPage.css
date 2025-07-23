@@ -508,18 +508,21 @@
 }
 
 .btn-primary {
-  background-color: #007bff;
+  background-color: #00B18F;
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 3px 3px 0.3px #03836A;
 }
 
 .btn-primary:hover {
-  background-color: #0056b3;
+  background-color: #03836A;
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0.3px #03836A;
 }
 
 /* Блок формы */

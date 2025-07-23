@@ -11,6 +11,7 @@ import {
   deleteNotification 
 } from '../services/notificationService';
 import { findStudentByUser, getCurrentStudent } from '../services/studentService';
+import ConfirmModal from './ConfirmModal';
 
 export default function Topbar({ userName, userRole, pageTitle, onBellClick, onProfileClick }) {
   const { user } = useAuth();
@@ -19,6 +20,7 @@ export default function Topbar({ userName, userRole, pageTitle, onBellClick, onP
   const [showNotifications, setShowNotifications] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [profileError, setProfileError] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   // Показываем уведомления только для студентов
   const showNotificationBell = userRole === 'student';
@@ -140,6 +142,39 @@ export default function Topbar({ userName, userRole, pageTitle, onBellClick, onP
     }
   };
 
+  const handleClearAllNotifications = async () => {
+    setShowConfirmModal(true);
+  };
+
+  const confirmClearAllNotifications = async () => {
+    setShowConfirmModal(false);
+    
+    try {
+      // Показываем индикатор загрузки (можно добавить спиннер)
+      console.log(`[TopBar] Clearing ${notifications.length} notifications...`);
+      
+      // Удаляем все уведомления
+      const deletePromises = notifications.map(notification => 
+        deleteNotification(notification.id)
+      );
+      
+      await Promise.all(deletePromises);
+      
+      // Очищаем локальное состояние с небольшой задержкой для плавности
+      setTimeout(() => {
+        setNotifications([]);
+        setUnreadCount(0);
+        setShowNotifications(false);
+        console.log('[TopBar] All notifications cleared successfully!');
+      }, 300);
+      
+    } catch (error) {
+      console.error('Failed to clear all notifications:', error);
+      // Более красивое уведомление об ошибке
+      alert('❌ Произошла ошибка при удалении уведомлений. Пожалуйста, попробуйте ещё раз.');
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -181,13 +216,25 @@ export default function Topbar({ userName, userRole, pageTitle, onBellClick, onP
                 <div className="notification-dropdown">
                   <div className="notification-header">
                     <h3>Уведомления</h3>
-                    <button 
-                      className="close-btn"
-                      onClick={() => setShowNotifications(false)}
-                      type="button"
-                    >
-                      ×
-                    </button>
+                    <div className="notification-actions">
+                      {notifications.length > 0 && (
+                        <button 
+                          className={`clear-all-btn ${notifications.length > 0 ? 'has-notifications' : ''}`}
+                          onClick={handleClearAllNotifications}
+                          type="button"
+                          title={`Очистить все (${notifications.length} уведомлений)`}
+                        >
+                          🗑️ Очистить все
+                        </button>
+                      )}
+                      <button 
+                        className="close-btn"
+                        onClick={() => setShowNotifications(false)}
+                        type="button"
+                      >
+                        ×
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="notification-list">
@@ -247,11 +294,27 @@ export default function Topbar({ userName, userRole, pageTitle, onBellClick, onP
             />
             <div className="profile-text">
               <span className="profile-name">{userName}</span>
-              <span className="profile-role">{userRole}</span>
+              <span className="profile-role">#{user?.username || 'N/A'}</span>
             </div>
           </div>
         </div>
       </div>
+      
+      {/* Модальное окно подтверждения */}
+      <ConfirmModal 
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={confirmClearAllNotifications}
+        title="🗑️ Очистить уведомления"
+        message={
+          notifications.length === 1 
+            ? "Вы действительно хотите удалить это уведомление? Это действие нельзя отменить." 
+            : `Вы действительно хотите удалить все уведомления (${notifications.length} шт.)? Это действие нельзя отменить.`
+        }
+        confirmText="✅ Да, удалить все"
+        cancelText="❌ Отмена"
+        type="warning"
+      />
     </div>
   );
 }

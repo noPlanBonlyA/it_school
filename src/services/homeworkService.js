@@ -354,3 +354,20 @@ export const createNotificationForStudent = async (studentId, message) => {
     throw error;
   }
 };
+
+/**
+ * Получение информации об уроке для студента
+ */
+export const getStudentLessonInfo = async (courseId, lessonId) => {
+  try {
+    console.log('[HomeworkService] Getting student lesson info:', { courseId, lessonId });
+    
+    const response = await api.get(`/courses/${courseId}/lessons/${lessonId}/student-info`);
+    
+    console.log('[HomeworkService] Student lesson info:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[HomeworkService] Error getting student lesson info:', error);
+    throw error;
+  }
+};

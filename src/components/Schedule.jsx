@@ -5,10 +5,11 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Schedule.css';
+import '../styles/ManageUserPage.css'; // Фирменные стили кнопок
 import api from '../api/axiosInstance';
 import { getUserScheduleOptimized, updateLessonGroup } from '../services/scheduleService';
 
-export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
+export default function Schedule({ events, onSelect, selectedEvent, onClose, onCardClick }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   
@@ -40,6 +41,15 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
   });
   const [uploadingHomework, setUploadingHomework] = useState(false);
   const [toggleLoading, setToggleLoading] = useState(false);
+  
+  // Состояния для редактирования времени урока
+  const [editingTime, setEditingTime] = useState(null);
+  const [timeFormData, setTimeFormData] = useState({
+    start_datetime: '',
+    end_datetime: '',
+    auditorium: ''
+  });
+  const [savingTime, setSavingTime] = useState(false);
 
   if (!events || events.length === 0) {
     return (
@@ -299,13 +309,109 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
     await loadLessonStudents(lessonGroupId);
   };
 
+  // Функция для открытия модального окна редактирования времени
+  const handleEditLessonTime = (event) => {
+    console.log('[Schedule] Opening time edit modal for event:', event);
+    
+    // Проверяем права доступа
+    if (user.role !== 'admin' && user.role !== 'superadmin') {
+      alert('У вас нет прав для изменения времени урока');
+      return;
+    }
+    
+    // Форматируем даты для input datetime-local
+    const formatDateTimeLocal = (dateString) => {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      // Убираем секунды и миллисекунды для корректного отображения в input
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+    
+    setTimeFormData({
+      start_datetime: formatDateTimeLocal(event.start_datetime),
+      end_datetime: formatDateTimeLocal(event.end_datetime),
+      auditorium: event.auditorium || ''
+    });
+    
+    setEditingTime(event);
+  };
+
+  // Функция для сохранения изменений времени
+  const handleSaveLessonTime = async () => {
+    if (!editingTime || !timeFormData.start_datetime || !timeFormData.end_datetime) {
+      alert('Пожалуйста, заполните все поля времени');
+      return;
+    }
+
+    try {
+      setSavingTime(true);
+      
+      // Проверяем логику времени
+      const startDate = new Date(timeFormData.start_datetime);
+      const endDate = new Date(timeFormData.end_datetime);
+      
+      if (startDate >= endDate) {
+        alert('Время начала должно быть раньше времени окончания');
+        return;
+      }
+      
+      // Форматируем данные для API
+      const updatePayload = {
+        lesson_id: String(editingTime.lesson_id),
+        group_id: String(editingTime.group_id),
+        start_datetime: startDate.toISOString(),
+        end_datetime: endDate.toISOString(),
+        is_opened: Boolean(editingTime.is_opened),
+        auditorium: String(timeFormData.auditorium),
+        id: String(editingTime.id)
+      };
+      
+      console.log('[Schedule] Updating lesson time with payload:', updatePayload);
+      
+      // Обновляем через API
+      const response = await api.put(`/courses/lesson-group/${editingTime.id}`, updatePayload);
+      
+      console.log('[Schedule] Lesson time updated successfully:', response.data);
+      
+      alert('Время урока успешно изменено!');
+      
+      // Закрываем модальное окно и перезагружаем страницу
+      setEditingTime(null);
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('[Schedule] Error updating lesson time:', error);
+      
+      if (error.response?.status === 403) {
+        alert('У вас нет прав для изменения времени этого урока');
+      } else if (error.response?.status === 404) {
+        alert('Урок не найден или был удален');
+      } else if (error.response?.status === 422) {
+        alert('Неверные данные для обновления времени урока');
+        console.error('[Schedule] Validation details:', error.response?.data?.detail);
+      } else {
+        const errorMessage = error.response?.data?.detail || 
+                            error.response?.data?.message || 
+                            'Ошибка обновления времени урока';
+        alert(`Ошибка: ${errorMessage}`);
+      }
+    } finally {
+      setSavingTime(false);
+    }
+  };
+
   // Обработчик "Открыть урок" для навигации к уроку
   const handleOpenLessonPage = (event) => {
     console.log('[Schedule] Opening lesson page for:', event);
     
     // Навигация к уроку
     if (event.course_id && event.lesson_id) {
-      if (user.role === 'teacher') {
+      if (user.role === 'teacher' || user.role === 'admin' || user.role === 'superadmin') {
         navigate(`/courses/${event.course_id}/teacher/lessons/${event.lesson_id}`);
       } else if (user.role === 'student') {
         navigate(`/courses/${event.course_id}/lessons/${event.lesson_id}`);
@@ -478,7 +584,7 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
   // Модальное окно проведения урока
   if (conductingLesson) {
     return (
-      <div className="modal-overlay">
+      <div className="modal-overlay conduct-lesson-modal">
         <div className="modal-content large">
           <div className="modal-header">
             <h2>Провести урок: {conductingLesson.lesson_name}</h2>
@@ -625,7 +731,13 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
         <div 
           key={event.id || index} 
           className={`schedule-item ${getStatusClass(event)}`}
-          onClick={() => onSelect && onSelect(event)}
+          onClick={(e) => {
+            // Останавливаем всплытие события, если есть обработчик для карточки
+            if (onCardClick) {
+              onCardClick(e);
+            }
+            onSelect && onSelect(event);
+          }}
         >
           <div className="schedule-time-block">
             <div className="schedule-date">
@@ -721,8 +833,76 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
             </div>
           </div>
 
-          {/* Кнопки действий для преподавателя */}
-          {user.role === 'teacher' && (
+          {/* Блок домашних заданий */}
+          {(selectedEvent.homework_materials?.length > 0 || selectedEvent.homework_text) && (
+            <div className="homework-section">
+              <h3 className="section-title">📝 Домашние задания</h3>
+              <div className="homework-items">
+                {selectedEvent.homework_materials?.map((hw, index) => (
+                  <div key={index} className="homework-item">
+                    <div className="homework-header">
+                      <span className="homework-name">{hw.name}</span>
+                      <span className="homework-type">Файл</span>
+                    </div>
+                    {hw.description && (
+                      <div className="homework-description">{hw.description}</div>
+                    )}
+                  </div>
+                ))}
+                {selectedEvent.homework_text && (
+                  <div className="homework-item">
+                    <div className="homework-header">
+                      <span className="homework-name">Текстовое задание</span>
+                      <span className="homework-type">Текст</span>
+                    </div>
+                    <div className="homework-description" dangerouslySetInnerHTML={{ __html: selectedEvent.homework_text }} />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Блок материалов урока */}
+          {(selectedEvent.teacher_materials?.length > 0 || selectedEvent.student_materials?.length > 0) && (
+            <div className="materials-section">
+              <h3 className="section-title">📚 Материалы урока</h3>
+              
+              {selectedEvent.teacher_materials?.length > 0 && (
+                <div className="material-category">
+                  <h4 className="material-category-title">👨‍🏫 Материалы преподавателя</h4>
+                  <div className="material-items">
+                    {selectedEvent.teacher_materials.map((material, index) => (
+                      <div key={index} className="material-item">
+                        <span className="material-name">{material.name}</span>
+                        <span className="material-type">
+                          {material.file_url ? '📁 Файл' : '📝 Текст'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {selectedEvent.student_materials?.length > 0 && (
+                <div className="material-category">
+                  <h4 className="material-category-title">👨‍🎓 Материалы для студентов</h4>
+                  <div className="material-items">
+                    {selectedEvent.student_materials.map((material, index) => (
+                      <div key={index} className="material-item">
+                        <span className="material-name">{material.name}</span>
+                        <span className="material-type">
+                          {material.file_url ? '📁 Файл' : '📝 Текст'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Кнопки действий для преподавателя и администраторов */}
+          {(user.role === 'teacher' || user.role === 'admin' || user.role === 'superadmin') && (
             <div className="event-actions">
               <button 
                 onClick={() => handleOpenLessonPage(selectedEvent)}
@@ -746,6 +926,16 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
               >
                 🎯 Провести урок
               </button>
+              {/* Кнопка редактирования времени для админов */}
+              {(user.role === 'admin' || user.role === 'superadmin') && (
+                <button 
+                  onClick={() => handleEditLessonTime(selectedEvent)}
+                  className="btn-primary"
+                  style={{ backgroundColor: '#3b82f6' }}
+                >
+                  ⏰ Изменить время
+                </button>
+              )}
             </div>
           )}
 
@@ -774,6 +964,87 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose }) {
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Модальное окно редактирования времени урока */}
+      {editingTime && (
+        <div className="modal-overlay conduct-lesson-modal">
+          <div className="modal-content medium">
+            <div className="modal-header">
+              <h2>⏰ Изменить время урока</h2>
+              <div style={{ fontSize: '14px', color: '#666', marginTop: '4px' }}>
+                {editingTime.lesson_name} - {editingTime.course_name}
+              </div>
+              <button className="close-modal" onClick={() => setEditingTime(null)}>×</button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="time-edit-form">
+                <div className="form-group">
+                  <label htmlFor="start_datetime">Время начала</label>
+                  <input
+                    type="datetime-local"
+                    id="start_datetime"
+                    value={timeFormData.start_datetime}
+                    onChange={(e) => setTimeFormData(prev => ({
+                      ...prev,
+                      start_datetime: e.target.value
+                    }))}
+                    className="form-control"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="end_datetime">Время окончания</label>
+                  <input
+                    type="datetime-local"
+                    id="end_datetime"
+                    value={timeFormData.end_datetime}
+                    onChange={(e) => setTimeFormData(prev => ({
+                      ...prev,
+                      end_datetime: e.target.value
+                    }))}
+                    className="form-control"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="auditorium">Аудитория</label>
+                  <input
+                    type="text"
+                    id="auditorium"
+                    value={timeFormData.auditorium}
+                    onChange={(e) => setTimeFormData(prev => ({
+                      ...prev,
+                      auditorium: e.target.value
+                    }))}
+                    placeholder="Введите номер аудитории"
+                    className="form-control"
+                  />
+                </div>
+
+                <div className="form-actions">
+                  <button 
+                    onClick={handleSaveLessonTime}
+                    className="btn-primary"
+                    disabled={savingTime}
+                  >
+                    {savingTime ? '⏳ Сохранение...' : '💾 Сохранить изменения'}
+                  </button>
+                  <button 
+                    onClick={() => setEditingTime(null)}
+                    className="btn-secondary"
+                    disabled={savingTime}
+                  >
+                    ❌ Отмена
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -155,8 +155,7 @@ export default function CourseDetailPage() {
         homework_material_text: '',
         id: editingLesson.id,
         teacher_material_id: editingLesson.teacher_material_id,
-        student_material_id: editingLesson.student_material_id,
-        homework_material_id: editingLesson.homework_id
+        student_material_id: editingLesson.student_material_id
       };
       
       await updateLessonWithMaterials(courseId, editingLesson.id, updateData);
@@ -231,8 +230,7 @@ export default function CourseDetailPage() {
     try {
       await deleteLessonWithMaterials(courseId, lessonToDelete.id, {
         teacher_material_id: lessonToDelete.teacher_material_id,
-        student_material_id: lessonToDelete.student_material_id,
-        homework_material_id: lessonToDelete.homework_id
+        student_material_id: lessonToDelete.student_material_id
       });
       await reloadLessons();
       alert('✅ Урок успешно удален!');
@@ -291,9 +289,6 @@ export default function CourseDetailPage() {
                     {course.age_category && (
                       <span className="course-category">🎯 {course.age_category}</span>
                     )}
-                    {course.price && (
-                      <span className="course-price">💰 {course.price} ₽</span>
-                    )}
                   </div>
                 </div>
                 
@@ -317,12 +312,6 @@ export default function CourseDetailPage() {
                     onClick={handleOpenLessonEditor}
                   >
                     📝 Создать урок с файлами
-                  </button>
-                  <button 
-                    className="btn-secondary"
-                    onClick={() => navigate(`/courses/${courseId}/lessons/manage`)}
-                  >
-                    ⚙️ Управление уроками
                   </button>
                 </div>
               )}
@@ -464,8 +453,7 @@ export default function CourseDetailPage() {
                             <span className="meta-value">
                               {lesson.teacher_material_id ? 'Материал преподавателя' : ''}
                               {lesson.student_material_id ? (lesson.teacher_material_id ? ' • ' : '') + 'Учебный материал' : ''}
-                              {lesson.homework_id ? ((lesson.teacher_material_id || lesson.student_material_id) ? ' • ' : '') + 'Домашнее задание' : ''}
-                              {!lesson.teacher_material_id && !lesson.student_material_id && !lesson.homework_id && 'Материалы не добавлены'}
+                              {!lesson.teacher_material_id && !lesson.student_material_id && 'Материалы не добавлены'}
                             </span>
                           </div>
                         </div>

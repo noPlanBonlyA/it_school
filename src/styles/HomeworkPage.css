@@ -30,12 +30,13 @@
   }
   
   .column h2 {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
     color: white;
     margin: 0;
     padding: 15px 20px;
     font-size: 1.1rem;
     font-weight: 600;
+    box-shadow: 4px 4px 0.3px rgba(3, 131, 106, 0.3);
   }
   
   /* Колонка 1: группы */
@@ -70,9 +71,10 @@
     background-color: #f8f9fa;
   }
   .groups-list li.selected {
-    background-color: #e3f2fd;
-    color: #1976d2;
+    background-color: rgba(0, 177, 143, 0.1);
+    color: #03836A;
     font-weight: 500;
+    border-left: 4px solid #00B18F;
   }
   
   .group-info {
@@ -120,8 +122,9 @@
     background-color: #f8f9fa;
   }
   .topics-list li.selected {
-    background-color: #e8f5e8;
-    color: #2e7d32;
+    background-color: rgba(0, 177, 143, 0.15);
+    color: #03836A;
+    border-left: 4px solid #00B18F;
   }
   
   .lesson-info {
@@ -184,8 +187,8 @@
     background-color: #f8f9fa;
   }
   .submission-header.expanded {
-    background-color: #fff3e0;
-    border-bottom: 1px solid #ffcc02;
+    background-color: rgba(0, 177, 143, 0.1);
+    border-bottom: 1px solid #00B18F;
   }
   
   .student-info {
@@ -218,21 +221,21 @@
     font-weight: 500;
   }
   .status-badge.submitted {
-    background-color: #e8f5e8;
-    color: #2e7d32;
+    background-color: rgba(0, 177, 143, 0.1);
+    color: #03836A;
   }
   .status-badge.not-submitted {
     background-color: #ffebee;
     color: #c62828;
   }
   .status-badge.graded {
-    background-color: #e3f2fd;
-    color: #1976d2;
+    background-color: rgba(0, 177, 143, 0.2);
+    color: #03836A;
   }
   
   .grade-display {
     font-weight: 600;
-    color: #1976d2;
+    color: #00B18F;
   }
   
   .expand-icon {
@@ -247,6 +250,50 @@
     padding: 20px;
     background-color: #fafafa;
     border-top: 1px solid #e0e0e0;
+    max-height: 500px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #00B18F #f1f1f1;
+    position: relative;
+  }
+  
+  /* Индикатор прокрутки */
+  .submission-details::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent 0%, #00B18F 50%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  .submission-details.has-scroll::before {
+    opacity: 0.6;
+  }
+  
+  /* Кастомный скроллбар для WebKit */
+  .submission-details::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .submission-details::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  .submission-details::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+  
+  .submission-details::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #03836A 0%, #025f4a 100%);
   }
   
   .homework-files {
@@ -322,8 +369,8 @@
   }
   .grade-field input:focus {
     outline: none;
-    border-color: #1976d2;
-    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+    border-color: #00B18F;
+    box-shadow: 0 0 0 2px rgba(0, 177, 143, 0.1);
   }
   
   .comment-field {
@@ -351,57 +398,110 @@
   }
   .comment-field textarea:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #00B18F;
+    box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1);
   }
   
   .details-buttons {
     display: flex;
     gap: 12px;
     margin-top: 24px;
-    padding-top: 20px;
+    padding: 20px;
     border-top: 1px solid #e5e7eb;
+    background: #fafafa;
+    position: sticky;
+    bottom: 0;
+    margin-left: -20px;
+    margin-right: -20px;
+    margin-bottom: -20px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
   }
-  
+  /* Фирменные стили кнопок наследуются из ManageUserPage.css */
   .btn-primary {
     flex: 1;
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    background: #00B18F;
     color: white;
     border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.95rem;
+    border-radius: 10px;
+    padding: 20px 40px;
+    font-size: 16px;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 4px 4px 0.3px #03836A;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
   }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
   .btn-primary:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    background: #03836A;
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0.3px #03836A;
+  }
+
+  .btn-primary:hover::before {
+    opacity: 1;
+  }
+
+  .btn-primary:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0.3px #03836A;
+    transition: transform 0.1s ease;
   }
   
   .btn-primary:disabled {
-    background: #9ca3af;
+    background: #94a3b8;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
   }
+
+  .btn-primary:disabled::before {
+    display: none;
+  }
   
   .btn-secondary {
-    padding: 12px 20px;
-    background: #f3f4f6;
-    color: #6b7280;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 0.95rem;
+    background: #f8fafc;
+    color: #03836A;
+    border: 2px solid #00B18F;
+    border-radius: 10px;
+    padding: 20px 40px;
+    font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 2px 2px 0.3px rgba(0, 177, 143, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
   }
+
   .btn-secondary:hover {
-    background: #e5e7eb;
-    color: #374151;
+    background: rgba(0, 177, 143, 0.1);
+    border-color: #03836A;
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0.3px rgba(0, 177, 143, 0.3);
+    color: #03836A;
   }
   
   /* Плейсхолдер при отсутствии выбора */
@@ -492,8 +592,8 @@
   }
   
   .coins-input-group:focus-within {
-    border-color: #fbbf24;
-    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+    border-color: #00B18F;
+    box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1);
   }
   
   .coins-input-group input {
@@ -525,15 +625,15 @@
   .comment-preview {
     margin-top: 12px;
     padding: 12px;
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
+    background: rgba(0, 177, 143, 0.1);
+    border: 1px solid rgba(0, 177, 143, 0.3);
     border-radius: 8px;
   }
   
   .comment-preview strong {
     display: block;
     margin-bottom: 8px;
-    color: #1e40af;
+    color: #03836A;
     font-size: 0.9rem;
   }
   
@@ -541,7 +641,7 @@
     background: white;
     padding: 10px 12px;
     border-radius: 6px;
-    border-left: 4px solid #3b82f6;
+    border-left: 4px solid #00B18F;
     font-size: 0.9rem;
     color: #374151;
     line-height: 1.4;
@@ -549,7 +649,7 @@
   
   /* Обновляем отображение статуса */
   .homework-status .grade-display {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    background: #00B18F;
     color: white;
     padding: 4px 8px;
     border-radius: 6px;
@@ -558,6 +658,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    box-shadow: 2px 2px 0.3px #03836A;
   }
   
   .homework-status .grade-display::before {
@@ -581,6 +682,7 @@
     
     .details-buttons {
       flex-direction: column;
+      padding: 15px;
     }
     
     .btn-primary,
@@ -596,11 +698,32 @@
     .notification-preview {
       font-size: 0.85rem;
     }
+    
+    /* Мобильные стили для скролла */
+    .submission-details {
+      max-height: 400px;
+      padding: 15px;
+    }
+    
+    .archive-details {
+      max-height: 300px;
+      padding: 12px;
+    }
+    
+    .archive-buttons {
+      padding: 12px;
+    }
+    
+    /* Увеличиваем размер скроллбара на мобильных */
+    .submission-details::-webkit-scrollbar,
+    .archive-details::-webkit-scrollbar {
+      width: 12px;
+    }
   }
   
   /* ===== НОВОЕ: Стили для архива ===== */
 .archive-toggle {
-  background: #f59e0b;
+  background: #00B18F;
   color: white;
   border: none;
   padding: 6px 12px;
@@ -609,11 +732,13 @@
   margin-left: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 2px 2px 0.3px #03836A;
 }
 
 .archive-toggle:hover {
-  background: #d97706;
-  transform: translateY(-1px);
+  background: #03836A;
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0.3px #03836A;
 }
 
 .submissions-section {
@@ -621,15 +746,15 @@
 }
 
 .archive-section {
-  background: #f8f9fa;
+  background: rgba(0, 177, 143, 0.05);
   border-radius: 12px;
   padding: 15px;
-  border: 2px dashed #dee2e6;
+  border: 2px dashed rgba(0, 177, 143, 0.3);
 }
 
 .archive-section h3 {
   margin: 0 0 15px 0;
-  color: #6c757d;
+  color: #03836A;
   font-size: 16px;
   display: flex;
   align-items: center;
@@ -680,7 +805,7 @@
 }
 
 .btn-ungrade {
-  background: #fd7e14;
+  background: #00B18F;
   color: white;
   border: none;
   border-radius: 50%;
@@ -692,16 +817,18 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  box-shadow: 2px 2px 0.3px #03836A;
 }
 
 .btn-ungrade:hover {
-  background: #e8590c;
-  transform: scale(1.1);
+  background: #03836A;
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0.3px #03836A;
 }
 
 .status-graded {
-  background: #d1edff;
-  color: #0d6efd;
+  background: rgba(0, 177, 143, 0.2);
+  color: #03836A;
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 11px;
@@ -731,23 +858,64 @@
   border-radius: 12px;
   font-size: 11px;
   font-weight: 600;
-}
-
-.archive-details {
-  padding: 15px;
-  background: white;
-}
+}  .archive-details {
+    padding: 15px;
+    background: white;
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #00B18F #f1f1f1;
+    position: relative;
+  }
+  
+  /* Индикатор прокрутки для архива */
+  .archive-details::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, #00B18F 50%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  .archive-details.has-scroll::before {
+    opacity: 0.5;
+  }
+  
+  /* Кастомный скроллбар для архивных деталей */
+  .archive-details::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .archive-details::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  .archive-details::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
+    border-radius: 3px;
+  }
+  
+  .archive-details::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #03836A 0%, #025f4a 100%);
+  }
 
 .grade-info {
-  background: #e7f3ff;
+  background: rgba(0, 177, 143, 0.1);
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 15px;
-  border-left: 4px solid #0d6efd;
+  border-left: 4px solid #00B18F;
 }
 
 .grade-summary strong {
-  color: #0d6efd;
+  color: #03836A;
   display: block;
   margin-bottom: 8px;
 }
@@ -771,19 +939,25 @@
 .graded-date {
   color: #6c757d;
   font-size: 12px;
-}
-
-.archive-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-start;
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid #e9ecef;
-}
+}  .archive-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+    margin-top: 15px;
+    padding: 15px;
+    border-top: 1px solid #e9ecef;
+    background: white;
+    position: sticky;
+    bottom: 0;
+    margin-left: -15px;
+    margin-right: -15px;
+    margin-bottom: -15px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
 
 .btn-warning {
-  background: #fd7e14;
+  background: #00B18F;
   color: white;
   border: none;
   padding: 10px 16px;
@@ -792,11 +966,13 @@
   font-weight: 600;
   transition: all 0.2s ease;
   font-size: 14px;
+  box-shadow: 2px 2px 0.3px #03836A;
 }
 
 .btn-warning:hover {
-  background: #e8590c;
-  transform: translateY(-1px);
+  background: #03836A;
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0.3px #03836A;
 }
 
 /* Обновляем статус для активных домашек */
@@ -810,3 +986,39 @@
   cursor: not-allowed !important;
   transform: none !important;
 }
+
+/* Подсказка о скролле */
+.scroll-hint {
+    position: absolute;
+    bottom: 70px;
+    right: 20px;
+    background: rgba(0, 177, 143, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 10;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+  }
+  
+  .submission-details.has-scroll .scroll-hint,
+  .archive-details.has-scroll .scroll-hint {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .scroll-hint::before {
+    content: '⬇️';
+    margin-right: 6px;
+  }
+
+  /* Скрываем подсказку через 3 секунды */
+  .scroll-hint.fade-out {
+    opacity: 0;
+    transform: translateX(20px);
+  }

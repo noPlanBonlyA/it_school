@@ -18,6 +18,7 @@ import shopIcon       from '../images/sidebar_icon5.png';
 import moderationIcon from '../images/sidebar_icon3.png';
 import adminIcon      from '../images/sidebar_icon1.png';
 import magicIcon      from '../images/sidebar_icon7.png'; // Иконка для магии
+import logoImage      from '../images/logo.png';
 
 import { useAuth }    from '../contexts/AuthContext';
 
@@ -124,8 +125,8 @@ export default function Sidebar({ activeItem, userRole }) {
         { key: 'settings',       label: 'Профиль',      icon: cogIcon },
         { key: 'schedule',       label: 'Расписание',   icon: calendarIcon },
         { key: 'manageStudents', label: 'Студенты',     icon: usersIcon },
-        { key: 'notifications',  label: 'Рассылка',     icon: broadcastIcon },
-        { key: 'groups',         label: 'Группы',       icon: usersIcon },
+        { key: 'broadcast',      label: 'Рассылка',     icon: broadcastIcon },
+        { key: 'manage-groups',  label: 'Группы',       icon: usersIcon },
         { key: 'manageTeachers', label: 'Преподаватели',icon: usersIcon },
         { key: 'news',           label: 'Новости',      icon: coursesIcon }
       ];
@@ -136,11 +137,11 @@ export default function Sidebar({ activeItem, userRole }) {
         { key: 'settings',        label: 'Профиль',          icon: cogIcon },
         { key: 'schedule',        label: 'Расписание',       icon: calendarIcon },
         { key: 'manageStudents',  label: 'Студенты',         icon: usersIcon },
-        { key: 'notifications',   label: 'Рассылка',         icon: broadcastIcon },
+        { key: 'broadcast',       label: 'Рассылка',         icon: broadcastIcon },
         { key: 'manageTeachers',  label: 'Преподаватели',    icon: usersIcon },
         { key: 'manageAdmins',    label: 'Администраторы',   icon: adminIcon },
-        { key: 'moderateCourses', label: 'Модерация курсов', icon: moderationIcon },
-        { key: 'groups',          label: 'Группы',           icon: usersIcon },
+        { key: 'manage-courses',  label: 'Модерация курсов', icon: moderationIcon },
+        { key: 'manage-groups',   label: 'Группы',           icon: usersIcon },
         { key: 'manageProducts',  label: 'Товары',           icon: shopIcon },
         { key: 'news',            label: 'Новости',          icon: coursesIcon },
         { key: 'impersonate',     label: 'Магия',            icon: magicIcon }
@@ -156,7 +157,20 @@ export default function Sidebar({ activeItem, userRole }) {
     
     // Создаем kebab-case версию itemKey для сравнения
     const kebabItemKey = itemKey.replace(/([A-Z])/g, '-$1').toLowerCase();
-    return kebabItemKey === activeItem;
+    if (kebabItemKey === activeItem) return true;
+    
+    // Также сравниваем с соответствующим маршрутом
+    const itemRoute = routes[itemKey];
+    if (itemRoute) {
+      // Извлекаем часть пути после последнего слеша
+      const routePart = itemRoute.split('/').pop();
+      if (routePart === activeItem) return true;
+      
+      // Сравниваем весь путь
+      if (itemRoute === `/${activeItem}`) return true;
+    }
+    
+    return false;
   };
 
   const renderItem = i => (
@@ -194,7 +208,9 @@ export default function Sidebar({ activeItem, userRole }) {
       )}
 
       <nav className={`sidebar ${isMobile ? 'mobile' : ''} ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-        <div className="logo" onClick={() => handleItemClick('/home')}>Bright&nbsp;Web</div>
+        <div className="logo" onClick={() => handleItemClick('/home')}>
+          <img src={logoImage} alt="Пайтишкино" style={{height: '40px', width: 'auto'}} />
+        </div>
         <ul className="sidebar-list">{main.map(renderItem)}</ul>
 
         <hr className="divider" />

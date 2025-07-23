@@ -240,68 +240,28 @@ export default function HomePage() {
 
         {/* Временные кнопки для тестирования */}
         {fullUser?.role === 'student' && (
-          <div style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-            zIndex: 1000
-          }}>
+          <div className="debug-buttons">
             <button 
               onClick={debugStudents}
-              style={{
-                background: '#6f42c1',
-                color: 'white',
-                border: 'none',
-                padding: '10px 15px',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
+              className="debug-btn purple"
             >
               Отладка студентов
             </button>
             <button 
               onClick={testProfile}
-              style={{
-                background: '#28a745',
-                color: 'white',
-                border: 'none',
-                padding: '10px 15px',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
+              className="debug-btn success"
             >
               Тест профиля
             </button>
             <button 
               onClick={testNotification}
-              style={{
-                background: '#007bff',
-                color: 'white',
-                border: 'none',
-                padding: '10px 15px',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
+              className="debug-btn info"
             >
               Тест уведомления
             </button>
             <button 
               onClick={testCoinsReload}
-              style={{
-                background: '#ffc107',
-                color: 'black',
-                border: 'none',
-                padding: '10px 15px',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
+              className="debug-btn warning"
             >
               Обновить монеты
             </button>
@@ -310,8 +270,15 @@ export default function HomePage() {
 
         <section className="cards">
           {/* Расписание - всегда первое */}
-          <div className="card schedule">
-            <h3>Пары на {labelNextDay}</h3>
+          <div 
+            className="card schedule clickable-card" 
+            onClick={() => navigate('/schedule')}
+            title="Перейти к полному расписанию"
+          >
+            <h3>
+              Пары на {labelNextDay}
+              <span className="card-nav-icon" title="Перейти к полному расписанию">📅</span>
+            </h3>
             <Schedule events={dayEvents} onSelect={e => {
               // Если кликнули на то же событие - закрываем виджет
               if (selEvent && selEvent.id === e.id) {
@@ -319,6 +286,9 @@ export default function HomePage() {
               } else {
                 setSel(e);
               }
+            }} onCardClick={(event) => {
+              // Останавливаем всплытие события, чтобы не сработал клик по карточке
+              event.stopPropagation();
             }} />
             
             {/* Мини-виджет пары - теперь внутри карточки расписания */}
@@ -419,58 +389,77 @@ export default function HomePage() {
           <div className="card news">
             <h3>Новости</h3>
             <div className="news-list">
-              {news.length === 0
-                ? <p className="empty-text">Нет актуальных новостей</p>
-                : news.map(n => (
-                    <div 
-                      key={n.id} 
-                      className={`news-row ${n.is_pinned ? 'pinned' : ''} ${expandedNews.has(n.id) ? 'expanded' : ''} ${!n.image_url ? 'no-image' : ''}`}
-                      onClick={(event) => toggleNewsExpansion(n.id, event)}
-                    >
-                      {/* Изображение новости - только если есть */}
-                      {n.image_url && (
-                        <img src={n.image_url} alt={n.name} className="news-thumb"/>
-                      )}
-                      
-                      {/* Контент новости */}
-                      <div className="news-content">
-                        <h4 className="news-title">{n.name}</h4>
-                        <div className="news-date">
-                          {new Date(n.created_at).toLocaleDateString('ru-RU', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                          })}
-                        </div>
-                        
-                        {/* Описание (показывается только при разворачивании) */}
-                        {n.description && (
-                          <div className="news-description">
-                            {n.description.split('\n').map((paragraph, index) => (
-                              paragraph.trim() && (
-                                <p key={index} style={{ margin: '0 0 8px 0' }}>
-                                  {paragraph}
-                                </p>
-                              )
-                            ))}
-                          </div>
+              <div className="news-scroll-container">
+                {news.length === 0
+                  ? <p className="empty-text">Нет актуальных новостей</p>
+                  : news.map(n => (
+                      <div 
+                        key={n.id} 
+                        className={`news-row ${n.is_pinned ? 'pinned' : ''} ${expandedNews.has(n.id) ? 'expanded' : ''} ${!n.image_url ? 'no-image' : ''}`}
+                        onClick={(event) => toggleNewsExpansion(n.id, event)}
+                      >
+                        {/* Изображение новости - только если есть */}
+                        {n.image_url && (
+                          <img src={n.image_url} alt={n.name} className="news-thumb"/>
                         )}
                         
-                        {/* Кнопка разворачивания */}
-                        <div className="news-expand-btn">
-                          {expandedNews.has(n.id) ? '▲ Свернуть' : '▼ Подробнее'}
+                        {/* Контент новости */}
+                        <div className="news-content">
+                          <h4 className="news-title">{n.name}</h4>
+                          <div className="news-date">
+                            {new Date(n.created_at).toLocaleDateString('ru-RU', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric'
+                            })}
+                          </div>
+                          
+                          {/* Описание (показывается только при разворачивании) */}
+                          {n.description && (
+                            <div className="news-description">
+                              {n.description.split('\n').map((paragraph, index) => (
+                                paragraph.trim() && (
+                                  <p key={index} style={{ margin: '0 0 12px 0' }}>
+                                    {paragraph}
+                                  </p>
+                                )
+                              ))}
+                            </div>
+                          )}
+                          
+                          {/* Кнопка разворачивания */}
+                          <div className="news-expand-btn">
+                            {expandedNews.has(n.id) ? (
+                              <>
+                                <span>▲</span>
+                                <span>Свернуть</span>
+                              </>
+                            ) : (
+                              <>
+                                <span>▼</span>
+                                <span>Подробнее</span>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))
-              }
+                    ))
+                }
+              </div>
             </div>
           </div>
 
           {/* Бесткоины - третье на мобильных */}
-          <div className="card coins">
+          <div 
+            className="card coins clickable-card" 
+            onClick={() => navigate('/rating')}
+            title="Перейти к рейтингу студентов"
+          >
             <div className="bestcoins-header">
-              <h3>Бесткоины</h3>
+              <h3>
+                Бесткоины
+                <span className="card-nav-icon" title="Перейти к рейтингу студентов">🏆</span>
+              </h3>
               {user?.role === 'student' && (
                 <div className="coins-info">
                   {coinsLoading ? (

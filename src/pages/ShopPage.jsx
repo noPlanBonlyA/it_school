@@ -11,7 +11,7 @@ import {
   getNotAvailableProducts
 } from '../services/productService';
 import { getCurrentStudent } from '../services/studentService';
-import '../styles/ShopPage.css';
+import '../styles/ShopPageNew.css';
 
 export default function ShopPage() {
   const navigate = useNavigate();
@@ -85,7 +85,14 @@ export default function ShopPage() {
 
   const getProductImage = (product) => {
     if (product.photo?.url) {
-      return product.photo.url;
+      const photoUrl = product.photo.url;
+      // Если URL уже абсолютный, возвращаем как есть
+      if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
+        return photoUrl;
+      }
+      // Если относительный путь, добавляем базовый URL
+      const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+      return `${baseURL}${photoUrl.startsWith('/') ? '' : '/'}${photoUrl}`;
     }
     return null;
   };
@@ -106,6 +113,21 @@ export default function ShopPage() {
 
   const canAfford = (product) => { // eslint-disable-line no-unused-vars
     return (studentData?.points || 0) >= product.price;
+  };
+
+  // Функция для расчета прогресса накопления монет
+  const getCoinsProgress = (product) => {
+    const currentCoins = studentData?.points || 0;
+    const productPrice = product.price;
+    const coinsNeeded = Math.max(0, productPrice - currentCoins);
+    const progressPercentage = Math.min(100, (currentCoins / productPrice) * 100);
+    
+    return {
+      currentCoins,
+      productPrice,
+      coinsNeeded,
+      progressPercentage: Math.round(progressPercentage)
+    };
   };
 
   const fullName = [user.first_name, user.surname, user.patronymic]
@@ -231,35 +253,60 @@ export default function ShopPage() {
                           <p>Накопите больше монет, чтобы купить эти товары</p>
                         </div>
                         <div className="products-grid">
-                          {notAvailableProducts.map(product => (
-                            <div key={product.id} className="product-card not-available">
-                              <div className="product-image">
-                                {getProductImage(product) ? (
-                                  <img src={getProductImage(product)} alt={product.name} />
-                                ) : (
-                                  <div className="image-placeholder">
-                                    <span>📦</span>
-                                  </div>
-                                )}
-                                <div className="unavailable-overlay">
-                                  <span>Недоступно</span>
-                                </div>
-                              </div>
-                              <div className="product-info">
-                                <h3>{product.name}</h3>
-                                <p className="product-description">{product.description}</p>
-                                <div className="product-footer">
-                                  <div className="product-price">
-                                    <span className="price">{product.price}</span>
-                                    <span className="currency">монет</span>
-                                  </div>
-                                  <div className="coins-needed">
-                                    Нужно еще: {product.price - (studentData?.points || 0)} монет
+                          {notAvailableProducts.map(product => {
+                            const progress = getCoinsProgress(product);
+                            return (
+                              <div key={product.id} className="product-card not-available">
+                                <div className="product-image">
+                                  {getProductImage(product) ? (
+                                    <img src={getProductImage(product)} alt={product.name} />
+                                  ) : (
+                                    <div className="image-placeholder">
+                                      <span>📦</span>
+                                    </div>
+                                  )}
+                                  <div className="unavailable-overlay">
+                                    <span>Накопите еще</span>
                                   </div>
                                 </div>
+                                <div className="product-info">
+                                  <h3>{product.name}</h3>
+                                  <p className="product-description">{product.description}</p>
+                                  
+                                  {/* Прогресс накопления */}
+                                  <div className="coins-progress">
+                                    <div className="progress-header">
+                                      <span className="progress-label">Прогресс накопления</span>
+                                      <span className="progress-percentage">{progress.progressPercentage}%</span>
+                                    </div>
+                                    <div className="progress-bar">
+                                      <div 
+                                        className="progress-fill" 
+                                        style={{ width: `${progress.progressPercentage}%` }}
+                                      ></div>
+                                    </div>
+                                    <div className="progress-info">
+                                      <span className="current-coins">{progress.currentCoins} 🪙</span>
+                                      <span className="target-coins">{progress.productPrice} 🪙</span>
+                                    </div>
+                                  </div>
+
+                                  <div className="product-footer">
+                                    <div className="product-price">
+                                      <span className="price">{product.price}</span>
+                                      <span className="currency">монет</span>
+                                    </div>
+                                    <div className="coins-needed">
+                                      <span className="needed-icon">💰</span>
+                                      <span className="needed-text">Нужно еще: </span>
+                                      <span className="needed-amount">{progress.coinsNeeded}</span>
+                                      <span className="needed-currency"> монет</span>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </>
                     )}

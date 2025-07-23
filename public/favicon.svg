@@ -1,0 +1,23 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Фон -->
+  <rect width="32" height="32" fill="#2E8B57" rx="4"/>
+  
+  <!-- Глаз-логотип -->
+  <g transform="translate(16,12)">
+    <!-- Зеленое тело глаза -->
+    <ellipse cx="0" cy="0" rx="8" ry="6" fill="#fff"/>
+    <!-- Зрачок -->
+    <circle cx="1" cy="0" r="3" fill="#333"/>
+    <!-- Блик -->
+    <circle cx="2" cy="-1" r="1" fill="white"/>
+    <!-- Ножки -->
+    <rect x="-2" y="6" width="1" height="4" fill="#2E8B57"/>
+    <rect x="1" y="6" width="1" height="4" fill="#2E8B57"/>
+    <!-- Ручки -->
+    <rect x="-10" y="2" width="3" height="1" fill="#2E8B57"/>
+    <rect x="7" y="2" width="3" height="1" fill="#2E8B57"/>
+  </g>
+  
+  <!-- Инициалы П внизу -->
+  <text x="16" y="28" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="#FFD93D" text-anchor="middle">П</text>
+</svg>

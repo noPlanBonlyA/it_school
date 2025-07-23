@@ -174,7 +174,7 @@
 
 /* Кнопки */
 .btn-primary {
-  background: #3b82f6;
+  background: #00B18F;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -182,16 +182,21 @@
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 4px 4px 0.3px #03836A;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2563eb;
+  background: #03836A;
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0.3px #03836A;
 }
 
 .btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: 4px 4px 0.3px #6b7280;
 }
 
 .btn-secondary {

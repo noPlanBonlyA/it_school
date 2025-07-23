@@ -1,33 +1,29 @@
 import React, { useState } from 'react';
 import { 
   createLessonWithMaterials, 
-  updateLessonWithMaterials,
-  createLessonWithMaterialsText,
-  updateLessonWithMaterialsText
+  updateLessonWithMaterials
 } from '../services/lessonService';
 import '../styles/LessonEditor.css';
+import '../styles/ManageUserPage.css'; // Фирменные стили кнопок
 
 export default function LessonEditor({ courseId, lesson = null, onSave, onCancel }) {
   const [formData, setFormData] = useState({
     name: lesson?.name || '',
   });
   
-  const [materialMode, setMaterialMode] = useState('file'); // 'text' или 'file'
+  // Файлы для дополнительных материалов
+  const [teacherAdditionalMaterialFile, setTeacherAdditionalMaterialFile] = useState(null);
+  const [studentAdditionalMaterialFile, setStudentAdditionalMaterialFile] = useState(null);
   
-  // Для файлов
-  const [teacherMaterialFile, setTeacherMaterialFile] = useState(null);
-  const [studentMaterialFile, setStudentMaterialFile] = useState(null);
-  const [homeworkMaterialFile, setHomeworkMaterialFile] = useState(null);
-  
-  // Для названий материалов
+  // Названия материалов
   const [teacherMaterialName, setTeacherMaterialName] = useState(lesson?.teacher_material?.name || '');
+  const [teacherAdditionalMaterialName, setTeacherAdditionalMaterialName] = useState('');
   const [studentMaterialName, setStudentMaterialName] = useState(lesson?.student_material?.name || '');
-  const [homeworkMaterialName, setHomeworkMaterialName] = useState(lesson?.homework?.name || '');
+  const [studentAdditionalMaterialName, setStudentAdditionalMaterialName] = useState('');
   
-  // Для текстового содержимого
+  // HTML текст для основных материалов
   const [teacherMaterialText, setTeacherMaterialText] = useState('');
   const [studentMaterialText, setStudentMaterialText] = useState('');
-  const [homeworkMaterialText, setHomeworkMaterialText] = useState('');
   
   const [loading, setLoading] = useState(false);
 
@@ -37,22 +33,16 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
 
   const handleFileChange = (type, file) => {
     switch (type) {
-      case 'teacher':
-        setTeacherMaterialFile(file);
-        if (file && !teacherMaterialName) {
-          setTeacherMaterialName(file.name.split('.')[0]); // Убираем расширение
+      case 'teacher_additional':
+        setTeacherAdditionalMaterialFile(file);
+        if (file && !teacherAdditionalMaterialName) {
+          setTeacherAdditionalMaterialName(file.name.split('.')[0]);
         }
         break;
-      case 'student':
-        setStudentMaterialFile(file);
-        if (file && !studentMaterialName) {
-          setStudentMaterialName(file.name.split('.')[0]);
-        }
-        break;
-      case 'homework':
-        setHomeworkMaterialFile(file);
-        if (file && !homeworkMaterialName) {
-          setHomeworkMaterialName(file.name.split('.')[0]);
+      case 'student_additional':
+        setStudentAdditionalMaterialFile(file);
+        if (file && !studentAdditionalMaterialName) {
+          setStudentAdditionalMaterialName(file.name.split('.')[0]);
         }
         break;
     }
@@ -69,87 +59,46 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
     try {
       setLoading(true);
       
-      if (materialMode === 'file') {
-        // РЕЖИМ ФАЙЛОВ - используем multipart/form-data
-        const submitData = new FormData();
-        
-        // Правильная структура данных для API
-        const lessonData = {
-          name: formData.name,
-          ...(teacherMaterialName && { teacher_material_name: teacherMaterialName }),
-          ...(studentMaterialName && { student_material_name: studentMaterialName }),
-          ...(homeworkMaterialName && { homework_material_name: homeworkMaterialName }),
-          // Для обновления передаем ID
-          ...(lesson && {
-            id: lesson.id,
-            ...(lesson.teacher_material_id && { teacher_material_id: lesson.teacher_material_id }),
-            ...(lesson.student_material_id && { student_material_id: lesson.student_material_id }),
-            ...(lesson.homework_id && { homework_id: lesson.homework_id })
-          })
-        };
-        
-        // Добавляем JSON данные как строку
-        submitData.append('data', JSON.stringify(lessonData));
-        
-        // Добавляем файлы с правильными именами полей
-        if (teacherMaterialFile) {
-          submitData.append('teacher_material_file', teacherMaterialFile);
+      // Новый API - создание урока с материалами
+      const submitData = new FormData();
+      
+      // Данные урока
+      const lessonData = {
+        name: formData.name,
+        // Названия материалов
+        ...(teacherMaterialName && { teacher_material_name: teacherMaterialName }),
+        ...(teacherAdditionalMaterialName && { teacher_additional_material_name: teacherAdditionalMaterialName }),
+        ...(studentMaterialName && { student_material_name: studentMaterialName }),
+        ...(studentAdditionalMaterialName && { student_additional_material_name: studentAdditionalMaterialName }),
+        // HTML текст для основных материалов
+        ...(teacherMaterialText && { teacher_material_text: teacherMaterialText }),
+        ...(studentMaterialText && { student_material_text: studentMaterialText })
+      };
+      
+      // Добавляем JSON данные
+      submitData.append('data', JSON.stringify(lessonData));
+      
+      // Добавляем файлы для дополнительных материалов
+      if (teacherAdditionalMaterialFile) {
+        submitData.append('teacher_additional_material_file', teacherAdditionalMaterialFile);
+      }
+      if (studentAdditionalMaterialFile) {
+        submitData.append('student_additional_material_file', studentAdditionalMaterialFile);
+      }
+      
+      console.log('[LessonEditor] Submitting lesson:', {
+        courseId,
+        lessonData,
+        files: {
+          teacher_additional: teacherAdditionalMaterialFile?.name,
+          student_additional: studentAdditionalMaterialFile?.name
         }
-        if (studentMaterialFile) {
-          submitData.append('student_material_file', studentMaterialFile);
-        }
-        if (homeworkMaterialFile) {
-          submitData.append('homework_material_file', homeworkMaterialFile);
-        }
-        
-        console.log('[LessonEditor] Submitting with files:', {
-          courseId,
-          lessonData,
-          files: {
-            teacher: teacherMaterialFile?.name,
-            student: studentMaterialFile?.name,
-            homework: homeworkMaterialFile?.name
-          }
-        });
-        
-        if (lesson) {
-          await updateLessonWithMaterials(courseId, lesson.id, submitData);
-        } else {
-          await createLessonWithMaterials(courseId, submitData);
-        }
-        
+      });
+      
+      if (lesson) {
+        await updateLessonWithMaterials(courseId, lesson.id, submitData);
       } else {
-        // РЕЖИМ ТЕКСТА - используем JSON
-        const textData = {
-          name: formData.name,
-          ...(teacherMaterialName && { 
-            teacher_material_name: teacherMaterialName,
-            teacher_material_text: teacherMaterialText 
-          }),
-          ...(studentMaterialName && { 
-            student_material_name: studentMaterialName,
-            student_material_text: studentMaterialText 
-          }),
-          ...(homeworkMaterialName && { 
-            homework_material_name: homeworkMaterialName,
-            homework_material_text: homeworkMaterialText 
-          }),
-          // Для обновления передаем ID
-          ...(lesson && {
-            id: lesson.id,
-            ...(lesson.teacher_material_id && { teacher_material_id: lesson.teacher_material_id }),
-            ...(lesson.student_material_id && { student_material_id: lesson.student_material_id }),
-            ...(lesson.homework_id && { homework_id: lesson.homework_id })
-          })
-        };
-        
-        console.log('[LessonEditor] Submitting with text:', { courseId, textData });
-        
-        if (lesson) {
-          await updateLessonWithMaterialsText(courseId, lesson.id, textData);
-        } else {
-          await createLessonWithMaterialsText(courseId, textData);
-        }
+        await createLessonWithMaterials(courseId, submitData);
       }
       
       onSave();
@@ -194,84 +143,38 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
           </label>
         </div>
 
-        {/* Выбор режима материалов */}
-        <div className="form-section">
-          <label className="form-label">
-            <span className="label-text">Тип материалов</span>
-            <div className="radio-group">
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  value="file"
-                  checked={materialMode === 'file'}
-                  onChange={(e) => setMaterialMode(e.target.value)}
-                />
-                <span className="radio-label">📁 Файловые материалы</span>
-              </label>
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  value="text"
-                  checked={materialMode === 'text'}
-                  onChange={(e) => setMaterialMode(e.target.value)}
-                />
-                <span className="radio-label">📝 Текстовые материалы (HTML)</span>
-              </label>
-            </div>
-          </label>
-        </div>
+        {/* Выбор режима материалов - убираем, так как теперь всегда можно и файлы и текст */}
 
         {/* Материалы */}
         <div className="materials-section">
           <h3 className="section-title">📚 Материалы урока</h3>
           
-          {/* Материал для преподавателя */}
-          <div className="material-block">
-            <div className="material-header">
-              <h4 className="material-title">👨‍🏫 Материал для преподавателя</h4>
-              <span className="material-subtitle">
-                {materialMode === 'file' ? 'Конспект, план урока, презентация' : 'HTML содержимое для преподавателя'}
-              </span>
-            </div>
+          {/* Материалы для преподавателя */}
+          <div className="material-category">
+            <h4 className="category-title">👨‍🏫 Материалы для преподавателя</h4>
             
-            <label className="form-label">
-              <span className="label-text">Название материала</span>
-              <input
-                type="text"
-                value={teacherMaterialName}
-                onChange={(e) => setTeacherMaterialName(e.target.value)}
-                placeholder="Например: Конспект урока по React"
-                className="form-input"
-              />
-            </label>
-            
-            {materialMode === 'file' ? (
-              <div className="file-upload">
-                <input
-                  type="file"
-                  id="teacher-file"
-                  onChange={(e) => handleFileChange('teacher', e.target.files[0])}
-                  accept=".pdf,.doc,.docx,.ppt,.pptx,.html,.txt,.zip,.rar"
-                  className="file-input"
-                />
-                <label htmlFor="teacher-file" className="file-label">
-                  <span className="file-icon">📁</span>
-                  <span className="file-text">
-                    {teacherMaterialFile ? teacherMaterialFile.name : 'Выберите файл'}
-                  </span>
-                </label>
-                {teacherMaterialFile && (
-                  <div className="file-info">
-                    <span className="file-size">
-                      Размер: {Math.round(teacherMaterialFile.size / 1024)} KB
-                    </span>
-                  </div>
-                )}
+            {/* Основной материал преподавателя */}
+            <div className="material-block">
+              <div className="material-header">
+                <h5 className="material-title">📋 Основной материал</h5>
+                <span className="material-subtitle">Конспект, план урока, презентация</span>
               </div>
-            ) : (
+              
+              <label className="form-label">
+                <span className="label-text">Название материала</span>
+                <input
+                  type="text"
+                  value={teacherMaterialName}
+                  onChange={(e) => setTeacherMaterialName(e.target.value)}
+                  placeholder="Например: Конспект урока по React"
+                  className="form-input"
+                />
+              </label>
+              
+              {/* Только HTML текст для основного материала */}
               <div className="text-area">
                 <label className="form-label">
-                  <span className="label-text">Содержимое материала (HTML)</span>
+                  <span className="label-text">HTML содержимое</span>
                   <textarea
                     value={teacherMaterialText}
                     onChange={(e) => setTeacherMaterialText(e.target.value)}
@@ -281,62 +184,83 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
                   />
                 </label>
               </div>
-            )}
-            
-            {lesson?.teacher_material && (
-              <div className="current-material">
-                Текущий материал: {lesson.teacher_material.name}
-              </div>
-            )}
-          </div>
-
-          {/* Материал для студента */}
-          <div className="material-block">
-            <div className="material-header">
-              <h4 className="material-title">👨‍🎓 Материал для студента</h4>
-              <span className="material-subtitle">
-                {materialMode === 'file' ? 'Учебные материалы, справочники' : 'HTML содержимое для студента'}
-              </span>
+              
+              {lesson?.teacher_material && (
+                <div className="current-material">
+                  Текущий материал: {lesson.teacher_material.name}
+                </div>
+              )}
             </div>
             
-            <label className="form-label">
-              <span className="label-text">Название материала</span>
-              <input
-                type="text"
-                value={studentMaterialName}
-                onChange={(e) => setStudentMaterialName(e.target.value)}
-                placeholder="Например: Учебные материалы по React"
-                className="form-input"
-              />
-            </label>
-            
-            {materialMode === 'file' ? (
+            {/* Дополнительный материал преподавателя */}
+            <div className="material-block">
+              <div className="material-header">
+                <h5 className="material-title">� Дополнительный материал</h5>
+                <span className="material-subtitle">Справочники, примеры, ресурсы</span>
+              </div>
+              
+              <label className="form-label">
+                <span className="label-text">Название дополнительного материала</span>
+                <input
+                  type="text"
+                  value={teacherAdditionalMaterialName}
+                  onChange={(e) => setTeacherAdditionalMaterialName(e.target.value)}
+                  placeholder="Например: Справочник по React Hooks"
+                  className="form-input"
+                />
+              </label>
+              
               <div className="file-upload">
                 <input
                   type="file"
-                  id="student-file"
-                  onChange={(e) => handleFileChange('student', e.target.files[0])}
+                  id="teacher-additional-file"
+                  onChange={(e) => handleFileChange('teacher_additional', e.target.files[0])}
                   accept=".pdf,.doc,.docx,.ppt,.pptx,.html,.txt,.zip,.rar"
                   className="file-input"
                 />
-                <label htmlFor="student-file" className="file-label">
+                <label htmlFor="teacher-additional-file" className="file-label">
                   <span className="file-icon">📁</span>
                   <span className="file-text">
-                    {studentMaterialFile ? studentMaterialFile.name : 'Выберите файл'}
+                    {teacherAdditionalMaterialFile ? teacherAdditionalMaterialFile.name : 'Выберите дополнительный файл'}
                   </span>
                 </label>
-                {studentMaterialFile && (
+                {teacherAdditionalMaterialFile && (
                   <div className="file-info">
                     <span className="file-size">
-                      Размер: {Math.round(studentMaterialFile.size / 1024)} KB
+                      Размер: {Math.round(teacherAdditionalMaterialFile.size / 1024)} KB
                     </span>
                   </div>
                 )}
               </div>
-            ) : (
+            </div>
+          </div>
+
+          {/* Материалы для студента */}
+          <div className="material-category">
+            <h4 className="category-title">�‍🎓 Материалы для студента</h4>
+            
+            {/* Основной материал студента */}
+            <div className="material-block">
+              <div className="material-header">
+                <h5 className="material-title">� Основной материал</h5>
+                <span className="material-subtitle">Учебные материалы, теория</span>
+              </div>
+              
+              <label className="form-label">
+                <span className="label-text">Название материала</span>
+                <input
+                  type="text"
+                  value={studentMaterialName}
+                  onChange={(e) => setStudentMaterialName(e.target.value)}
+                  placeholder="Например: Учебные материалы по React"
+                  className="form-input"
+                />
+              </label>
+              
+              {/* Только HTML текст для основного материала */}
               <div className="text-area">
                 <label className="form-label">
-                  <span className="label-text">Содержимое материала (HTML)</span>
+                  <span className="label-text">HTML содержимое</span>
                   <textarea
                     value={studentMaterialText}
                     onChange={(e) => setStudentMaterialText(e.target.value)}
@@ -346,79 +270,56 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
                   />
                 </label>
               </div>
-            )}
-            
-            {lesson?.student_material && (
-              <div className="current-material">
-                Текущий материал: {lesson.student_material.name}
-              </div>
-            )}
-          </div>
-
-          {/* Домашнее задание */}
-          <div className="material-block">
-            <div className="material-header">
-              <h4 className="material-title">📝 Домашнее задание</h4>
-              <span className="material-subtitle">
-                {materialMode === 'file' ? 'Практические задания, упражнения' : 'HTML содержимое задания'}
-              </span>
+              
+              {lesson?.student_material && (
+                <div className="current-material">
+                  Текущий материал: {lesson.student_material.name}
+                </div>
+              )}
             </div>
             
-            <label className="form-label">
-              <span className="label-text">Название задания</span>
-              <input
-                type="text"
-                value={homeworkMaterialName}
-                onChange={(e) => setHomeworkMaterialName(e.target.value)}
-                placeholder="Например: Практическое задание по React"
-                className="form-input"
-              />
-            </label>
-            
-            {materialMode === 'file' ? (
+            {/* Дополнительный материал студента */}
+            <div className="material-block">
+              <div className="material-header">
+                <h5 className="material-title">� Дополнительный материал</h5>
+                <span className="material-subtitle">Примеры, практические задания</span>
+              </div>
+              
+              <label className="form-label">
+                <span className="label-text">Название дополнительного материала</span>
+                <input
+                  type="text"
+                  value={studentAdditionalMaterialName}
+                  onChange={(e) => setStudentAdditionalMaterialName(e.target.value)}
+                  placeholder="Например: Практические примеры"
+                  className="form-input"
+                />
+              </label>
+              
               <div className="file-upload">
                 <input
                   type="file"
-                  id="homework-file"
-                  onChange={(e) => handleFileChange('homework', e.target.files[0])}
+                  id="student-additional-file"
+                  onChange={(e) => handleFileChange('student_additional', e.target.files[0])}
                   accept=".pdf,.doc,.docx,.ppt,.pptx,.html,.txt,.zip,.rar"
                   className="file-input"
                 />
-                <label htmlFor="homework-file" className="file-label">
+                <label htmlFor="student-additional-file" className="file-label">
                   <span className="file-icon">📁</span>
                   <span className="file-text">
-                    {homeworkMaterialFile ? homeworkMaterialFile.name : 'Выберите файл'}
+                    {studentAdditionalMaterialFile ? studentAdditionalMaterialFile.name : 'Выберите дополнительный файл'}
                   </span>
                 </label>
-                {homeworkMaterialFile && (
+                {studentAdditionalMaterialFile && (
                   <div className="file-info">
                     <span className="file-size">
-                      Размер: {Math.round(homeworkMaterialFile.size / 1024)} KB
+                      Размер: {Math.round(studentAdditionalMaterialFile.size / 1024)} KB
                     </span>
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="text-area">
-                <label className="form-label">
-                  <span className="label-text">Содержимое задания (HTML)</span>
-                  <textarea
-                    value={homeworkMaterialText}
-                    onChange={(e) => setHomeworkMaterialText(e.target.value)}
-                    placeholder="Введите HTML содержимое задания..."
-                    rows={6}
-                    className="form-textarea"
-                  />
-                </label>
-              </div>
-            )}
-            
-            {lesson?.homework && (
-              <div className="current-material">
-                Текущее задание: {lesson.homework.name}
-              </div>
-            )}
-          </div>
+            </div>          </div>
+
         </div>
 
         <div className="form-actions">
