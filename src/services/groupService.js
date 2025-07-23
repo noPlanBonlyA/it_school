@@ -61,10 +61,46 @@ export const getGroupById = async (groupId) => {
  * Создание группы
  */
 export const createGroup = async (groupData) => {
-  console.log('[GroupService] Creating group:', groupData);
+  console.log('[GroupService] Creating group with initial data:', groupData);
+  console.log('[GroupService] Data types:', {
+    name: typeof groupData?.name,
+    description: typeof groupData?.description,
+    start_date: typeof groupData?.start_date,
+    end_date: typeof groupData?.end_date
+  });
+  
+  // Валидация обязательных полей
+  if (!groupData || typeof groupData !== 'object') {
+    throw new Error('Group data must be an object');
+  }
+  
+  const { name, description, start_date, end_date } = groupData;
+  
+  if (!name || typeof name !== 'string' || !name.trim()) {
+    throw new Error('Group name is required and must be a non-empty string');
+  }
+  
+  if (!start_date || typeof start_date !== 'string') {
+    throw new Error('Start date is required and must be a string');
+  }
+  
+  if (!end_date || typeof end_date !== 'string') {
+    throw new Error('End date is required and must be a string');
+  }
+  
+  // Создаем очищенный объект данных
+  const cleanData = {
+    name: name.trim(),
+    description: description ? String(description).trim() : '',
+    start_date: start_date,
+    end_date: end_date
+  };
+  
+  console.log('[GroupService] Clean data to send:', cleanData);
+  console.log('[GroupService] JSON stringified data:', JSON.stringify(cleanData));
   
   try {
-    const response = await api.post('/groups/', groupData);
+    const response = await api.post('/groups/', cleanData);
     
     console.log('[GroupService] Group created:', response.data);
     return response.data;
@@ -80,13 +116,43 @@ export const createGroup = async (groupData) => {
 export const updateGroup = async (groupId, groupData) => {
   console.log('[GroupService] Updating group:', { groupId, groupData });
   
+  // Валидация данных перед отправкой
+  if (!groupId) {
+    throw new Error('Group ID is required');
+  }
+  
+  if (!groupData || typeof groupData !== 'object') {
+    throw new Error('Group data must be an object');
+  }
+  
+  // Проверяем, что данные не содержат объекты вместо строк
+  const cleanData = {};
+  Object.keys(groupData).forEach(key => {
+    const value = groupData[key];
+    if (value !== null && value !== undefined) {
+      if (typeof value === 'string') {
+        cleanData[key] = value;
+      } else if (typeof value === 'number' || typeof value === 'boolean') {
+        cleanData[key] = value;
+      } else {
+        console.warn(`[GroupService] Converting non-primitive value for ${key}:`, value);
+        cleanData[key] = String(value);
+      }
+    } else {
+      cleanData[key] = value;
+    }
+  });
+  
+  console.log('[GroupService] Clean data to send:', cleanData);
+  
   try {
-    const response = await api.put(`/groups/${groupId}`, groupData);
+    const response = await api.put(`/groups/${groupId}`, cleanData);
     
     console.log('[GroupService] Group updated:', response.data);
     return response.data;
   } catch (error) {
     console.error('[GroupService] Error updating group:', error);
+    console.error('[GroupService] Error response:', error.response?.data);
     throw error;
   }
 };

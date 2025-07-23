@@ -193,3 +193,89 @@ export const listLessons = getCourseLessons;
 export const createLesson = createLessonWithMaterials;
 export const updateLesson = updateLessonWithMaterials;
 export const deleteLesson = deleteLessonWithMaterials;
+
+/**
+ * Создает урок с автоматическим добавлением в расписания групп
+ */
+export const createLessonWithAutoSchedule = async (courseId, formData) => {
+  console.log('[LessonService] Creating lesson with auto schedule:', { courseId });
+  
+  try {
+    // Сначала создаем урок
+    const lessonResponse = await createLessonWithMaterials(courseId, formData);
+    const newLesson = lessonResponse;
+    
+    console.log('[LessonService] Lesson created, now adding to group schedules:', newLesson);
+    
+    // Автоматически добавляем урок во все группы курса
+    const { autoAddLessonToAllCourseGroups } = await import('./groupScheduleService');
+    const autoScheduleResult = await autoAddLessonToAllCourseGroups(courseId, newLesson.id);
+    
+    console.log('[LessonService] Auto schedule completed:', autoScheduleResult);
+    
+    // Формируем сообщение для пользователя
+    let message = '';
+    if (autoScheduleResult.total === 0) {
+      message = 'Урок создан. Курс пока не привязан к группам.';
+    } else if (autoScheduleResult.successCount === 0) {
+      message = `Урок создан. Не удалось добавить в расписание ${autoScheduleResult.total} групп(ы). Проверьте настройки расписания групп и нажмите "Обновить" в нужных группах.`;
+    } else if (autoScheduleResult.successCount === autoScheduleResult.total) {
+      message = `Урок создан и автоматически добавлен в расписание ${autoScheduleResult.total} групп(ы).`;
+    } else {
+      message = `Урок создан. Добавлен в расписание ${autoScheduleResult.successCount} из ${autoScheduleResult.total} групп(ы). Для остальных групп зайдите в группу и нажмите "Обновить расписание".`;
+    }
+    
+    return {
+      lesson: newLesson,
+      autoSchedule: autoScheduleResult,
+      message
+    };
+    
+  } catch (error) {
+    console.error('[LessonService] Error creating lesson with auto schedule:', error);
+    throw error;
+  }
+};
+
+/**
+ * Создает урок с текстом и автоматическим добавлением в расписания групп
+ */
+export const createLessonWithMaterialsTextAndAutoSchedule = async (courseId, textData) => {
+  console.log('[LessonService] Creating lesson with text and auto schedule:', { courseId });
+  
+  try {
+    // Сначала создаем урок
+    const lessonResponse = await createLessonWithMaterialsText(courseId, textData);
+    const newLesson = lessonResponse;
+    
+    console.log('[LessonService] Lesson created, now adding to group schedules:', newLesson);
+    
+    // Автоматически добавляем урок во все группы курса
+    const { autoAddLessonToAllCourseGroups } = await import('./groupScheduleService');
+    const autoScheduleResult = await autoAddLessonToAllCourseGroups(courseId, newLesson.id);
+    
+    console.log('[LessonService] Auto schedule completed:', autoScheduleResult);
+    
+    // Формируем сообщение для пользователя
+    let message = '';
+    if (autoScheduleResult.total === 0) {
+      message = 'Урок создан. Курс пока не привязан к группам.';
+    } else if (autoScheduleResult.successCount === 0) {
+      message = `Урок создан. Не удалось добавить в расписание ${autoScheduleResult.total} групп(ы). Проверьте настройки расписания групп и нажмите "Обновить" в нужных группах.`;
+    } else if (autoScheduleResult.successCount === autoScheduleResult.total) {
+      message = `Урок создан и автоматически добавлен в расписание ${autoScheduleResult.total} групп(ы).`;
+    } else {
+      message = `Урок создан. Добавлен в расписание ${autoScheduleResult.successCount} из ${autoScheduleResult.total} групп(ы). Для остальных групп зайдите в группу и нажмите "Обновить расписание".`;
+    }
+    
+    return {
+      lesson: newLesson,
+      autoSchedule: autoScheduleResult,
+      message
+    };
+    
+  } catch (error) {
+    console.error('[LessonService] Error creating lesson with text and auto schedule:', error);
+    throw error;
+  }
+};

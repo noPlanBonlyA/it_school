@@ -535,3 +535,95 @@ mark { background:#ffecb5; border-radius:2px; padding:0 2px; }
   display: flex;
   gap: 8px;
 }
+
+/* Информация о расписании группы */
+.schedule-info {
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.schedule-info.has-schedule {
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.08), rgba(40, 167, 69, 0.05));
+  border: 1px solid rgba(0, 123, 255, 0.2);
+}
+
+.schedule-info.no-schedule {
+  background: rgba(108, 117, 125, 0.05);
+  border: 1px solid rgba(108, 117, 125, 0.2);
+  color: #6c757d;
+  text-align: center;
+}
+
+.schedule-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.schedule-day {
+  font-weight: 600;
+  color: #007bff;
+  background: rgba(0, 123, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.schedule-time {
+  font-family: 'Monaco', 'Menlo', monospace;
+  color: #28a745;
+  font-weight: 500;
+  background: rgba(40, 167, 69, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.schedule-interval {
+  color: #6c757d;
+  font-size: 11px;
+  font-style: italic;
+}
+
+.schedule-auditorium {
+  margin-top: 6px;
+  color: #6c757d;
+  font-size: 11px;
+}
+
+.schedule-status {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.schedule-hint {
+  display: block;
+  margin-top: 4px;
+  color: #adb5bd;
+  font-size: 11px;
+  font-style: italic;
+}
+
+/* Компактная версия */
+.schedule-info-compact {
+  display: inline-block;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin: 4px 0;
+}
+
+.schedule-info-compact.has-schedule {
+  background: rgba(0, 123, 255, 0.1);
+  color: #007bff;
+  border: 1px solid rgba(0, 123, 255, 0.2);
+}
+
+.schedule-info-compact.no-schedule {
+  background: rgba(108, 117, 125, 0.05);
+  color: #6c757d;
+  border: 1px solid rgba(108, 117, 125, 0.2);
+}

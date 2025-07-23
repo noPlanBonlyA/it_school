@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
 import LessonEditor from '../components/LessonEditor';
+import CourseGroupsViewer from '../components/CourseGroupsViewer';
 import { useAuth } from '../contexts/AuthContext';
 import { getCourseLessons, deleteLessonWithMaterials } from '../services/lessonService';
 import { getCourse } from '../services/courseService';
@@ -19,6 +20,7 @@ export default function ManageLessonsPage() {
   const [showEditor, setShowEditor] = useState(false);
   const [editingLesson, setEditingLesson] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [lastCreatedLessonId, setLastCreatedLessonId] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -67,7 +69,13 @@ export default function ManageLessonsPage() {
     }
   };
 
-  const handleSaveLesson = async () => {
+  const handleSaveLesson = async (savedLesson) => {
+    // Если это новый урок (не редактирование), сохраняем его ID
+    if (!editingLesson && savedLesson && savedLesson.id) {
+      setLastCreatedLessonId(savedLesson.id);
+      console.log('New lesson created:', savedLesson.id);
+    }
+    
     setShowEditor(false);
     setEditingLesson(null);
     await loadData();
@@ -106,6 +114,19 @@ export default function ManageLessonsPage() {
           </button>
           <h1>{course?.name} - Управление уроками</h1>
         </div>
+
+        {/* Компонент для показа групп курса и автоматического добавления урока */}
+        {course && (
+          <CourseGroupsViewer 
+            courseId={courseId}
+            courseName={course.name}
+            newLessonId={lastCreatedLessonId}
+            onAutoAdd={(results) => {
+              console.log('Auto-add results:', results);
+              setLastCreatedLessonId(null); // Сбрасываем после использования
+            }}
+          />
+        )}
 
         {showEditor ? (
           <div className="block">

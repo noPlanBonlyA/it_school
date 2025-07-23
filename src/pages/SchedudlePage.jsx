@@ -9,8 +9,10 @@ import interactionPlugin from '@fullcalendar/interaction';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
 import Schedule from '../components/Schedule';
+import ScheduleFilterModal from '../components/ScheduleFilterModal';
 import { useAuth } from '../contexts/AuthContext';
 import { getUserScheduleOptimized } from '../services/scheduleService';
+import { getFilteredSchedule, getFilterOptions, formatFiltersText } from '../services/scheduleFilterService';
 
 import '../styles/SchedulePage.css';
 
@@ -21,27 +23,75 @@ export default function SchedulePage() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Состояния для фильтрации (только для админов)
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [activeFilters, setActiveFilters] = useState({});
+  const [filterOptions, setFilterOptions] = useState({});
+  const [isFiltered, setIsFiltered] = useState(false);
+
+  // Проверяем, является ли пользователь админом
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+
+  // ───── загрузка опций для фильтров ─────
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const loadFilterOptions = async () => {
+      try {
+        const options = await getFilterOptions();
+        setFilterOptions(options);
+      } catch (error) {
+        console.error('[SchedulePage] Error loading filter options:', error);
+      }
+    };
+
+    loadFilterOptions();
+  }, [isAdmin]);
+
   // ───── загрузка расписания ─────
+  const loadSchedule = async (filters = {}) => {
+    try {
+      setLoading(true);
+      
+      let scheduleData;
+      if (isAdmin && Object.keys(filters).length > 0) {
+        // Для админов с фильтрами - используем фильтрованное расписание
+        scheduleData = await getFilteredSchedule(filters);
+        setIsFiltered(true);
+      } else {
+        // Обычное расписание для всех или админов без фильтров
+        scheduleData = await getUserScheduleOptimized(user);
+        setIsFiltered(false);
+      }
+      
+      console.log('[SchedulePage] Schedule loaded:', scheduleData);
+      setEvents(scheduleData || []);
+    } catch (error) {
+      console.error('[SchedulePage] Error loading schedule:', error);
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       navigate('/login');
       return;
     }
 
-    (async () => {
-      try {
-        setLoading(true);
-        const scheduleData = await getUserScheduleOptimized(user);
-        console.log('[SchedulePage] Schedule loaded:', scheduleData);
-        setEvents(scheduleData || []);
-      } catch (error) {
-        console.error('[SchedulePage] Error loading schedule:', error);
-        setEvents([]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [user, navigate]);
+    loadSchedule(activeFilters);
+  }, [user, navigate, activeFilters]);
+
+  // ───── обработка фильтров ─────
+  const handleFilterApply = (filters) => {
+    console.log('[SchedulePage] Applying filters:', filters);
+    setActiveFilters(filters);
+  };
+
+  const handleClearFilters = () => {
+    setActiveFilters({});
+  };
 
   // ───── подготовка событий для FullCalendar ─────
   const calendarEvents = useMemo(() => events.map(e => ({
@@ -131,6 +181,41 @@ export default function SchedulePage() {
       <div className="main-content">
         <Topbar userName={fio} userRole={user.role} pageTitle="Расписание" onProfileClick={() => navigate('/profile')} />
         
+        {/* Панель фильтрации для админов */}
+        {isAdmin && (
+          <div className="admin-schedule-controls">
+            <div className="filter-info">
+              <div className="filter-status">
+                {isFiltered ? (
+                  <span className="filtered-badge">
+                    🔍 Применены фильтры: {formatFiltersText(activeFilters, filterOptions)}
+                  </span>
+                ) : (
+                  <span className="all-items-badge">
+                    📋 Показаны все записи расписания
+                  </span>
+                )}
+              </div>
+              <div className="filter-controls">
+                <button 
+                  className="btn btn-filter" 
+                  onClick={() => setShowFilterModal(true)}
+                >
+                  🔍 Фильтрация
+                </button>
+                {isFiltered && (
+                  <button 
+                    className="btn btn-clear" 
+                    onClick={handleClearFilters}
+                  >
+                    ✖️ Очистить фильтры
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="schedule-page">
           <div className="schedule-layout">
             {/* Виджет ближайших занятий */}
@@ -185,6 +270,16 @@ export default function SchedulePage() {
             </div>
           </div>
         </div>
+
+        {/* Модальное окно фильтрации для админов */}
+        {isAdmin && (
+          <ScheduleFilterModal
+            isOpen={showFilterModal}
+            onClose={() => setShowFilterModal(false)}
+            onFilterApply={handleFilterApply}
+            currentFilters={activeFilters}
+          />
+        )}
       </div>
     </div>
   );

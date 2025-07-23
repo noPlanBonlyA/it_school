@@ -1,0 +1,240 @@
+/* Настройки расписания по умолчанию */
+.default-schedule-settings {
+  position: relative;
+  display: inline-block;
+}
+
+.settings-toggle-btn {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.settings-toggle-btn:hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.settings-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.settings-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.settings-header h3 {
+  margin: 0;
+  color: #1e1e2f;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: rgba(108, 117, 125, 0.1);
+  color: #495057;
+}
+
+.settings-body {
+  padding: 24px;
+}
+
+.settings-description {
+  color: #6c757d;
+  font-size: 14px;
+  margin: 0 0 24px 0;
+  padding: 12px;
+  background: rgba(0, 123, 255, 0.05);
+  border-left: 4px solid #007bff;
+  border-radius: 4px;
+}
+
+.setting-group {
+  margin-bottom: 20px;
+}
+
+.setting-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+.setting-select,
+.setting-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.setting-select:focus,
+.setting-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.setting-select {
+  cursor: pointer;
+}
+
+.settings-preview {
+  margin-top: 24px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.05), rgba(0, 123, 255, 0.03));
+  border: 1px solid rgba(40, 167, 69, 0.2);
+  border-radius: 8px;
+}
+
+.settings-preview h4 {
+  margin: 0 0 12px 0;
+  color: #28a745;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.preview-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.preview-item {
+  font-size: 13px;
+  color: #495057;
+}
+
+.preview-item strong {
+  color: #1e1e2f;
+  min-width: 100px;
+  display: inline-block;
+}
+
+.settings-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+  background: #f8f9fa;
+}
+
+.settings-footer .btn-secondary {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.settings-footer .btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.settings-footer .btn-primary {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+}
+
+.settings-footer .btn-primary:hover {
+  background: linear-gradient(135deg, #218838, #1e7e34);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .settings-modal {
+    width: 95vw;
+    margin: 10px;
+  }
+  
+  .settings-header,
+  .settings-body,
+  .settings-footer {
+    padding: 16px;
+  }
+  
+  .settings-footer {
+    flex-direction: column;
+  }
+  
+  .settings-footer .btn-secondary,
+  .settings-footer .btn-primary {
+    width: 100%;
+  }
+}

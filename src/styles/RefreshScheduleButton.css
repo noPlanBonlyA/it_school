@@ -1,0 +1,74 @@
+/* src/styles/RefreshScheduleButton.css */
+
+.refresh-schedule-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+}
+
+.refresh-schedule-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #45a049 0%, #4CAF50 100%);
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+  transform: translateY(-1px);
+}
+
+.refresh-schedule-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+}
+
+.refresh-schedule-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.refresh-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.refresh-icon.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Вариант для компактного размещения */
+.refresh-schedule-btn.compact {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.refresh-schedule-btn.compact .refresh-icon {
+  font-size: 14px;
+}
+
+/* Вариант только с иконкой */
+.refresh-schedule-btn.icon-only {
+  padding: 8px;
+  min-width: 36px;
+  justify-content: center;
+}
+
+.refresh-schedule-btn.icon-only span:not(.refresh-icon) {
+  display: none;
+}

@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 
 import Sidebar from '../components/Sidebar';
 import SmartTopBar from '../components/SmartTopBar';
+import AutoScheduleModal from '../components/AutoScheduleModal';
+import GroupScheduleInfo from '../components/GroupScheduleInfo';
+import DefaultScheduleSettings from '../components/DefaultScheduleSettings';
+import RefreshScheduleButton from '../components/RefreshScheduleButton';
 import { useAuth } from '../contexts/AuthContext';
 
 import {
@@ -18,9 +22,16 @@ import { findStudentByUser } from '../services/studentService';
 import { findTeacherByUser } from '../services/teacherService';
 import { getAllCourses }     from '../services/courseService';
 
+import { 
+  createAutoSchedule,
+  loadGroupScheduleSettings,
+  saveGroupScheduleSettings 
+} from '../services/groupScheduleService';
+
 import api from '../api/axiosInstance';
 import '../styles/ManageUserPage.css';
 import '../styles/ManageGroupPage.css';
+import '../styles/AutoScheduleModal.css';
 
 /* ─────────────────── helpers ────────────────────────*/
 const hi = (txt, q) => {
@@ -79,7 +90,7 @@ export default function ManageGroupPage() {
   const [errs, setErrs] = useState({});
 
   const [sel , setSel ] = useState(null);
-  const [edit, setEdit] = useState(null);
+  const [edit, setEdit] = useState({ name: '', description: '' });
   const [show, setShow] = useState(false);
 
   const [addStu, setAddStu] = useState(false);
@@ -97,6 +108,10 @@ export default function ManageGroupPage() {
   const [schedulingMode, setSchedulingMode] = useState(false);
   const [courseLessons, setCourseLessons] = useState([]);
   const [lessonSchedules, setLessonSchedules] = useState({});
+  
+  // Новые состояния для автоматического расписания
+  const [showAutoSchedule, setShowAutoSchedule] = useState(false);
+  const [selectedCourseForAuto, setSelectedCourseForAuto] = useState(null);
 
   /* ─── initial groups load ────────*/
   useEffect(() => { 
@@ -199,11 +214,25 @@ export default function ManageGroupPage() {
       futureDate.setFullYear(futureDate.getFullYear() + 1);
       const endDate = futureDate.toISOString().split('T')[0];
       
-      const g   = await createGroup({
-        ...newF,
+      // Создаем объект с валидными данными, исключая undefined и null
+      const groupData = {
+        name: newF.name.trim(),
+        description: newF.description?.trim() || '',
         start_date: currentDate,
         end_date: endDate
+      };
+      
+      console.log('[ManageGroupPage] Creating group with data:', groupData);
+      console.log('[ManageGroupPage] Data validation:', {
+        name: groupData.name,
+        nameLength: groupData.name.length,
+        description: groupData.description,
+        start_date: groupData.start_date,
+        end_date: groupData.end_date,
+        allFieldsPresent: !!(groupData.name && groupData.start_date && groupData.end_date)
       });
+      
+      const g = await createGroup(groupData);
       const obj = await refresh(g.id);
       if (obj) {
         setGroups(gs => [...gs, obj]);
@@ -212,7 +241,21 @@ export default function ManageGroupPage() {
       setErrs({});
     } catch (error) { 
       console.error('Error creating group:', error);
-      alert('Ошибка создания группы'); 
+      let errorMessage = 'Ошибка создания группы';
+      
+      if (error.response?.data?.detail) {
+        if (typeof error.response.data.detail === 'string') {
+          errorMessage += ': ' + error.response.data.detail;
+        } else if (Array.isArray(error.response.data.detail)) {
+          errorMessage += ':\n' + error.response.data.detail.map(err => 
+            `${err.loc?.join('.') || 'field'}: ${err.msg || err.type || 'invalid'}`
+          ).join('\n');
+        }
+      } else if (error.message) {
+        errorMessage += ': ' + error.message;
+      }
+      
+      alert(errorMessage);
     }
   };
 
@@ -229,9 +272,14 @@ export default function ManageGroupPage() {
   };
 
   const open = g => {
+    console.log('[ManageGroupPage] Opening group for edit:', g);
     setSel(g);
     setEdit({
-      name       : g.name,
+      name: g.name || '',
+      description: g.description || ''
+    });
+    console.log('[ManageGroupPage] Edit state initialized:', {
+      name: g.name || '',
       description: g.description || ''
     });
     setAddStu(false); setAddTea(false); setAddCou(false);
@@ -242,13 +290,38 @@ export default function ManageGroupPage() {
 
   const save = async () => {
     if (!sel) return;
+    
+    console.log('[ManageGroupPage] Save called with:', { sel, edit });
+    
     const body = {};
     ['name','description'].forEach(f=>{
-      if ((sel[f]||'') !== (edit[f]||'')) body[f] = edit[f] || null;
+      const oldValue = sel[f] || '';
+      const newValue = edit[f] || '';
+      
+      if (oldValue !== newValue) {
+        // Убеждаемся, что отправляем строки, а не объекты
+        body[f] = typeof newValue === 'string' ? newValue.trim() : String(newValue || '').trim();
+      }
     });
-    if (!Object.keys(body).length) return;
+    
+    console.log('[ManageGroupPage] Changes detected:', body);
+    
+    if (!Object.keys(body).length) {
+      console.log('[ManageGroupPage] No changes to save');
+      return;
+    }
+    
+    // Валидация данных перед отправкой
+    if (body.name !== undefined && (!body.name || body.name.length < 1)) {
+      alert('Название группы не может быть пустым');
+      return;
+    }
+    
     try {
-      await updateGroup(sel.id, body);
+      console.log('[ManageGroupPage] Calling updateGroup with:', { groupId: sel.id, body });
+      const result = await updateGroup(sel.id, body);
+      console.log('[ManageGroupPage] Update result:', result);
+      
       let fr = await refresh(sel.id);
 
       /* PUT teacher может обнулиться; вернём обратно, если был */
@@ -259,15 +332,41 @@ export default function ManageGroupPage() {
       if (fr) {
         setSel(fr); 
         setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
+        
+        // Обновляем состояние edit после успешного сохранения
+        setEdit({
+          name: fr.name || '',
+          description: fr.description || ''
+        });
+        
+        alert('Группа успешно обновлена!');
       }
     } catch (error) { 
       console.error('Error saving group:', error);
-      alert('Не удалось сохранить'); 
+      let errorMessage = 'Не удалось сохранить группу';
+      
+      if (error.response?.data?.detail) {
+        if (typeof error.response.data.detail === 'string') {
+          errorMessage += ': ' + error.response.data.detail;
+        } else if (Array.isArray(error.response.data.detail)) {
+          errorMessage += ':\n' + error.response.data.detail.map(err => 
+            `${err.loc?.join('.') || 'field'}: ${err.msg || err.type || 'invalid'}`
+          ).join('\n');
+        }
+      } else if (error.message) {
+        errorMessage += ': ' + error.message;
+      }
+      
+      alert(errorMessage); 
     }
   };
   
   const changed = sel && ['name','description']
-    .some(f => (sel[f]||'') !== (edit[f]||''));
+    .some(f => {
+      const oldValue = (sel[f] || '').toString();
+      const newValue = (edit[f] || '').toString();
+      return oldValue !== newValue;
+    });
 
   /* ────────────── filters ───────────────────*/
   const filterArr = (arr,q,fn)=>{ 
@@ -385,14 +484,69 @@ export default function ManageGroupPage() {
         return;
       }
 
-      // Переходим в режим планирования расписания
-      setCourseLessons(lessons);
-      setLessonSchedules({});
-      setSchedulingMode(true);
+      // Показываем выбор типа добавления курса
+      const useAutoSchedule = window.confirm(
+        `Курс содержит ${lessons.length} уроков.\n\n` +
+        'Выберите способ добавления:\n' +
+        '• ОК - Автоматическое расписание (рекомендуется)\n' +
+        '• Отмена - Ручное планирование каждого урока'
+      );
+
+      if (useAutoSchedule) {
+        // Находим выбранный курс
+        const selectedCourse = courses.find(c => c.id === chosenC);
+        setSelectedCourseForAuto({
+          id: chosenC,
+          name: selectedCourse?.name || 'Неизвестный курс',
+          lessonCount: lessons.length
+        });
+        setShowAutoSchedule(true);
+      } else {
+        // Переходим в режим ручного планирования расписания
+        setCourseLessons(lessons);
+        setLessonSchedules({});
+        setSchedulingMode(true);
+      }
       
     } catch(e) {
       console.error('Error loading course lessons:', e);
       alert('Не удалось загрузить уроки курса');
+    }
+  };
+
+  // Обработчик для автоматического создания расписания
+  const handleAutoScheduleConfirm = async (scheduleSettings) => {
+    try {
+      console.log('[ManageGroupPage] Creating auto schedule:', {
+        groupId: sel.id,
+        courseId: selectedCourseForAuto.id,
+        scheduleSettings
+      });
+
+      const result = await createAutoSchedule(
+        sel.id, 
+        selectedCourseForAuto.id, 
+        scheduleSettings
+      );
+      
+      // Обновляем группу
+      const fr = await refresh(sel.id);
+      if (fr) {
+        setSel(fr); 
+        setGroups(gs => gs.map(g => g.id === fr.id ? fr : g));
+      }
+      
+      // Сбрасываем состояние
+      setSelectedCourseForAuto(null);
+      setChosenC(null);
+      setAddCou(false);
+      setCFil('');
+      
+      alert(`Курс "${selectedCourseForAuto.name}" успешно добавлен!\nСоздано расписание для ${result.lessonCount} уроков.`);
+      
+    } catch(error) {
+      console.error('Error creating auto schedule:', error);
+      throw error; // Пробрасываем ошибку в модал
     }
   };
 
@@ -472,7 +626,10 @@ export default function ManageGroupPage() {
 
           {/*— create group —*/}
           <div className="block">
-            <h2>Создать группу</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h2 style={{ margin: 0 }}>Создать группу</h2>
+              <DefaultScheduleSettings />
+            </div>
             <div className="user-form form-grid">
               {['name','description'].map(f=>(
                 <div className="field" key={f}>
@@ -520,6 +677,9 @@ export default function ManageGroupPage() {
                       {' • '}Студентов: {g.students.length}
                       {' • '}Курсов: {g.courses?.length || 0}
                     </p>
+                    
+                    {/* Информация о расписании группы */}
+                    <GroupScheduleInfo group={g} compact={true} />
                   </div>
                   <div className="group-actions" style={{ display: 'flex', gap: '8px' }}>
                     <button className="btn-primary" onClick={() => open(g)}>Управлять</button>
@@ -566,18 +726,23 @@ export default function ManageGroupPage() {
                       <div className="field" key={f}>
                         <label>{f.replace('_',' ')}</label>
                         {f==='description'
-                          ? <textarea value={edit[f]}
-                                      onChange={e=>setEdit(s=>({...s,[f]:e.target.value}))}
+                          ? <textarea value={edit[f] || ''}
+                                      onChange={e=>setEdit(s=>({...s,[f]:e.target.value || ''}))}
                                       style={{ minHeight: '60px', resize: 'vertical' }}/>
                           : <input type={f.includes('date')?'date':'text'}
-                                   value={edit[f]}
-                                   onChange={e=>setEdit(s=>({...s,[f]:e.target.value}))}/>}
+                                   value={edit[f] || ''}
+                                   onChange={e=>setEdit(s=>({...s,[f]:e.target.value || ''}))}/>}
                       </div>
                     ))}
                     <button className="btn-primary" disabled={!changed}
                             style={{opacity:changed?1:0.55}} onClick={save}>
                       Сохранить изменения
                     </button>
+                    
+                    {/* Информация о расписании группы */}
+                    <div style={{ marginTop: '16px' }}>
+                      <GroupScheduleInfo group={sel} />
+                    </div>
                   </div>
                 </div>
 
@@ -716,12 +881,21 @@ export default function ManageGroupPage() {
                   <div className="section">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                       <h4 style={{ margin: 0 }}>Курсы ({sel.courses?.length || 0})</h4>
-                      <button className="btn-primary" style={{ fontSize: '12px', padding: '4px 8px' }} onClick={async()=>{
-                        const n=!addCou; setAddCou(n); setAddStu(false); setAddTea(false);
-                        if(n) await loadCou();
-                      }}>
-                        {addCou?'Отмена':'Добавить'}
-                      </button>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {sel.courses?.length > 0 && (
+                          <RefreshScheduleButton 
+                            groupId={sel.id} 
+                            courses={sel.courses}
+                            variant="small"
+                          />
+                        )}
+                        <button className="btn-primary" style={{ fontSize: '12px', padding: '4px 8px' }} onClick={async()=>{
+                          const n=!addCou; setAddCou(n); setAddStu(false); setAddTea(false);
+                          if(n) await loadCou();
+                        }}>
+                          {addCou?'Отмена':'Добавить'}
+                        </button>
+                      </div>
                     </div>
 
                     {/* уже привязанные */}
@@ -867,6 +1041,19 @@ export default function ManageGroupPage() {
             </div>{/* modal-content */}
           </div>
         )}
+
+        {/* Модал автоматического расписания */}
+        <AutoScheduleModal
+          isOpen={showAutoSchedule}
+          onClose={() => {
+            setShowAutoSchedule(false);
+            setSelectedCourseForAuto(null);
+          }}
+          onConfirm={handleAutoScheduleConfirm}
+          groupId={sel?.id}
+          courseName={selectedCourseForAuto?.name}
+          lessonCount={selectedCourseForAuto?.lessonCount}
+        />
       </div>
     </div>
   );

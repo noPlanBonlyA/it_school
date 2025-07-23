@@ -18,6 +18,94 @@
   box-sizing: border-box;
 }
 
+/* ---------- Панель управления фильтрами для админов ---------- */
+.admin-schedule-controls {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.filter-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  gap: 16px;
+}
+
+.filter-status {
+  flex: 1;
+}
+
+.filtered-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #dbeafe;
+  color: #1e40af;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid #bfdbfe;
+}
+
+.all-items-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #f0f9ff;
+  color: #0369a1;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid #e0f2fe;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-filter {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-filter:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-clear {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-clear:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
 /* Основная страница расписания */
 .schedule-page {
   padding-top: 20px !important; /* Дополнительный отступ сверху */
@@ -692,4 +780,36 @@
 .fc .fc-day-today .fc-daygrid-day-number {
   color: #00B18F !important;
   font-weight: 700 !important;
+}
+
+/* Мобильные стили для панели фильтрации */
+@media (max-width: 768px) {
+  .filter-info {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .filter-status {
+    width: 100%;
+  }
+
+  .filter-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .filtered-badge,
+  .all-items-badge {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+
+  .btn {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
 }

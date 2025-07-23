@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { 
   createLessonWithMaterials, 
-  updateLessonWithMaterials
+  updateLessonWithMaterials,
+  createLessonWithAutoSchedule,
+  createLessonWithMaterialsTextAndAutoSchedule
 } from '../services/lessonService';
 import '../styles/LessonEditor.css';
 import '../styles/ManageUserPage.css'; // Фирменные стили кнопок
@@ -24,6 +26,9 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
   // HTML текст для основных материалов
   const [teacherMaterialText, setTeacherMaterialText] = useState('');
   const [studentMaterialText, setStudentMaterialText] = useState('');
+  
+  // Опция автоматического расписания
+  const [useAutoSchedule, setUseAutoSchedule] = useState(true);
   
   const [loading, setLoading] = useState(false);
 
@@ -96,12 +101,42 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
       });
       
       if (lesson) {
+        // При редактировании урока автоматическое расписание не используется
         await updateLessonWithMaterials(courseId, lesson.id, submitData);
+        onSave(); // Для обновления не нужно передавать данные урока
       } else {
-        await createLessonWithMaterials(courseId, submitData);
+        // При создании нового урока
+        let createdLesson;
+        
+        if (useAutoSchedule) {
+          console.log('[LessonEditor] Creating lesson with auto schedule');
+          const result = await createLessonWithAutoSchedule(courseId, submitData);
+          createdLesson = result.lesson; // Получаем данные созданного урока
+          
+          // Показываем результат автоматического планирования с новым сообщением
+          if (result.message) {
+            alert(`Урок "${formData.name}" создан!\n\n${result.message}`);
+          } else {
+            // Fallback для старого формата
+            if (result.autoSchedule && result.autoSchedule.total > 0) {
+              const message = `Урок "${formData.name}" создан!\n\n` +
+                `Автоматически добавлен в расписание:\n` +
+                `✅ Успешно: ${result.autoSchedule.successCount} групп(ы)\n` +
+                (result.autoSchedule.failCount > 0 ? `❌ Ошибки: ${result.autoSchedule.failCount} групп(ы)\n` : '') +
+                `\nВсего групп с этим курсом: ${result.autoSchedule.total}`;
+              alert(message);
+            } else {
+              alert(`Урок "${formData.name}" успешно создан!\n\nКурс пока не привязан ни к одной группе. При привязке курса к группе все уроки автоматически добавятся в расписание.`);
+            }
+          }
+        } else {
+          createdLesson = await createLessonWithMaterials(courseId, submitData);
+          alert(`Урок "${formData.name}" успешно создан!\n\nУрок готов к добавлению в расписание групп.`);
+        }
+        
+        // Передаем данные созданного урока в callback
+        onSave(createdLesson);
       }
-      
-      onSave();
       
     } catch (error) {
       console.error('[LessonEditor] Error saving lesson:', error);
@@ -142,6 +177,29 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
             />
           </label>
         </div>
+
+        {/* Автоматическое расписание (только при создании нового урока) */}
+        {!lesson && (
+          <div className="form-section">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={useAutoSchedule}
+                onChange={(e) => setUseAutoSchedule(e.target.checked)}
+                className="checkbox-input"
+              />
+              <span className="checkbox-text">
+                🗓️ Автоматически добавить урок в расписание групп
+              </span>
+            </label>
+            <div className="form-hint">
+              {useAutoSchedule 
+                ? "✅ Урок создастся и автоматически добавится в расписание групп, которые уже изучают этот курс. Если групп пока нет - урок просто создастся." 
+                : "⚠️ Урок создастся без автоматического добавления в расписание. Позже можно будет добавить при привязке курса к группе."
+              }
+            </div>
+          </div>
+        )}
 
         {/* Выбор режима материалов - убираем, так как теперь всегда можно и файлы и текст */}
 
