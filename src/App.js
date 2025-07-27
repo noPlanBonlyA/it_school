@@ -6,12 +6,15 @@ import HomePage             from './pages/HomePage';
 import LoginPage            from './pages/LoginPage';
 import ProfilePage          from './pages/ProfilePage';
 import SchedulePage         from './pages/SchedudlePage';
+import CoinHistoryPage      from './pages/CoinHistoryPage';
 
 import ManageGroupPage      from './pages/ManageGroupPage';
 import ManageStudentsPage   from './pages/ManageStudents';
 import ManageTeachersPage   from './pages/ManageTeachers';
 import ManageAdminsPage     from './pages/ManageAdmins';
 import ManageCoursePage     from './pages/ManageCourse';
+import ManageEventsPage     from './pages/ManageEventsPage';
+import ManagePointsPage     from './pages/ManagePointsPage';
 
 import StudentCoursesPage   from './pages/StudentCoursesPage';
 import StudentCoursePage    from './pages/StudentCoursePage';
@@ -57,6 +60,7 @@ export default function App() {
           {/* ───── базовые приватные ───── */}
           <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+          <Route path="/coin-history" element={<PrivateRoute><CoinHistoryPage /></PrivateRoute>} />
 
           {/* ───────────────────── STUDENT ───────────────────── */}
           <Route path="/courses" element={<PrivateRoute><StudentCoursesPage /></PrivateRoute>} />
@@ -82,7 +86,9 @@ export default function App() {
           <Route path="/manage-teachers" element={<PrivateRoute><ManageTeachersPage /></PrivateRoute>} />
           <Route path="/manage-admins" element={<PrivateRoute><ManageAdminsPage /></PrivateRoute>} />
           <Route path="/manage-courses" element={<PrivateRoute><ManageCoursePage /></PrivateRoute>} />
+          <Route path="/manage-events" element={<PrivateRoute><ManageEventsPage /></PrivateRoute>} />
           <Route path="/manage-products" element={<PrivateRoute><ManageProductsPage /></PrivateRoute>} />
+          <Route path="/manage-points" element={<PrivateRoute><ManagePointsPage /></PrivateRoute>} />
           <Route path="/news" element={<PrivateRoute><ManageNewsPage /></PrivateRoute>} />
           <Route path="/broadcast" element={<PrivateRoute><NotificationPage /></PrivateRoute>} />
           <Route path="/impersonate" element={<PrivateRoute><ImpersonatePage /></PrivateRoute>} />

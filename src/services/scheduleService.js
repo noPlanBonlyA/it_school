@@ -244,10 +244,16 @@ export const getUserScheduleOptimized = async (user) => {
     console.log('[ScheduleService] Getting optimized schedule for user:', user.role, user.id);
 
     const response = await api.get('/schedule/');
-    const scheduleData = response.data || [];
+    const data = response.data || {};
     
-    // Получаем уникальные ID групп
-    const uniqueGroupIds = [...new Set(scheduleData.map(item => item.group_id).filter(Boolean))];
+    // Новая схема API возвращает объект с lessons и events
+    const lessons = data.lessons || [];
+    const events = data.events || [];
+    
+    console.log('[ScheduleService] Received lessons:', lessons.length, 'events:', events.length);
+    
+    // Получаем уникальные ID групп из уроков
+    const uniqueGroupIds = [...new Set(lessons.map(item => item.group_id).filter(Boolean))];
     
     // Загружаем все группы параллельно
     const groupsPromises = uniqueGroupIds.map(groupId => getCachedGroup(groupId));
@@ -261,8 +267,8 @@ export const getUserScheduleOptimized = async (user) => {
       }
     });
 
-    // Обогащаем данные расписания
-    const enhancedSchedule = await Promise.all(scheduleData.map(async (item) => {
+    // Обогащаем данные уроков
+    const enhancedLessons = await Promise.all(lessons.map(async (item) => {
       const groupInfo = groupsMap.get(item.group_id);
       const teacherInfo = groupInfo?.teacher;
       let courseId = item.course_id; // Используем course_id из исходных данных
@@ -296,7 +302,7 @@ export const getUserScheduleOptimized = async (user) => {
         id: item.id,
         lesson_id: item.lesson_id,
         lesson_name: item.lesson_name,
-        course_id: courseId, // ИСПРАВЛЕНО: используем правильно полученный course_id
+        course_id: courseId,
         course_name: item.course_name,
         group_id: item.group_id,
         group_name: groupInfo?.name || 'Группа не найдена',
@@ -309,17 +315,40 @@ export const getUserScheduleOptimized = async (user) => {
         auditorium: item.auditorium || '',
         is_opened: item.is_opened,
         description: item.description || '',
+        type: 'lesson', // Маркируем как урок
+        // Для обратной совместимости
         holding_date: item.start_datetime,
         start: item.start_datetime,
         end: item.end_datetime
       };
     }));
 
-    console.log('[ScheduleService] Optimized enhanced schedule:', enhancedSchedule);
-    return enhancedSchedule;
+    // Обогащаем данные событий
+    const enhancedEvents = events.map(event => ({
+      id: event.event_id,
+      event_id: event.event_id,
+      name: event.event_name,
+      lesson_name: event.event_name, // Для совместимости
+      start_datetime: event.start_datetime,
+      end_datetime: event.end_datetime,
+      auditorium: event.auditorium || '',
+      description: event.description || '',
+      type: 'event', // Маркируем как событие
+      is_opened: true, // События считаем открытыми
+      // Для обратной совместимости
+      holding_date: event.start_datetime,
+      start: event.start_datetime,
+      end: event.end_datetime
+    }));
+
+    // Объединяем уроки и события
+    const combinedSchedule = [...enhancedLessons, ...enhancedEvents];
+    
+    console.log('[ScheduleService] Enhanced schedule:', combinedSchedule.length, 'items');
+    return combinedSchedule;
 
   } catch (error) {
-    console.error('Ошибка получения оптимизированного расписания:', error);
+    console.error('[ScheduleService] Error getting optimized schedule:', error);
     throw error;
   }
 };

@@ -6,166 +6,100 @@ import '../styles/AttendanceWidget.css';
 
 export default function AttendanceWidget() {
   const { user } = useAuth();
-  const [attendanceData, setAttendanceData] = useState([]);
+  const [attendanceData, setAttendanceData] = useState({
+    attendanceMap: {},
+    stats: {
+      totalLessons: 0,
+      attendedLessons: 0,
+      excusedLessons: 0,
+      missedLessons: 0
+    }
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
 
-  useEffect(() => {
-    if (user?.role === 'student') {
-      loadAttendanceData();
-    }
-  }, [user]);
-
+  // Загружаем данные о посещаемости
   const loadAttendanceData = async () => {
     try {
       setLoading(true);
       setError(null);
-
-      // Получаем данные о посещаемости студента через специальный эндпоинт
-      const response = await api.get('/courses/student/lesson-student');
-
-      const lessons = response.data || [];
       
-      // Создаем карту посещаемости по датам
+      console.log('[AttendanceWidget] Loading attendance data for user:', user?.id);
+      const response = await api.get('/courses/student/lesson-student');
+      
+      console.log('[AttendanceWidget] API Response:', response.data);
+      
+      const lessonStudents = response.data || [];
+      
+      // Группируем по дате
       const attendanceMap = {};
       let totalLessons = 0;
       let attendedLessons = 0;
       let excusedLessons = 0;
+      let missedLessons = 0;
       
-      lessons.forEach(lesson => {
-        const date = lesson.lesson_group?.start_datetime;
-        if (date) {
-          const dateStr = new Date(date).toISOString().split('T')[0]; // YYYY-MM-DD
-          
-          if (!attendanceMap[dateStr]) {
-            attendanceMap[dateStr] = [];
-          }
-          
-          attendanceMap[dateStr].push({
-            lessonName: lesson.lesson_group?.lesson?.name || 'Урок',
-            courseName: lesson.lesson_group?.lesson?.course?.name || 'Курс',
-            isVisited: lesson.is_visited,
-            isExcused: lesson.is_excused_absence,
-            gradeForVisit: lesson.grade_for_visit,
-            coinsForVisit: lesson.coins_for_visit,
-            time: new Date(date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-          });
-          
-          totalLessons++;
-          if (lesson.is_visited) attendedLessons++;
-          if (lesson.is_excused_absence && !lesson.is_visited) excusedLessons++;
+      lessonStudents.forEach(ls => {
+        if (!ls.lesson_group?.start_datetime) return;
+        
+        const date = ls.lesson_group.start_datetime.split('T')[0];
+        if (!attendanceMap[date]) {
+          attendanceMap[date] = [];
         }
+        
+        // Определяем статус посещаемости на основе булевых полей
+        let attendance_status = 'unknown';
+        if (ls.is_visited) {
+          attendance_status = 'attended';
+        } else if (ls.is_excused_absence) {
+          attendance_status = 'excused';
+        } else {
+          attendance_status = 'missed';
+        }
+        
+        attendanceMap[date].push({
+          course_name: ls.lesson_group?.lesson?.course?.name || 'Курс',
+          lesson_name: ls.lesson_group?.lesson?.name || 'Урок',
+          attendance_status: attendance_status,
+          start_datetime: ls.lesson_group.start_datetime,
+          is_visited: ls.is_visited,
+          is_excused_absence: ls.is_excused_absence,
+          is_compensated_skip: ls.is_compensated_skip
+        });
+        
+        totalLessons++;
+        if (attendance_status === 'attended') attendedLessons++;
+        else if (attendance_status === 'excused') excusedLessons++;
+        else if (attendance_status === 'missed') missedLessons++;
       });
-
+      
+      console.log('[AttendanceWidget] Processed data:', {
+        attendanceMap,
+        stats: { totalLessons, attendedLessons, excusedLessons, missedLessons }
+      });
+      
       setAttendanceData({
         attendanceMap,
         stats: {
           totalLessons,
           attendedLessons,
           excusedLessons,
-          missedLessons: totalLessons - attendedLessons - excusedLessons
+          missedLessons
         }
       });
-    } catch (error) {
-      console.error('[AttendanceWidget] Error loading attendance:', error);
-      setError('Ошибка загрузки данных о посещаемости');
+    } catch (err) {
+      console.error('[AttendanceWidget] Error loading data:', err);
+      setError('Ошибка загрузки данных');
     } finally {
       setLoading(false);
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '—';
-    return new Date(dateString).toLocaleDateString('ru-RU', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
-
-  // Генерируем календарную сетку за последний год
-  const generateCalendarGrid = () => {
-    const today = new Date();
-    const oneYearAgo = new Date(today);
-    oneYearAgo.setFullYear(today.getFullYear() - 1);
-    
-    const weeks = [];
-    const currentDate = new Date(oneYearAgo);
-    
-    // Начинаем с понедельника недели
-    const dayOfWeek = currentDate.getDay();
-    const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    currentDate.setDate(currentDate.getDate() - daysToSubtract);
-    
-    while (currentDate <= today) {
-      const week = [];
-      for (let i = 0; i < 7; i++) {
-        const dateStr = currentDate.toISOString().split('T')[0];
-        const dayData = attendanceData.attendanceMap?.[dateStr] || null;
-        
-        week.push({
-          date: new Date(currentDate),
-          dateStr,
-          dayData,
-          isToday: dateStr === today.toISOString().split('T')[0]
-        });
-        
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-      weeks.push(week);
+  useEffect(() => {
+    if (user?.id) {
+      loadAttendanceData();
     }
-    
-    return weeks;
-  };
-
-  // Определяем цвет ячейки
-  const getCellClass = (dayData) => {
-    if (!dayData) return 'day-cell empty';
-    
-    const hasVisited = dayData.some(lesson => lesson.isVisited);
-    const hasExcused = dayData.some(lesson => lesson.isExcused && !lesson.isVisited);
-    const hasMissed = dayData.some(lesson => !lesson.isVisited && !lesson.isExcused);
-    
-    if (hasVisited) return 'day-cell attended';
-    if (hasExcused) return 'day-cell excused';
-    if (hasMissed) return 'day-cell missed';
-    
-    return 'day-cell empty';
-  };
-
-  // Получаем статистику для дня
-  const getDayTooltip = (day) => {
-    if (!day.dayData) return `${day.date.toLocaleDateString('ru-RU')}\nНет занятий`;
-    
-    const lessons = day.dayData;
-    const visitedCount = lessons.filter(l => l.isVisited).length;
-    const excusedCount = lessons.filter(l => l.isExcused && !l.isVisited).length;
-    const missedCount = lessons.filter(l => !l.isVisited && !l.isExcused).length;
-    
-    let tooltip = `${day.date.toLocaleDateString('ru-RU')}\n`;
-    tooltip += `Занятий: ${lessons.length}\n`;
-    if (visitedCount > 0) tooltip += `✅ Посещено: ${visitedCount}\n`;
-    if (excusedCount > 0) tooltip += `⚠️ Уважительно: ${excusedCount}\n`;
-    if (missedCount > 0) tooltip += `❌ Пропущено: ${missedCount}\n`;
-    
-    lessons.forEach(lesson => {
-      tooltip += `\n${lesson.time} - ${lesson.lessonName}`;
-      if (lesson.isVisited && lesson.gradeForVisit > 0) {
-        tooltip += ` (Оценка: ${lesson.gradeForVisit})`;
-      }
-      if (lesson.isVisited && lesson.coinsForVisit > 0) {
-        tooltip += ` (+${lesson.coinsForVisit} монет)`;
-      }
-    });
-    
-    return tooltip;
-  };
-
-  const getAttendancePercentage = () => {
-    const { totalLessons, attendedLessons } = attendanceData.stats || {};
-    if (totalLessons === 0) return 0;
-    return Math.round((attendedLessons / totalLessons) * 100);
-  };
+  }, [user?.id]);
 
   if (loading) {
     return (
@@ -184,35 +118,191 @@ export default function AttendanceWidget() {
       <div className="attendance-widget">
         <h3>📊 Посещаемость</h3>
         <div className="error-container">
-          <p className="error-message">{error}</p>
-          <button onClick={loadAttendanceData} className="retry-btn">
-            Повторить попытку
+          <div className="error-message">{error}</div>
+          <button className="retry-btn" onClick={loadAttendanceData}>
+            Попробовать еще раз
           </button>
         </div>
       </div>
     );
   }
 
-  if (attendanceData.length === 0) {
-    return (
-      <div className="attendance-widget">
-        <h3>📊 Посещаемость</h3>
-        <div className="empty-state">
-          <p>Данные о посещаемости отсутствуют</p>
-          <span className="empty-subtitle">Возможно, вы еще не записаны на курсы</span>
-        </div>
-      </div>
-    );
-  }
+  // Функции для работы с месячным календарем
+  const goToPreviousMonth = () => {
+    setCurrentDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(newDate.getMonth() - 1);
+      return newDate;
+    });
+  };
+
+  const goToNextMonth = () => {
+    setCurrentDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(newDate.getMonth() + 1);
+      return newDate;
+    });
+  };
+
+  const goToCurrentMonth = () => {
+    setCurrentDate(new Date());
+  };
+
+  // Генерируем календарную сетку для текущего месяца
+  const generateMonthCalendar = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // Первый день месяца
+    const firstDay = new Date(year, month, 1);
+    // Последний день месяца
+    const lastDay = new Date(year, month + 1, 0);
+    
+    // Определяем, с какого дня недели начинается месяц (понедельник = 0)
+    let startDay = firstDay.getDay();
+    startDay = startDay === 0 ? 6 : startDay - 1; // Конвертируем в формат понедельник=0
+    
+    const daysInMonth = lastDay.getDate();
+    const calendar = [];
+    
+    // Добавляем дни предыдущего месяца для заполнения первой недели
+    for (let i = startDay - 1; i >= 0; i--) {
+      const date = new Date(year, month, -i);
+      calendar.push({
+        date,
+        dateStr: date.toISOString().split('T')[0],
+        dayData: attendanceData.attendanceMap?.[date.toISOString().split('T')[0]] || null,
+        isCurrentMonth: false,
+        isToday: false
+      });
+    }
+    
+    // Добавляем дни текущего месяца
+    const today = new Date();
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const dateStr = date.toISOString().split('T')[0];
+      const isToday = dateStr === today.toISOString().split('T')[0];
+      
+      calendar.push({
+        date,
+        dateStr,
+        dayData: attendanceData.attendanceMap?.[dateStr] || null,
+        isCurrentMonth: true,
+        isToday
+      });
+    }
+    
+    // Добавляем дни следующего месяца для заполнения последней недели
+    const remainingDays = 42 - calendar.length; // 6 недель × 7 дней = 42
+    for (let day = 1; day <= remainingDays; day++) {
+      const date = new Date(year, month + 1, day);
+      calendar.push({
+        date,
+        dateStr: date.toISOString().split('T')[0],
+        dayData: attendanceData.attendanceMap?.[date.toISOString().split('T')[0]] || null,
+        isCurrentMonth: false,
+        isToday: false
+      });
+    }
+    
+    // Разбиваем на недели
+    const weeks = [];
+    for (let i = 0; i < calendar.length; i += 7) {
+      weeks.push(calendar.slice(i, i + 7));
+    }
+    
+    return weeks;
+  };
+
+    // Получаем CSS класс для ячейки дня
+  const getDayCellClass = (dayData, isCurrentMonth = true, isToday = false) => {
+    let baseClass = 'day-cell';
+    
+    // Добавляем класс для дней не текущего месяца
+    if (!isCurrentMonth) {
+      baseClass += ' other-month';
+    }
+    
+    // Добавляем класс для сегодняшнего дня
+    if (isToday) {
+      baseClass += ' today';
+    }
+    
+    // Если нет данных о занятиях
+    if (!dayData || dayData.length === 0) {
+      baseClass += ' empty';
+      return baseClass;
+    }
+    
+    // Определяем основной статус дня
+    const attendedCount = dayData.filter(lesson => lesson.is_visited).length;
+    const excusedCount = dayData.filter(lesson => lesson.is_excused_absence).length;
+    const missedCount = dayData.filter(lesson => !lesson.is_visited && !lesson.is_excused_absence).length;
+    
+    // Приоритет: пропуск > уваж. причина > посещение
+    if (missedCount > 0) {
+      baseClass += ' missed';
+    } else if (excusedCount > 0) {
+      baseClass += ' excused';
+    } else if (attendedCount > 0) {
+      baseClass += ' attended';
+    } else {
+      baseClass += ' empty';
+    }
+    
+    // Добавляем интенсивность в зависимости от количества занятий
+    const totalLessons = dayData.length;
+    const intensity = Math.min(totalLessons, 4);
+    if (intensity > 0) {
+      baseClass += ` intensity-${intensity}`;
+    }
+    
+    return baseClass;
+  };
+
+  // Получаем текст подсказки для дня
+  const getTooltipText = (dayData, dateStr) => {
+    const date = new Date(dateStr).toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+    
+    if (!dayData || dayData.length === 0) {
+      return `${date} - нет занятий`;
+    }
+    
+    const lessons = dayData.map(lesson => {
+      const status = lesson.attendance_status === 'attended' ? 'присутствовал' :
+                    lesson.attendance_status === 'excused' ? 'уважительная причина' :
+                    lesson.attendance_status === 'missed' ? 'отсутствовал' : 'неизвестно';
+      return `${lesson.course_name || 'Занятие'}: ${status}`;
+    }).join('\n');
+    
+    return `${date}\n${lessons}`;
+  };
+
+  const getAttendancePercentage = () => {
+    const { totalLessons, attendedLessons } = attendanceData.stats || {};
+    if (totalLessons === 0) return 0;
+    return Math.round((attendedLessons / totalLessons) * 100);
+  };
 
   const stats = attendanceData.stats || {};
   const percentage = getAttendancePercentage();
-  const calendarWeeks = generateCalendarGrid();
-  const monthNames = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
+  const weeks = generateMonthCalendar();
 
   return (
     <div className="attendance-widget">
-      <h3>📊 Посещаемость за последний год</h3>
+      <div className="attendance-header">
+        <h3>📊 Календарь посещаемости</h3>
+        <div className="attendance-summary">
+          <span className="summary-text">
+            <strong>{stats.totalLessons || 0}</strong> занятий всего
+          </span>
+        </div>
+      </div>
       
       {/* Статистика */}
       <div className="attendance-stats-grid">
@@ -234,48 +324,78 @@ export default function AttendanceWidget() {
         </div>
       </div>
 
-      {/* Календарь активности */}
+      {/* Календарь активности по месяцам */}
       <div className="activity-calendar">
-        <div className="calendar-header">
-          <div className="months-row">
-            {monthNames.map((month, index) => (
-              <span key={index} className="month-label">{month}</span>
-            ))}
-          </div>
-        </div>
-        
-        <div className="calendar-grid">
-          <div className="weekdays">
-            <span></span>
-            <span>Пн</span>
-            <span></span>
-            <span>Ср</span>
-            <span></span>
-            <span>Пт</span>
-            <span></span>
+        <div className="calendar-container">
+          {/* Навигация по месяцам */}
+          <div className="month-navigation">
+            <button 
+              className="nav-button" 
+              onClick={goToPreviousMonth}
+              title="Предыдущий месяц"
+            >
+              ←
+            </button>
+            <h3 className="current-month">
+              {currentDate.toLocaleDateString('ru-RU', { 
+                month: 'long', 
+                year: 'numeric' 
+              })}
+            </h3>
+            <button 
+              className="nav-button" 
+              onClick={goToNextMonth}
+              title="Следующий месяц"
+            >
+              →
+            </button>
+            <button 
+              className="nav-button today-button" 
+              onClick={goToCurrentMonth}
+              title="Текущий месяц"
+            >
+              Сегодня
+            </button>
           </div>
           
-          <div className="weeks-container">
-            {calendarWeeks.map((week, weekIndex) => (
-              <div key={weekIndex} className="week-row">
-                {week.map((day, dayIndex) => (
-                  <div
-                    key={dayIndex}
-                    className={`${getCellClass(day.dayData)} ${day.isToday ? 'today' : ''}`}
-                    title={getDayTooltip(day)}
-                    data-date={day.dateStr}
-                  >
-                    {day.dayData && (
-                      <span className="day-indicator">
-                        {day.dayData.length > 1 && (
-                          <span className="lesson-count">{day.dayData.length}</span>
+          <div className="calendar-grid">
+            {/* Дни недели */}
+            <div className="weekdays-header">
+              {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(day => (
+                <div key={day} className="weekday-label">
+                  {day}
+                </div>
+              ))}
+            </div>
+            
+            {/* Календарная сетка */}
+            <div className="calendar-weeks">
+              {weeks.map((week, weekIndex) => (
+                <div key={weekIndex} className="calendar-week">
+                  {week.map((day, dayIndex) => {
+                    const cellClass = getDayCellClass(day.dayData, day.isCurrentMonth, day.isToday);
+                    const tooltipText = getTooltipText(day.dayData, day.dateStr);
+                    
+                    return (
+                      <div
+                        key={dayIndex}
+                        className={cellClass}
+                        title={tooltipText}
+                      >
+                        <span className="day-number">
+                          {day.date.getDate()}
+                        </span>
+                        {day.dayData && day.dayData.length > 0 && (
+                          <div className="lesson-indicator">
+                            <span className="lesson-count">{day.dayData.length}</span>
+                          </div>
                         )}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -288,15 +408,15 @@ export default function AttendanceWidget() {
               <span>Нет занятий</span>
             </div>
             <div className="legend-item">
-              <div className="day-cell excused"></div>
+              <div className="day-cell excused intensity-1"></div>
               <span>Уважительная</span>
             </div>
             <div className="legend-item">
-              <div className="day-cell attended"></div>
+              <div className="day-cell attended intensity-1"></div>
               <span>Присутствовал</span>
             </div>
             <div className="legend-item">
-              <div className="day-cell missed"></div>
+              <div className="day-cell missed intensity-1"></div>
               <span>Пропустил</span>
             </div>
           </div>

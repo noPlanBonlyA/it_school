@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
 import AttendanceWidget from '../components/AttendanceWidget';
@@ -7,6 +8,7 @@ import api from '../api/axiosInstance';
 import '../styles/ProfilePage.css';
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -226,6 +228,42 @@ export default function ProfilePage() {
             {user.role === 'student' && (
               <div className="attendance-section">
                 <AttendanceWidget userId={user.id} />
+              </div>
+            )}
+
+            {/* Кнопка истории монет для студентов */}
+            {user.role === 'student' && (
+              <div className="coin-history-section" style={{ marginTop: '24px' }}>
+                <button 
+                  className="coin-history-btn"
+                  onClick={() => navigate('/coin-history')}
+                  style={{
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '12px 24px',
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    justifyContent: 'center'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                >
+                  💰 История монет
+                </button>
               </div>
             )}
           </div>

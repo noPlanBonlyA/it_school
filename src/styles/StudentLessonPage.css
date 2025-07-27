@@ -545,3 +545,52 @@
     min-height: 300px;
   }
 }
+
+/* Стили для улучшенного интерфейса домашнего задания */
+.homework-grade-info {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  border-left: 4px solid #28a745;
+}
+
+.homework-grade-info p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.resubmit-section {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px dashed #dee2e6;
+  text-align: center;
+}
+
+.btn-secondary {
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268 !important;
+  transform: translateY(-1px);
+}
+
+.hw-submitted {
+  text-align: center;
+  padding: 30px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+}
+
+.submitted-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.hw-submitted h3 {
+  color: #28a745;
+  margin-bottom: 10px;
+}

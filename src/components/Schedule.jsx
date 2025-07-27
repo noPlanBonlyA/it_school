@@ -8,6 +8,7 @@ import '../styles/Schedule.css';
 import '../styles/ManageUserPage.css'; // Фирменные стили кнопок
 import api from '../api/axiosInstance';
 import { getUserScheduleOptimized, updateLessonGroup } from '../services/scheduleService';
+import { createLessonCoinsHistory } from '../services/coinHistoryService';
 
 export default function Schedule({ events, onSelect, selectedEvent, onClose, onCardClick }) {
   const { user } = useAuth();
@@ -98,10 +99,14 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
   };
 
   const getStatusClass = (event) => {
-    if (event.is_opened) return 'opened';
+    // Определяем тип события
+    const isEvent = !event.lesson_id && event.event_id;
+    const baseClass = isEvent ? 'event-item' : '';
+    
+    if (event.is_opened) return `opened ${baseClass}`;
     const now = new Date();
     const lessonTime = new Date(event.start_datetime || event.start);
-    return now < lessonTime ? 'scheduled' : 'closed';
+    return `${now < lessonTime ? 'scheduled' : 'closed'} ${baseClass}`;
   };
 
   const getStatusText = (event) => {
@@ -109,6 +114,25 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
     const now = new Date();
     const lessonTime = new Date(event.start_datetime || event.start);
     return now < lessonTime ? 'Запланирован' : 'Закрыт';
+  };
+
+  // Функция для определения типа события
+  const getEventType = (event) => {
+    return !event.lesson_id && event.event_id ? 'event' : 'lesson';
+  };
+
+  const getEventDisplayName = (event) => {
+    if (getEventType(event) === 'event') {
+      return event.name || event.event_name || 'Мероприятие без названия';
+    }
+    return event.lesson_name || 'Урок';
+  };
+
+  const getEventSubtitle = (event) => {
+    if (getEventType(event) === 'event') {
+      return event.description || 'Мероприятие';
+    }
+    return event.course_name || 'Курс';
   };
 
   // НОВОЕ: Функция для открытия/закрытия урока
@@ -436,17 +460,44 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
         const updateData = {
           student_id: student.student_id,
           lesson_group_id: student.lesson_group_id,
-          is_visited: grades.is_visited,
-          is_excused_absence: grades.is_excused_absence,
-          coins_for_visit: parseInt(grades.coins_for_visit) || 0,
-          grade_for_visit: parseInt(grades.grade_for_visit) || 0,
-          is_sent_homework: student.is_sent_homework || false,
-          is_graded_homework: student.is_graded_homework || false,
-          coins_for_homework: student.coins_for_homework || 0,
-          grade_for_homework: student.grade_for_homework || 0
+          is_visited: Boolean(grades.is_visited),
+          is_excused_absence: Boolean(grades.is_excused_absence),
+          is_compensated_skip: Boolean(student.is_compensated_skip || false),
+          coins_for_visit: Number(grades.coins_for_visit) || 0,
+          grade_for_visit: Number(grades.grade_for_visit) || 0,
+          is_sent_homework: Boolean(student.is_sent_homework),
+          is_graded_homework: Boolean(student.is_graded_homework),
+          coins_for_homework: Number(student.coins_for_homework) || 0,
+          grade_for_homework: Number(student.grade_for_homework) || 0,
+          id: student.id
         };
         
-        await api.put(`/courses/lesson-student/${student.id}`, updateData);
+        console.log('[Schedule] Updating lesson student with data:', updateData);
+        
+        const response = await api.put(`/courses/lesson-student/${student.id}`, updateData);
+        console.log('[Schedule] Lesson student updated successfully:', response.data);
+        
+        // Создаем записи в истории поинтов, если начислены монеты
+        if ((updateData.coins_for_visit > 0 || updateData.coins_for_homework > 0) && student.student?.user_id) {
+          try {
+            await createLessonCoinsHistory(
+              student.student.user_id,
+              {
+                coins_for_visit: updateData.coins_for_visit,
+                coins_for_homework: updateData.coins_for_homework
+              },
+              {
+                lesson_name: conductingLesson?.lesson_name || 'Урок',
+                course_name: conductingLesson?.course_name
+              },
+              student.student?.id // Передаем ID профиля студента для уведомлений
+            );
+            console.log('[Schedule] Coins history records created for student:', student.student.user_id);
+          } catch (historyError) {
+            console.warn('[Schedule] Failed to create coins history:', historyError);
+            // Не прерываем основной процесс, просто логируем предупреждение
+          }
+        }
         
         // Если есть комментарий, отправляем уведомление
         if (comment && comment.trim()) {
@@ -475,7 +526,23 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
       
     } catch (error) {
       console.error('[Schedule] Error saving grades:', error);
-      alert('Ошибка сохранения данных');
+      
+      // Более детальная обработка ошибок
+      let errorMessage = 'Ошибка сохранения данных';
+      
+      if (error.message && error.message.includes('Network Error')) {
+        errorMessage = 'Ошибка сети: Проверьте подключение к серверу на http://localhost:8080';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Ошибка сервера (500): Проверьте логи backend сервера';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Урок или студент не найден (404)';
+      } else if (error.response?.status === 422) {
+        errorMessage = 'Неверный формат данных (422): Проверьте отправляемые данные';
+      } else if (error.response?.data?.message) {
+        errorMessage = `Ошибка: ${error.response.data.message}`;
+      }
+      
+      alert(errorMessage);
     }
   };
 
@@ -730,7 +797,7 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
       {events.map((event, index) => (
         <div 
           key={event.id || index} 
-          className={`schedule-item ${getStatusClass(event)}`}
+          className={`schedule-item ${getStatusClass(event)} ${getEventType(event) === 'event' ? 'is-event' : 'is-lesson'}`}
           onClick={(e) => {
             // Останавливаем всплытие события, если есть обработчик для карточки
             if (onCardClick) {
@@ -753,10 +820,10 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
           
           <div className="schedule-content">
             <div className="schedule-lesson-name">
-              {event.lesson_name}
+              {getEventDisplayName(event)}
             </div>
             <div className="schedule-course-name">
-              {event.course_name}
+              {getEventSubtitle(event)}
             </div>
             {event.group_name && (
               <div className="schedule-group">
@@ -901,8 +968,8 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
             </div>
           )}
 
-          {/* Кнопки действий для преподавателя и администраторов */}
-          {(user.role === 'teacher' || user.role === 'admin' || user.role === 'superadmin') && (
+          {/* Кнопки действий для преподавателя и администраторов - только для уроков */}
+          {(user.role === 'teacher' || user.role === 'admin' || user.role === 'superadmin') && getEventType(selectedEvent) === 'lesson' && (
             <div className="event-actions">
               <button 
                 onClick={() => handleOpenLessonPage(selectedEvent)}
@@ -939,8 +1006,8 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
             </div>
           )}
 
-          {/* Кнопка для студента - только если урок открыт */}
-          {user.role === 'student' && selectedEvent.is_opened && (
+          {/* Кнопка для студента - только если урок открыт И это урок (не мероприятие) */}
+          {user.role === 'student' && selectedEvent.is_opened && getEventType(selectedEvent) === 'lesson' && (
             <div className="event-actions">
               <button 
                 onClick={() => handleOpenLessonPage(selectedEvent)}
@@ -952,7 +1019,7 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
           )}
 
           {/* Сообщение для студента если урок закрыт */}
-          {user.role === 'student' && !selectedEvent.is_opened && (
+          {user.role === 'student' && !selectedEvent.is_opened && getEventType(selectedEvent) === 'lesson' && (
             <div className="event-actions">
               <p style={{ 
                 color: '#6b7280', 
@@ -961,6 +1028,21 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
                 margin: 0
               }}>
                 Урок пока закрыт преподавателем
+              </p>
+            </div>
+          )}
+
+          {/* Информация для мероприятий */}
+          {getEventType(selectedEvent) === 'event' && (
+            <div className="event-actions">
+              <p style={{ 
+                color: '#8b5cf6', 
+                fontStyle: 'italic', 
+                textAlign: 'center',
+                margin: 0,
+                fontWeight: '500'
+              }}>
+                🎉 Это мероприятие - никаких дополнительных действий не требуется
               </p>
             </div>
           )}

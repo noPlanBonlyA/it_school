@@ -39,7 +39,8 @@ export default function ManageCoursesPage() {
   const [form, setForm] = useState({
     name: '',
     description: '',
-    age_category: 'Все возрасты'
+    age_category: 'ALL',
+    price: '0'
   });
   const [formImage, setFormImage] = useState(null);
   const [formPreviewUrl, setFormPreviewUrl] = useState(null);
@@ -127,29 +128,52 @@ export default function ManageCoursesPage() {
   const handleCreate = async () => {
     setUploading(true);
     try {
-      const fd = new FormData();
-      
       // Определяем имя автора из текущего пользователя
       const authorName = [user.first_name, user.surname].filter(Boolean).join(' ') || user.username || 'Неизвестный автор';
       
-      // Данные курса
+      // Данные курса (без поля photo - изображение передается отдельно)
       const courseData = {
         name:         form.name,
         description:  form.description,
         age_category: [form.age_category], // Передаем как массив
+        price:        Number(form.price) || 0,
         author_name:  authorName
       };
       
-      // Если есть изображение, добавляем поле photo с именем
+      // Простой способ создания FormData
+      const fd = new FormData();
+      
+      // Добавляем данные курса как простую строку
+      const courseDataJson = JSON.stringify(courseData);
+      console.log('[ManageCourse] Course data JSON string:', courseDataJson);
+      fd.append('course_data', courseDataJson);
+      
+      // Проверяем, что поле добавилось
+      console.log('[ManageCourse] FormData has course_data:', fd.has('course_data'));
+      console.log('[ManageCourse] FormData get course_data:', fd.get('course_data'));
+      
+      // Если есть изображение, добавляем его отдельно
       if (formImage) {
-        courseData.photo = { name: formImage.name };
         fd.append('image', formImage);
       }
-      
-      fd.append('course_data', JSON.stringify(courseData));
+
+      console.log('[ManageCourse] Sending course data:', courseData);
+      console.log('[ManageCourse] JSON stringified course data:', JSON.stringify(courseData));
+      console.log('[ManageCourse] FormData contents:');
+      for (let [key, value] of fd.entries()) {
+        if (key === 'course_data') {
+          console.log(key, '(parsed):', JSON.parse(value));
+          console.log(key, '(raw):', value);
+          console.log(key, '(type):', typeof value);
+          console.log(key, '(length):', value.length);
+        } else {
+          console.log(key, value);
+          console.log(key, '(type):', typeof value);
+        }
+      }
 
       await createCourse(fd);
-      setForm({ name:'', description:'', age_category:'Все возрасты' });
+      setForm({ name:'', description:'', age_category:'ALL', price:'0' });
       setFormImage(null);
       setFormPreviewUrl(null);
       setShowConfirmCreate(false);
@@ -157,7 +181,18 @@ export default function ManageCoursesPage() {
       alert('Курс создан успешно');
     } catch (e) {
       console.error('[ManageCourse] Error creating course:', e);
-      alert('Ошибка создания курса');
+      
+      // Подробная информация об ошибке валидации
+      if (e.response?.status === 422 && e.response?.data?.detail) {
+        console.error('[ManageCourse] Validation errors:', e.response.data.detail);
+        e.response.data.detail.forEach((detail, index) => {
+          console.error(`[ManageCourse] Validation error ${index + 1}:`, detail);
+        });
+        alert(`Ошибка валидации: ${e.response.data.detail.map(d => d.msg || d.message || JSON.stringify(d)).join(', ')}`);
+      } else {
+        alert('Ошибка создания курса');
+      }
+      
       setShowConfirmCreate(false);
     } finally {
       setUploading(false);
@@ -170,11 +205,11 @@ export default function ManageCoursesPage() {
     
     // Маппинг старых значений на новые
     let mappedAgeCategory = ageCategory;
-    if (ageCategory === 'All') mappedAgeCategory = 'Все возрасты';
+    if (ageCategory === 'All' || ageCategory === 'Все возрасты') mappedAgeCategory = 'ALL';
     else if (ageCategory === 'SixPlus') mappedAgeCategory = '5-7';
     else if (ageCategory === 'TwelvePlus') mappedAgeCategory = '12-14';
-    else if (!['Все возрасты', '5-7', '8-10', '12-14'].includes(ageCategory)) {
-      mappedAgeCategory = 'Все возрасты'; // дефолт для неизвестных значений
+    else if (!['ALL', '5-7', '8-10', '12-14'].includes(ageCategory)) {
+      mappedAgeCategory = 'ALL'; // дефолт для неизвестных значений
     }
     
     setEdit({
@@ -182,6 +217,7 @@ export default function ManageCoursesPage() {
       name:         c.name || '',
       description:  c.description || '',
       age_category: mappedAgeCategory,
+      price:        c.price != null ? c.price.toString() : '0',
       author_name:  c.author_name || ''  // только для отображения, не для редактирования
     });
     setEditImage(null);
@@ -194,21 +230,22 @@ export default function ManageCoursesPage() {
     try {
       const fd = new FormData();
       
-      // Данные курса (author_name не изменяем)
+      // Данные курса (author_name не изменяем, photo передается отдельно)
       const courseData = {
         name:         edit.name,
         description:  edit.description,
-        age_category: [edit.age_category] // Передаем как массив
+        age_category: [edit.age_category], // Передаем как массив
+        price:        Number(edit.price) || 0
         // author_name исключен - не изменяем автора курса
       };
       
-      // Если заменяем изображение, добавляем поле photo с именем
+      // Добавляем данные курса
+      fd.append('course_data', JSON.stringify(courseData));
+      
+      // Если заменяем изображение, добавляем его отдельно
       if (editImage) {
-        courseData.photo = { name: editImage.name };
         fd.append('image', editImage);
       }
-      
-      fd.append('course_data', JSON.stringify(courseData));
 
       await updateCourse(edit.id, fd);
       setEdit(null);
@@ -273,11 +310,22 @@ export default function ManageCoursesPage() {
                 onChange={e => setForm(f => ({ ...f, age_category: e.target.value }))}
                 className="age-category-select"
               >
-                <option value="Все возрасты">Все возрасты</option>
+                <option value="ALL">ALL</option>
                 <option value="5-7">5-7</option>
                 <option value="8-10">8-10</option>
                 <option value="12-14">12-14</option>
               </select>
+            </div>
+
+            <div className="field">
+              <label>Цена</label>
+              <input
+                type="number"
+                min="0"
+                value={form.price}
+                onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
+                placeholder="Введите цену курса"
+              />
             </div>
 
             <div className="field" style={{ gridColumn: '1 / -1' }}>
@@ -392,11 +440,22 @@ export default function ManageCoursesPage() {
                   onChange={e => setEdit(p => ({ ...p, age_category: e.target.value }))}
                   className="age-category-select"
                 >
-                  <option value="Все возрасты">Все возрасты</option>
+                  <option value="ALL">ALL</option>
                   <option value="5-7">5-7</option>
                   <option value="8-10">8-10</option>
                   <option value="12-14">12-14</option>
                 </select>
+              </div>
+
+              <div className="field">
+                <label>Цена</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={edit.price}
+                  onChange={e => setEdit(p => ({ ...p, price: e.target.value }))}
+                  placeholder="Введите цену курса"
+                />
               </div>
 
               <div className="field" style={{ gridColumn: '1 / -1' }}>

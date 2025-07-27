@@ -1,8 +1,29 @@
 // src/services/homeworkService.js
 import api from '../api/axiosInstance';
+import { createLessonCoinsHistory } from './coinHistoryService';
 
 /**
- * Отправка домашнего задания студентом
+ * Отправка     // Форматируем данные для API
+    const apiData = {
+      student_id: updateData.student_id,
+      lesson_group_id: updateData.lesson_group_id,
+      is_visited: Boolean(updateData.is_visited),
+      is_excused_absence: Boolean(updateData.is_excused_absence),
+      is_compensated_skip: Boolean(updateData.is_compensated_skip || false),
+      is_sent_homework: Boolean(updateData.is_sent_homework),
+      is_graded_homework: Boolean(updateData.is_graded_homework),
+      coins_for_visit: Number(updateData.coins_for_visit) || 0,
+      grade_for_visit: Number(updateData.grade_for_visit) || 0,
+      coins_for_homework: Number(updateData.coins_for_homework) || 0,
+      grade_for_homework: Number(updateData.grade_for_homework) || 0,
+      id: lessonStudentId
+    };
+    
+    console.log('[HomeworkService] Formatted API data:', apiData);
+    
+    const response = await api.put(`/courses/lesson-student/${lessonStudentId}`, apiData);
+    
+    console.log('[HomeworkService] Lesson student updated:', response.data);удентом
  */
 export const submitHomework = async (courseId, lessonId, formData) => {
   try {
@@ -174,6 +195,29 @@ export const updateLessonStudent = async (lessonStudentId, updateData) => {
     const response = await api.put(`/courses/lesson-student/${lessonStudentId}`, apiData);
     
     console.log('[HomeworkService] Lesson student updated:', response.data);
+    
+    // Создаем записи в истории поинтов, если начислены монеты
+    if ((apiData.coins_for_visit > 0 || apiData.coins_for_homework > 0) && updateData.student_id) {
+      try {
+        await createLessonCoinsHistory(
+          updateData.student_id,
+          {
+            coins_for_visit: apiData.coins_for_visit,
+            coins_for_homework: apiData.coins_for_homework
+          },
+          {
+            lesson_name: updateData.lesson_name || 'Урок',
+            course_name: updateData.course_name
+          },
+          updateData.student_profile_id // Передаем ID профиля студента для уведомлений
+        );
+        console.log('[HomeworkService] Coins history records created successfully');
+      } catch (historyError) {
+        console.warn('[HomeworkService] Failed to create coins history:', historyError);
+        // Не прерываем основной процесс, просто логируем предупреждение
+      }
+    }
+    
     return response.data;
   } catch (error) {
     console.error('[HomeworkService] Error updating lesson student:', error);
@@ -362,12 +406,83 @@ export const getStudentLessonInfo = async (courseId, lessonId) => {
   try {
     console.log('[HomeworkService] Getting student lesson info:', { courseId, lessonId });
     
-    const response = await api.get(`/courses/${courseId}/lessons/${lessonId}/student-info`);
+    // Получаем прогресс студента по всем урокам
+    const response = await api.get('/courses/student/lesson-student');
+    console.log('[HomeworkService] Student lesson progress response:', response.data);
     
-    console.log('[HomeworkService] Student lesson info:', response.data);
-    return response.data;
+    if (Array.isArray(response.data)) {
+      // Ищем урок по lesson_id в структуре lesson_group
+      const lessonProgress = response.data.find(item => {
+        if (item.lesson_group && item.lesson_group.lesson_id === lessonId) {
+          console.log('[HomeworkService] Found matching lesson_group:', item.lesson_group);
+          return true;
+        }
+        return false;
+      });
+      
+      if (lessonProgress) {
+        console.log('[HomeworkService] Found lesson progress:', lessonProgress);
+        
+        // Добавляем дополнительную информацию для удобства
+        const enrichedProgress = {
+          ...lessonProgress,
+          lesson_id: lessonProgress.lesson_group?.lesson_id,
+          course_id: courseId // добавляем для полноты информации
+        };
+        
+        return enrichedProgress;
+      }
+    }
+    
+    // Если не найдено через lesson-student, пытаемся получить через lesson-group
+    console.log('[HomeworkService] No lesson progress found, trying lesson-group approach...');
+    
+    try {
+      // Получаем lesson groups и ищем подходящий
+      const lessonGroupResponse = await api.get('/courses/lesson-group', {
+        params: { group_id: null } // Этот запрос может потребовать group_id
+      });
+      
+      console.log('[HomeworkService] Lesson group response:', lessonGroupResponse.data);
+      
+      // Если lesson-group подход не сработал, возвращаем null
+      return null;
+      
+    } catch (lessonGroupError) {
+      console.log('[HomeworkService] Lesson group approach failed:', lessonGroupError);
+      return null;
+    }
+    
   } catch (error) {
     console.error('[HomeworkService] Error getting student lesson info:', error);
     throw error;
+  }
+};
+
+/**
+ * Альтернативный метод - проверка через прямой запрос lesson-student материалов
+ */
+export const checkHomeworkSubmissionStatus = async (courseId, lessonId) => {
+  try {
+    console.log('[HomeworkService] Checking homework submission status:', { courseId, lessonId });
+    
+    // Пытаемся получить материалы студента для конкретного урока
+    const response = await api.get(`/courses/${courseId}/lessons/${lessonId}/student-materials`);
+    console.log('[HomeworkService] Student materials response:', response.data);
+    
+    // Если запрос прошел успешно, значит у студента есть доступ к уроку
+    // Но этот эндпоинт не возвращает статус домашнего задания
+    // Возвращаем базовую информацию
+    return {
+      lesson_id: lessonId,
+      course_id: courseId,
+      has_access: true,
+      is_sent_homework: false, // По умолчанию false, будет обновлено основным методом
+      is_graded_homework: false
+    };
+    
+  } catch (error) {
+    console.error('[HomeworkService] Error checking homework submission status:', error);
+    return null;
   }
 };

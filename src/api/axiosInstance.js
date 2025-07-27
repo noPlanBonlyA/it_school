@@ -2,8 +2,13 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080/api',
   withCredentials: true,   // чтобы браузер слал HttpOnly-cookie
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  },
+  timeout: 15000, // 15 секунд таймаут
 });
 
 // Добавляем интерцептор для запросов
@@ -44,6 +49,11 @@ api.interceptors.response.use(
       data: err.response?.data,
       message: err.message
     });
+    
+    // Специальная обработка CORS ошибок
+    if (err.message && err.message.includes('Network Error')) {
+      console.error('[API] Возможная CORS ошибка или сервер недоступен');
+    }
     
     const url = err.config?.url || '';
     // автоматический редирект только для всех 401, кроме /users/me

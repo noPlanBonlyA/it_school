@@ -181,6 +181,82 @@
   opacity: 0.7;
 }
 
+/* Стили для мероприятий */
+.schedule-item.is-event {
+  border-left-color: #8b5cf6;
+  background: linear-gradient(135deg, #f3e8ff 0%, #faf5ff 100%);
+  border: 2px solid #e9d5ff;
+  border-left: 6px solid #8b5cf6;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+}
+
+.schedule-item.is-event::before {
+  content: '🎉';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 20px;
+  opacity: 0.8;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-3px);
+  }
+  60% {
+    transform: translateY(-1px);
+  }
+}
+
+.schedule-item.is-event:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+  border-color: #a855f7;
+  background: linear-gradient(135deg, #ede9fe 0%, #f5f3ff 100%);
+}
+
+.schedule-item.is-event .schedule-time-block {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+.schedule-item.is-event .schedule-item-content h4 {
+  color: #7c3aed;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.schedule-item.is-event .schedule-item-content p {
+  color: #8b5cf6;
+  font-weight: 500;
+}
+
+/* Стили для обычных уроков */
+.schedule-item.is-lesson {
+  border-left-color: #3b82f6;
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+}
+
+.schedule-item.is-lesson:hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.schedule-item.is-lesson .schedule-time-block {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.schedule-item.is-lesson .schedule-item-content h4 {
+  color: #1e40af;
+}
+
 .schedule-time-block {
   flex-shrink: 0;
   width: 70px;

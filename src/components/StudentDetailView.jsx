@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { studentDetailService } from '../services/studentDetailService';
+import CoinHistory from './CoinHistory';
 import '../styles/StudentDetailView.css';
 
 const StudentDetailView = ({ student, onClose }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(false);
+  const [coinHistoryExpanded, setCoinHistoryExpanded] = useState(false);
   const [data, setData] = useState({
     basicInfo: null,
     performance: null,
@@ -208,6 +210,32 @@ const StudentDetailView = ({ student, onClose }) => {
                 </span>
               </div>
             ))}
+          </div>
+
+          {/* Виджет истории монет */}
+          <div className="coin-history-widget">
+            <div 
+              className="coin-history-header" 
+              onClick={() => setCoinHistoryExpanded(!coinHistoryExpanded)}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderTop: '1px solid #e0e0e0', marginTop: '20px' }}
+            >
+              <h4 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>💰</span>
+                История монет
+              </h4>
+              <span style={{ transform: coinHistoryExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                ▼
+              </span>
+            </div>
+            
+            {coinHistoryExpanded && (
+              <div className="coin-history-content" style={{ marginTop: '12px' }}>
+                <CoinHistory 
+                  studentId={student?.id || student?.student?.id || student?.user?.id || student?.student_id} 
+                  compact={true} 
+                />
+              </div>
+            )}
           </div>
         </div>
       ) : (

@@ -46,11 +46,13 @@ export default function ShopPage() {
       
       // Загружаем доступные товары
       const availableData = await getAvailableProducts(studentCoins, 50, 0);
-      setAvailableProducts(availableData.objects || []);
+      const sortedAvailable = sortProducts(availableData.objects || []);
+      setAvailableProducts(sortedAvailable);
       
       // Загружаем недоступные товары
       const notAvailableData = await getNotAvailableProducts(studentCoins, 50, 0);
-      setNotAvailableProducts(notAvailableData.objects || []);
+      const sortedNotAvailable = sortProducts(notAvailableData.objects || []);
+      setNotAvailableProducts(sortedNotAvailable);
       
     } catch (error) {
       console.error('Error loading products:', error);
@@ -58,6 +60,17 @@ export default function ShopPage() {
       setLoading(false);
     }
   }, [studentData?.points]);
+
+  // Функция сортировки товаров (закрепленные первыми)
+  const sortProducts = (productsList) => {
+    return [...productsList].sort((a, b) => {
+      // Сначала сортируем по is_pinned (закрепленные первыми)
+      if (a.is_pinned && !b.is_pinned) return -1;
+      if (!a.is_pinned && b.is_pinned) return 1;
+      // Затем по цене (дешевые первыми)
+      return a.price - b.price;
+    });
+  };
 
   // Загрузка данных студента
   useEffect(() => {
@@ -204,7 +217,12 @@ export default function ShopPage() {
                         </div>
                         <div className="products-grid">
                           {availableProducts.map(product => (
-                            <div key={product.id} className="product-card available">
+                            <div key={product.id} className={`product-card available ${product.is_pinned ? 'pinned' : ''}`}>
+                              {product.is_pinned && (
+                                <div className="pinned-badge">
+                                  ⭐ Рекомендуем
+                                </div>
+                              )}
                               <div className="product-image">
                                 {getProductImage(product) ? (
                                   <img src={getProductImage(product)} alt={product.name} />
@@ -256,7 +274,12 @@ export default function ShopPage() {
                           {notAvailableProducts.map(product => {
                             const progress = getCoinsProgress(product);
                             return (
-                              <div key={product.id} className="product-card not-available">
+                              <div key={product.id} className={`product-card not-available ${product.is_pinned ? 'pinned' : ''}`}>
+                                {product.is_pinned && (
+                                  <div className="pinned-badge">
+                                    ⭐ Рекомендуем
+                                  </div>
+                                )}
                                 <div className="product-image">
                                   {getProductImage(product) ? (
                                     <img src={getProductImage(product)} alt={product.name} />

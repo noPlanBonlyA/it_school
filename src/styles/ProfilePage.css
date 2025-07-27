@@ -1,8 +1,9 @@
 /* ---------------- базовый лэйаут ---------------- */
 .app-layout {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   font-family: 'Mont', 'Inter', 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow-x: hidden;
 }
 
 .main-content {
@@ -12,6 +13,8 @@
   background: #F8FCFB;
   min-height: 100vh;
   padding-top: 80px; /* Отступ от TopBar */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* ---------------- заголовок ---------------- */
@@ -29,11 +32,12 @@
 /* --------------- контейнер формы --------------- */
 .profile-page {
   flex: 1;
-  padding: 24px 40px 40px;
+  padding: 24px 40px 80px; /* Увеличиваем нижний отступ */
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  min-height: calc(100vh - 80px);
+  min-height: auto;
+  overflow: visible;
 }
 
 .profile-form {
@@ -42,10 +46,13 @@
   padding: 48px;
   box-shadow: 0 8px 32px rgba(0, 177, 143, 0.1);
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px; /* Увеличиваем ширину для лучшего отображения виджета */
   box-sizing: border-box;
   border: 1px solid rgba(0, 177, 143, 0.1);
   animation: slideUp 0.6s ease-out;
+  display: flex;
+  flex-direction: column;
+  min-height: auto;
 }
 
 @keyframes slideUp {
@@ -318,6 +325,7 @@
   .profile-form {
     padding: 32px 24px;
     border-radius: 20px;
+    max-width: 100%;
   }
   
   .fields-grid {
@@ -342,15 +350,21 @@
   .page-title {
     font-size: 28px;
   }
+  
+  .attendance-section {
+    margin-top: 24px;
+    padding-top: 24px;
+  }
 }
 
 @media (max-width: 480px) {
   .profile-page {
-    padding: 12px 16px 32px;
+    padding: 12px 16px 60px; /* Увеличиваем нижний отступ для мобильных */
   }
   
   .profile-form {
     padding: 24px 16px;
+    max-width: 100%;
   }
   
   .avatar-img {
@@ -375,4 +389,19 @@
   .save-button, .cancel-button {
     width: 100%;
   }
+  
+  .attendance-section {
+    margin-top: 24px;
+    padding-top: 20px;
+  }
+}
+
+/* Секция посещаемости */
+.attendance-section {
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 2px solid rgba(0, 177, 143, 0.1);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }

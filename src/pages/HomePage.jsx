@@ -6,6 +6,7 @@ import Topbar    from '../components/TopBar';
 import Schedule  from '../components/Schedule';
 import BestCoins from '../components/BestCoin';
 import NewsModal from '../components/NewsModal';
+import CoinHistory from '../components/CoinHistory';
 
 import { useAuth }          from '../contexts/AuthContext';
 import userService          from '../services/userService';
@@ -480,6 +481,11 @@ export default function HomePage() {
               loading={user?.role === 'student' ? coinsLoading : false}
             />
           </div>
+
+          {/* История монет - только для студентов */}
+          {user?.role === 'student' && (
+            <CoinHistory compact={true} />
+          )}
         </section>
 
         {/* Модалка новости */}

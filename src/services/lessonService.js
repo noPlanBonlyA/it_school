@@ -279,3 +279,54 @@ export const createLessonWithMaterialsTextAndAutoSchedule = async (courseId, tex
     throw error;
   }
 };
+
+/**
+ * Получение материалов урока для студента
+ * @param {string} courseId - ID курса
+ * @param {string} lessonId - ID урока
+ * @returns {Promise<Object>} Материалы урока для студента
+ */
+export const getLessonMaterialsForStudent = async (courseId, lessonId) => {
+  try {
+    const response = await api.get(`/courses/${courseId}/lessons/${lessonId}/student-materials`);
+    return response.data;
+  } catch (error) {
+    console.error('[LessonService] Ошибка при получении материалов урока для студента:', error);
+    throw error;
+  }
+};
+
+/**
+ * Получение материалов урока для преподавателя
+ * @param {string} courseId - ID курса
+ * @param {string} lessonId - ID урока
+ * @param {string} studentId - ID студента
+ * @returns {Promise<Object>} Материалы урока для преподавателя
+ */
+export const getLessonMaterialsForTeacher = async (courseId, lessonId, studentId) => {
+  try {
+    const response = await api.get(`/courses/${courseId}/lessons/${lessonId}/teacher-materials`, {
+      params: { student_id: studentId }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('[LessonService] Ошибка при получении материалов урока для преподавателя:', error);
+    throw error;
+  }
+};
+
+/**
+ * Получение информации об уроке для преподавателя
+ * @param {string} courseId - ID курса
+ * @param {string} lessonId - ID урока
+ * @returns {Promise<Object>} Информация об уроке
+ */
+export const getLessonInfoForTeacher = async (courseId, lessonId) => {
+  try {
+    const response = await api.get(`/courses/${courseId}/lessons/${lessonId}/teacher-info`);
+    return response.data;
+  } catch (error) {
+    console.error('[LessonService] Ошибка при получении информации об уроке:', error);
+    throw error;
+  }
+};

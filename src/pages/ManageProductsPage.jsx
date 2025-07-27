@@ -27,7 +27,8 @@ export default function ManageProductsPage() {
   const [form, setForm] = useState({
     name: '',
     description: '',
-    price: ''
+    price: '',
+    is_pinned: false
   });
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -87,7 +88,7 @@ export default function ManageProductsPage() {
   };
 
   const resetForm = () => {
-    setForm({ name: '', description: '', price: '' });
+    setForm({ name: '', description: '', price: '', is_pinned: false });
     setImageFile(null);
     setPreviewUrl(null);
     setErrors({});
@@ -132,7 +133,8 @@ export default function ManageProductsPage() {
       const productData = {
         name: form.name.trim(),
         description: form.description.trim(),
-        price: Number(form.price)
+        price: Number(form.price),
+        is_pinned: form.is_pinned
       };
       
       if (editingProduct) {
@@ -160,7 +162,8 @@ export default function ManageProductsPage() {
     setForm({
       name: product.name,
       description: product.description,
-      price: product.price.toString()
+      price: product.price.toString(),
+      is_pinned: product.is_pinned || false
     });
     if (product.photo?.url) {
       setPreviewUrl(product.photo.url);
@@ -196,7 +199,18 @@ export default function ManageProductsPage() {
     return null;
   };
 
-  const displayedProducts = search.trim() ? filtered : products;
+  // Функция сортировки товаров (закрепленные первыми)
+  const sortProducts = (productsList) => {
+    return [...productsList].sort((a, b) => {
+      // Сначала сортируем по is_pinned (закрепленные первыми)
+      if (a.is_pinned && !b.is_pinned) return -1;
+      if (!a.is_pinned && b.is_pinned) return 1;
+      // Затем по дате создания (новые первыми)
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+  };
+
+  const displayedProducts = search.trim() ? sortProducts(filtered) : sortProducts(products);
 
   if (loading) {
     return (
@@ -267,7 +281,12 @@ export default function ManageProductsPage() {
               </div>
             ) : (
               displayedProducts.map(product => (
-                <div key={product.id} className="product-card">
+                <div key={product.id} className={`product-card ${product.is_pinned ? 'pinned' : ''}`}>
+                  {product.is_pinned && (
+                    <div className="pinned-badge">
+                      📌 Закреплено
+                    </div>
+                  )}
                   <div className="product-image">
                     {getProductImage(product) ? (
                       <img src={getProductImage(product)} alt={product.name} />
@@ -357,6 +376,17 @@ export default function ManageProductsPage() {
                     placeholder="Введите цену"
                   />
                   {errors.price && <span className="error-text">{errors.price}</span>}
+                </div>
+
+                <div className="form-group">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={form.is_pinned}
+                      onChange={(e) => setForm({...form, is_pinned: e.target.checked})}
+                    />
+                    <span className="checkbox-text">Закрепить товар (отображать в начале списка)</span>
+                  </label>
                 </div>
 
                 <div className="form-group">

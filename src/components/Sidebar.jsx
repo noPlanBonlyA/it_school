@@ -15,6 +15,7 @@ import cogIcon        from '../images/sidebar_icon7.png';
 import powerOffIcon   from '../images/sidebar_icon8.png';
 import broadcastIcon  from '../images/sidebar_icon4.png';
 import shopIcon       from '../images/sidebar_icon5.png';
+import coinsIcon      from '../images/sidebar_icon5.png'; // Иконка для монет (такая же как магазин)
 import moderationIcon from '../images/sidebar_icon3.png';
 import adminIcon      from '../images/sidebar_icon1.png';
 import magicIcon      from '../images/sidebar_icon7.png'; // Иконка для магии
@@ -85,6 +86,7 @@ export default function Sidebar({ activeItem, userRole }) {
     'manage-groups':  '/groups',
     manageTeachers:   '/manage-teachers',
     'manage-teachers': '/manage-teachers',
+    'manage-events':  '/manage-events',
     news:             '/news',
     manageAdmins:     '/manage-admins',
     'manage-admins':  '/manage-admins',
@@ -93,6 +95,10 @@ export default function Sidebar({ activeItem, userRole }) {
     manageProducts:   '/manage-products',
     'manage-products': '/manage-products',
     shop:             '/shop',
+    coinHistory:      '/coin-history',
+    'coin-history':   '/coin-history',
+    managePoints:     '/manage-points',
+    'manage-points':  '/manage-points',
     impersonate:      '/impersonate',
     settings:         '/profile',
     logout:           '/login'
@@ -102,21 +108,23 @@ export default function Sidebar({ activeItem, userRole }) {
   switch (userRole) {
     case 'student':
       main = [
-        { key: 'dashboard',      label: 'Главная',    icon: homeIcon },
-        { key: 'schedule',       label: 'Расписание', icon: calendarIcon },
-        { key: 'studentCourses', label: 'Мои курсы',  icon: coursesIcon },
-        { key: 'rating',         label: 'Рейтинг',    icon: chartIcon },
-        { key: 'shop',           label: 'Магазин',    icon: shopIcon },
-        { key: 'settings',       label: 'Профиль',    icon: cogIcon }
+        { key: 'dashboard',      label: 'Главная',      icon: homeIcon },
+        { key: 'schedule',       label: 'Расписание',   icon: calendarIcon },
+        { key: 'studentCourses', label: 'Мои курсы',    icon: coursesIcon },
+        { key: 'rating',         label: 'Рейтинг',      icon: chartIcon },
+        { key: 'coinHistory',    label: 'История монет', icon: coinsIcon },
+        { key: 'shop',           label: 'Магазин',      icon: shopIcon },
+        { key: 'settings',       label: 'Профиль',      icon: cogIcon }
       ];
       break;
     case 'teacher':
       main = [
-        { key: 'dashboard',      label: 'Главная',     icon: homeIcon },
-        { key: 'settings',       label: 'Мой профиль', icon: cogIcon },
-        { key: 'schedule',       label: 'Расписание',  icon: calendarIcon },
-        { key: 'teacherCourses', label: 'Курсы',       icon: coursesIcon },
-        { key: 'homework',       label: 'Дом. задания',icon: homeworkIcon }
+        { key: 'dashboard',      label: 'Главная',      icon: homeIcon },
+        { key: 'settings',       label: 'Мой профиль',  icon: cogIcon },
+        { key: 'schedule',       label: 'Расписание',   icon: calendarIcon },
+        { key: 'teacherCourses', label: 'Курсы',        icon: coursesIcon },
+        { key: 'homework',       label: 'Дом. задания', icon: homeworkIcon },
+        { key: 'managePoints',   label: 'Управление монетами', icon: coinsIcon }
       ];
       break;
     case 'admin':
@@ -125,9 +133,11 @@ export default function Sidebar({ activeItem, userRole }) {
         { key: 'settings',       label: 'Профиль',      icon: cogIcon },
         { key: 'schedule',       label: 'Расписание',   icon: calendarIcon },
         { key: 'manageStudents', label: 'Студенты',     icon: usersIcon },
+        { key: 'managePoints',   label: 'Управление монетами', icon: coinsIcon },
         { key: 'broadcast',      label: 'Рассылка',     icon: broadcastIcon },
         { key: 'manage-groups',  label: 'Группы',       icon: usersIcon },
         { key: 'manageTeachers', label: 'Преподаватели',icon: usersIcon },
+        { key: 'manage-events',  label: 'Мероприятия',  icon: calendarIcon },
         { key: 'news',           label: 'Новости',      icon: coursesIcon }
       ];
       break;
@@ -137,11 +147,13 @@ export default function Sidebar({ activeItem, userRole }) {
         { key: 'settings',        label: 'Профиль',          icon: cogIcon },
         { key: 'schedule',        label: 'Расписание',       icon: calendarIcon },
         { key: 'manageStudents',  label: 'Студенты',         icon: usersIcon },
+        { key: 'managePoints',    label: 'Управление монетами', icon: coinsIcon },
         { key: 'broadcast',       label: 'Рассылка',         icon: broadcastIcon },
         { key: 'manageTeachers',  label: 'Преподаватели',    icon: usersIcon },
         { key: 'manageAdmins',    label: 'Администраторы',   icon: adminIcon },
         { key: 'manage-courses',  label: 'Модерация курсов', icon: moderationIcon },
         { key: 'manage-groups',   label: 'Группы',           icon: usersIcon },
+        { key: 'manage-events',   label: 'Мероприятия',      icon: calendarIcon },
         { key: 'manageProducts',  label: 'Товары',           icon: shopIcon },
         { key: 'news',            label: 'Новости',          icon: coursesIcon },
         { key: 'impersonate',     label: 'Магия',            icon: magicIcon }

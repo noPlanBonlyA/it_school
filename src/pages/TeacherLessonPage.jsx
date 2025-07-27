@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate }     from 'react-router-dom';
 import Sidebar                         from '../components/Sidebar';
 import Topbar                          from '../components/TopBar';
+import TeacherLessonMaterials          from '../components/TeacherLessonMaterials';
 import { useAuth }                     from '../contexts/AuthContext';
 import { listStudentMaterials, postComment, listComments, getTeacherLessonInfo } from '../services/homeworkService';
 
@@ -81,49 +82,11 @@ export default function TeacherLessonPage() {
           <h1>{lesson?.name || 'Урок'}</h1>
         </div>
 
-        {/* ОБНОВЛЕНО: Используем данные из teacher-info endpoint */}
-        {lesson?.teacher_material_url && (
-          <div className="block">
-            <h2>Материалы для преподавателя</h2>
-            <div className="material-content">
-              <iframe 
-                src={lesson.teacher_material_url} 
-                title="Материал для преподавателя"
-                style={{
-                  width: '100%',
-                  minHeight: '400px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
-            <a href={lesson.teacher_material_url} target="_blank" rel="noreferrer">
-              Открыть в новом окне
-            </a>
-          </div>
-        )}
-
-        {/* ОБНОВЛЕНО: Используем данные из teacher-info endpoint */}
-        {lesson?.homework_material_url && (
-          <div className="block">
-            <h2>Домашнее задание</h2>
-            <div className="material-content">
-              <iframe 
-                src={lesson.homework_material_url} 
-                title="Домашнее задание"
-                style={{
-                  width: '100%',
-                  minHeight: '300px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
-            <a href={lesson.homework_material_url} target="_blank" rel="noreferrer">
-              Открыть в новом окне
-            </a>
-          </div>
-        )}
+        {/* Новый компонент для отображения материалов преподавателя */}
+        <TeacherLessonMaterials 
+          courseId={courseId} 
+          lessonId={lessonId} 
+        />
 
         <div className="block">
           <h2>Домашние задания студентов</h2>

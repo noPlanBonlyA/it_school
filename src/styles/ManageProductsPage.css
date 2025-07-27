@@ -77,22 +77,45 @@
 /* Сетка товаров */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
   margin-top: 24px;
+  padding: 16px 0;
+}
+
+/* Для больших экранов - показываем больше товаров в ряд */
+@media (min-width: 1400px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+}
+
+/* Для средних экранов */
+@media (max-width: 1200px) and (min-width: 768px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
 }
 
 .product-card {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.3s ease;
+  border: 1px solid #f1f5f9;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .product-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #e2e8f0;
 }
 
 .product-image {
@@ -124,21 +147,20 @@
 }
 
 .product-info {
-  padding: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 12px;
 }
 
 .product-info h3 {
-  margin: 0 0 8px 0;
+  margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
   color: #1f2937;
-}
-
-.product-description {
-  margin: 0 0 12px 0;
-  color: #6b7280;
-  font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.3;
+  min-height: 2.6rem; /* Фиксированная высота для выравнивания */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -146,30 +168,73 @@
   overflow: hidden;
 }
 
+.product-description {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+  min-height: 4.5rem; /* Фиксированная высота для выравнивания */
+}
+
 .product-price {
-  margin-bottom: 16px;
+  margin: 8px 0 0 0;
 }
 
 .price {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #059669;
 }
 
 .product-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  margin-top: auto; /* Прижимаем кнопки к низу карточки */
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
 }
 
 .product-actions button {
   flex: 1;
-  padding: 8px 16px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-actions .btn-secondary {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.product-actions .btn-secondary:hover {
+  background: #e2e8f0;
+  color: #334155;
+  transform: translateY(-1px);
+}
+
+.product-actions .btn-danger {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.product-actions .btn-danger:hover {
+  background: #fecaca;
+  color: #b91c1c;
+  transform: translateY(-1px);
 }
 
 /* Кнопки */
@@ -400,18 +465,159 @@
   
   .products-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 8px 0;
+  }
+  
+  .product-card {
+    border-radius: 12px;
+  }
+  
+  .product-info {
+    padding: 16px;
+  }
+  
+  .product-info h3 {
+    font-size: 1.1rem;
+    min-height: auto;
+  }
+  
+  .product-description {
+    min-height: auto;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+  
+  .price {
+    font-size: 1.3rem;
+  }
+  
+  .product-actions {
+    flex-direction: row;
+    gap: 8px;
+    padding-top: 12px;
+  }
+  
+  .product-actions button {
+    padding: 8px 12px;
+    font-size: 13px;
   }
   
   .modal-content {
     width: 95%;
     margin: 20px;
-  }
-  
-  .product-actions {
-    flex-direction: column;
+    border-radius: 12px;
   }
   
   .form-actions {
     flex-direction: column;
+    gap: 12px;
   }
+  
+  .pinned-badge {
+    top: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+}
+
+/* Планшеты */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  .product-info {
+    padding: 18px;
+  }
+}
+
+/* Стили для чекбокса закрепления */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  padding: 8px 0;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #00B18F;
+  cursor: pointer;
+}
+
+.checkbox-text {
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.checkbox-label:hover {
+  color: #1f2937;
+}
+
+.checkbox-label:hover .checkbox-text {
+  color: #1f2937;
+}
+
+/* Стили для закрепленных товаров */
+.product-card.pinned {
+  border: 2px solid #00B18F;
+  background: linear-gradient(135deg, #f0fdf4, #ffffff);
+  position: relative;
+  box-shadow: 0 6px 20px rgba(0, 177, 143, 0.15);
+}
+
+.product-card.pinned:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(0, 177, 143, 0.2);
+  border-color: #059669;
+}
+
+.pinned-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #00B18F, #059669);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 3;
+  box-shadow: 0 4px 12px rgba(0, 177, 143, 0.3);
+  animation: pulse-pin 2s infinite;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes pulse-pin {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(0, 177, 143, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 177, 143, 0.4);
+  }
+}
+
+.product-card.pinned .product-info h3 {
+  background: linear-gradient(135deg, #00B18F, #059669);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+.product-card.pinned .price {
+  background: linear-gradient(135deg, #00B18F, #059669);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
 }
