@@ -384,7 +384,15 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  border: 2px solid #e5e5e5;
   object-fit: cover;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+}
+
+.profile-wrapper:hover .profile-avatar {
+  border-color: #00B18F;
+  box-shadow: 0 2px 8px rgba(0, 177, 143, 0.2);
 }
 
 .profile-text {
@@ -417,49 +425,13 @@
 /* Адаптивность */
 @media (max-width: 768px) {
   .topbar {
-    left: 0; /* На мобильных занимает всю ширину */
-    right: 0;
-    padding-left: 70px; /* Отступ для бургер-кнопки */
-  }
-  
-  .topbar-content {
-    padding: 0 16px;
-  }
-  
-  .page-title {
-    font-size: 20px;
-  }
-  
-  .profile-text {
-    display: none;
-  }
-  
-  .notification-dropdown {
-    width: 280px;
-    right: -20px;
-  }
-  
-  .clear-all-btn {
-    font-size: 11px;
-    padding: 8px 12px;
-    letter-spacing: 0.5px;
+    display: none; /* Скрываем TopBar на мобильных */
   }
 }
 
 @media (max-width: 480px) {
   .topbar {
-    height: 60px;
-    left: 0;
-    right: 0;
-    padding-left: 60px; /* Уменьшенный отступ для маленьких экранов */
-  }
-  
-  .topbar-content {
-    padding: 0 12px;
-  }
-  
-  .page-title {
-    font-size: 18px;
+    display: none; /* Скрываем TopBar на маленьких экранах */
   }
   
   .profile-avatar {

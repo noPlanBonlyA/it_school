@@ -26,6 +26,7 @@ export default function ShopPage() {
   const [activeTab, setActiveTab] = useState('available'); // 'available' | 'not-available'
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Проверка прав доступа
   useEffect(() => {
@@ -97,16 +98,22 @@ export default function ShopPage() {
   };
 
   const getProductImage = (product) => {
-    if (product.photo?.url) {
+    // Проверяем, что photo не null и не undefined
+    if (product?.photo && product.photo !== null && product.photo.url) {
       const photoUrl = product.photo.url;
+      
       // Если URL уже абсолютный, возвращаем как есть
       if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
         return photoUrl;
       }
+      
       // Если относительный путь, добавляем базовый URL
-      const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-      return `${baseURL}${photoUrl.startsWith('/') ? '' : '/'}${photoUrl}`;
+      const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+      const cleanPhotoUrl = photoUrl.startsWith('/') ? photoUrl : `/${photoUrl}`;
+      const fullUrl = `${baseURL}${cleanPhotoUrl}`;
+      return fullUrl;
     }
+    
     return null;
   };
 
@@ -118,10 +125,9 @@ export default function ShopPage() {
   const confirmPurchase = async () => {
     if (!selectedProduct) return;
     
-    // В реальном приложении здесь был бы API вызов для покупки
-    alert(`Покупка товара "${selectedProduct.name}" за ${selectedProduct.price} монет будет реализована в следующих версиях`);
+    // Закрываем модальное окно покупки и показываем успешное уведомление
     setShowPurchaseModal(false);
-    setSelectedProduct(null);
+    setShowSuccessModal(true);
   };
 
   const canAfford = (product) => { // eslint-disable-line no-unused-vars
@@ -225,10 +231,25 @@ export default function ShopPage() {
                               )}
                               <div className="product-image">
                                 {getProductImage(product) ? (
-                                  <img src={getProductImage(product)} alt={product.name} />
+                                  <>
+                                    <img 
+                                      src={getProductImage(product)} 
+                                      alt={product.name}
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        e.target.parentNode.querySelector('.image-placeholder').style.display = 'flex';
+                                      }}
+                                    />
+                                    <div className="image-placeholder" style={{display: 'none'}}>
+                                      <div className="placeholder-icon">❌</div>
+                                      <div className="placeholder-text">Ошибка загрузки</div>
+                                    </div>
+                                  </>
                                 ) : (
-                                  <div className="image-placeholder">
-                                    <span>📦</span>
+                                  <div className="image-placeholder no-photo">
+                                    <div className="placeholder-icon">�</div>
+                                    <div className="placeholder-text">Фото не загружено</div>
+                                    <div className="placeholder-subtext">Администратор еще не добавил изображение</div>
                                   </div>
                                 )}
                               </div>
@@ -282,10 +303,25 @@ export default function ShopPage() {
                                 )}
                                 <div className="product-image">
                                   {getProductImage(product) ? (
-                                    <img src={getProductImage(product)} alt={product.name} />
+                                    <>
+                                      <img 
+                                        src={getProductImage(product)} 
+                                        alt={product.name}
+                                        onError={(e) => {
+                                          e.target.style.display = 'none';
+                                          e.target.parentNode.querySelector('.image-placeholder').style.display = 'flex';
+                                        }}
+                                      />
+                                      <div className="image-placeholder" style={{display: 'none'}}>
+                                        <div className="placeholder-icon">❌</div>
+                                        <div className="placeholder-text">Ошибка загрузки</div>
+                                      </div>
+                                    </>
                                   ) : (
-                                    <div className="image-placeholder">
-                                      <span>📦</span>
+                                    <div className="image-placeholder no-photo">
+                                      <div className="placeholder-icon">�</div>
+                                      <div className="placeholder-text">Фото не загружено</div>
+                                      <div className="placeholder-subtext">Администратор еще не добавил изображение</div>
                                     </div>
                                   )}
                                   <div className="unavailable-overlay">
@@ -309,8 +345,8 @@ export default function ShopPage() {
                                       ></div>
                                     </div>
                                     <div className="progress-info">
-                                      <span className="current-coins">{progress.currentCoins} 🪙</span>
-                                      <span className="target-coins">{progress.productPrice} 🪙</span>
+                                      <span className="current-coins">{progress.currentCoins} 💻</span>
+                                      <span className="target-coins">{progress.productPrice} 💻</span>
                                     </div>
                                   </div>
 
@@ -320,7 +356,7 @@ export default function ShopPage() {
                                       <span className="currency">монет</span>
                                     </div>
                                     <div className="coins-needed">
-                                      <span className="needed-icon">💰</span>
+                                      <span className="needed-icon">�</span>
                                       <span className="needed-text">Нужно еще: </span>
                                       <span className="needed-amount">{progress.coinsNeeded}</span>
                                       <span className="needed-currency"> монет</span>
@@ -361,10 +397,24 @@ export default function ShopPage() {
                 <div className="purchase-info">
                   <div className="product-preview">
                     {getProductImage(selectedProduct) ? (
-                      <img src={getProductImage(selectedProduct)} alt={selectedProduct.name} />
+                      <>
+                        <img 
+                          src={getProductImage(selectedProduct)} 
+                          alt={selectedProduct.name}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.parentNode.querySelector('.image-placeholder').style.display = 'flex';
+                          }}
+                        />
+                        <div className="image-placeholder" style={{display: 'none'}}>
+                          <div className="placeholder-icon">❌</div>
+                          <div className="placeholder-text">Ошибка загрузки</div>
+                        </div>
+                      </>
                     ) : (
-                      <div className="image-placeholder">
-                        <span>📦</span>
+                      <div className="image-placeholder no-photo">
+                        <div className="placeholder-icon">�</div>
+                        <div className="placeholder-text">Фото не загружено</div>
                       </div>
                     )}
                   </div>
@@ -401,6 +451,41 @@ export default function ShopPage() {
                   }}
                 >
                   Отмена
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Модальное окно успешной покупки */}
+        {showSuccessModal && selectedProduct && (
+          <div className="modal-overlay">
+            <div className="modal-content success-modal">
+              <div className="success-header">
+                <div className="success-icon">🎉</div>
+                <h2>Отличный выбор!</h2>
+              </div>
+              
+              <div className="success-body">
+                <div className="success-message">
+                  <div className="purchased-item">
+                    <strong>"{selectedProduct.name}"</strong>
+                  </div>
+                  <p className="instruction">
+                    Обратитесь к администратору для покупки.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="success-actions">
+                <button 
+                  className="btn-success"
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    setSelectedProduct(null);
+                  }}
+                >
+                  Понятно, спасибо! 👍
                 </button>
               </div>
             </div>

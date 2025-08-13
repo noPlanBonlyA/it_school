@@ -54,9 +54,10 @@ const PointsManagement = ({ onClose, selectedStudent = null }) => {
     const filtered = students.filter(student => {
       const fullName = `${student.user?.first_name} ${student.user?.surname}`.toLowerCase();
       const email = student.user?.email?.toLowerCase() || '';
+      const username = student.user?.username?.toLowerCase() || '';
       const search = formData.student_name.toLowerCase();
       
-      return fullName.includes(search) || email.includes(search);
+      return fullName.includes(search) || email.includes(search) || username.includes(search);
     }).slice(0, 5); // Показываем максимум 5 результатов
 
     setFilteredStudents(filtered);
@@ -230,7 +231,7 @@ const PointsManagement = ({ onClose, selectedStudent = null }) => {
                 id="student"
                 type="text"
                 className={`form-control ${errors.student_name ? 'error' : ''}`}
-                placeholder="Начните вводить имя или email студента"
+                placeholder="Поиск по имени, email или табельному номеру"
                 value={formData.student_name}
                 onChange={(e) => handleInputChange('student_name', e.target.value)}
                 onFocus={() => !selectedStudent && setShowSuggestions(formData.student_name.length > 0)}
@@ -248,6 +249,11 @@ const PointsManagement = ({ onClose, selectedStudent = null }) => {
                     >
                       <div className="suggestion-name">
                         {student.user?.first_name} {student.user?.surname}
+                        {student.user?.username && (
+                          <span style={{ color: '#666', fontWeight: 'normal', marginLeft: '8px' }}>
+                            (№{student.user.username})
+                          </span>
+                        )}
                       </div>
                       <div className="suggestion-email">
                         {student.user?.email}

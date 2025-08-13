@@ -123,6 +123,11 @@ export default function ManageNewsPage() {
       setForm(emptyForm);
       setImageFile(null);
       setPreviewUrl(null);
+      
+      // Очищаем input file для создания
+      const fileInput = document.querySelector('input[type="file"]:not([data-edit])');
+      if (fileInput) fileInput.value = '';
+      
       loadNews();
     } catch (e) {
       console.error('[ManageNewsPage] Error creating news:', e);
@@ -279,7 +284,13 @@ export default function ManageNewsPage() {
                   />
                   <button 
                     type="button" 
-                    onClick={() => { setImageFile(null); setPreviewUrl(null); }}
+                    onClick={() => { 
+                      setImageFile(null); 
+                      setPreviewUrl(null);
+                      // Очищаем также input file
+                      const fileInput = document.querySelector('input[type="file"]:not([data-edit])');
+                      if (fileInput) fileInput.value = '';
+                    }}
                     style={{ marginLeft: '10px', padding: '5px 10px' }}
                   >
                     Удалить
@@ -386,13 +397,20 @@ export default function ManageNewsPage() {
                 <input
                   type="file"
                   accept="image/*"
+                  data-edit="true"
                   onChange={e => handleFileSelect(e.target.files[0], true)}
                 />
                 
                 {previewUrl && (
                   <button 
                     type="button" 
-                    onClick={() => { setImageFile(null); setPreviewUrl(null); }}
+                    onClick={() => { 
+                      setImageFile(null); 
+                      setPreviewUrl(null);
+                      // Очищаем input file для редактирования
+                      const editFileInput = document.querySelector('input[type="file"][data-edit="true"]');
+                      if (editFileInput) editFileInput.value = '';
+                    }}
                     style={{ marginTop: '5px', padding: '5px 10px' }}
                   >
                     Отменить замену
@@ -422,7 +440,10 @@ export default function ManageNewsPage() {
                   onClick={() => { 
                     setEditItem(null); 
                     setImageFile(null); 
-                    setPreviewUrl(null); 
+                    setPreviewUrl(null);
+                    // Очищаем input file для редактирования
+                    const editFileInput = document.querySelector('input[type="file"][data-edit="true"]');
+                    if (editFileInput) editFileInput.value = '';
                   }}
                 >
                   Отмена

@@ -14,15 +14,19 @@ const api = axios.create({
 // Добавляем интерцептор для запросов
 api.interceptors.request.use(
   config => {
-    // Устанавливаем Content-Type только для JSON данных
-    if (config.data && typeof config.data === 'object' && !(config.data instanceof FormData)) {
+    // Для FormData не устанавливаем Content-Type, позволяем браузеру сделать это
+    if (config.data instanceof FormData) {
+      // Удаляем Content-Type для multipart/form-data
+      delete config.headers['Content-Type'];
+    } else if (config.data && typeof config.data === 'object') {
       config.headers['Content-Type'] = 'application/json';
     }
+    
     console.log('[API] Request:', {
       method: config.method,
       url: config.url,
       headers: config.headers,
-      data: config.data
+      data: config.data instanceof FormData ? 'FormData' : config.data
     });
     return config;
   },

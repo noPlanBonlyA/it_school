@@ -134,10 +134,9 @@ export default function EventCreateModal({ onSave, onClose }) {
     try {
       setSaving(true);
       
-      // Добавляем ID для нового события (требуется по API)
+      // Подготавливаем данные события для отправки (без ID - сервер сам его сгенерирует)
       const eventDataWithId = {
         ...formData,
-        id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
         // Убеждаемся, что даты в правильном формате ISO
         start_datetime: formData.start_datetime ? new Date(formData.start_datetime).toISOString() : null,
         end_datetime: formData.end_datetime ? new Date(formData.end_datetime).toISOString() : null,

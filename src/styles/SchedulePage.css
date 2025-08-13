@@ -18,6 +18,16 @@
   box-sizing: border-box;
 }
 
+/* Скролл только на мобильных */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 0 16px 24px 16px;
+    padding-top: 20px !important; /* Меньший отступ на мобильных */
+    overflow-y: auto;
+    height: 100vh;
+  }
+}
+
 /* ---------- Панель управления фильтрами для админов ---------- */
 .admin-schedule-controls {
   background: white;
@@ -188,13 +198,37 @@
 /* Основной layout расписания */
 .schedule-layout {
   display: flex;
-  gap: 24px;
+  gap: 0; /* Убираем gap, так как теперь одна колонка */
   margin-top: 24px !important;
-  margin-bottom: 40px !important; /* Отступ снизу */
-  padding-bottom: 40px !important; /* Дополнительный отступ снизу */
-  /* УБИРАЕМ фиксированную высоту */
+  margin-bottom: 40px !important;
+  padding-bottom: 40px !important;
   min-height: calc(100vh - 200px);
-  align-items: flex-start; /* выравниваем по верху */
+  width: 100%;
+}
+
+/* Календарь на всю ширину */
+.calendar-widget.full-width {
+  width: 100%;
+  height: auto;
+  min-height: calc(100vh - 200px);
+  background: white;
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 60px rgba(0, 177, 143, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 177, 143, 0.08);
+  overflow: hidden;
+  padding: 24px;
+}
+
+/* Адаптация для EventModal на странице расписания */
+.schedule-page .event-modal {
+  z-index: 9999;
+}
+
+.schedule-page .event-modal .modal-overlay {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
 }
 
 .schedule-sidebar {
@@ -387,18 +421,46 @@
 
 .fc-event {
   border: none !important;
-  border-radius: 6px !important;
+  border-radius: 12px !important;
   font-size: 13px !important;
   font-weight: 600 !important;
-  padding: 2px 6px !important;
+  padding: 6px 10px !important;
   cursor: pointer !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   font-family: 'Mont', sans-serif !important;
+  /* Добавляем прозрачность и красивые стили */
+  backdrop-filter: blur(10px) !important;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Добавляем эффект стекла для событий */
+.fc-event::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.15) 0%, 
+    transparent 50%, 
+    rgba(0, 0, 0, 0.05) 100%) !important;
+  pointer-events: none !important;
 }
 
 .fc-event:hover {
-  transform: scale(1.02) !important;
-  box-shadow: 0 4px 12px rgba(0, 177, 143, 0.2) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 
+    0 8px 32px rgba(0, 177, 143, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .fc .fc-timegrid-slot-label {
@@ -725,6 +787,65 @@
   
   .event-details-overlay {
     padding: 16px;
+  }
+
+  /* Мобильные стили для FullCalendar */
+  .fc-header-toolbar {
+    flex-direction: column !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .fc-toolbar-chunk {
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  .fc-button-group {
+    margin: 0 !important;
+  }
+
+  .fc-button {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+
+  .fc-event {
+    font-size: 12px !important;
+    padding: 2px 4px !important;
+    border-radius: 6px !important;
+  }
+
+  .fc-event-title {
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .fc-daygrid-event {
+    margin-bottom: 2px !important;
+  }
+
+  .fc-h-event {
+    border: none !important;
+  }
+
+  /* Адаптация календаря под тач */
+  .fc-timegrid-slot {
+    min-height: 40px !important;
+  }
+
+  .fc-timegrid-axis {
+    width: 50px !important;
+  }
+
+  .fc-timegrid-axis-frame {
+    padding: 4px !important;
+  }
+
+  .fc-scrollgrid-sync-table {
+    font-size: 12px !important;
   }
   
   /* ДОБАВЛЕНО: мобильные стили для календаря */

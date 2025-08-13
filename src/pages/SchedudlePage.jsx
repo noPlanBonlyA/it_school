@@ -9,6 +9,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
 import Schedule from '../components/Schedule';
+import EventModal from '../components/EventModal';
 import ScheduleFilterModal from '../components/ScheduleFilterModal';
 import { useAuth } from '../contexts/AuthContext';
 import { getUserScheduleOptimized } from '../services/scheduleService';
@@ -94,27 +95,42 @@ export default function SchedulePage() {
   };
 
   // ───── подготовка событий для FullCalendar ─────
-  const calendarEvents = useMemo(() => events.map(e => ({
-    id: e.id,
-    title: `${e.lesson_name} (${e.course_name})`,
-    start: e.start_datetime || e.start,
-    end: e.end_datetime || e.end,
-    backgroundColor: e.is_opened ? '#00B18F' : 
-                     new Date() < new Date(e.start_datetime || e.start) ? '#FFC107' : '#EF4444',
-    borderColor: e.is_opened ? '#03836A' : 
-                 new Date() < new Date(e.start_datetime || e.start) ? '#D39E00' : '#DC2626',
-    extendedProps: {
-      originalEvent: e,
-      lesson_name: e.lesson_name,
-      course_name: e.course_name,
-      group_name: e.group_name,
-      teacher_name: e.teacher_name,
-      auditorium: e.auditorium,
-      is_opened: e.is_opened,
-      course_id: e.course_id,
-      lesson_id: e.lesson_id
-    }
-  })), [events]);
+  const calendarEvents = useMemo(() => events.map(e => {
+    // Форматируем время
+    const startTime = new Date(e.start_datetime || e.start).toLocaleTimeString('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    return {
+      id: e.id,
+      title: `${startTime} ${e.course_name}`, // Показываем только время и название курса
+      start: e.start_datetime || e.start,
+      end: e.end_datetime || e.end,
+      // Обновленные прозрачные цвета для красивого отображения
+      backgroundColor: e.is_opened 
+        ? 'rgba(0, 177, 143, 0.85)' 
+        : new Date() < new Date(e.start_datetime || e.start) 
+          ? 'rgba(255, 193, 7, 0.85)' 
+          : 'rgba(239, 68, 68, 0.85)',
+      borderColor: e.is_opened 
+        ? 'rgba(3, 131, 106, 0.9)' 
+        : new Date() < new Date(e.start_datetime || e.start) 
+          ? 'rgba(211, 158, 0, 0.9)' 
+          : 'rgba(220, 38, 38, 0.9)',
+      extendedProps: {
+        originalEvent: e,
+        lesson_name: e.lesson_name,
+        course_name: e.course_name,
+        group_name: e.group_name,
+        teacher_name: e.teacher_name,
+        auditorium: e.auditorium,
+        is_opened: e.is_opened,
+        course_id: e.course_id,
+        lesson_id: e.lesson_id
+      }
+    };
+  }), [events]);
 
   // ───── ближайший день ─────
   const nearestDayISO = useMemo(() => {
@@ -218,19 +234,8 @@ export default function SchedulePage() {
         
         <div className="schedule-page">
           <div className="schedule-layout">
-            {/* Виджет ближайших занятий */}
-            <div className="widget nearest-lessons">
-              <h2>{widgetLabel}</h2>
-              <Schedule 
-                events={nearestDayEvents} 
-                onSelect={setSelectedEvent}
-                selectedEvent={selectedEvent}
-                onClose={() => setSelectedEvent(null)}
-              />
-            </div>
-
-            {/* Календарь */}
-            <div className="calendar-widget">
+            {/* Календарь - теперь на всю ширину */}
+            <div className="calendar-widget full-width">
               <FullCalendar
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView="dayGridMonth"
@@ -240,25 +245,25 @@ export default function SchedulePage() {
                   right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 }}
                 locale="ru"
-                height="auto"
+                height="calc(100vh - 250px)" /* Фиксированная высота для лучшего отображения */
                 events={calendarEvents}
                 eventClick={handleEventClick}
                 eventDisplay="block"
                 dayMaxEvents={3}
                 moreLinkText="ещё"
-                slotMinTime="08:00:00" /* Начинаем показ с 8:00 утра */
-                slotMaxTime="22:00:00" /* Заканчиваем в 22:00 */
-                scrollTime="08:00:00" /* Автоматическая прокрутка к 8:00 */
+                slotMinTime="08:00:00"
+                slotMaxTime="22:00:00"
+                scrollTime="08:00:00"
                 businessHours={{
                   daysOfWeek: [1, 2, 3, 4, 5, 6], // Пн-Сб
                   startTime: '08:00',
                   endTime: '20:00'
                 }}
-                allDaySlot={false} /* Убираем строку "Весь день" */
-                slotDuration="00:30:00" /* 30-минутные интервалы */
-                slotLabelInterval="01:00:00" /* Показываем метки времени каждый час */
-                expandRows={true} /* Растягиваем строки */
-                nowIndicator={true} /* Показываем текущее время */
+                allDaySlot={false}
+                slotDuration="00:30:00"
+                slotLabelInterval="01:00:00"
+                expandRows={true}
+                nowIndicator={true}
                 
                 /* Настройки формата времени */
                 slotLabelFormat={{
@@ -280,6 +285,13 @@ export default function SchedulePage() {
             currentFilters={activeFilters}
           />
         )}
+
+        {/* Модальное окно детальной информации о событии */}
+        <EventModal
+          event={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+          userRole={user?.role}
+        />
       </div>
     </div>
   );

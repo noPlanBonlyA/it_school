@@ -7,6 +7,7 @@ import CourseGroupsViewer from '../components/CourseGroupsViewer';
 import { useAuth } from '../contexts/AuthContext';
 import { getCourseLessons, deleteLessonWithMaterials } from '../services/lessonService';
 import { getCourse } from '../services/courseService';
+import { getCoursesPath, getCoursesTitle } from '../utils/navigationUtils';
 import '../styles/LessonEditor.css';
 import '../styles/ManageUserPage.css'; // Фирменные стили кнопок
 
@@ -84,10 +85,23 @@ export default function ManageLessonsPage() {
   const fullName = [user.first_name, user.surname, user.patronymic]
     .filter(Boolean).join(' ');
 
+  // Определяем правильный activeItem в зависимости от роли
+  const getSidebarActiveItem = (userRole) => {
+    switch (userRole) {
+      case 'admin':
+      case 'superadmin':
+        return 'manageCourses';
+      case 'teacher':
+        return 'teacherCourses';
+      default:
+        return 'teacherCourses';
+    }
+  };
+
   if (loading) {
     return (
       <div className="app-layout">
-        <Sidebar activeItem="teacherCourses" userRole={user.role} />
+        <Sidebar activeItem={getSidebarActiveItem(user.role)} userRole={user.role} />
         <div className="main-content">
           <Topbar userName={fullName} userRole={user.role} onProfileClick={() => navigate('/profile')} />
           <div className="loading-container">
@@ -101,16 +115,16 @@ export default function ManageLessonsPage() {
 
   return (
     <div className="app-layout">
-      <Sidebar activeItem="teacherCourses" userRole={user.role} />
+      <Sidebar activeItem={getSidebarActiveItem(user.role)} userRole={user.role} />
       <div className="main-content">
         <Topbar userName={fullName} userRole={user.role} onProfileClick={() => navigate('/profile')} />
 
         <div className="course-header">
           <button 
             className="btn-back"
-            onClick={() => navigate('/teacher-courses')}
+            onClick={() => navigate(getCoursesPath(user.role))}
           >
-            ← Вернуться к курсам
+            ← Вернуться к {getCoursesTitle(user.role)}
           </button>
           <h1>{course?.name} - Управление уроками</h1>
         </div>

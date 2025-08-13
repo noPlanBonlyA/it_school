@@ -338,3 +338,141 @@ export const formatPointsChange = (changedPoints) => {
   }
   return changedPoints.toString();
 };
+
+/**
+ * Получение истории поинтов для конкретного студента (для админов)
+ * @param {string} studentId - ID студента
+ * @param {Object} params - Параметры запроса (limit, offset)
+ * @param {number} params.limit - Количество записей (максимум 100, по умолчанию 10)
+ * @param {number} params.offset - Смещение для пагинации (минимум 0, по умолчанию 0)
+ * @returns {Promise<Object>} История поинтов с объектами и общим количеством
+ */
+export const getStudentPointsHistory = async (studentId, params = {}) => {
+  try {
+    const { limit = 10, offset = 0 } = params;
+    
+    // Валидация параметров согласно API
+    const validLimit = Math.min(Math.max(1, limit), 100);
+    const validOffset = Math.max(0, offset);
+    
+    console.log('[CoinHistoryService] Getting points history for studentId:', studentId);
+    
+    if (!studentId) {
+      console.log('[CoinHistoryService] No studentId provided, using general endpoint for current user');
+      // Если нет конкретного studentId, используем обычный endpoint для текущего пользователя
+      return await getPointsHistory(params);
+    }
+    
+    // Согласно API документации, для получения истории конкретного студента 
+    // используем общий endpoint /api/points/history/ и получаем все записи для фильтрации
+    
+    try {
+      console.log('[CoinHistoryService] Trying to get all points history records...');
+      
+      // Получаем все записи истории поинтов (с максимальным лимитом)
+      const allRecords = [];
+      let currentOffset = 0;
+      const pageSize = 100;
+      
+      // Получаем записи постранично
+      while (true) {
+        const response = await api.get('/points/history/', {
+          params: { 
+            limit: pageSize,
+            offset: currentOffset
+          }
+        });
+        
+        const pageData = response.data?.objects || [];
+        console.log(`[CoinHistoryService] Got page with ${pageData.length} records (offset: ${currentOffset})`);
+        
+        if (pageData.length === 0) {
+          break; // Больше записей нет
+        }
+        
+        allRecords.push(...pageData);
+        
+        // Если получили меньше записей чем запрашивали, значит это последняя страница
+        if (pageData.length < pageSize) {
+          break;
+        }
+        
+        currentOffset += pageSize;
+        
+        // Ограничиваем количество запросов для избежания бесконечного цикла
+        if (currentOffset > 1000) {
+          console.warn('[CoinHistoryService] Reached maximum offset limit, stopping...');
+          break;
+        }
+      }
+      
+      console.log(`[CoinHistoryService] Total records retrieved: ${allRecords.length}`);
+      console.log('[CoinHistoryService] Looking for records with student_id:', studentId);
+      
+      // Фильтруем по studentId - проверяем разные возможные поля
+      const filteredHistory = allRecords.filter(record => {
+        const matchesStudentId = record.student_id === studentId;
+        const matchesUserId = record.user_id === studentId;
+        
+        // Логируем только несколько первых записей для отладки
+        if (allRecords.indexOf(record) < 5) {
+          console.log('[CoinHistoryService] Checking record:', {
+            recordId: record.id,
+            recordStudentId: record.student_id,
+            recordUserId: record.user_id,
+            targetStudentId: studentId,
+            matchesStudentId,
+            matchesUserId
+          });
+        }
+        
+        return matchesStudentId || matchesUserId;
+      });
+      
+      console.log('[CoinHistoryService] Filtered history:', filteredHistory.length, 'records');
+      
+      if (filteredHistory.length > 0) {
+        console.log('[CoinHistoryService] Found records:', filteredHistory);
+      }
+      
+      // Применяем пагинацию после фильтрации
+      const startIndex = validOffset;
+      const endIndex = startIndex + validLimit;
+      const paginatedHistory = filteredHistory.slice(startIndex, endIndex);
+      
+      return {
+        objects: paginatedHistory,
+        meta: {
+          total_count: filteredHistory.length,
+          limit: validLimit,
+          offset: validOffset
+        }
+      };
+      
+    } catch (error) {
+      console.error('[CoinHistoryService] Error getting points history:', error);
+      
+      // Fallback: если ничего не работает, возвращаем пустую историю
+      return {
+        objects: [],
+        meta: {
+          total_count: 0,
+          limit: validLimit,
+          offset: validOffset
+        }
+      };
+    }
+  } catch (error) {
+    console.error('[CoinHistoryService] Ошибка при получении истории поинтов студента:', error);
+    
+    // Возвращаем пустую структуру в случае ошибки
+    return {
+      objects: [],
+      meta: {
+        total_count: 0,
+        limit: params.limit || 10,
+        offset: params.offset || 0
+      }
+    };
+  }
+};

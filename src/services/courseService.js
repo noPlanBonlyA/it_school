@@ -271,11 +271,9 @@ export const createCourse = async (formData) => {
       console.log(`[CourseService] FormData key: "${key}", value:`, value, 'type:', typeof value);
     }
     
-    // Отправляем запрос с явным указанием, что это multipart/form-data
+    // Отправляем запрос с правильным Content-Type заголовком
     const { data } = await api.post('/courses/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers: { 'Content-Type': 'multipart/form-data' }
     });
     
     // Отправляем уведомление о создании курса
@@ -334,7 +332,9 @@ export async function updateCourse(id, formData) {
     }
   }
   
-  const { data } = await api.put(`/courses/${id}`, formData);
+  const { data } = await api.put(`/courses/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
   return data;
 }
 
@@ -345,10 +345,48 @@ export async function deleteCourse(id) {
 
 // GET /api/courses/{courseId}/lessons - уроки курса
 export async function getCourseLessons(courseId, limit = 100, offset = 0) {
-  const { data } = await api.get(`/courses/${courseId}/lessons`, { 
-    params: { limit, offset } 
-  });
-  return data.objects || [];
+  try {
+    console.log('[CourseService] Getting course lessons for course:', courseId);
+    
+    const { data } = await api.get(`/courses/${courseId}/lessons`, { 
+      params: { limit, offset } 
+    });
+    
+    console.log('[CourseService] Course lessons response:', data);
+    console.log('[CourseService] Response data type:', typeof data);
+    console.log('[CourseService] Response data is array:', Array.isArray(data));
+    
+    // Проверяем различные варианты структуры ответа
+    let lessons = [];
+    
+    if (data && typeof data === 'object') {
+      if (Array.isArray(data.objects)) {
+        lessons = data.objects;
+        console.log('[CourseService] Using data.objects as lessons array');
+      } else if (Array.isArray(data)) {
+        lessons = data;
+        console.log('[CourseService] Using data as lessons array');
+      } else {
+        console.warn('[CourseService] Unexpected response structure:', data);
+        lessons = [];
+      }
+    } else if (Array.isArray(data)) {
+      lessons = data;
+      console.log('[CourseService] Direct array response');
+    } else {
+      console.warn('[CourseService] Invalid response format:', data);
+      lessons = [];
+    }
+    
+    console.log('[CourseService] Final lessons array:', lessons);
+    console.log('[CourseService] Lessons count:', lessons.length);
+    
+    return lessons;
+  } catch (error) {
+    console.error('[CourseService] Error getting course lessons:', error);
+    console.error('[CourseService] Error response:', error.response?.data);
+    return []; // Возвращаем пустой массив в случае ошибки
+  }
 }
 
 /**

@@ -17,7 +17,10 @@ export const getFilteredSchedule = async (filters = {}) => {
 
     // Получаем базовое расписание
     const response = await api.get('/schedule/');
-    let scheduleData = response.data || [];
+    const data = response.data || {};
+    
+    // Новая схема API возвращает объект с lessons и events
+    let scheduleData = data.lessons || [];
     
     console.log('[ScheduleFilterService] Base schedule data:', scheduleData.length, 'items');
 
@@ -34,6 +37,11 @@ export const getFilteredSchedule = async (filters = {}) => {
     if (filters.course_id) {
       // Получаем информацию о всех уроках для сопоставления с курсами
       const lessonPromises = filteredData.map(async (item) => {
+        // Сначала проверяем, есть ли уже course_id в данных
+        if (item.course_id === filters.course_id) {
+          return { ...item, matches_course: true };
+        }
+        
         if (!item.lesson_id) return { ...item, matches_course: false };
         
         try {
@@ -70,7 +78,10 @@ export const getFilteredSchedule = async (filters = {}) => {
           const groupData = groupResponse.data;
           
           if (groupData && groupData.students) {
-            const hasStudent = groupData.students.some(student => student.id === filters.student_id);
+            const hasStudent = groupData.students.some(student => 
+              student.id === filters.student_id || 
+              student.user_id === filters.student_id
+            );
             return { ...item, has_student: hasStudent };
           }
           return { ...item, has_student: false };
@@ -96,6 +107,8 @@ export const getFilteredSchedule = async (filters = {}) => {
           
           if (groupData && groupData.teacher_id) {
             return { ...item, has_teacher: groupData.teacher_id === filters.teacher_id };
+          } else if (groupData && groupData.teacher && groupData.teacher.id) {
+            return { ...item, has_teacher: groupData.teacher.id === filters.teacher_id };
           }
           return { ...item, has_teacher: false };
         } catch (error) {
@@ -147,7 +160,7 @@ export const getFilteredSchedule = async (filters = {}) => {
         }
       }
 
-      return {
+      const enhancedItem = {
         id: item.id,
         lesson_id: item.lesson_id,
         lesson_name: item.lesson_name,
@@ -168,6 +181,16 @@ export const getFilteredSchedule = async (filters = {}) => {
         start: item.start_datetime,
         end: item.end_datetime
       };
+
+      console.log(`[ScheduleFilterService] Enhanced item ${item.id}:`, {
+        group_id: enhancedItem.group_id,
+        group_name: enhancedItem.group_name,
+        course_id: enhancedItem.course_id,
+        teacher_name: enhancedItem.teacher_name,
+        lesson_name: enhancedItem.lesson_name
+      });
+
+      return enhancedItem;
     }));
 
     console.log('[ScheduleFilterService] Final filtered schedule:', enhancedData.length, 'items');

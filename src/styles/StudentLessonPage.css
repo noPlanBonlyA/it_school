@@ -5,6 +5,79 @@
   padding: 20px;
 }
 
+/* Материалы урока */
+.lesson-materials {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.lesson-materials h3 {
+  margin: 0 0 20px 0;
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+
+.material-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.material-card h4 {
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+  color: #374151;
+}
+
+.material-content {
+  width: 100%;
+}
+
+.no-materials {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+}
+
+.no-materials p {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+/* Блок домашнего задания */
+.block {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.block h2 {
+  margin: 0 0 20px 0;
+  font-size: 1.8rem;
+  color: #1f2937;
+}
+
+.block h3 {
+  margin: 15px 0 10px 0;
+  font-size: 1.3rem;
+  color: #374151;
+}
+
+.homework-material {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+  border-left: 4px solid #28a745;
+}
+
 .breadcrumb {
   display: flex;
   align-items: center;
@@ -593,4 +666,57 @@
 .hw-submitted h3 {
   color: #28a745;
   margin-bottom: 10px;
+}
+
+/* ===== Стили для поля комментария студента ===== */
+.student-comment-section {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.student-comment-section h3 {
+  margin: 0 0 12px 0;
+  color: #495057;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.student-comment-section textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.student-comment-section textarea:focus {
+  outline: none;
+  border-color: #00B18F;
+  box-shadow: 0 0 0 0.2rem rgba(0, 177, 143, 0.25);
+}
+
+.student-comment-section textarea:disabled {
+  background-color: #e9ecef;
+  opacity: 1;
+}
+
+/* Предпросмотр комментария */
+.student-comment-section .comment-preview {
+  margin-top: 10px;
+  padding: 10px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.student-comment-section .comment-preview strong {
+  color: #495057;
+  margin-bottom: 5px;
+  display: block;
 }

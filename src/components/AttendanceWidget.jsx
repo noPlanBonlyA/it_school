@@ -1,18 +1,17 @@
 // src/components/AttendanceWidget.jsx
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import api from '../api/axiosInstance';
 import '../styles/AttendanceWidget.css';
 
-export default function AttendanceWidget() {
-  const { user } = useAuth();
+export default function AttendanceWidget({ userId }) {
   const [attendanceData, setAttendanceData] = useState({
     attendanceMap: {},
     stats: {
       totalLessons: 0,
       attendedLessons: 0,
       excusedLessons: 0,
-      missedLessons: 0
+      missedLessons: 0,
+      futureLessons: 0
     }
   });
   const [loading, setLoading] = useState(true);
@@ -25,12 +24,27 @@ export default function AttendanceWidget() {
       setLoading(true);
       setError(null);
       
-      console.log('[AttendanceWidget] Loading attendance data for user:', user?.id);
+      if (!userId) {
+        console.warn('[AttendanceWidget] No userId provided');
+        setError('Не указан ID пользователя');
+        return;
+      }
+      
+      console.log('[AttendanceWidget] Loading attendance data for user:', userId);
       const response = await api.get('/courses/student/lesson-student');
       
-      console.log('[AttendanceWidget] API Response:', response.data);
+      console.log('[AttendanceWidget] API Response:', response);
+      console.log('[AttendanceWidget] API Response data:', response.data);
+      console.log('[AttendanceWidget] API Response status:', response.status);
       
       const lessonStudents = response.data || [];
+      
+      console.log('[AttendanceWidget] Lesson students array:', lessonStudents);
+      console.log('[AttendanceWidget] Array length:', lessonStudents.length);
+      
+      if (lessonStudents.length === 0) {
+        console.log('[AttendanceWidget] No lesson students found - user might not be enrolled in any courses or have no lessons yet');
+      }
       
       // Группируем по дате
       const attendanceMap = {};
@@ -38,44 +52,84 @@ export default function AttendanceWidget() {
       let attendedLessons = 0;
       let excusedLessons = 0;
       let missedLessons = 0;
+      let futureLessons = 0; // Счетчик будущих уроков
       
-      lessonStudents.forEach(ls => {
-        if (!ls.lesson_group?.start_datetime) return;
+      // Получаем текущую дату в локальном времени
+      const today = new Date();
+      const todayStr = today.getFullYear() + '-' + 
+        String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+        String(today.getDate()).padStart(2, '0');
+
+      lessonStudents.forEach((ls, index) => {
+        console.log(`[AttendanceWidget] Processing lesson student ${index}:`, ls);
+        console.log(`[AttendanceWidget] lesson_group:`, ls.lesson_group);
+        console.log(`[AttendanceWidget] lesson_group.lesson:`, ls.lesson_group?.lesson);
+        console.log(`[AttendanceWidget] lesson_group.lesson.course:`, ls.lesson_group?.lesson?.course);
         
-        const date = ls.lesson_group.start_datetime.split('T')[0];
-        if (!attendanceMap[date]) {
-          attendanceMap[date] = [];
+        if (!ls.lesson_group?.start_datetime) {
+          console.log(`[AttendanceWidget] Skipping lesson student ${index} - no start_datetime`);
+          return;
+        }
+        
+        // Правильно обрабатываем дату с учетом часового пояса
+        const lessonDate = new Date(ls.lesson_group.start_datetime);
+        const dateStr = lessonDate.getFullYear() + '-' + 
+          String(lessonDate.getMonth() + 1).padStart(2, '0') + '-' + 
+          String(lessonDate.getDate()).padStart(2, '0');
+        
+        if (!attendanceMap[dateStr]) {
+          attendanceMap[dateStr] = [];
         }
         
         // Определяем статус посещаемости на основе булевых полей
         let attendance_status = 'unknown';
-        if (ls.is_visited) {
-          attendance_status = 'attended';
-        } else if (ls.is_excused_absence) {
-          attendance_status = 'excused';
+        let isFuture = dateStr > todayStr;
+        
+        if (isFuture) {
+          // Для будущих уроков
+          attendance_status = 'future';
+          futureLessons++;
+          console.log(`[AttendanceWidget] Future lesson found: ${dateStr}`);
         } else {
-          attendance_status = 'missed';
+          // Для прошедших уроков - считаем в статистике
+          if (ls.is_visited) {
+            attendance_status = 'attended';
+          } else if (ls.is_excused_absence) {
+            attendance_status = 'excused';
+          } else {
+            attendance_status = 'missed';
+          }
+          
+          totalLessons++;
+          if (attendance_status === 'attended') attendedLessons++;
+          else if (attendance_status === 'excused') excusedLessons++;
+          else if (attendance_status === 'missed') missedLessons++;
         }
         
-        attendanceMap[date].push({
-          course_name: ls.lesson_group?.lesson?.course?.name || 'Курс',
-          lesson_name: ls.lesson_group?.lesson?.name || 'Урок',
+        attendanceMap[dateStr].push({
+          course_name: ls.lesson_group?.lesson?.course?.name || 'Неизвестный курс',
+          lesson_name: ls.lesson_group?.lesson?.name || 'Неизвестный урок',
           attendance_status: attendance_status,
           start_datetime: ls.lesson_group.start_datetime,
           is_visited: ls.is_visited,
           is_excused_absence: ls.is_excused_absence,
-          is_compensated_skip: ls.is_compensated_skip
+          is_compensated_skip: ls.is_compensated_skip,
+          is_future: isFuture
         });
         
-        totalLessons++;
-        if (attendance_status === 'attended') attendedLessons++;
-        else if (attendance_status === 'excused') excusedLessons++;
-        else if (attendance_status === 'missed') missedLessons++;
+        console.log(`[AttendanceWidget] Added lesson for ${dateStr}:`, {
+          course_name: ls.lesson_group?.lesson?.course?.name || 'Неизвестный курс',
+          lesson_name: ls.lesson_group?.lesson?.name || 'Неизвестный урок',
+          attendance_status,
+          is_visited: ls.is_visited,
+          is_excused_absence: ls.is_excused_absence,
+          is_future: isFuture
+        });
       });
       
       console.log('[AttendanceWidget] Processed data:', {
         attendanceMap,
-        stats: { totalLessons, attendedLessons, excusedLessons, missedLessons }
+        stats: { totalLessons, attendedLessons, excusedLessons, missedLessons, futureLessons }
       });
       
       setAttendanceData({
@@ -84,22 +138,38 @@ export default function AttendanceWidget() {
           totalLessons,
           attendedLessons,
           excusedLessons,
-          missedLessons
+          missedLessons,
+          futureLessons
         }
       });
     } catch (err) {
       console.error('[AttendanceWidget] Error loading data:', err);
-      setError('Ошибка загрузки данных');
+      console.error('[AttendanceWidget] Error response:', err.response);
+      console.error('[AttendanceWidget] Error status:', err.response?.status);
+      console.error('[AttendanceWidget] Error data:', err.response?.data);
+      
+      let errorMessage = 'Ошибка загрузки данных';
+      if (err.response?.status === 401) {
+        errorMessage = 'Ошибка авторизации';
+      } else if (err.response?.status === 403) {
+        errorMessage = 'Нет доступа к данным';
+      } else if (err.response?.status === 404) {
+        errorMessage = 'Данные не найдены';
+      } else if (err.response?.data?.detail) {
+        errorMessage = err.response.data.detail;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (user?.id) {
+    if (userId) {
       loadAttendanceData();
     }
-  }, [user?.id]);
+  }, [userId]);
 
   if (loading) {
     return (
@@ -168,10 +238,13 @@ export default function AttendanceWidget() {
     // Добавляем дни предыдущего месяца для заполнения первой недели
     for (let i = startDay - 1; i >= 0; i--) {
       const date = new Date(year, month, -i);
+      const dateStr = date.getFullYear() + '-' + 
+        String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+        String(date.getDate()).padStart(2, '0');
       calendar.push({
         date,
-        dateStr: date.toISOString().split('T')[0],
-        dayData: attendanceData.attendanceMap?.[date.toISOString().split('T')[0]] || null,
+        dateStr: dateStr,
+        dayData: attendanceData.attendanceMap?.[dateStr] || null,
         isCurrentMonth: false,
         isToday: false
       });
@@ -179,10 +252,16 @@ export default function AttendanceWidget() {
     
     // Добавляем дни текущего месяца
     const today = new Date();
+    const todayStr = today.getFullYear() + '-' + 
+      String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+      String(today.getDate()).padStart(2, '0');
+    
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
-      const dateStr = date.toISOString().split('T')[0];
-      const isToday = dateStr === today.toISOString().split('T')[0];
+      const dateStr = date.getFullYear() + '-' + 
+        String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+        String(date.getDate()).padStart(2, '0');
+      const isToday = dateStr === todayStr;
       
       calendar.push({
         date,
@@ -197,10 +276,13 @@ export default function AttendanceWidget() {
     const remainingDays = 42 - calendar.length; // 6 недель × 7 дней = 42
     for (let day = 1; day <= remainingDays; day++) {
       const date = new Date(year, month + 1, day);
+      const dateStr = date.getFullYear() + '-' + 
+        String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+        String(date.getDate()).padStart(2, '0');
       calendar.push({
         date,
-        dateStr: date.toISOString().split('T')[0],
-        dayData: attendanceData.attendanceMap?.[date.toISOString().split('T')[0]] || null,
+        dateStr: dateStr,
+        dayData: attendanceData.attendanceMap?.[dateStr] || null,
         isCurrentMonth: false,
         isToday: false
       });
@@ -235,18 +317,32 @@ export default function AttendanceWidget() {
       return baseClass;
     }
     
-    // Определяем основной статус дня
-    const attendedCount = dayData.filter(lesson => lesson.is_visited).length;
-    const excusedCount = dayData.filter(lesson => lesson.is_excused_absence).length;
-    const missedCount = dayData.filter(lesson => !lesson.is_visited && !lesson.is_excused_absence).length;
+    // Проверяем, есть ли будущие уроки
+    const futureCount = dayData.filter(lesson => lesson.is_future).length;
+    const pastLessons = dayData.filter(lesson => !lesson.is_future);
     
-    // Приоритет: пропуск > уваж. причина > посещение
-    if (missedCount > 0) {
-      baseClass += ' missed';
-    } else if (excusedCount > 0) {
-      baseClass += ' excused';
-    } else if (attendedCount > 0) {
-      baseClass += ' attended';
+    if (futureCount > 0 && pastLessons.length === 0) {
+      // Только будущие уроки
+      baseClass += ' future';
+    } else if (pastLessons.length > 0) {
+      // Есть прошедшие уроки - определяем статус по ним
+      const attendedCount = pastLessons.filter(lesson => lesson.is_visited).length;
+      const excusedCount = pastLessons.filter(lesson => lesson.is_excused_absence).length;
+      const missedCount = pastLessons.filter(lesson => !lesson.is_visited && !lesson.is_excused_absence).length;
+      
+      // Приоритет: пропуск > уваж. причина > посещение
+      if (missedCount > 0) {
+        baseClass += ' missed';
+      } else if (excusedCount > 0) {
+        baseClass += ' excused';
+      } else if (attendedCount > 0) {
+        baseClass += ' attended';
+      }
+      
+      // Если есть еще и будущие уроки, добавляем соответствующий класс
+      if (futureCount > 0) {
+        baseClass += ' has-future';
+      }
     } else {
       baseClass += ' empty';
     }
@@ -273,14 +369,25 @@ export default function AttendanceWidget() {
       return `${date} - нет занятий`;
     }
     
-    const lessons = dayData.map(lesson => {
+    const pastLessons = dayData.filter(lesson => !lesson.is_future);
+    const futureLessons = dayData.filter(lesson => lesson.is_future);
+    
+    const lessons = [];
+    
+    // Добавляем прошедшие уроки с их статусом
+    pastLessons.forEach(lesson => {
       const status = lesson.attendance_status === 'attended' ? 'присутствовал' :
                     lesson.attendance_status === 'excused' ? 'уважительная причина' :
                     lesson.attendance_status === 'missed' ? 'отсутствовал' : 'неизвестно';
-      return `${lesson.course_name || 'Занятие'}: ${status}`;
-    }).join('\n');
+      lessons.push(`${lesson.course_name || 'Занятие'}: ${status}`);
+    });
     
-    return `${date}\n${lessons}`;
+    // Добавляем будущие уроки
+    futureLessons.forEach(lesson => {
+      lessons.push(`${lesson.course_name || 'Занятие'}: запланировано`);
+    });
+    
+    return `${date}\n${lessons.join('\n')}`;
   };
 
   const getAttendancePercentage = () => {
@@ -299,7 +406,12 @@ export default function AttendanceWidget() {
         <h3>📊 Календарь посещаемости</h3>
         <div className="attendance-summary">
           <span className="summary-text">
-            <strong>{stats.totalLessons || 0}</strong> занятий всего
+            <strong>{stats.totalLessons || 0}</strong> прошедших занятий
+            {stats.futureLessons > 0 && (
+              <span className="future-info">
+                , <strong>{stats.futureLessons}</strong> впереди
+              </span>
+            )}
           </span>
         </div>
       </div>
@@ -308,7 +420,7 @@ export default function AttendanceWidget() {
       <div className="attendance-stats-grid">
         <div className="stat-item">
           <span className="stat-number">{stats.totalLessons || 0}</span>
-          <span className="stat-label">всего занятий</span>
+          <span className="stat-label">прошедших занятий</span>
         </div>
         <div className="stat-item">
           <span className="stat-number">{stats.attendedLessons || 0}</span>
@@ -322,6 +434,12 @@ export default function AttendanceWidget() {
           <span className="stat-number">{percentage}%</span>
           <span className="stat-label">процент посещения</span>
         </div>
+        {stats.futureLessons > 0 && (
+          <div className="stat-item future-lessons">
+            <span className="stat-number">{stats.futureLessons}</span>
+            <span className="stat-label">будущих занятий</span>
+          </div>
+        )}
       </div>
 
       {/* Календарь активности по месяцам */}
@@ -406,6 +524,10 @@ export default function AttendanceWidget() {
             <div className="legend-item">
               <div className="day-cell empty"></div>
               <span>Нет занятий</span>
+            </div>
+            <div className="legend-item">
+              <div className="day-cell future intensity-1"></div>
+              <span>Запланировано</span>
             </div>
             <div className="legend-item">
               <div className="day-cell excused intensity-1"></div>

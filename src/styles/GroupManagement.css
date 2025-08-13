@@ -1,0 +1,755 @@
+/* Стили для управления группами */
+
+/* Блок создания группы */
+.create-group-block {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.create-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.create-group-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.create-group-form {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  align-items: end;
+}
+
+.create-group-form .field {
+  margin-bottom: 0;
+}
+
+.create-group-btn {
+  padding: 14px 28px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  background: #00b18f !important;
+  color: white !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  height: fit-content !important;
+  line-height: 1.4 !important;
+}
+
+.create-group-btn:hover {
+  background: #009d7f !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 10px rgba(0, 177, 143, 0.3) !important;
+}
+
+/* Блок списка групп */
+.groups-list-block {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.groups-list-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.groups-list-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Основные стили группового виджета */
+.group-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.group-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.group-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.group-info p {
+  margin: 0 0 6px 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.group-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Кнопки в карточках групп */
+.group-actions .btn-primary,
+.group-actions .btn-danger {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 110px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.group-actions .btn-primary {
+  background: #00b18f;
+  color: white;
+}
+
+.group-actions .btn-primary:hover {
+  background: #009d7f;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 177, 143, 0.3);
+}
+
+.group-actions .btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.group-actions .btn-danger:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+/* Модальное окно */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 1300px;
+  width: 95%;
+  max-height: 92vh;
+  overflow: hidden;
+  min-width: 1000px;
+  min-height: 600px;
+}
+
+.modal-header {
+  padding: 28px 36px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: 2px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 24px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-btn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.modal-body {
+  padding: 36px 36px;
+  display: grid;
+  grid-template-columns: 1fr 2.2fr;
+  gap: 44px;
+  max-height: calc(92vh - 130px);
+  overflow: auto;
+}
+
+/* Панели в модальном окне */
+.panel {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 28px;
+  border: 1px solid #e2e8f0;
+  min-height: 520px;
+}
+
+.panel h3 {
+  margin: 0 0 22px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.panel h4 {
+  margin: 0 0 14px 0;
+  font-size: 17px;
+  font-weight: 500;
+  color: #334155;
+}
+
+/* Секции в панелях */
+.section {
+  margin-bottom: 36px;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  min-height: 36px;
+  flex-shrink: 0;
+}
+
+.section-header h4 {
+  margin: 0;
+  flex: 1;
+}
+
+.section-header .section-btn {
+  flex-shrink: 0 !important;
+  width: auto !important;
+  max-width: 80px !important;
+  margin-left: 12px !important;
+}
+
+.section-header > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Кнопки управления в секциях */
+.section-btn {
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  border-radius: 4px !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  min-width: auto !important;
+  max-width: 80px !important;
+  width: auto !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  display: inline-block !important;
+  flex: none !important;
+}
+
+.section-btn.btn-primary {
+  background: #00b18f !important;
+  color: white !important;
+}
+
+.section-btn.btn-primary:hover {
+  background: #009d7f !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(0, 177, 143, 0.3) !important;
+}
+
+.section-btn.btn-secondary {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.section-btn.btn-secondary:hover {
+  background: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+/* Карточки участников */
+.member-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+  min-height: 50px;
+}
+
+.member-card:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.member-card span {
+  font-size: 15px;
+  color: #334155;
+  font-weight: 500;
+  flex: 1;
+  margin-right: 12px;
+}
+
+.member-remove-btn {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+  font-size: 14px !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.member-remove-btn:hover {
+  background: #fecaca !important;
+  color: #b91c1c !important;
+  transform: scale(1.1) !important;
+}
+
+/* Формы добавления */
+.add-form {
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  background: white;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.add-form input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 14px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.add-form input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.add-form .list-container {
+  max-height: 160px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+  min-height: 120px;
+}
+
+.add-form .list-item {
+  display: block;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+  min-height: 38px;
+  box-sizing: border-box;
+}
+
+.add-form .list-item:last-child {
+  border-bottom: none;
+}
+
+.add-form .list-item:hover {
+  background: #f3f4f6;
+}
+
+.add-form .list-item.selected {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.add-form .list-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-form .list-item input[type="checkbox"],
+.add-form .list-item input[type="radio"] {
+  margin-right: 8px;
+  width: auto;
+}
+
+.add-form .submit-btn {
+  width: 100% !important;
+  padding: 14px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  background: #00b18f !important;
+  color: white !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  line-height: 1.4 !important;
+}
+
+.add-form .submit-btn:hover:not(:disabled) {
+  background: #009d7f !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 10px rgba(0, 177, 143, 0.3) !important;
+}
+
+.add-form .submit-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* Пустые состояния */
+.empty-state {
+  color: #6b7280;
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-state {
+  color: #6b7280;
+  text-align: center;
+  padding: 20px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Поля формы */
+.field {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.field textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Кнопка сохранения изменений */
+.save-changes-btn {
+  width: 100% !important;
+  padding: 14px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  background: #f59e0b !important;
+  color: white !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  line-height: 1.4 !important;
+}
+
+.save-changes-btn:hover:not(:disabled) {
+  background: #d97706 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3) !important;
+}
+
+.save-changes-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* Планирование расписания */
+.schedule-planning {
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  margin-top: 16px;
+}
+
+.schedule-planning h4 {
+  margin: 0 0 20px 0;
+  color: #1e40af;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.schedule-lessons {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.schedule-lesson-card {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-lesson-card h5 {
+  margin: 0 0 16px 0;
+  color: #1e293b;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.schedule-lesson-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.schedule-lesson-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.schedule-lesson-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.schedule-lesson-field input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.schedule-lesson-field input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.schedule-auditorium-field {
+  grid-column: 1 / -1;
+}
+
+.schedule-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.schedule-actions .btn-primary,
+.schedule-actions .btn-secondary {
+  flex: 1;
+  padding: 14px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  line-height: 1.4 !important;
+}
+
+.schedule-actions .btn-primary {
+  background: #00b18f !important;
+  color: white !important;
+}
+
+.schedule-actions .btn-primary:hover:not(:disabled) {
+  background: #009d7f !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 10px rgba(0, 177, 143, 0.3) !important;
+}
+
+.schedule-actions .btn-primary:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.schedule-actions .btn-secondary {
+  background: #64748b !important;
+  color: white !important;
+}
+
+.schedule-actions .btn-secondary:hover {
+  background: #475569 !important;
+  transform: translateY(-1px) !important;
+}
+
+.schedule-progress {
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+}
+
+/* Контейнеры для списков участников и курсов */
+.members-container,
+.courses-container {
+  min-height: 100px;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.courses-container {
+  max-height: 140px;
+}
+
+.members-container:empty::after,
+.courses-container:empty::after {
+  content: "";
+  display: block;
+  height: 60px;
+}
+@media (max-width: 1024px) {
+  .create-group-form {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .create-group-form .field:last-child {
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-body {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .group-card {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .group-actions {
+    justify-content: stretch;
+  }
+  
+  .group-actions .btn-primary,
+  .group-actions .btn-danger {
+    flex: 1;
+  }
+  
+  .schedule-lesson-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .schedule-actions {
+    flex-direction: column;
+  }
+  
+  .create-group-form {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}

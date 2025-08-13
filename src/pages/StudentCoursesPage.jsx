@@ -56,7 +56,7 @@ export default function StudentCoursesPage() {
   };
 
   const openDisabled = () => {
-    alert('У вас нет доступа к этому курсу. Обратитесь к администратору для добавления в группу.');
+    alert('💬 Хотите записаться на этот курс? Обратитесь к администратору или преподавателю для добавления в группу.');
   };
 
   const fullName = [user.first_name, user.surname, user.patronymic]
@@ -114,7 +114,7 @@ export default function StudentCoursesPage() {
           <div className="course-info-footer">
             {course.author_name && <span className="author">👩‍🏫 {course.author_name}</span>}
             {ageCategory && <span className="age">👥 {ageCategory}</span>}
-            {disabled && <span className="status" style={{color: '#dc3545'}}>🔒 Недоступно</span>}
+            {disabled && <span className="status">� Запись</span>}
           </div>
         </div>
       </div>
@@ -169,83 +169,19 @@ export default function StudentCoursesPage() {
           )}
         </section>
 
-        {/* Недоступные курсы */}
-        <section className="courses-section" style={{ marginTop: '2rem' }}>
-          <div className="section-header">
-            <h2 className="section-label">Другие курсы</h2>
-            <span className="course-count">{otherCourses.length} курс(ов)</span>
-          </div>
-          
-          {/* Информация о возрастной фильтрации */}
-          {user.birth_date && (
-            <div className="age-filter-info" style={{
-              background: 'linear-gradient(135deg, #e3f2fd 0%, #f0f9ff 100%)',
-              border: '1px solid #2196f3',
-              borderRadius: '8px',
-              padding: '12px 16px',
-              marginBottom: '16px',
-              fontSize: '14px',
-              color: '#1565c0'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>🎂</span>
-                <span>
-                  Курсы подобраны с учетом вашего возраста ({(() => {
-                    const today = new Date();
-                    const birth = new Date(user.birth_date);
-                    let age = today.getFullYear() - birth.getFullYear();
-                    const monthDiff = today.getMonth() - birth.getMonth();
-                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-                      age--;
-                    }
-                    return age;
-                  })()} лет)
-                </span>
-              </div>
+        {/* Недоступные курсы - только если есть */}
+        {otherCourses.length > 0 && (
+          <section className="courses-section other-courses">
+            <div className="section-header">
+              <h2 className="section-label">Доступные для записи</h2>
+              <span className="course-count">{otherCourses.length}</span>
             </div>
-          )}
-          {otherCourses.length ? (
+            
             <div className="courses-grid">
               {otherCourses.map(course => renderCourseCard(course, true))}
             </div>
-          ) : (
-            <div className="empty-state">
-              <div className="empty-icon">🎯</div>
-              <h3>Вы имеете доступ ко всем курсам!</h3>
-              <p>Все доступные курсы отображены в разделе выше</p>
-            </div>
-          )}
-        </section>
-
-        <section className="info-section">
-          <div className="info-card">
-            <h3>📚 Как работает система курсов?</h3>
-            <div style={{ marginBottom: '16px' }}>
-              <h4>🔐 Доступ к курсам:</h4>
-              <ol>
-                <li>Курсы доступны только через группы</li>
-                <li>Администратор должен добавить вас в группу</li>
-                <li>К группе должен быть привязан курс</li>
-                <li>После этого курс появится в разделе "Мои доступные курсы"</li>
-              </ol>
-            </div>
-            
-            <div style={{ marginBottom: '16px' }}>
-              <h4>🎂 Возрастная фильтрация:</h4>
-              <ul>
-                <li>Курсы автоматически фильтруются по вашему возрасту</li>
-                <li>Показываются только подходящие вам курсы</li>
-                <li>Это помогает найти материалы нужного уровня сложности</li>
-              </ul>
-            </div>
-            
-            <p>
-              <strong>Текущий статус:</strong> {myCourses.length > 0 
-                ? `У вас есть доступ к ${myCourses.length} из ${myCourses.length + otherCourses.length} курс(ов)` 
-                : `Нет доступных курсов из ${otherCourses.length} подходящих курсов`}
-            </p>
-          </div>
-        </section>
+          </section>
+        )}
       </div>
     </div>
   );

@@ -77,20 +77,33 @@ export const getProductById = async (productId) => {
 export const createProduct = async (productData, imageFile = null) => {
   try {
     const formData = new FormData();
-    formData.append('product_data', JSON.stringify(productData));
     
-    if (imageFile) {
+    // ИСПРАВЛЕНО: product_data с полем photo (как в новостях)
+    const finalProductData = { ...productData };
+    
+    // Если есть файл, добавляем поле photo с именем
+    if (imageFile && imageFile instanceof File) {
+      finalProductData.photo = { name: imageFile.name };
       formData.append('image', imageFile);
+      console.log('Adding image file:', imageFile.name, imageFile.size, 'bytes');
+    } else {
+      console.log('No image file provided or invalid file');
     }
+    
+    formData.append('product_data', JSON.stringify(finalProductData));
+
+    console.log('Creating product with data:', finalProductData);
+    console.log('Image file:', imageFile);
 
     const response = await api.post('/products/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+      headers: { 'Content-Type': 'multipart/form-data' }
     });
+    
+    console.log('Product created successfully:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error creating product:', error);
+    console.error('Error details:', error.response?.data);
     throw error;
   }
 };
@@ -104,20 +117,33 @@ export const createProduct = async (productData, imageFile = null) => {
 export const updateProduct = async (productId, productData, imageFile = null) => {
   try {
     const formData = new FormData();
-    formData.append('product_data', JSON.stringify(productData));
     
-    if (imageFile) {
+    // ИСПРАВЛЕНО: product_data с полем photo (как в новостях)
+    const finalProductData = { ...productData };
+    
+    // Если есть файл, добавляем поле photo с именем
+    if (imageFile && imageFile instanceof File) {
+      finalProductData.photo = { name: imageFile.name };
       formData.append('image', imageFile);
+      console.log('Adding image file for update:', imageFile.name, imageFile.size, 'bytes');
+    } else {
+      console.log('No new image file provided for update');
     }
+    
+    formData.append('product_data', JSON.stringify(finalProductData));
+
+    console.log('Updating product with data:', finalProductData);
+    console.log('Image file:', imageFile);
 
     const response = await api.put(`/products/${productId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+      headers: { 'Content-Type': 'multipart/form-data' }
     });
+    
+    console.log('Product updated successfully:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error updating product:', error);
+    console.error('Error details:', error.response?.data);
     throw error;
   }
 };
@@ -128,9 +154,14 @@ export const updateProduct = async (productId, productData, imageFile = null) =>
  */
 export const deleteProduct = async (productId) => {
   try {
-    await api.delete(`/products/${productId}`);
+    console.log('Deleting product with ID:', productId);
+    const response = await api.delete(`/products/${productId}`);
+    console.log('Product deleted successfully:', response.status);
+    return response.data;
   } catch (error) {
     console.error('Error deleting product:', error);
+    console.error('Error details:', error.response?.data);
+    console.error('Product ID that failed to delete:', productId);
     throw error;
   }
 };
@@ -147,11 +178,7 @@ export const createProductPhoto = async (productId, photoData, imageFile) => {
     formData.append('photo_data', JSON.stringify(photoData));
     formData.append('image', imageFile);
 
-    const response = await api.post(`/products/${productId}/photo/`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
+    const response = await api.post(`/products/${productId}/photo/`, formData);
     return response.data;
   } catch (error) {
     console.error('Error creating product photo:', error);
@@ -172,11 +199,7 @@ export const updateProductPhoto = async (productId, photoId, photoData, imageFil
     formData.append('photo_data', JSON.stringify(photoData));
     formData.append('image', imageFile);
 
-    const response = await api.put(`/products/${productId}/photo/${photoId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
+    const response = await api.put(`/products/${productId}/photo/${photoId}`, formData);
     return response.data;
   } catch (error) {
     console.error('Error updating product photo:', error);

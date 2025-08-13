@@ -7,6 +7,7 @@ import Topbar from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
 import { getCourse, getCourseLessons } from '../services/courseService';
 import { getUserScheduleOptimized } from '../services/scheduleService';
+import { getCoursesPath, getCoursesTitle } from '../utils/navigationUtils';
 import '../styles/CourseDetailPage.css';
 
 export default function StudentCoursePage() {
@@ -20,6 +21,21 @@ export default function StudentCoursePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Определяем правильный activeItem в зависимости от роли
+  const getSidebarActiveItem = (userRole) => {
+    switch (userRole) {
+      case 'admin':
+      case 'superadmin':
+        return 'manageCourses';
+      case 'teacher':
+        return 'teacherCourses';
+      case 'student':
+        return 'studentCourses';
+      default:
+        return 'studentCourses';
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -31,7 +47,17 @@ export default function StudentCoursePage() {
         
         // Загружаем уроки курса
         const lessonsData = await getCourseLessons(courseId);
-        setLessons(lessonsData);
+        
+        // ДОБАВЛЕНО: дополнительная проверка типа данных
+        console.log('[StudentCoursePage] Lessons data received:', lessonsData);
+        console.log('[StudentCoursePage] Lessons data type:', typeof lessonsData);
+        console.log('[StudentCoursePage] Is array:', Array.isArray(lessonsData));
+        
+        // Убеждаемся, что у нас есть массив
+        const validLessons = Array.isArray(lessonsData) ? lessonsData : [];
+        console.log('[StudentCoursePage] Valid lessons:', validLessons);
+        
+        setLessons(validLessons);
         
         // Загружаем расписание для проверки доступа к урокам
         const scheduleData = await getUserScheduleOptimized(user);
@@ -96,7 +122,7 @@ export default function StudentCoursePage() {
   if (loading) {
     return (
       <div className="app-layout">
-        <Sidebar activeItem="studentCourses" userRole={user.role} />
+        <Sidebar activeItem={getSidebarActiveItem(user.role)} userRole={user.role} />
         <div className="main-content">
           <Topbar
             userName={fullName}
@@ -115,7 +141,7 @@ export default function StudentCoursePage() {
   if (error) {
     return (
       <div className="app-layout">
-        <Sidebar activeItem="studentCourses" userRole={user.role} />
+        <Sidebar activeItem={getSidebarActiveItem(user.role)} userRole={user.role} />
         <div className="main-content">
           <Topbar
             userName={fullName}
@@ -126,10 +152,10 @@ export default function StudentCoursePage() {
             <h2>Ошибка загрузки</h2>
             <p>{error}</p>
             <button 
-              onClick={() => navigate('/courses')} 
+              onClick={() => navigate(getCoursesPath(user.role))} 
               className="btn-back"
             >
-              Вернуться к курсам
+              Вернуться к {getCoursesTitle(user.role)}
             </button>
           </div>
         </div>
@@ -139,7 +165,7 @@ export default function StudentCoursePage() {
 
   return (
     <div className="app-layout">
-      <Sidebar activeItem="studentCourses" userRole={user.role} />
+      <Sidebar activeItem={getSidebarActiveItem(user.role)} userRole={user.role} />
       <div className="main-content">
         <Topbar
           userName={fullName}
@@ -150,9 +176,9 @@ export default function StudentCoursePage() {
         <div className="course-header">
           <button 
             className="btn-back"
-            onClick={() => navigate('/courses')}
+            onClick={() => navigate(getCoursesPath(user.role))}
           >
-            ← Вернуться к курсам
+            ← Вернуться к {getCoursesTitle(user.role)}
           </button>
           
           {course && (
@@ -194,7 +220,7 @@ export default function StudentCoursePage() {
             </div>
           ) : (
             <div className="lessons-list">
-              {lessons.map((lesson, index) => {
+              {Array.isArray(lessons) && lessons.map((lesson, index) => {
                 const status = getLessonStatus(lesson.id);
                 const isOpen = isLessonOpened(lesson.id);
                 

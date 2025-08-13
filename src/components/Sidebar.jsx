@@ -44,6 +44,25 @@ export default function Sidebar({ activeItem, userRole }) {
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
+  // Закрытие меню при клике вне его области
+  useEffect(() => {
+    if (!isMobile || !isMobileMenuOpen) return;
+
+    const handleClickOutside = (event) => {
+      const sidebar = document.querySelector('.sidebar');
+      const toggle = document.querySelector('.mobile-menu-toggle');
+      
+      // Если клик не по сайдбару и не по кнопке, закрываем меню
+      if (sidebar && !sidebar.contains(event.target) && 
+          toggle && !toggle.contains(event.target)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMobile, isMobileMenuOpen]);
+
   // Закрываем меню при клике на элемент (только на мобильных)
   const handleItemClick = (route) => {
     navigate(route);
@@ -209,14 +228,6 @@ export default function Sidebar({ activeItem, userRole }) {
           <span></span>
           <span></span>
         </button>
-      )}
-
-      {/* Overlay для закрытия меню при клике вне его */}
-      {isMobile && isMobileMenuOpen && (
-        <div 
-          className="mobile-menu-overlay"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
       )}
 
       <nav className={`sidebar ${isMobile ? 'mobile' : ''} ${isMobileMenuOpen ? 'mobile-open' : ''}`}>

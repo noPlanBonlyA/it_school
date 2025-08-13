@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
+import { getCoursesPath, getCoursesTitle } from '../utils/navigationUtils';
 import '../styles/CourseDetailPage.css';
 
 import { getCourse, getCourseLessons, deleteLessonWithMaterials, getLessonWithMaterials, updateLessonWithMaterials } from '../services/lessonService';
@@ -29,6 +30,21 @@ export default function CourseDetailPage() {
 
   const fullName = `${user.first_name || ''} ${user.surname || ''}`.trim() || user.username || 'Пользователь';
 
+  // Определяем правильный activeItem в зависимости от роли
+  const getSidebarActiveItem = (userRole) => {
+    switch (userRole) {
+      case 'admin':
+      case 'superadmin':
+        return 'manageCourses';
+      case 'teacher':
+        return 'teacherCourses';
+      case 'student':
+        return 'courses';
+      default:
+        return 'courses';
+    }
+  };
+
   // ───── helpers ───── */
   const reloadLessons = useCallback(async () => {
     try {
@@ -43,17 +59,37 @@ export default function CourseDetailPage() {
       
       let lessonGroups = [];
       if (scheduleResponse.ok) {
-        lessonGroups = await scheduleResponse.json();
+        const scheduleData = await scheduleResponse.json();
+        console.log('[CourseDetail] Schedule response:', scheduleData);
+        
+        // ИСПРАВЛЕНО: Извлекаем массив lessons из ответа API
+        if (scheduleData && Array.isArray(scheduleData.lessons)) {
+          lessonGroups = scheduleData.lessons;
+        } else if (Array.isArray(scheduleData)) {
+          // На случай, если API вернет прямой массив
+          lessonGroups = scheduleData;
+        } else {
+          console.warn('[CourseDetail] Unexpected schedule data format:', scheduleData);
+          lessonGroups = [];
+        }
       }
       
+      console.log('[CourseDetail] Lesson groups:', lessonGroups);
+      console.log('[CourseDetail] Lesson groups type:', typeof lessonGroups);
+      console.log('[CourseDetail] Is array:', Array.isArray(lessonGroups));
+      
       // Обогащаем уроки с их датами из lesson-groups
-      const lessonsWithDates = lessonsData.map(lesson => {
-        const lessonGroup = lessonGroups.find(lg => lg.lesson_id === lesson.id);
-        return {
-          ...lesson,
-          holding_date: lessonGroup?.holding_date || null
-        };
-      });
+      const lessonsWithDates = Array.isArray(lessonsData) 
+        ? lessonsData.map(lesson => {
+            const lessonGroup = Array.isArray(lessonGroups) 
+              ? lessonGroups.find(lg => lg.lesson_id === lesson.id)
+              : null;
+            return {
+              ...lesson,
+              holding_date: lessonGroup?.start_datetime || lessonGroup?.holding_date || null
+            };
+          })
+        : []; // Защищаем lessonsData.map
       
       // Сортируем по дате
       const sorted = lessonsWithDates.sort((a, b) => {
@@ -173,12 +209,27 @@ export default function CourseDetailPage() {
         
         if (scheduleResponse.ok) {
           const scheduleData = await scheduleResponse.json();
-          const lessonGroups = scheduleData.filter(
-            item => item.lesson_id === editingLesson.id
-          );
+          console.log('[CourseDetail] Schedule data for lesson update:', scheduleData);
+          
+          // ИСПРАВЛЕНО: Обработка различных форматов ответа API
+          let scheduleArray = [];
+          if (scheduleData && Array.isArray(scheduleData.lessons)) {
+            scheduleArray = scheduleData.lessons;
+          } else if (Array.isArray(scheduleData)) {
+            scheduleArray = scheduleData;
+          } else {
+            console.warn('[CourseDetail] Unexpected schedule data format for lesson update:', scheduleData);
+          }
+          
+          const lessonGroups = Array.isArray(scheduleArray) 
+            ? scheduleArray.filter(item => item.lesson_id === editingLesson.id)
+            : [];
+          
+          console.log('[CourseDetail] Found lesson groups for update:', lessonGroups);
           
           // Обновляем дату во всех lesson-groups этого урока
-          await Promise.all(lessonGroups.map(async lessonGroup => {
+          if (Array.isArray(lessonGroups) && lessonGroups.length > 0) {
+            await Promise.all(lessonGroups.map(async lessonGroup => {
             try {
               const response = await fetch(`http://localhost:8080/api/courses/lesson-group/${lessonGroup.id}`, {
                 method: 'PUT',
@@ -201,8 +252,9 @@ export default function CourseDetailPage() {
               console.error('Error updating lesson-group:', e);
             }
           }));
-        }
-      }
+          } // Закрытие if (Array.isArray(lessonGroups) && lessonGroups.length > 0)
+        } // Закрытие if (scheduleResponse.ok)
+      } // Закрытие if (editLessonDateTime)
 
       setEditingLesson(null);
       setEditLessonName('');
@@ -244,7 +296,7 @@ export default function CourseDetailPage() {
   if (loading) {
     return (
       <div className="app-layout">
-        <Sidebar activeItem="courses" userRole={user.role} />
+        <Sidebar activeItem={getSidebarActiveItem(user.role)} userRole={user.role} />
         <div className="main-content">
           <Topbar userName={fullName} userRole={user.role} onProfileClick={() => navigate('/profile')} />
           <div className="loading-container">
@@ -258,7 +310,7 @@ export default function CourseDetailPage() {
 
   return (
     <div className="app-layout">
-      <Sidebar activeItem="courses" userRole={user.role} />
+      <Sidebar activeItem={getSidebarActiveItem(user.role)} userRole={user.role} />
       <div className="main-content">
         <Topbar
           userName={fullName}
@@ -271,9 +323,9 @@ export default function CourseDetailPage() {
             <div className="course-header">
               <button 
                 className="btn-back"
-                onClick={() => navigate('/courses')}
+                onClick={() => navigate(getCoursesPath(user.role))}
               >
-                ← Вернуться к курсам
+                ← Вернуться к {getCoursesTitle(user.role)}
               </button>
               
               <div className="course-overview">
@@ -389,13 +441,13 @@ export default function CourseDetailPage() {
               <div className="lessons-header">
                 <h2>Уроки курса</h2>
                 <div className="lessons-count">
-                  {lessons.length} {lessons.length === 1 ? 'урок' : lessons.length < 5 ? 'урока' : 'уроков'}
-                </div>
+                {Array.isArray(lessons) ? lessons.length : 0} {(Array.isArray(lessons) ? lessons.length : 0) === 1 ? 'урок' : (Array.isArray(lessons) ? lessons.length : 0) < 5 ? 'урока' : 'уроков'}
               </div>
-              
-              {lessons.length > 0 ? (
-                <div className="lessons-grid">
-                  {lessons.map((lesson, index) => (
+            </div>
+            
+            {Array.isArray(lessons) && lessons.length > 0 ? (
+              <div className="lessons-grid">
+                {lessons.map((lesson, index) => (
                     <div key={lesson.id} className="lesson-card">
                       <div className="lesson-number">
                         {index + 1}

@@ -105,39 +105,43 @@
   position: fixed;
   top: 20px;
   left: 20px;
-  z-index: 1001;
-  background: rgba(255, 255, 255, 0.9);
+  z-index: 1002; /* Поверх меню */
+  background: rgba(255, 255, 255, 0.95);
   border: none;
   width: 44px;
   height: 44px;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 177, 143, 0.2);
 }
 
 .mobile-menu-toggle:hover {
   background: rgba(255, 255, 255, 1);
   transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(0, 177, 143, 0.3);
 }
 
 .mobile-menu-toggle span {
   width: 20px;
   height: 2px;
   background: #00B18F;
-  border-radius: 1px;
-  transition: all 0.3s ease;
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
 }
 
+/* Анимация превращения в крестик */
 .mobile-menu-toggle.open span:nth-child(1) {
   transform: rotate(45deg) translateY(6px);
+  background: #e74c3c;
 }
 
 .mobile-menu-toggle.open span:nth-child(2) {
@@ -147,45 +151,53 @@
 
 .mobile-menu-toggle.open span:nth-child(3) {
   transform: rotate(-45deg) translateY(-6px);
+  background: #e74c3c;
 }
 
-/* Overlay для закрытия меню */
+/* Убираем overlay - теперь меню не затемняет фон */
 .mobile-menu-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  backdrop-filter: blur(2px);
+  display: none; /* Полностью скрываем overlay */
 }
 
 /* Адаптивные стили для sidebar */
 @media (max-width: 768px) {
   .sidebar {
-    position: fixed;
+    position: fixed !important; /* Принудительно fixed */
     top: 0;
     left: -100%;
-    width: 280px;
+    width: 300px;
     height: 100vh;
-    z-index: 1000;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border-right: 1px solid rgba(224, 224, 224, 0.5);
-    transition: left 0.3s ease;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    z-index: 1001; /* Поверх всего контента */
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(25px);
+    border: none;
+    border-right: 1px solid rgba(224, 224, 224, 0.3);
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 40px rgba(0, 0, 0, 0.15);
+    overflow-y: auto;
+    /* Полностью исключаем из layout */
+    margin: 0;
+    padding: 0;
+    transform: translateZ(0); /* Включаем аппаратное ускорение */
+    /* Важно: убираем из flex-контейнера */
+    display: block !important;
+    flex: none !important;
+    min-width: 0 !important;
   }
   
   .sidebar.mobile-open {
     left: 0;
+    transform: translateZ(0) translateX(0); /* Плавная анимация */
   }
   
   .sidebar .logo {
-    margin-top: 60px; /* Отступ для бургер-кнопки */
+    margin-top: 80px; /* Отступ для бургер-кнопки */
     margin-bottom: 32px;
     font-size: 28px;
     text-align: center;
+    color: #00B18F;
+    font-weight: 700;
+    padding: 0 20px;
   }
   
   .sidebar-item {
@@ -196,7 +208,9 @@
     margin-right: 16px;
     border-left: none;
     background: transparent;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
   }
   
   .sidebar-item:hover {
@@ -207,6 +221,7 @@
   .sidebar-item.active {
     background: rgba(0, 177, 143, 0.15);
     border-left: none;
+    color: #00B18F;
   }
   
   .sidebar-item.active::before {

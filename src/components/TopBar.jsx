@@ -29,32 +29,38 @@ export default function Topbar({ userName, userRole, pageTitle, onBellClick, onP
     try {
       setProfileError(null);
       
-      if (user?.id && userRole === 'student') {
-        console.log('[TopBar] Loading student profile for user:', user.id);
+      if (user?.id) {
+        console.log('[TopBar] Loading user profile for user:', user.id, 'role:', userRole);
         
-        let profile = null;
-        
-        // Пробуем разные способы получения профиля студента
-        try {
-          // Способ 1: через user_id
-          profile = await findStudentByUser(user.id);
-        } catch (error) {
-          console.log('[TopBar] findStudentByUser failed, trying getCurrentStudent...');
+        // Для студентов загружаем полный профиль студента
+        if (userRole === 'student') {
+          let profile = null;
+          
+          // Пробуем разные способы получения профиля студента
           try {
-            // Способ 2: через me endpoint
-            profile = await getCurrentStudent();
-          } catch (meError) {
-            console.error('[TopBar] Both methods failed:', { findError: error, meError });
-            setProfileError('Не удалось загрузить профиль студента');
-            return;
+            // Способ 1: через user_id
+            profile = await findStudentByUser(user.id);
+          } catch (error) {
+            console.log('[TopBar] findStudentByUser failed, trying getCurrentStudent...');
+            try {
+              // Способ 2: через me endpoint
+              profile = await getCurrentStudent();
+            } catch (meError) {
+              console.error('[TopBar] Both methods failed:', { findError: error, meError });
+              setProfileError('Не удалось загрузить профиль студента');
+              return;
+            }
           }
+          
+          console.log('[TopBar] Student profile loaded:', profile);
+          setUserProfile(profile);
         }
         
-        console.log('[TopBar] Student profile loaded:', profile);
-        setUserProfile(profile);
+        // Информация о фото уже есть в user объекте из AuthContext
+        console.log('[TopBar] User photo info:', user.photo);
       }
     } catch (error) {
-      console.error('Failed to load student profile:', error);
+      console.error('Failed to load user profile:', error);
       setProfileError(error.message);
     }
   }, [user?.id, userRole]);
@@ -81,10 +87,10 @@ export default function Topbar({ userName, userRole, pageTitle, onBellClick, onP
 
   // Загружаем профиль пользователя при монтировании
   useEffect(() => {
-    if (showNotificationBell && user?.id) {
+    if (user?.id) {
       loadUserProfile();
     }
-  }, [showNotificationBell, user?.id, loadUserProfile]);
+  }, [user?.id, loadUserProfile]);
 
   // Загружаем уведомления
   useEffect(() => {
@@ -184,6 +190,23 @@ export default function Topbar({ userName, userRole, pageTitle, onBellClick, onP
     if (diffMinutes < 60) return `${diffMinutes} мин назад`;
     if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)} ч назад`;
     return date.toLocaleDateString('ru-RU');
+  };
+
+  const getUserAvatar = () => {
+    // Проверяем есть ли фото у пользователя
+    if (user?.photo?.url) {
+      console.log('[TopBar] Using user photo:', user.photo.url);
+      return user.photo.url;
+    }
+    
+    // Для студентов также проверяем userProfile (если есть полная информация о студенте)
+    if (userRole === 'student' && userProfile?.user?.photo?.url) {
+      console.log('[TopBar] Using student profile photo:', userProfile.user.photo.url);
+      return userProfile.user.photo.url;
+    }
+    
+    console.log('[TopBar] Using default avatar for user:', user?.username);
+    return avatarImg;
   };
 
   return (
@@ -288,7 +311,7 @@ export default function Topbar({ userName, userRole, pageTitle, onBellClick, onP
           {/* Профиль пользователя */}
           <div className="profile-wrapper" onClick={onProfileClick}>
             <img 
-              src={avatarImg} 
+              src={getUserAvatar()} 
               alt="Профиль" 
               className="profile-avatar"
             />

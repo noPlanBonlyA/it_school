@@ -16,6 +16,29 @@
   font-weight: 600;
 }
 
+/* Информационный блок для домашних заданий */
+.homework-section {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+}
+
+.homework-note {
+  margin: 0 0 12px 0;
+  color: #495057;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.homework-instructions {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 /* Загрузка */
 .lesson-materials.loading {
   display: flex;
@@ -78,11 +101,47 @@
   background: #2980b9;
 }
 
+/* Информация об отсутствии материалов */
+.no-materials-info {
+  text-align: center;
+  padding: 40px 20px;
+  background: rgba(236, 240, 241, 0.8);
+  border-radius: 12px;
+  border: 2px dashed #bdc3c7;
+  margin: 20px 0;
+}
+
+.no-materials-info p {
+  margin: 10px 0;
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}
+
+.no-materials-info p:first-child {
+  font-weight: 600;
+  color: #5d6d7e;
+}
+
 /* Сетка материалов */
 .materials-grid {
   display: grid;
   gap: 24px;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  margin-top: 20px;
+}
+
+/* Адаптивность для больших экранов */
+@media (min-width: 1200px) {
+  .materials-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .materials-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
 /* Карточка материала */
@@ -157,9 +216,19 @@
 
 .material-iframe {
   width: 100%;
-  min-height: 200px;
+  min-height: 300px;
+  height: 400px;
   border: none;
   display: block;
+  background: white;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .material-iframe {
+    min-height: 250px;
+    height: 300px;
+  }
 }
 
 .material-link {
@@ -257,5 +326,101 @@
   .download-btn {
     padding: 10px 16px;
     font-size: 0.9rem;
+  }
+}
+
+/* Стили для компонента учителя */
+.lesson-materials.teacher-view {
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(155, 89, 182, 0.05) 100%);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.teacher-materials .lesson-info {
+  background: rgba(52, 152, 219, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.teacher-materials .lesson-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.teacher-materials .lesson-meta p {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 0.95rem;
+}
+
+.teacher-materials .lesson-meta strong {
+  color: #3498db;
+}
+
+.material-card.teacher-card {
+  border-left: 4px solid #3498db;
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(255, 255, 255, 0.95) 100%);
+}
+
+.material-card.teacher-card h4 {
+  color: #2980b9;
+}
+
+.teacher-notes {
+  background: rgba(46, 204, 113, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 24px;
+  border: 1px solid rgba(46, 204, 113, 0.2);
+}
+
+.teacher-notes h4 {
+  color: #27ae60;
+  margin: 0 0 16px 0;
+  font-size: 1.2rem;
+}
+
+.teacher-notes .notes-content {
+  color: #2c3e50;
+}
+
+.teacher-notes .notes-content p {
+  margin: 0 0 12px 0;
+  font-weight: 500;
+}
+
+.teacher-notes .notes-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.teacher-notes .notes-content li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(46, 204, 113, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.teacher-notes .notes-content li:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .teacher-materials .lesson-meta {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .teacher-notes {
+    padding: 16px;
+  }
+  
+  .teacher-notes h4 {
+    font-size: 1.1rem;
   }
 }

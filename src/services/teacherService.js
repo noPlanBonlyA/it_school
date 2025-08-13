@@ -112,11 +112,7 @@ export async function createTeacherWithUser(teacherData, imageFile = null) {
     
     // Сначала создаем пользователя
     console.log('[TeacherService] Creating user first...');
-    const userResponse = await api.post('/users/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const userResponse = await api.post('/users/', formData);
     
     console.log('[TeacherService] User created:', userResponse.data);
     

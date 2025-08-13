@@ -1,263 +1,418 @@
-/* Компонент BestCoins расширяет базовый .card из HomePage.css */
-.card.bestcoins {
-    /* выравниваем содержимое по центру */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  
-    /* если нужно — можно подправить отступы */
-    padding: 32px 24px;
+/* Минималистичный дизайн BestCoins с чистым белым фоном */
+.bestcoins-container {
+  padding: 20px 24px;
+  background: #ffffff;
+  border: 2px solid #00B18F;
+  border-radius: 20px;
+  color: #1e293b;
+  text-align: center;
+  box-shadow: 
+    0 8px 32px rgba(0, 177, 143, 0.15),
+    0 0 0 1px rgba(0, 177, 143, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bestcoins-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+.bestcoins-display {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.coins-icon {
+  font-size: 36px;
+  filter: drop-shadow(0 2px 8px rgba(0, 177, 143, 0.3));
+  transition: transform 0.3s ease;
+}
+
+.coins-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.coins-number {
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #00B18F 0%, #0369a1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0, 177, 143, 0.1);
+  line-height: 1;
+}
+
+.coins-loading-animation {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-dots {
+  font-size: 20px;
+  font-weight: 700;
+  animation: loading-pulse 1.5s ease-in-out infinite;
+  background: linear-gradient(135deg, #00B18F 0%, #0369a1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes loading-pulse {
+  0%, 100% { 
+    opacity: 0.6;
+    transform: scale(1);
   }
-  
-  /* Само значение */
-  .card.bestcoins .amount {
-    margin-top: 16px;
-    font-size: 48px;
-    font-weight: 700;
-    line-height: 1;
-    color: #202224;
+  50% { 
+    opacity: 1;
+    transform: scale(1.1);
   }
-  
+}
+
+.coins-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  background: linear-gradient(135deg, #00B18F 0%, #0369a1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+/* Hover эффекты */
+.bestcoins-container:hover {
+  box-shadow: 
+    0 12px 40px rgba(0, 177, 143, 0.25),
+    0 0 0 2px rgba(0, 177, 143, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transform: translateY(-3px);
+  border-color: #00a67d;
+}
+
+.bestcoins-container:hover .coins-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
   .bestcoins-container {
-    padding: 20px;
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    padding: 16px 20px;
+    max-width: 100%;
     border-radius: 16px;
-    color: white;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .bestcoins-container::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-    animation: shimmer 3s ease-in-out infinite;
-  }
-  
-  @keyframes shimmer {
-    0%, 100% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(180deg) scale(1.1); }
   }
   
   .bestcoins-display {
-    position: relative;
-    z-index: 2;
-    margin-bottom: 20px;
+    flex-direction: row;
+    gap: 14px;
+    text-align: left;
   }
   
   .coins-icon {
-    font-size: 3rem;
-    margin-bottom: 12px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-    animation: bounce 2s ease-in-out infinite;
-  }
-  
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    font-size: 32px;
   }
   
   .coins-amount {
-    margin-bottom: 8px;
+    flex: 1;
+    align-items: flex-start;
   }
   
   .coins-number {
-    font-size: 2.5rem;
-    font-weight: 800;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    display: block;
-  }
-  
-  .coins-loading-animation {
-    height: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .loading-dots {
-    font-size: 2rem;
-    font-weight: bold;
-    animation: loading-pulse 1.5s ease-in-out infinite;
-  }
-  
-  @keyframes loading-pulse {
-    0%, 100% { opacity: 0.5; transform: scale(0.8); }
-    50% { opacity: 1; transform: scale(1.2); }
+    font-size: 24px;
   }
   
   .coins-label {
-    font-size: 1rem;
-    font-weight: 600;
-    text-transform: uppercase;
+    font-size: 12px;
     letter-spacing: 1px;
-    opacity: 0.9;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@media (max-width: 480px) {
+  .bestcoins-container {
+    padding: 14px 18px;
+    border-radius: 14px;
   }
   
-  .coins-progress {
-    position: relative;
-    z-index: 2;
-    margin-bottom: 16px;
+  .coins-icon {
+    font-size: 28px;
   }
   
-  .progress-bar {
-    width: 100%;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 8px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  .coins-number {
+    font-size: 22px;
   }
   
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ffffff 0%, #fef3c7 100%);
-    border-radius: 4px;
-    transition: width 0.8s ease;
-    box-shadow: 0 1px 3px rgba(255, 255, 255, 0.4);
+  .coins-label {
+    font-size: 11px;
+  }
+}
+
+/* Для карточек в HomePage */
+.card.bestcoins {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  min-height: auto;
+  max-height: none;
+}
+
+/* Для карточек в HomePage */
+.card.bestcoins {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  min-height: auto;
+  max-height: none;
+}
+
+/* Дополнительные стили для HomePage */
+.bestcoins-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.bestcoins-header h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: 'Mont', sans-serif;
+  line-height: 1.2;
+}
+
+.coins-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.coins-loading {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-style: italic;
+  text-align: right;
+}
+
+.coins-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  align-items: flex-end;
+}
+
+.coins-source,
+.coins-updated {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  font-family: 'Courier New', monospace;
+  text-align: right;
+  line-height: 1.2;
+}
+
+.coins-source {
+  font-weight: 600;
+  color: #00B18F;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .card.bestcoins {
+    padding: 12px 16px; /* Компактные отступы */
   }
   
-  .progress-text {
-    font-size: 0.9rem;
-    opacity: 0.9;
-    font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  .bestcoins-container {
+    padding: 12px 16px; /* Более компактно */
+    max-width: 100%;
+    border-radius: 16px;
+    transform: none; /* Убираем 3D эффект на мобильных */
+    background: #ffffff;
+    border: 2px solid #00B18F;
+    box-shadow: 0 4px 15px rgba(0, 177, 143, 0.25);
+    color: #1e293b; /* Темный текст на белом фоне */
   }
   
-  .coins-actions {
-    position: relative;
-    z-index: 2;
-  }
-  
-  .action-hint {
-    display: flex;
+  .bestcoins-display {
+    min-height: 50px; /* Более компактно */
+    flex-direction: row; /* Размещаем в ряд на мобильных */
+    gap: 12px;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 12px 16px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
   }
   
-  .hint-icon {
-    font-size: 1.2rem;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  .coins-icon {
+    font-size: 1.8rem; /* Меньший размер */
+    margin-bottom: 0; /* Убираем отступ снизу */
   }
   
-  .hint-text {
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  .coins-amount {
+    flex: 1;
+    text-align: left;
   }
   
-  /* Дополнительные стили для HomePage */
+  .coins-number {
+    font-size: 1.8rem; /* Большая цифра */
+    font-weight: 800;
+    display: block;
+    line-height: 1;
+  }
+  
+  .coins-label {
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    margin-top: 2px;
+    opacity: 0.9;
+  }
+  
   .bestcoins-header {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+    align-items: center;
   }
   
   .bestcoins-header h3 {
-    margin: 0;
-    color: #1f2937;
-    font-size: 1.2rem;
-    font-weight: 700;
-  }
-  
-  .coins-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  
-  .coins-loading {
-    font-size: 0.8rem;
-    color: #6b7280;
-    font-style: italic;
+    font-size: 1rem;
   }
   
   .coins-details {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: flex-end;
   }
   
   .coins-source,
   .coins-updated {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .card.bestcoins {
+    padding: 12px 16px;
+  }
+  
+  .bestcoins-container {
+    padding: 14px 16px;
+    border-radius: 16px;
+    transform: perspective(1000px) rotateX(0deg);
+  }
+  
+  .bestcoins-display {
+    min-height: 65px;
+  }
+  
+  .coins-icon {
+    font-size: 2rem;
+    margin-bottom: 4px;
+  }
+  
+  .coins-number {
+    font-size: 1.8rem;
+  }
+  
+  .coins-label {
     font-size: 0.75rem;
-    color: #9ca3af;
-    font-family: 'Courier New', monospace;
+    letter-spacing: 1.2px;
   }
   
-  .coins-source {
-    font-weight: 600;
+  .bestcoins-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 10px;
   }
   
-  /* Адаптивность */
-  @media (max-width: 768px) {
-    .bestcoins-container {
-      padding: 16px;
-    }
-    
-    .coins-icon {
-      font-size: 2.5rem;
-    }
-    
-    .coins-number {
-      font-size: 2rem;
-    }
-    
-    .action-hint {
-      padding: 10px 14px;
-    }
-    
-    .hint-text {
-      font-size: 0.8rem;
-    }
-    
-    .bestcoins-header {
-      margin-bottom: 12px;
-    }
-    
-    .coins-details {
-      align-items: flex-start;
-    }
-    
-    .coins-source,
-    .coins-updated {
-      font-size: 0.7rem;
-    }
+  .bestcoins-header h3 {
+    font-size: 0.9rem;
   }
   
-  @media (max-width: 480px) {
-    .coins-icon {
-      font-size: 2rem;
-    }
-    
-    .coins-number {
-      font-size: 1.8rem;
-    }
-    
-    .action-hint {
-      flex-direction: column;
-      gap: 6px;
-      text-align: center;
-    }
-    
-    .hint-text {
-      font-size: 0.75rem;
-      line-height: 1.4;
-    }
+  .coins-info {
+    align-self: flex-end;
+    align-items: flex-end;
   }
+  
+  .coins-source,
+  .coins-updated {
+    font-size: 0.6rem;
+  }
+  
+  .bestcoins-container:hover {
+    transform: perspective(1000px) rotateX(0deg) translateY(-2px) scale(1.01);
+  }
+}
+
+/* Стили для более компактного отображения на карточке */
+.card.coins .bestcoins-container {
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+
+.card.coins:hover .bestcoins-container {
+  transform: scale(1);
+}
+
+/* Убираем желтый фон и делаем дизайн более технологичным */
+.bestcoins-tech-theme {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+.bestcoins-tech-theme::before {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+}
+
+.bestcoins-tech-theme .coins-label {
+  background: linear-gradient(135deg, #00D4AA 0%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Эффект подсветки при наведении */
+.bestcoins-container:hover {
+  box-shadow: 
+    0 15px 40px rgba(0, 177, 143, 0.4),
+    0 0 0 2px rgba(255, 255, 255, 0.2),
+    0 0 30px rgba(0, 177, 143, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: perspective(1000px) rotateX(0deg) translateY(-3px) scale(1.02);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bestcoins-container:hover .coins-icon {
+  transform: translateY(-2px) rotate(5deg) scale(1.1);
+}
+
+.bestcoins-container:hover .coins-number {
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(255, 255, 255, 0.5);
+}

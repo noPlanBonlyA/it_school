@@ -852,8 +852,8 @@
 }
 
 .coins-display {
-  background: #fff9c4;
-  color: #a16207;
+  background: transparent;
+  color: #059669;
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 11px;
@@ -927,9 +927,9 @@
 }
 
 .coins-earned {
-  color: #a16207;
+  color: #059669;
   font-weight: 600;
-  background: #fff9c4;
+  background: transparent;
   padding: 4px 8px;
   border-radius: 6px;
   display: inline-block;
@@ -1022,3 +1022,72 @@
     opacity: 0;
     transform: translateX(20px);
   }
+
+/* ===== Стили для комментариев студентов ===== */
+.student-comments {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+}
+
+.student-comments h4 {
+  margin: 0 0 12px 0;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.student-comment-item {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.comment-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.comment-icon {
+  font-size: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.comment-text {
+  color: #495057;
+  font-size: 14px;
+  line-height: 1.4;
+  font-style: italic;
+  flex: 1;
+}
+
+.comment-date {
+  font-size: 11px;
+  color: #6c757d;
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* Адаптивность для комментариев */
+@media (max-width: 768px) {
+  .student-comments {
+    margin: 15px 0;
+    padding: 12px;
+  }
+  
+  .comment-text {
+    font-size: 13px;
+  }
+}

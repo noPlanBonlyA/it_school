@@ -32,6 +32,7 @@ import api from '../api/axiosInstance';
 import '../styles/ManageUserPage.css';
 import '../styles/ManageGroupPage.css';
 import '../styles/AutoScheduleModal.css';
+import '../styles/GroupManagement.css';
 
 /* ─────────────────── helpers ────────────────────────*/
 const hi = (txt, q) => {
@@ -625,68 +626,77 @@ export default function ManageGroupPage() {
           {/*— убираем дублирующий заголовок, так как он теперь в TopBar —*/}
 
           {/*— create group —*/}
-          <div className="block">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h2 style={{ margin: 0 }}>Создать группу</h2>
+          <div className="block create-group-block">
+            <div className="create-group-header">
+              <h2>Создать новую группу</h2>
               <DefaultScheduleSettings />
             </div>
-            <div className="user-form form-grid">
-              {['name','description'].map(f=>(
-                <div className="field" key={f}>
-                  <label>{f.replace('_',' ')}</label>
-                  {f==='description'
-                    ? <textarea value={newF[f]}
-                                onChange={e=>setNewF(s=>({...s,[f]:e.target.value}))}/>
-                    : <input type={f.includes('date')?'date':'text'}
-                             value={newF[f]}
-                             onChange={e=>setNewF(s=>({...s,[f]:e.target.value}))}/>}
-                  {f==='name' && errs.name && <div className="error-text">{errs.name}</div>}
-                </div>
-              ))}
-              <div className="buttons">
-                <button className="btn-primary" onClick={createGrp}>Создать группу</button>
+            <div className="create-group-form">
+              <div className="field">
+                <label>Название группы</label>
+                <input 
+                  type="text"
+                  value={newF.name}
+                  onChange={e=>setNewF(s=>({...s,name:e.target.value}))}
+                  placeholder="Введите название группы"
+                />
+                {errs.name && <div className="error-text">{errs.name}</div>}
+              </div>
+              <div className="field">
+                <label>Описание группы</label>
+                <textarea 
+                  value={newF.description}
+                  onChange={e=>setNewF(s=>({...s,description:e.target.value}))}
+                  placeholder="Введите описание группы (необязательно)"
+                  rows="3"
+                />
+              </div>
+              <div>
+                <button className="create-group-btn" onClick={createGrp}>
+                  Создать группу
+                </button>
               </div>
             </div>
           </div>
 
           {/*— list of groups —*/}
-          <div className="block">
-            <h2>Список групп</h2>
+          <div className="block groups-list-block">
+            <div className="groups-list-header">
+              <h2>Управление группами</h2>
+            </div>
             <div className="groups-list">
-              {groups.map(g=>(
-                <div className="group-card" key={g.id} style={{
-                  background: 'white',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  padding: '16px',
-                  marginBottom: '12px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}>
+              {groups.length > 0 ? groups.map(g=>(
+                <div className="group-card" key={g.id}>
                   <div className="group-info">
-                    <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', color: '#1e1e2f' }}>
-                      {g.name}
-                    </h3>
-                    <p style={{ margin: '0 0 4px 0', color: '#6b7280', fontSize: '14px' }}>
-                      {g.description||'—'}
+                    <h3>{g.name}</h3>
+                    <p>{g.description||'Описание отсутствует'}</p>
+                    <p>
+                      <strong>Преподаватель:</strong>&nbsp;
+                      {g.teacher ? `${g.teacher.first_name} ${g.teacher.surname}` : 'Не назначен'}
                     </p>
-                    <p style={{ margin: '0', color: '#6b7280', fontSize: '14px' }}>
-                      Преподаватель:&nbsp;
-                      {g.teacher ? `${g.teacher.first_name} ${g.teacher.surname}` : '—'}
-                      {' • '}Студентов: {g.students.length}
-                      {' • '}Курсов: {g.courses?.length || 0}
+                    <p>
+                      <strong>Студентов:</strong> {g.students.length} • 
+                      <strong> Курсов:</strong> {g.courses?.length || 0}
                     </p>
                     
                     {/* Информация о расписании группы */}
                     <GroupScheduleInfo group={g} compact={true} />
                   </div>
-                  <div className="group-actions" style={{ display: 'flex', gap: '8px' }}>
-                    <button className="btn-primary" onClick={() => open(g)}>Управлять</button>
-                    <button className="btn-danger"    onClick={() => delGrp(g.id)}>Удалить</button>
+                  <div className="group-actions">
+                    <button className="btn-primary" onClick={() => open(g)}>
+                      Управлять
+                    </button>
+                    <button className="btn-danger" onClick={() => delGrp(g.id)}>
+                      Удалить
+                    </button>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="empty-state" style={{ padding: '40px', textAlign: 'center' }}>
+                  <h3 style={{ color: '#6b7280', marginBottom: '8px' }}>Группы не созданы</h3>
+                  <p style={{ color: '#9ca3af' }}>Создайте первую группу, используя форму выше</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -694,53 +704,50 @@ export default function ManageGroupPage() {
         {/*— modal —*/}
         {show && sel && (
           <div className="modal-overlay">
-            <div className="modal-content" style={{ maxWidth: '900px' }}>
+            <div className="modal-content">
 
               {/* header */}
               <div className="modal-header">
-                <h2>{sel.name}</h2>
-                <button className="btn-secondary" onClick={close} style={{
-                  background: 'transparent',
-                  border: '1px solid rgba(0, 177, 143, 0.3)',
-                  fontSize: '24px',
-                  cursor: 'pointer',
-                  color: '#6b7280'
-                }}>×</button>
+                <h2>Управление группой: {sel.name}</h2>
+                <button className="modal-close-btn" onClick={close}>
+                  ×
+                </button>
               </div>
 
               {/* body */}
-              <div className="modal-body" style={{ 
-                padding: '24px', 
-                display: 'grid', 
-                gridTemplateColumns: '1fr 2fr', 
-                gap: '24px',
-                maxHeight: '70vh',
-                overflow: 'auto'
-              }}>
+              <div className="modal-body">
 
                 {/* panel: parameters */}
                 <div className="panel">
-                  <h3 style={{ marginTop: 0 }}>Параметры</h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <h3>Параметры группы</h3>
+                  <div>
                     {['name','description'].map(f=>(
                       <div className="field" key={f}>
-                        <label>{f.replace('_',' ')}</label>
+                        <label>{f === 'name' ? 'Название' : 'Описание'}</label>
                         {f==='description'
-                          ? <textarea value={edit[f] || ''}
-                                      onChange={e=>setEdit(s=>({...s,[f]:e.target.value || ''}))}
-                                      style={{ minHeight: '60px', resize: 'vertical' }}/>
-                          : <input type={f.includes('date')?'date':'text'}
-                                   value={edit[f] || ''}
-                                   onChange={e=>setEdit(s=>({...s,[f]:e.target.value || ''}))}/>}
+                          ? <textarea 
+                              value={edit[f] || ''}
+                              onChange={e=>setEdit(s=>({...s,[f]:e.target.value || ''}))}
+                              placeholder="Введите описание группы"
+                            />
+                          : <input 
+                              type="text"
+                              value={edit[f] || ''}
+                              onChange={e=>setEdit(s=>({...s,[f]:e.target.value || ''}))}
+                              placeholder="Введите название группы"
+                            />}
                       </div>
                     ))}
-                    <button className="btn-primary" disabled={!changed}
-                            style={{opacity:changed?1:0.55}} onClick={save}>
+                    <button 
+                      className={`save-changes-btn ${changed ? '' : 'disabled'}`}
+                      disabled={!changed}
+                      onClick={save}
+                    >
                       Сохранить изменения
                     </button>
                     
                     {/* Информация о расписании группы */}
-                    <div style={{ marginTop: '16px' }}>
+                    <div style={{ marginTop: '20px' }}>
                       <GroupScheduleInfo group={sel} />
                     </div>
                   </div>
@@ -751,56 +758,68 @@ export default function ManageGroupPage() {
                   <h3 style={{ marginTop: 0 }}>Участники</h3>
 
                   {/*─ teacher ─*/}
-                  <div className="section" style={{ marginBottom: '24px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <h4 style={{ margin: 0 }}>Преподаватель</h4>
+                  <div className="section">
+                    <div className="section-header">
+                      <h4>Преподаватель</h4>
                       {!sel.teacher && (
-                        <button className="btn-primary" style={{ fontSize: '12px', padding: '4px 8px' }} onClick={async()=>{
-                          const n=!addTea; setAddTea(n); setAddStu(false); setAddCou(false);
-                          if(n) await loadTea();
-                        }}>
+                        <button 
+                          className="section-btn btn-primary" 
+                          onClick={async()=>{
+                            const n=!addTea; setAddTea(n); setAddStu(false); setAddCou(false);
+                            if(n) await loadTea();
+                          }}
+                        >
                           {addTea?'Отмена':'Добавить'}
                         </button>
                       )}
                     </div>
 
                     {sel.teacher ? (
-                      <div style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        alignItems: 'center', 
-                        padding: '8px 12px', 
-                        background: '#f8f9fa', 
-                        borderRadius: '6px' 
-                      }}>
-                        <span>{sel.teacher.first_name} {sel.teacher.surname} ({sel.teacher.username})</span>
-                        <button className="btn-danger" style={{ fontSize: '12px', padding: '2px 6px' }} onClick={()=>rmTeacher(sel.teacher.id)}>×</button>
+                      <div className="member-card">
+                        <span>
+                          {sel.teacher.first_name} {sel.teacher.surname} 
+                          <em style={{ color: '#6b7280', marginLeft: '8px' }}>
+                            ({sel.teacher.username})
+                          </em>
+                        </span>
+                        <button 
+                          className="member-remove-btn" 
+                          onClick={()=>rmTeacher(sel.teacher.id)}
+                          title="Удалить преподавателя"
+                        >
+                          ×
+                        </button>
                       </div>
                     ) : addTea && (
-                      <div style={{ border: '1px solid #e5e7eb', borderRadius: '6px', padding: '12px' }}>
-                        <input placeholder="Поиск преподавателя..." value={tFil} onChange={e=>setTFil(e.target.value)}
-                               style={{ width: '100%', marginBottom: '8px' }}/>
-                        <div style={{ maxHeight: '120px', overflowY: 'auto', marginBottom: '8px' }}>
+                      <div className="add-form">
+                        <input 
+                          placeholder="Поиск преподавателя..." 
+                          value={tFil} 
+                          onChange={e=>setTFil(e.target.value)}
+                        />
+                        <div className="list-container">
                           {teaLoaded
                             ? fTea.length ? fTea.map(t=>(
-                                <label key={t.profileId}
-                                       style={{ 
-                                         display: 'block', 
-                                         padding: '4px 0', 
-                                         cursor: 'pointer',
-                                         background: chosenT===t.userId ? '#e3f2fd' : 'transparent'
-                                       }}>
-                                  <input type="radio" name="teacher"
-                                         checked={chosenT===t.userId}
-                                         onChange={()=>setChosenT(t.userId)}
-                                         style={{ marginRight: '8px' }}/>
+                                <label 
+                                  key={t.profileId}
+                                  className={`list-item ${chosenT===t.userId ? 'selected' : ''}`}
+                                >
+                                  <input 
+                                    type="radio" 
+                                    name="teacher"
+                                    checked={chosenT===t.userId}
+                                    onChange={()=>setChosenT(t.userId)}
+                                  />
                                   {hi(`${t.first_name} ${t.surname}`,tFil)} ({hi(t.username,tFil)})
                                 </label>
-                              )) : <div style={{ color: '#6b7280', textAlign: 'center' }}>Список пуст</div>
-                            : <div style={{ color: '#6b7280', textAlign: 'center' }}>Загрузка…</div>}
+                              )) : <div className="empty-state">Преподаватели не найдены</div>
+                            : <div className="loading-state">Загрузка преподавателей...</div>}
                         </div>
-                        <button className="btn-primary" disabled={!chosenT} onClick={assignTeacher}
-                                style={{ width: '100%' }}>
+                        <button 
+                          className="submit-btn" 
+                          disabled={!chosenT} 
+                          onClick={assignTeacher}
+                        >
                           Назначить преподавателя
                         </button>
                       </div>
@@ -808,79 +827,89 @@ export default function ManageGroupPage() {
                   </div>
 
                   {/*─ students ─*/}
-                  <div className="section" style={{ marginBottom: '24px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <h4 style={{ margin: 0 }}>Студенты ({sel.students.length})</h4>
-                      <button className="btn-primary" style={{ fontSize: '12px', padding: '4px 8px' }} onClick={async()=>{
-                        const n=!addStu; setAddStu(n); setAddTea(false); setAddCou(false);
-                        if(n) await loadStu();
-                      }}>
+                  <div className="section">
+                    <div className="section-header">
+                      <h4>Студенты ({sel.students.length})</h4>
+                      <button 
+                        className="section-btn btn-primary" 
+                        onClick={async()=>{
+                          const n=!addStu; setAddStu(n); setAddTea(false); setAddCou(false);
+                          if(n) await loadStu();
+                        }}
+                      >
                         {addStu?'Отмена':'Добавить'}
                       </button>
                     </div>
 
                     {addStu && (
-                      <div style={{ border: '1px solid #e5e7eb', borderRadius: '6px', padding: '12px', marginBottom: '12px' }}>
-                        <input placeholder="Поиск студентов..." value={sFil} onChange={e=>setSFil(e.target.value)}
-                               style={{ width: '100%', marginBottom: '8px' }}/>
-                        <div style={{ maxHeight: '120px', overflowY: 'auto', marginBottom: '8px' }}>
+                      <div className="add-form">
+                        <input 
+                          placeholder="Поиск студентов..." 
+                          value={sFil} 
+                          onChange={e=>setSFil(e.target.value)}
+                        />
+                        <div className="list-container">
                           {stuLoaded
                             ? fStu.length ? fStu.map(s=>(
                                 (s.username||s.first_name||s.surname) && (
-                                  <label key={s.profileId}
-                                         style={{ 
-                                           display: 'block', 
-                                           padding: '4px 0', 
-                                           cursor: s.already ? 'not-allowed' : 'pointer',
-                                           opacity: s.already ? 0.5 : 1,
-                                           background: chk.has(s.profileId) ? '#e3f2fd' : 'transparent'  // ИСПРАВЛЕНО: используем profileId
-                                         }}>
-                                    <input type="checkbox" disabled={s.already}
-                                           checked={chk.has(s.profileId)}  // ИСПРАВЛЕНО: используем profileId
-                                           onChange={e=>{
-                                             setChk(prev=>{
-                                               const out=new Set(prev);
-                                               e.target.checked?out.add(s.profileId):out.delete(s.profileId);  // ИСПРАВЛЕНО: используем profileId
-                                               return out;
-                                             });
-                                           }}
-                                           style={{ marginRight: '8px' }}/>
+                                  <label 
+                                    key={s.profileId}
+                                    className={`list-item ${s.already ? 'disabled' : ''} ${chk.has(s.profileId) ? 'selected' : ''}`}
+                                  >
+                                    <input 
+                                      type="checkbox" 
+                                      disabled={s.already}
+                                      checked={chk.has(s.profileId)}
+                                      onChange={e=>{
+                                        setChk(prev=>{
+                                          const out=new Set(prev);
+                                          e.target.checked?out.add(s.profileId):out.delete(s.profileId);
+                                          return out;
+                                        });
+                                      }}
+                                    />
                                     {hi(`${s.first_name} ${s.surname}`.trim(),sFil)} ({hi(s.username,sFil)})
-                                    {s.already && ' — уже в группе'}
+                                    {s.already && <em style={{ color: '#ef4444' }}> — уже в группе</em>}
                                   </label>
                                 )
-                              )) : <div style={{ color: '#6b7280', textAlign: 'center' }}>Список пуст</div>
-                            : <div style={{ color: '#6b7280', textAlign: 'center' }}>Загрузка…</div>}
+                              )) : <div className="empty-state">Студенты не найдены</div>
+                            : <div className="loading-state">Загрузка студентов...</div>}
                         </div>
-                        <button className="btn-primary" disabled={chk.size===0} onClick={addStudents}
-                                style={{ width: '100%' }}>
+                        <button 
+                          className="submit-btn" 
+                          disabled={chk.size===0} 
+                          onClick={addStudents}
+                        >
                           Добавить студентов {chk.size?`(${chk.size})`:''}
                         </button>
                       </div>
                     )}
 
-                    <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
+                    <div className="members-container">
                       {sel.students.length ? sel.students.map(st=>(
-                        <div key={st.id} style={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between', 
-                          alignItems: 'center', 
-                          padding: '6px 12px', 
-                          marginBottom: '4px',
-                          background: '#f8f9fa', 
-                          borderRadius: '4px' 
-                        }}>
-                          <span>{st.first_name} {st.surname} ({st.username})</span>
-                          <button className="btn-danger" style={{ fontSize: '12px', padding: '2px 6px' }} onClick={()=>rmStudent(st.id)}>×</button>
+                        <div key={st.id} className="member-card">
+                          <span>
+                            {st.first_name} {st.surname}
+                            <em style={{ color: '#6b7280', marginLeft: '8px' }}>
+                              ({st.username})
+                            </em>
+                          </span>
+                          <button 
+                            className="member-remove-btn" 
+                            onClick={()=>rmStudent(st.id)}
+                            title="Удалить студента"
+                          >
+                            ×
+                          </button>
                         </div>
-                      )) : <p style={{ color: '#6b7280', textAlign: 'center' }}>Студентов нет</p>}
+                      )) : <div className="empty-state">Студенты не добавлены</div>}
                     </div>
                   </div>
 
                   {/*─ courses ─*/}
                   <div className="section">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <h4 style={{ margin: 0 }}>Курсы ({sel.courses?.length || 0})</h4>
+                    <div className="section-header">
+                      <h4>Курсы ({sel.courses?.length || 0})</h4>
                       <div style={{ display: 'flex', gap: '8px' }}>
                         {sel.courses?.length > 0 && (
                           <RefreshScheduleButton 
@@ -889,60 +918,64 @@ export default function ManageGroupPage() {
                             variant="small"
                           />
                         )}
-                        <button className="btn-primary" style={{ fontSize: '12px', padding: '4px 8px' }} onClick={async()=>{
-                          const n=!addCou; setAddCou(n); setAddStu(false); setAddTea(false);
-                          if(n) await loadCou();
-                        }}>
+                        <button 
+                          className="section-btn btn-primary" 
+                          onClick={async()=>{
+                            const n=!addCou; setAddCou(n); setAddStu(false); setAddTea(false);
+                            if(n) await loadCou();
+                          }}
+                        >
                           {addCou?'Отмена':'Добавить'}
                         </button>
                       </div>
                     </div>
 
                     {/* уже привязанные */}
-                    <div style={{ maxHeight: '120px', overflowY: 'auto', marginBottom: '12px' }}>
+                    <div className="courses-container">
                       {sel.courses?.length ? sel.courses.map(c=>(
-                        <div key={c.id} style={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between', 
-                          alignItems: 'center', 
-                          padding: '8px 12px', 
-                          marginBottom: '4px',
-                          background: '#f8f9fa', 
-                          borderRadius: '4px' 
-                        }}>
-                          <span>{c.name}</span>
+                        <div key={c.id} className="member-card">
+                          <span>
+                            {c.name}
+                            <em style={{ color: '#6b7280', marginLeft: '8px', fontSize: '12px' }}>
+                              (ID: {c.id})
+                            </em>
+                          </span>
                         </div>
-                      )) : <p style={{ color: '#6b7280', textAlign: 'center' }}>Курсы не добавлены</p>}
+                      )) : <div className="empty-state">Курсы не добавлены</div>}
                     </div>
 
                     {/* выбор нового */}
                     {addCou && !schedulingMode && (
-                      <div style={{ border: '1px solid #e5e7eb', borderRadius: '6px', padding: '12px' }}>
-                        <input placeholder="Поиск курсов..." value={cFil} onChange={e=>setCFil(e.target.value)}
-                               style={{ width: '100%', marginBottom: '8px' }}/>
-                        <div style={{ maxHeight: '120px', overflowY: 'auto', marginBottom: '8px' }}>
+                      <div className="add-form">
+                        <input 
+                          placeholder="Поиск курсов..." 
+                          value={cFil} 
+                          onChange={e=>setCFil(e.target.value)}
+                        />
+                        <div className="list-container">
                           {couLoaded
                             ? fCou.length ? fCou.map(c=>(
-                                <label key={c.id}
-                                       style={{ 
-                                         display: 'block', 
-                                         padding: '4px 0', 
-                                         cursor: c.already ? 'not-allowed' : 'pointer',
-                                         opacity: c.already ? 0.5 : 1,
-                                         background: chosenC===c.id ? '#e3f2fd' : 'transparent'
-                                       }}>
-                                  <input type="radio" disabled={c.already}
-                                         checked={chosenC===c.id}
-                                         onChange={()=>setChosenC(c.id)}
-                                         style={{ marginRight: '8px' }}/>
+                                <label 
+                                  key={c.id}
+                                  className={`list-item ${c.already ? 'disabled' : ''} ${chosenC===c.id ? 'selected' : ''}`}
+                                >
+                                  <input 
+                                    type="radio" 
+                                    disabled={c.already}
+                                    checked={chosenC===c.id}
+                                    onChange={()=>setChosenC(c.id)}
+                                  />
                                   {hi(c.name,cFil)}
-                                  {c.already && ' — уже привязан'}
+                                  {c.already && <em style={{ color: '#ef4444' }}> — уже привязан</em>}
                                 </label>
-                              )) : <div style={{ color: '#6b7280', textAlign: 'center' }}>Список пуст</div>
-                            : <div style={{ color: '#6b7280', textAlign: 'center' }}>Загрузка…</div>}
+                              )) : <div className="empty-state">Курсы не найдены</div>
+                            : <div className="loading-state">Загрузка курсов...</div>}
                         </div>
-                        <button className="btn-primary" disabled={!chosenC} onClick={addCourse}
-                                style={{ width: '100%' }}>
+                        <button 
+                          className="submit-btn" 
+                          disabled={!chosenC} 
+                          onClick={addCourse}
+                        >
                           Добавить курс
                         </button>
                       </div>
@@ -950,87 +983,70 @@ export default function ManageGroupPage() {
 
                     {/* Планирование расписания */}
                     {schedulingMode && (
-                      <div style={{ border: '2px solid #007bff', borderRadius: '8px', padding: '16px', background: '#f8f9ff' }}>
-                        <h4 style={{ margin: '0 0 16px 0', color: '#007bff' }}>
+                      <div className="schedule-planning">
+                        <h4>
                           Планирование расписания для курса: {courses.find(c => c.id === chosenC)?.name}
                         </h4>
                         
-                        <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                        <div className="schedule-lessons">
                           {courseLessons.map((lesson, index) => (
-                            <div key={lesson.id} style={{ 
-                              border: '1px solid #e5e7eb', 
-                              borderRadius: '6px', 
-                              padding: '12px', 
-                              marginBottom: '12px',
-                              background: 'white'
-                            }}>
-                              <h5 style={{ margin: '0 0 12px 0' }}>
+                            <div key={lesson.id} className="schedule-lesson-card">
+                              <h5>
                                 Урок {index + 1}: {lesson.name}
                               </h5>
                               
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                                <div>
-                                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 'bold' }}>
-                                    Дата и время начала:
-                                  </label>
+                              <div className="schedule-lesson-grid">
+                                <div className="schedule-lesson-field">
+                                  <label>Дата и время начала:</label>
                                   <input
                                     type="datetime-local"
                                     value={lessonSchedules[lesson.id]?.start_datetime || ''}
                                     onChange={e => updateLessonSchedule(lesson.id, 'start_datetime', e.target.value)}
-                                    style={{ width: '100%', padding: '6px', border: '1px solid #ccc', borderRadius: '4px' }}
                                     required
                                   />
                                 </div>
                                 
-                                <div>
-                                  <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 'bold' }}>
-                                    Дата и время окончания:
-                                  </label>
+                                <div className="schedule-lesson-field">
+                                  <label>Дата и время окончания:</label>
                                   <input
                                     type="datetime-local"
                                     value={lessonSchedules[lesson.id]?.end_datetime || ''}
                                     onChange={e => updateLessonSchedule(lesson.id, 'end_datetime', e.target.value)}
-                                    style={{ width: '100%', padding: '6px', border: '1px solid #ccc', borderRadius: '4px' }}
                                     required
                                   />
                                 </div>
-                              </div>
-                              
-                              <div style={{ marginTop: '12px' }}>
-                                <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 'bold' }}>
-                                  Аудитория (необязательно):
-                                </label>
-                                <input
-                                  type="text"
-                                  value={lessonSchedules[lesson.id]?.auditorium || ''}
-                                  onChange={e => updateLessonSchedule(lesson.id, 'auditorium', e.target.value)}
-                                  placeholder="Например: 101, Онлайн, Zoom"
-                                  style={{ width: '100%', padding: '6px', border: '1px solid #ccc', borderRadius: '4px' }}
-                                />
+                                
+                                <div className="schedule-lesson-field schedule-auditorium-field">
+                                  <label>Аудитория (необязательно):</label>
+                                  <input
+                                    type="text"
+                                    value={lessonSchedules[lesson.id]?.auditorium || ''}
+                                    onChange={e => updateLessonSchedule(lesson.id, 'auditorium', e.target.value)}
+                                    placeholder="Например: 101, Онлайн, Zoom"
+                                  />
+                                </div>
                               </div>
                             </div>
                           ))}
                         </div>
                         
-                        <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                        <div className="schedule-actions">
                           <button 
                             className="btn-primary" 
                             onClick={confirmSchedule}
                             disabled={Object.keys(lessonSchedules).length !== courseLessons.length}
-                            style={{ flex: 1 }}
                           >
                             Подтвердить расписание
                           </button>
                           <button 
                             className="btn-secondary" 
                             onClick={cancelScheduling}
-                            style={{ flex: 1, background: '#6c757d', color: 'white', border: 'none' }}
                           >
                             Отмена
                           </button>
                         </div>
                         
-                        <div style={{ marginTop: '8px', fontSize: '12px', color: '#6b7280' }}>
+                        <div className="schedule-progress">
                           Установлено расписание для {Object.keys(lessonSchedules).length} из {courseLessons.length} уроков
                         </div>
                       </div>

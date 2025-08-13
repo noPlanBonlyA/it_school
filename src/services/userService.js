@@ -52,11 +52,7 @@ export async function createUser(payload, imageFile = null) {
     formData.append('image', imageFile);
   }
   
-  const { data } = await api.post('/users/', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  const { data } = await api.post('/users/', formData);
   return data;
 }
 
@@ -69,11 +65,7 @@ export async function updateUser(id, payload) {
   // Добавляем данные пользователя как JSON строку
   formData.append('user_data', JSON.stringify(payload));
   
-  const { data } = await api.put(`/users/${id}`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  const { data } = await api.put(`/users/${id}`, formData);
   return data;
 }
 
@@ -113,11 +105,7 @@ export async function createAdminWithUser(adminData, imageFile = null) {
     
     // Создаем пользователя
     console.log('[UserService] Creating admin user...');
-    const userResponse = await api.post('/users/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const userResponse = await api.post('/users/', formData);
     
     console.log('[UserService] Admin user created:', userResponse.data);
     

@@ -577,7 +577,6 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
     
     try {
       setUploadingHomework(true);
-      
       console.log('[Schedule] Uploading homework with:', {
         course_id: conductingLesson.course_id,
         lesson_id: conductingLesson.lesson_id,
@@ -585,16 +584,14 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
         hasText: !!homeworkData.textContent,
         hasFile: !!homeworkData.file
       });
-      
       let uploadedSuccessfully = 0;
       let errors = [];
-      
-      // Загружаем текстовое домашнее задание, если есть
+
+      // 1. Основное ДЗ (текст)
       if (homeworkData.textContent && homeworkData.textContent.trim()) {
         try {
           const textEndpoint = `/courses/${conductingLesson.course_id}/lessons/${conductingLesson.lesson_id}/homework-material-text`;
           console.log('[Schedule] Text homework endpoint:', textEndpoint);
-          
           await api.post(textEndpoint, {
             name: homeworkData.name,
             html_text: homeworkData.textContent.trim()
@@ -606,17 +603,15 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
           errors.push('текстовое задание');
         }
       }
-      
-      // Загружаем файл домашнего задания, если есть
+
+      // 2. Дополнительное ДЗ (файл)
       if (homeworkData.file) {
         try {
           const fileEndpoint = `/courses/${conductingLesson.course_id}/lessons/${conductingLesson.lesson_id}/homework-material`;
           console.log('[Schedule] File homework endpoint:', fileEndpoint);
-          
           const formData = new FormData();
           formData.append('homework_material_name', homeworkData.name);
           formData.append('homework_material_file', homeworkData.file);
-          
           await api.post(fileEndpoint, formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -629,7 +624,7 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
           errors.push('файл');
         }
       }
-      
+
       // Показываем результат
       if (uploadedSuccessfully > 0 && errors.length === 0) {
         alert('Домашнее задание загружено успешно!');
@@ -639,7 +634,6 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
       } else {
         alert(`Ошибка загрузки домашнего задания: ${errors.join(', ')}`);
       }
-      
     } catch (error) {
       console.error('[Schedule] Error uploading homework:', error);
       alert('Общая ошибка загрузки домашнего задания');

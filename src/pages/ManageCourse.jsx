@@ -39,8 +39,7 @@ export default function ManageCoursesPage() {
   const [form, setForm] = useState({
     name: '',
     description: '',
-    age_category: 'ALL',
-    price: '0'
+    age_category: 'ALL'
   });
   const [formImage, setFormImage] = useState(null);
   const [formPreviewUrl, setFormPreviewUrl] = useState(null);
@@ -131,14 +130,19 @@ export default function ManageCoursesPage() {
       // Определяем имя автора из текущего пользователя
       const authorName = [user.first_name, user.surname].filter(Boolean).join(' ') || user.username || 'Неизвестный автор';
       
-      // Данные курса (без поля photo - изображение передается отдельно)
+      // ИСПРАВЛЕНО: Данные курса с полем photo (как в новостях и товарах)
       const courseData = {
         name:         form.name,
         description:  form.description,
         age_category: [form.age_category], // Передаем как массив
-        price:        Number(form.price) || 0,
+        price:        0, // Всегда 0 для курсов
         author_name:  authorName
       };
+      
+      // Если есть изображение, добавляем поле photo с именем
+      if (formImage) {
+        courseData.photo = { name: formImage.name };
+      }
       
       // Простой способ создания FormData
       const fd = new FormData();
@@ -173,7 +177,7 @@ export default function ManageCoursesPage() {
       }
 
       await createCourse(fd);
-      setForm({ name:'', description:'', age_category:'ALL', price:'0' });
+      setForm({ name:'', description:'', age_category:'ALL' });
       setFormImage(null);
       setFormPreviewUrl(null);
       setShowConfirmCreate(false);
@@ -217,7 +221,6 @@ export default function ManageCoursesPage() {
       name:         c.name || '',
       description:  c.description || '',
       age_category: mappedAgeCategory,
-      price:        c.price != null ? c.price.toString() : '0',
       author_name:  c.author_name || ''  // только для отображения, не для редактирования
     });
     setEditImage(null);
@@ -230,14 +233,19 @@ export default function ManageCoursesPage() {
     try {
       const fd = new FormData();
       
-      // Данные курса (author_name не изменяем, photo передается отдельно)
+      // ИСПРАВЛЕНО: Данные курса с полем photo (как в новостях и товарах)
       const courseData = {
         name:         edit.name,
         description:  edit.description,
         age_category: [edit.age_category], // Передаем как массив
-        price:        Number(edit.price) || 0
+        price:        0 // Всегда 0 для курсов
         // author_name исключен - не изменяем автора курса
       };
+      
+      // Если заменяем изображение, добавляем поле photo с именем
+      if (editImage) {
+        courseData.photo = { name: editImage.name };
+      }
       
       // Добавляем данные курса
       fd.append('course_data', JSON.stringify(courseData));
@@ -315,17 +323,6 @@ export default function ManageCoursesPage() {
                 <option value="8-10">8-10</option>
                 <option value="12-14">12-14</option>
               </select>
-            </div>
-
-            <div className="field">
-              <label>Цена</label>
-              <input
-                type="number"
-                min="0"
-                value={form.price}
-                onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
-                placeholder="Введите цену курса"
-              />
             </div>
 
             <div className="field" style={{ gridColumn: '1 / -1' }}>
@@ -445,17 +442,6 @@ export default function ManageCoursesPage() {
                   <option value="8-10">8-10</option>
                   <option value="12-14">12-14</option>
                 </select>
-              </div>
-
-              <div className="field">
-                <label>Цена</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={edit.price}
-                  onChange={e => setEdit(p => ({ ...p, price: e.target.value }))}
-                  placeholder="Введите цену курса"
-                />
               </div>
 
               <div className="field" style={{ gridColumn: '1 / -1' }}>

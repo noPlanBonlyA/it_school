@@ -46,6 +46,13 @@ export default function ScheduleFilterModal({
           students: studentsRes.data?.objects || [],
           teachers: teachersRes.data?.objects || []
         });
+        
+        console.log('[ScheduleFilterModal] Loaded options:', {
+          groups: groupsRes.data?.objects?.length || 0,
+          courses: coursesRes.data?.objects?.length || 0,
+          students: studentsRes.data?.objects?.length || 0,
+          teachers: teachersRes.data?.objects?.length || 0
+        });
       } catch (error) {
         console.error('[ScheduleFilterModal] Error loading options:', error);
       } finally {
@@ -68,6 +75,9 @@ export default function ScheduleFilterModal({
     const activeFilters = Object.fromEntries(
       Object.entries(filters).filter(([_, value]) => value !== '')
     );
+    
+    console.log('[ScheduleFilterModal] Applying filters:', activeFilters);
+    console.log('[ScheduleFilterModal] Available options:', options);
     
     onFilterApply(activeFilters);
     onClose();
@@ -172,7 +182,7 @@ export default function ScheduleFilterModal({
                   <option value="">-- Все студенты --</option>
                   {options.students.map(student => (
                     <option key={student.id} value={student.id}>
-                      {getFilterLabel('students', student.id)}
+                      {`${student.user?.first_name || ''} ${student.user?.surname || ''}`.trim() || student.user?.username || `Студент ${student.id}`}
                     </option>
                   ))}
                 </select>
@@ -193,7 +203,7 @@ export default function ScheduleFilterModal({
                   <option value="">-- Все преподаватели --</option>
                   {options.teachers.map(teacher => (
                     <option key={teacher.id} value={teacher.id}>
-                      {getFilterLabel('teachers', teacher.id)}
+                      {`${teacher.user?.first_name || ''} ${teacher.user?.surname || ''}`.trim() || teacher.user?.username || `Преподаватель ${teacher.id}`}
                     </option>
                   ))}
                 </select>

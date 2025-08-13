@@ -684,6 +684,28 @@ export default function HomeworkPage() {
                               </div>
                             )}
 
+                            {/* Комментарии студента */}
+                            {student.details?.comments_students && student.details.comments_students.length > 0 && (
+                              <div className="student-comments">
+                                <h4>Комментарии студента:</h4>
+                                <div className="comments-list">
+                                  {student.details.comments_students.map((comment, index) => (
+                                    <div key={comment.id || index} className="student-comment-item">
+                                      <div className="comment-content">
+                                        <span className="comment-icon">💬</span>
+                                        <span className="comment-text">"{comment.text}"</span>
+                                      </div>
+                                      {comment.created_at && (
+                                        <div className="comment-date">
+                                          {formatDate(comment.created_at)}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
                             {/* Бесткоины за ДЗ */}
                             <div className="homework-grading-section">
                               <div className="coins-field">
@@ -830,6 +852,28 @@ export default function HomeworkPage() {
                                         >
                                           Скачать
                                         </a>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Комментарии студента */}
+                            {student.details?.comments_students && student.details.comments_students.length > 0 && (
+                              <div className="student-comments">
+                                <h4>Комментарии студента:</h4>
+                                <div className="comments-list">
+                                  {student.details.comments_students.map((comment, index) => (
+                                    <div key={comment.id || index} className="student-comment-item">
+                                      <div className="comment-content">
+                                        <span className="comment-icon">💬</span>
+                                        <span className="comment-text">"{comment.text}"</span>
+                                      </div>
+                                      {comment.created_at && (
+                                        <div className="comment-date">
+                                          {formatDate(comment.created_at)}
+                                        </div>
                                       )}
                                     </div>
                                   ))}

@@ -1,0 +1,726 @@
+/* EventModal.css - Современный дизайн модального окна события */
+
+.event-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.event-modal {
+  background: linear-gradient(145deg, #ffffff 0%, #fafbfc 100%);
+  border-radius: 24px;
+  box-shadow: 
+    0 32px 64px rgba(15, 23, 42, 0.25),
+    0 0 0 1px rgba(148, 163, 184, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  padding: 0;
+  max-width: 640px;
+  width: 92%;
+  max-height: 92vh;
+  overflow: hidden;
+  position: relative;
+  animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  font-size: 22px;
+  cursor: pointer;
+  color: #1e293b;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-close-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(239, 68, 68, 0.15);
+}
+
+.event-modal-content {
+  padding: 0;
+  overflow-y: auto;
+  max-height: 92vh;
+}
+
+/* Красивый заголовок с градиентным фоном */
+.event-modal-header {
+  background: linear-gradient(135deg, #00B18F 0%, #0369a1 100%);
+  padding: 32px;
+  padding-top: 40px;
+  padding-bottom: 28px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.event-modal-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.event-modal-title {
+  margin: 0 0 20px 0;
+  font-size: 28px;
+  color: #ffffff;
+  line-height: 1.3;
+  font-weight: 700;
+  font-family: 'Mont', sans-serif;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+.event-modal-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-family: 'Mont', sans-serif;
+  position: relative;
+  z-index: 1;
+}
+
+.event-modal-status.opened {
+  background: rgba(34, 197, 94, 0.2);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+.event-modal-status.closed {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* Основной контент */
+.event-modal-info {
+  padding: 32px;
+  padding-bottom: 24px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.info-item {
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.6) 100%);
+  border-radius: 16px;
+  padding: 20px 24px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.info-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #00B18F 0%, #0369a1 100%);
+  border-radius: 0 2px 2px 0;
+}
+
+.info-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  border-color: rgba(0, 177, 143, 0.2);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%);
+}
+
+.info-label {
+  font-weight: 600;
+  color: #475569;
+  font-size: 13px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Mont', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  color: #0f172a;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 600;
+  padding-left: 28px;
+  font-family: 'Mont', sans-serif;
+}
+
+/* Описание */
+.event-modal-description {
+  margin: 0 32px 24px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.04) 0%, rgba(147, 51, 234, 0.06) 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.event-modal-description::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #3b82f6 0%, #8b5cf6 100%);
+  border-radius: 0 2px 2px 0;
+}
+
+.event-modal-description h3 {
+  margin: 0 0 16px 0;
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Mont', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.event-modal-description p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+  font-size: 15px;
+  padding-left: 32px;
+  font-weight: 500;
+}
+
+/* Кнопки действий */
+.event-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px 32px 32px;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.5) 0%, rgba(255, 255, 255, 0.8) 100%);
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.event-btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 32px;
+  
+  background: linear-gradient(135deg, #00B18F 0%, #0369a1 100%);
+  box-shadow: 
+    0 8px 16px rgba(0, 177, 143, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  border: none;
+  
+  font-family: 'Mont', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 15px;
+  color: #FFFFFF;
+  
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.event-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.event-btn-primary:hover {
+  background: linear-gradient(135deg, #00A081 0%, #0284c7 100%);
+  box-shadow: 
+    0 12px 24px rgba(0, 177, 143, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.event-btn-primary:hover::before {
+  left: 100%;
+}
+
+.event-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 4px 12px rgba(0, 177, 143, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Адаптивность для планшетов */
+@media (max-width: 768px) {
+  .event-modal {
+    width: 96%;
+    max-height: 88vh;
+    border-radius: 20px;
+  }
+  
+  .event-modal-header {
+    padding: 28px 24px 24px;
+    padding-top: 36px;
+  }
+  
+  .event-modal-title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  
+  .event-modal-status {
+    padding: 10px 16px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .event-modal-info {
+    padding: 24px;
+    padding-bottom: 20px;
+  }
+  
+  .info-item {
+    padding: 16px 20px;
+    border-radius: 14px;
+  }
+  
+  .info-label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  
+  .info-value {
+    font-size: 15px;
+    padding-left: 24px;
+  }
+  
+  .event-modal-description {
+    margin: 0 24px 20px;
+    padding: 20px;
+    border-radius: 14px;
+  }
+  
+  .event-modal-description h3 {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+  
+  .event-modal-description p {
+    font-size: 14px;
+    padding-left: 28px;
+  }
+  
+  .event-modal-actions {
+    padding: 20px 24px 28px;
+  }
+  
+  .event-btn-primary {
+    padding: 14px 28px;
+    font-size: 14px;
+    border-radius: 14px;
+  }
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 480px) {
+  .event-modal {
+    width: 98%;
+    max-height: 92vh;
+    border-radius: 16px;
+    margin: 16px 0;
+  }
+  
+  .modal-close-btn {
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    border-radius: 10px;
+  }
+  
+  .event-modal-header {
+    padding: 24px 20px 20px;
+    padding-top: 32px;
+  }
+  
+  .event-modal-title {
+    font-size: 20px;
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+  
+  .event-modal-status {
+    padding: 8px 14px;
+    font-size: 11px;
+    gap: 5px;
+    border-radius: 16px;
+  }
+  
+  .event-modal-info {
+    padding: 20px;
+    padding-bottom: 16px;
+  }
+  
+  .info-grid {
+    gap: 12px;
+  }
+  
+  .info-item {
+    padding: 14px 16px;
+    border-radius: 12px;
+  }
+  
+  .info-label {
+    font-size: 11px;
+    margin-bottom: 5px;
+    gap: 6px;
+  }
+  
+  .info-value {
+    font-size: 14px;
+    padding-left: 20px;
+    font-weight: 600;
+  }
+  
+  .event-modal-description {
+    margin: 0 20px 16px;
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  .event-modal-description h3 {
+    font-size: 14px;
+    margin-bottom: 10px;
+    gap: 6px;
+  }
+  
+  .event-modal-description p {
+    font-size: 13px;
+    padding-left: 24px;
+    line-height: 1.5;
+  }
+  
+  .event-modal-actions {
+    padding: 16px 20px 24px;
+  }
+  
+  .event-btn-primary {
+    padding: 12px 24px;
+    font-size: 13px;
+    width: 100%;
+    border-radius: 12px;
+    gap: 8px;
+  }
+}
+
+/* Красивый скроллбар для модального окна */
+.event-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.event-modal-content::-webkit-scrollbar-track {
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 10px;
+  margin: 8px 0;
+}
+
+.event-modal-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.3) 0%, rgba(3, 105, 161, 0.5) 100%);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.event-modal-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.5) 0%, rgba(3, 105, 161, 0.7) 100%);
+}
+
+/* Адаптивность для планшетов */
+@media (max-width: 768px) {
+  .event-modal {
+    width: 95%;
+    max-height: 85vh;
+    border-radius: 16px;
+  }
+  
+  .event-modal-content {
+    padding: 24px;
+    padding-top: 60px;
+  }
+  
+  .event-modal-title {
+    font-size: 24px;
+  }
+  
+  .info-item {
+    padding: 16px;
+  }
+  
+  .info-label {
+    font-size: 13px;
+  }
+  
+  .info-value {
+    font-size: 15px;
+    padding-left: 20px;
+  }
+  
+  .event-modal-description {
+    padding: 20px;
+  }
+  
+  .event-modal-description h3 {
+    font-size: 16px;
+  }
+  
+  .event-modal-description p {
+    font-size: 14px;
+    padding-left: 28px;
+  }
+  
+  .event-btn-primary {
+    padding: 14px 28px;
+    font-size: 15px;
+  }
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 480px) {
+  .event-modal {
+    width: 98%;
+    max-height: 90vh;
+    border-radius: 12px;
+    margin: 20px 0;
+  }
+  
+  .event-modal-content {
+    padding: 20px;
+    padding-top: 56px;
+  }
+  
+  .modal-close-btn {
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+  
+  .event-modal-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+  }
+  
+  .event-modal-title {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+  
+  .event-modal-status {
+    padding: 10px 16px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .info-item {
+    padding: 14px;
+    border-radius: 12px;
+  }
+  
+  .info-label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  
+  .info-value {
+    font-size: 14px;
+    padding-left: 18px;
+  }
+  
+  .event-modal-description {
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .event-modal-description h3 {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+  
+  .event-modal-description p {
+    font-size: 13px;
+    padding-left: 24px;
+  }
+  
+  .event-modal-actions {
+    margin-top: 24px;
+    padding-top: 20px;
+  }
+  
+  .event-btn-primary {
+    padding: 12px 24px;
+    font-size: 14px;
+    width: 100%;
+    border-radius: 10px;
+  }
+}
+
+/* Красивый скроллбар для модального окна */
+.event-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.event-modal::-webkit-scrollbar-track {
+  background: rgba(0, 177, 143, 0.1);
+  border-radius: 12px;
+  margin: 8px 0;
+}
+
+.event-modal::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.4) 0%, rgba(3, 131, 106, 0.6) 100%);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.event-modal::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.6) 0%, rgba(3, 131, 106, 0.8) 100%);
+}
+
+/* Мобильная адаптация EventModal */
+@media (max-width: 768px) {
+  .event-modal {
+    width: 95%;
+    max-height: 85vh;
+    margin: 0 16px;
+    border-radius: 16px;
+  }
+
+  .modal-close-btn {
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .event-modal-header {
+    padding: 24px 20px;
+    padding-top: 32px;
+  }
+
+  .event-title {
+    font-size: 22px !important;
+    line-height: 1.3 !important;
+  }
+
+  .event-subtitle {
+    font-size: 14px !important;
+    margin-top: 8px !important;
+  }
+
+  .event-modal-body {
+    padding: 20px !important;
+  }
+
+  .event-info-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .event-info-item {
+    padding: 12px !important;
+  }
+
+  .event-description {
+    margin-top: 16px !important;
+  }
+
+  .lesson-controls {
+    padding: 16px 20px !important;
+    gap: 12px !important;
+  }
+
+  .lesson-control-btn {
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+  }
+}

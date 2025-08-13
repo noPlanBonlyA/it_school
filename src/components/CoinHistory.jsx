@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   getPointsHistory, 
+  getStudentPointsHistory,
   REASON_LABELS, 
   getReasonIcon 
 } from '../services/coinHistoryService';
@@ -19,6 +20,7 @@ const CoinHistory = ({ studentId = null, compact = false }) => {
   const itemsPerPage = compact ? 5 : 10;
 
   useEffect(() => {
+    console.log('[CoinHistory] Component mounted with studentId:', studentId);
     loadHistory();
   }, [currentPage, studentId]);
 
@@ -32,11 +34,21 @@ const CoinHistory = ({ studentId = null, compact = false }) => {
         offset: currentPage * itemsPerPage
       };
 
-      const response = await getPointsHistory(params);
+      console.log('[CoinHistory] Loading history for studentId:', studentId);
+      console.log('[CoinHistory] Request params:', params);
+
+      // Используем правильный метод в зависимости от того, есть ли studentId
+      const response = studentId 
+        ? await getStudentPointsHistory(studentId, params)
+        : await getPointsHistory(params);
+      
+      console.log('[CoinHistory] Response:', response);
+      console.log('[CoinHistory] Objects array:', response.objects);
+      console.log('[CoinHistory] Objects length:', response.objects?.length);
       
       setHistory(response.objects || []);
-      setTotalCount(response.count || 0);
-      setHasMore((currentPage + 1) * itemsPerPage < response.count);
+      setTotalCount(response.meta?.total_count || response.count || 0);
+      setHasMore((currentPage + 1) * itemsPerPage < (response.meta?.total_count || response.count || 0));
     } catch (err) {
       console.error('Ошибка при загрузке истории поинтов:', err);
       setError('Не удалось загрузить историю монет');
@@ -132,7 +144,7 @@ const CoinHistory = ({ studentId = null, compact = false }) => {
     <div className="coin-history">
       <div className="coin-history-header">
         <h3 className="coin-history-title">
-          <span className="coin-icon">💰</span>
+          <span className="coin-icon">�</span>
           История монет
         </h3>
         <div className="history-controls">
@@ -160,6 +172,13 @@ const CoinHistory = ({ studentId = null, compact = false }) => {
           <div className="empty-state-icon">📝</div>
           <h3>История пуста</h3>
           <p>Пока нет записей о получении или трате монет</p>
+          {/* Отладочная информация */}
+          <div style={{ marginTop: '16px', fontSize: '12px', color: '#888', border: '1px solid #ddd', padding: '8px', borderRadius: '4px' }}>
+            <strong>Отладка:</strong><br/>
+            Student ID: {studentId || 'не указан'}<br/>
+            Загружено записей: {history.length}<br/>
+            Общее количество: {totalCount}
+          </div>
         </div>
       ) : (
         <>
@@ -184,7 +203,7 @@ const CoinHistory = ({ studentId = null, compact = false }) => {
                 </div>
                 <div className="item-right">
                   <div className={`points-change ${getPointsChangeClass(item.changed_points)}`}>
-                    <span className="points-icon">🪙</span>
+                    <span className="points-icon">💻</span>
                     {formatPointsChange(item.changed_points)}
                   </div>
                 </div>

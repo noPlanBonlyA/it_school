@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { studentDetailService } from '../services/studentDetailService';
-import CoinHistory from './CoinHistory';
 import '../styles/StudentDetailView.css';
 
 const StudentDetailView = ({ student, onClose }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(false);
-  const [coinHistoryExpanded, setCoinHistoryExpanded] = useState(false);
   const [data, setData] = useState({
     basicInfo: null,
     performance: null,
@@ -183,11 +181,15 @@ const StudentDetailView = ({ student, onClose }) => {
           <div className="stats-summary">
             <div className="stat-item">
               <span className="stat-value">{data.attendance.totalClasses}</span>
-              <span className="stat-label">Всего занятий</span>
+              <span className="stat-label">Прошедших занятий</span>
             </div>
             <div className="stat-item">
               <span className="stat-value attended">{data.attendance.attendedClasses}</span>
               <span className="stat-label">Посещено</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-value excused">{data.attendance.excusedClasses || 0}</span>
+              <span className="stat-label">Уважительно</span>
             </div>
             <div className="stat-item">
               <span className="stat-value missed">{data.attendance.missedClasses}</span>
@@ -195,46 +197,32 @@ const StudentDetailView = ({ student, onClose }) => {
             </div>
             <div className="stat-item">
               <span className="stat-value rate">{data.attendance.attendanceRate}%</span>
-              <span className="stat-label">Процент посещаемости</span>
+              <span className="stat-label">Процент посещения</span>
             </div>
+            {data.attendance.futureLessons > 0 && (
+              <div className="stat-item future">
+                <span className="stat-value future-value">{data.attendance.futureLessons}</span>
+                <span className="stat-label">Будущих занятий</span>
+              </div>
+            )}
           </div>
           
           <div className="recent-attendance">
             <h4>Последние занятия</h4>
-            {data.attendance.recentClasses.map((cls, index) => (
-              <div key={index} className="attendance-item">
-                <span className="date">{cls.date}</span>
-                <span className="course">{cls.course}</span>
-                <span className={`status ${cls.attended ? 'attended' : 'missed'}`}>
-                  {cls.attended ? 'Присутствовал' : 'Отсутствовал'}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Виджет истории монет */}
-          <div className="coin-history-widget">
-            <div 
-              className="coin-history-header" 
-              onClick={() => setCoinHistoryExpanded(!coinHistoryExpanded)}
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderTop: '1px solid #e0e0e0', marginTop: '20px' }}
-            >
-              <h4 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>💰</span>
-                История монет
-              </h4>
-              <span style={{ transform: coinHistoryExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
-                ▼
-              </span>
-            </div>
-            
-            {coinHistoryExpanded && (
-              <div className="coin-history-content" style={{ marginTop: '12px' }}>
-                <CoinHistory 
-                  studentId={student?.id || student?.student?.id || student?.user?.id || student?.student_id} 
-                  compact={true} 
-                />
-              </div>
+            {data.attendance.recentClasses && data.attendance.recentClasses.length > 0 ? (
+              data.attendance.recentClasses.map((cls, index) => (
+                <div key={index} className="attendance-item">
+                  <span className="date">{cls.date}</span>
+                  <span className="course">{cls.course}</span>
+                  <span className="lesson">{cls.lesson}</span>
+                  <span className={`status ${cls.attended ? 'attended' : cls.excused ? 'excused' : 'missed'}`}>
+                    {cls.attended ? 'Присутствовал' : cls.excused ? 'Уважительная' : 'Отсутствовал'}
+                  </span>
+                  {cls.compensated && <span className="compensated">Компенсировано</span>}
+                </div>
+              ))
+            ) : (
+              <div className="no-recent">Нет данных о недавних занятиях</div>
             )}
           </div>
         </div>

@@ -49,6 +49,11 @@
   margin-bottom: 32px;
 }
 
+/* Адаптивная сетка для будущих уроков */
+.attendance-stats-grid:has(.future-lessons) {
+  grid-template-columns: repeat(5, 1fr);
+}
+
 .stat-item {
   text-align: center;
   padding: 16px 12px;
@@ -58,6 +63,27 @@
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+}
+
+.stat-item.future-lessons {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.stat-item.future-lessons::before {
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+}
+
+.stat-item.future-lessons .stat-number {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.future-info {
+  color: #3b82f6;
+  font-weight: 600;
 }
 
 .stat-item::before {
@@ -378,6 +404,35 @@
 .day-cell.excused.intensity-3 { background-color: #fdcb6e; }
 .day-cell.excused.intensity-4 { background-color: #e17055; }
 
+/* Будущие уроки */
+.day-cell.future {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border-color: #93c5fd;
+}
+
+.day-cell.future.intensity-1 { background-color: #dbeafe; }
+.day-cell.future.intensity-2 { background-color: #bfdbfe; }
+.day-cell.future.intensity-3 { background-color: #93c5fd; }
+.day-cell.future.intensity-4 { background-color: #60a5fa; }
+
+/* Дни с комбинацией прошедших и будущих уроков */
+.day-cell.has-future {
+  position: relative;
+}
+
+.day-cell.has-future::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  background: #3b82f6;
+  border-radius: 50%;
+  border: 1px solid white;
+}
+
 /* Анимации при наведении для месячного вида */
 .day-cell.attended:hover {
   background: #155724 !important;
@@ -391,6 +446,12 @@
 
 .day-cell.missed:hover {
   background: #721c24 !important;
+  transform: scale(1.1);
+}
+
+.day-cell.future:hover {
+  background: #1e40af !important;
+  color: white !important;
   transform: scale(1.1);
 }
 
@@ -460,6 +521,10 @@
   .attendance-stats-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
+  }
+  
+  .attendance-stats-grid:has(.future-lessons) {
+    grid-template-columns: repeat(3, 1fr);
   }
   
   .stat-number {

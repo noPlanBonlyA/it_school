@@ -391,35 +391,159 @@
 }
 
 /* Attendance Tab */
-.attendance-overview {
+.student-attendance {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
 .attendance-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 16px;
-}
-
-.stat-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 20px;
+  background: #f8fafc;
   border-radius: 12px;
-  text-align: center;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
 }
 
-.stat-number {
-  font-size: 32px;
+.stats-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.stat-value {
+  font-size: 24px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  color: #1f2937;
+}
+
+.stat-value.attended {
+  color: #059669;
+}
+
+.stat-value.excused {
+  color: #d97706;
+}
+
+.stat-value.missed {
+  color: #dc2626;
+}
+
+.stat-value.rate {
+  color: #7c3aed;
+}
+
+.stat-value.future-value {
+  color: #2563eb;
 }
 
 .stat-label {
-  font-size: 14px;
-  opacity: 0.9;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-item.future {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #93c5fd;
+}
+
+.recent-attendance h4 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.attendance-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 8px;
+}
+
+.attendance-item .date {
+  font-size: 12px;
+  color: #6b7280;
+  min-width: 80px;
+}
+
+.attendance-item .course {
+  font-weight: 500;
+  color: #374151;
+  flex: 1;
+}
+
+.attendance-item .lesson {
+  font-size: 13px;
+  color: #6b7280;
+  flex: 1;
+}
+
+.attendance-item .status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.attendance-item .status.attended {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.attendance-item .status.excused {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.attendance-item .status.missed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.compensated {
+  padding: 2px 6px;
+  background: #e0e7ff;
+  color: #3730a3;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.no-recent,
+.no-data {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 20px;
+}
+
+.loading {
+  text-align: center;
+  color: #6b7280;
+  padding: 20px;
 }
 
 .recent-attendance h4 {
@@ -630,12 +754,17 @@
     gap: 16px;
   }
 
-  .attendance-stats {
+  .stats-summary {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 
-  .stat-number {
-    font-size: 24px;
+  .stat-item {
+    padding: 12px;
+  }
+
+  .stat-value {
+    font-size: 20px;
   }
 
   .schedule-item {
@@ -651,17 +780,33 @@
 }
 
 @media (max-width: 480px) {
-  .attendance-stats {
+  .stats-summary {
     grid-template-columns: 1fr;
   }
 
-  .stat-card {
-    padding: 16px;
+  .stat-item {
+    padding: 12px;
+  }
+
+  .stat-value {
+    font-size: 18px;
   }
 
   .achievement-item,
   .activity-item,
-  .attendance-record {
+  .attendance-item {
     padding: 8px;
+  }
+
+  .attendance-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .attendance-item .date,
+  .attendance-item .course,
+  .attendance-item .lesson {
+    min-width: auto;
   }
 }

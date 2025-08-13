@@ -1,10 +1,12 @@
 // src/components/StudentLessonMaterials.jsx
 
 import React, { useState, useEffect } from 'react';
-import { getLessonWithMaterials } from '../services/lessonService';
+import { getSmartLessonMaterials } from '../services/lessonService';
+import { useAuth } from '../contexts/AuthContext';
 import '../styles/LessonMaterials.css';
 
 const StudentLessonMaterials = ({ courseId, lessonId }) => {
+  const { user } = useAuth();
   const [lessonInfo, setLessonInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,12 +20,21 @@ const StudentLessonMaterials = ({ courseId, lessonId }) => {
       setLoading(true);
       setError(null);
 
-      // Используем lessons-with-materials эндпоинт который содержит ВСЕ материалы
-      const lessonData = await getLessonWithMaterials(courseId, lessonId);
+      // Используем умную функцию, которая сама выбирает подходящий эндпоинт
+      const lessonData = await getSmartLessonMaterials(courseId, lessonId, user?.role || 'student');
+      console.log('[StudentLessonMaterials] Materials loaded:', lessonData);
+      
       setLessonInfo(lessonData);
     } catch (err) {
       console.error('Ошибка при загрузке материалов урока:', err);
-      setError('Не удалось загрузить материалы урока');
+      
+      if (err.response?.status === 403) {
+        setError('У вас нет доступа к материалам этого урока. Возможно, урок ещё не открыт для вашей группы.');
+      } else if (err.response?.status === 404) {
+        setError('Урок не найден. Возможно, он был удален или ещё не создан.');
+      } else {
+        setError('Не удалось загрузить материалы урока. Проверьте подключение к интернету.');
+      }
     } finally {
       setLoading(false);
     }
@@ -31,23 +42,18 @@ const StudentLessonMaterials = ({ courseId, lessonId }) => {
 
   const renderMaterialCard = (title, materialUrl, additionalMaterialUrl, materialName = "Материал", additionalMaterialName = "Дополнительный материал") => {
     if (!materialUrl && !additionalMaterialUrl) {
-      return (
-        <div className="material-card empty">
-          <h4>{title}</h4>
-          <p className="no-material">Материалы не добавлены</p>
-        </div>
-      );
+      return null; // Не отображаем пустые карточки
     }
 
     return (
       <div className="material-card">
         <h4>{title}</h4>
         
-        {/* Основной материал (текст) */}
+        {/* Основной материал (текст/HTML) */}
         {materialUrl && (
           <div className="material-section">
             <div className="material-text">
-              <h5>Основной материал:</h5>
+              <h5>Материал:</h5>
               <div className="material-content">
                 <iframe 
                   src={materialUrl} 
@@ -71,14 +77,15 @@ const StudentLessonMaterials = ({ courseId, lessonId }) => {
         {additionalMaterialUrl && (
           <div className="material-section">
             <div className="material-file">
-              <h5>Дополнительный материал:</h5>
+              <h5>{materialUrl ? 'Дополнительный файл:' : 'Файл:'}</h5>
               <div className="file-download">
                 <a 
                   href={additionalMaterialUrl} 
-                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="download-btn"
                 >
-                  📁 Скачать {additionalMaterialName}
+                  📁 Открыть {additionalMaterialName}
                 </a>
               </div>
             </div>
@@ -110,23 +117,62 @@ const StudentLessonMaterials = ({ courseId, lessonId }) => {
   return (
     <div className="lesson-materials">
       <div className="student-materials">
-        <h3>Материалы урока</h3>
-        <div className="materials-grid">
-          {renderMaterialCard(
-            "Материалы для изучения", 
-            lessonInfo?.student_material_url, 
-            lessonInfo?.student_additional_material_url,
-            "Материалы для изучения",
-            "Дополнительные материалы для изучения"
-          )}
-          {renderMaterialCard(
-            "Домашнее задание", 
-            lessonInfo?.homework_material_url, 
-            lessonInfo?.homework_additional_material_url,
-            "Домашнее задание",
-            "Дополнительные материалы к ДЗ"
-          )}
-        </div>
+        <h3>Материалы урока: {lessonInfo?.name || 'Без названия'}</h3>
+        
+        {!lessonInfo?.student_material_url && !lessonInfo?.student_additional_material_url && 
+         !lessonInfo?.homework_material_url && !lessonInfo?.homework_additional_material_url ? (
+          <div className="no-materials-info">
+            {lessonInfo?._isStudentEndpoint ? (
+              <>
+                <p>📋 Урок "{lessonInfo?.name}" найден, но материалы ещё не загружены.</p>
+                <p>Материалы появятся здесь, когда преподаватель их добавит.</p>
+              </>
+            ) : (
+              <>
+                <p>📋 Материалы для урока "{lessonInfo?.name}" пока не добавлены.</p>
+                <p>Обратитесь к преподавателю за дополнительной информацией.</p>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="materials-grid">
+            {/* Основной учебный материал (HTML/текст) */}
+            {lessonInfo?.student_material_url && renderMaterialCard(
+              "Учебный материал", 
+              lessonInfo.student_material_url, 
+              null,
+              lessonInfo?.student_material?.name || "Учебный материал",
+              null
+            )}
+            
+            {/* Дополнительный файл к учебному материалу */}
+            {lessonInfo?.student_additional_material_url && renderMaterialCard(
+              "Дополнительные материалы", 
+              null, 
+              lessonInfo.student_additional_material_url,
+              null,
+              lessonInfo?.student_additional_material?.name || "Дополнительные материалы"
+            )}
+            
+            {/* Домашнее задание (HTML/текст) */}
+            {lessonInfo?.homework_material_url && renderMaterialCard(
+              "Домашнее задание", 
+              lessonInfo.homework_material_url, 
+              null,
+              lessonInfo?.homework?.name || "Домашнее задание",
+              null
+            )}
+            
+            {/* Дополнительный файл к домашнему заданию */}
+            {lessonInfo?.homework_additional_material_url && renderMaterialCard(
+              "Дополнительные материалы к ДЗ", 
+              null, 
+              lessonInfo.homework_additional_material_url,
+              null,
+              lessonInfo?.homework_additional_material?.name || "Дополнительные материалы к ДЗ"
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

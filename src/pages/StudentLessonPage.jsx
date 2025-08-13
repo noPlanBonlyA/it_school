@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
-import StudentLessonMaterials from '../components/StudentLessonMaterials';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api/axiosInstance';
 import { getStudentMaterials, getStudentLessonInfo } from '../services/homeworkService';
+import { getLessonInfoForStudent } from '../services/lessonService';
 import '../styles/StudentLessonPage.css';
 
 export default function StudentLessonPage() {
@@ -17,6 +17,7 @@ export default function StudentLessonPage() {
 
   const [lesson, setLesson] = useState(null);
   const [file, setFile] = useState(null);
+  const [studentComment, setStudentComment] = useState(''); // Комментарий студента
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -57,6 +58,52 @@ export default function StudentLessonPage() {
           lessonData = alternativeResponse.data;
           console.log('[StudentLessonPage] Alternative API response:', lessonData);
         }
+      }
+      
+      console.log('[StudentLessonPage] Raw API Response structure:', JSON.stringify(lessonData, null, 2));
+      
+      if (lessonData) {
+        const lessonObject = {
+          id: lessonId,
+          name: lessonData.name || lessonData.lesson_name || lessonData.title || 'Урок',
+          course_id: courseId,
+          // Различные возможные форматы URL-ов материалов
+          student_material_url: 
+            lessonData.student_material?.url || 
+            lessonData.student_material_url || 
+            lessonData.materials?.student_url ||
+            lessonData.student_materials ||
+            null,
+          student_additional_material_url: 
+            lessonData.student_additional_material?.url || 
+            lessonData.student_additional_material_url || 
+            lessonData.materials?.student_additional_url ||
+            null,
+          homework_material_url: 
+            lessonData.homework?.url || 
+            lessonData.homework_material_url || 
+            lessonData.homework?.file_url ||
+            lessonData.homework_url ||
+            lessonData.materials?.homework_url ||
+            null,
+          homework_additional_material_url: 
+            lessonData.homework_additional_material?.url || 
+            lessonData.homework_additional_material_url || 
+            lessonData.materials?.homework_additional_url ||
+            null
+        };
+        
+        console.log('[StudentLessonPage] Final lesson object:', lessonObject);
+        console.log('[StudentLessonPage] Material URLs found:', {
+          student_material_url: lessonObject.student_material_url,
+          student_additional_material_url: lessonObject.student_additional_material_url,
+          homework_material_url: lessonObject.homework_material_url,
+          homework_additional_material_url: lessonObject.homework_additional_material_url
+        });
+        setLesson(lessonObject);
+        
+      } else {
+        setError('Материалы урока не найдены');
       }
       
       // Проверяем статус домашнего задания
@@ -114,40 +161,6 @@ export default function StudentLessonPage() {
         });
       }
       
-      console.log('[StudentLessonPage] Raw API Response structure:', JSON.stringify(lessonData, null, 2));
-      
-      if (lessonData) {
-        const lessonObject = {
-          id: lessonId,
-          name: lessonData.name || lessonData.lesson_name || lessonData.title || 'Урок',
-          course_id: courseId,
-          // Различные возможные форматы URL-ов материалов
-          student_material_url: 
-            lessonData.student_material?.url || 
-            lessonData.student_material_url || 
-            lessonData.materials?.student_url ||
-            lessonData.student_materials ||
-            null,
-          homework_material_url: 
-            lessonData.homework?.url || 
-            lessonData.homework_material_url || 
-            lessonData.homework?.file_url ||
-            lessonData.homework_url ||
-            lessonData.materials?.homework_url ||
-            null
-        };
-        
-        console.log('[StudentLessonPage] Final lesson object:', lessonObject);
-        console.log('[StudentLessonPage] Material URLs found:', {
-          student_material_url: lessonObject.student_material_url,
-          homework_material_url: lessonObject.homework_material_url
-        });
-        setLesson(lessonObject);
-        
-      } else {
-        setError('Материалы урока не найдены');
-      }
-      
     } catch (error) {
       console.error('[StudentLessonPage] Error loading lesson:', error);
       setError('Ошибка загрузки урока: ' + (error.response?.data?.detail || error.message));
@@ -181,6 +194,7 @@ export default function StudentLessonPage() {
       formData.append('homework_file', file);
       formData.append('homework_data', JSON.stringify({
         name: file.name,
+        text: studentComment.trim() || '', // Добавляем комментарий студента
         lesson_student_id: lessonId // или другой ID, если нужен
       }));
 
@@ -206,6 +220,7 @@ export default function StudentLessonPage() {
       
       setSubmitted(true);
       setFile(null);
+      setStudentComment(''); // Очищаем комментарий после отправки
       
       // Обновляем статус домашнего задания
       setHomeworkStatus(prevStatus => ({
@@ -341,11 +356,83 @@ export default function StudentLessonPage() {
           {/* Содержимое урока */}
           <div className="lesson-content">
             
-            {/* Новый компонент для отображения материалов студента */}
-            <StudentLessonMaterials 
-              courseId={courseId} 
-              lessonId={lessonId} 
-            />
+            {/* Материалы урока */}
+            <div className="lesson-materials">
+              <h3>Материалы урока</h3>
+              
+              {/* Основные материалы урока */}
+              {lesson?.student_material_url ? (
+                <div className="material-card">
+                  <h4>📚 Учебный материал</h4>
+                  <div className="material-content">
+                    <iframe 
+                      src={lesson.student_material_url} 
+                      title="Учебный материал"
+                      style={{
+                        width: '100%',
+                        height: '400px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        marginBottom: '10px'
+                      }}
+                    />
+                    <a 
+                      href={lesson.student_material_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-block',
+                        padding: '8px 16px',
+                        backgroundColor: '#007bff',
+                        color: 'white',
+                        textDecoration: 'none',
+                        borderRadius: '4px',
+                        fontSize: '14px'
+                      }}
+                    >
+                      📄 Открыть в новой вкладке
+                    </a>
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Дополнительные материалы урока */}
+              {lesson?.student_additional_material_url ? (
+                <div className="material-card" style={{ marginTop: '20px' }}>
+                  <h4>📎 Дополнительные материалы урока</h4>
+                  <div className="material-content">
+                    <a 
+                      href={lesson.student_additional_material_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-block',
+                        padding: '12px 20px',
+                        backgroundColor: '#17a2b8',
+                        color: 'white',
+                        textDecoration: 'none',
+                        borderRadius: '4px',
+                        fontSize: '14px',
+                        marginBottom: '10px'
+                      }}
+                    >
+                      📥 Скачать дополнительные материалы
+                    </a>
+                    <p style={{ fontSize: '12px', color: '#666', margin: '5px 0' }}>
+                      Дополнительные файлы и ресурсы для изучения урока
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Если нет ни основных, ни дополнительных материалов */}
+              {!lesson?.student_material_url && !lesson?.student_additional_material_url && (
+                <div className="no-materials">
+                  <p>📋 Материалы для этого урока пока не добавлены.</p>
+                  <p>Обратитесь к преподавателю за дополнительной информацией.</p>
+                </div>
+              )}
+            </div>
             
             {/* Debug панель (только в development) */}
             {process.env.NODE_ENV === 'development' && lesson && (
@@ -354,139 +441,262 @@ export default function StudentLessonPage() {
                   <summary>🔧 Debug Info (dev only)</summary>
                   <pre>{JSON.stringify(lesson, null, 2)}</pre>
                   <p><strong>Student Material URL:</strong> {lesson.student_material_url || 'Не найден'}</p>
+                  <p><strong>Student Additional Material URL:</strong> {lesson.student_additional_material_url || 'Не найден'}</p>
                   <p><strong>Homework Material URL:</strong> {lesson.homework_material_url || 'Не найден'}</p>
+                  <p><strong>Homework Additional Material URL:</strong> {lesson.homework_additional_material_url || 'Не найден'}</p>
                 </details>
               </div>
             )}
 
-            {/* Форма отправки домашнего задания - показываем только если есть ДЗ */}
-            {lesson?.homework_material_url && (
-              <div className="block">
-                <h2>Сдача домашнего задания</h2>
-                
-                {/* Отладочная информация (только в development) */}
-                {process.env.NODE_ENV === 'development' && (
-                  <div style={{ 
-                    marginTop: '20px', 
-                    padding: '10px', 
-                    backgroundColor: '#f8f9fa', 
-                    border: '1px solid #dee2e6',
-                    borderRadius: '4px',
-                    fontSize: '12px'
-                  }}>
-                    <strong>Debug Info:</strong><br/>
-                    submitted: {submitted.toString()}<br/>
-                    homeworkStatus: {JSON.stringify(homeworkStatus, null, 2)}
-                  </div>
-                )}
-                
-                {/* Форма отправки домашнего задания */}
-                {submitted || (homeworkStatus && homeworkStatus.submitted) ? (
-                  <div className="hw-submitted">
-                    <div className="submitted-icon">✅</div>
-                    <h3>Домашнее задание уже отправлено</h3>
-                    <p>Преподаватель скоро его проверит</p>
-                    
-                    {/* Показываем статус проверки если есть */}
-                    {homeworkStatus && homeworkStatus.graded && (
-                      <div className="homework-grade-info">
-                        <p><strong>Оценка:</strong> {homeworkStatus.grade}/5</p>
-                        {homeworkStatus.coins > 0 && (
-                          <p><strong>Получено монет:</strong> {homeworkStatus.coins}</p>
-                        )}
-                      </div>
-                    )}
-                    
-                    {/* Кнопка "Отправить еще раз" */}
-                    <div className="resubmit-section" style={{ marginTop: '20px' }}>
-                      <button 
-                        className="btn-secondary"
-                        onClick={() => {
-                          console.log('[StudentLessonPage] User clicked "Submit again"');
-                          setSubmitted(false);
-                          setFile(null);
-                        }}
+            {/* Блок домашнего задания */}
+            <div className="block">
+              <h2>Домашнее задание</h2>
+              
+              {/* Показываем материал ДЗ если есть */}
+              {lesson?.homework_material_url && (
+                <div className="homework-material" style={{ marginBottom: '20px' }}>
+                  <h3>📝 Задание:</h3>
+                  <div className="material-card">
+                    <div className="material-content">
+                      <iframe 
+                        src={lesson.homework_material_url} 
+                        title="Домашнее задание"
                         style={{
-                          padding: '10px 20px',
-                          backgroundColor: '#6c757d',
-                          color: 'white',
-                          border: 'none',
+                          width: '100%',
+                          height: '300px',
+                          border: '1px solid #ddd',
                           borderRadius: '4px',
-                          cursor: 'pointer'
+                          marginBottom: '10px'
+                        }}
+                      />
+                      <a 
+                        href={lesson.homework_material_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-block',
+                          padding: '8px 16px',
+                          backgroundColor: '#28a745',
+                          color: 'white',
+                          textDecoration: 'none',
+                          borderRadius: '4px',
+                          fontSize: '14px'
                         }}
                       >
-                        📤 Отправить еще раз
-                      </button>
-                      <p style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
-                        Вы можете отправить новую версию домашнего задания
+                        📄 Открыть задание в новой вкладке
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Дополнительные материалы ДЗ */}
+              {lesson?.homework_additional_material_url && (
+                <div className="homework-additional-material" style={{ marginBottom: '20px' }}>
+                  <h3>📎 Дополнительные материалы к домашнему заданию:</h3>
+                  <div className="material-card">
+                    <div className="material-content">
+                      <a 
+                        href={lesson.homework_additional_material_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-block',
+                          padding: '12px 20px',
+                          backgroundColor: '#fd7e14',
+                          color: 'white',
+                          textDecoration: 'none',
+                          borderRadius: '4px',
+                          fontSize: '14px',
+                          marginBottom: '10px'
+                        }}
+                      >
+                        📥 Скачать дополнительные материалы к ДЗ
+                      </a>
+                      <p style={{ fontSize: '12px', color: '#666', margin: '5px 0' }}>
+                        Дополнительные файлы, шаблоны или ресурсы для выполнения домашнего задания
                       </p>
                     </div>
                   </div>
-                ) : (
-                  <div className="hw-form">
-                    <p>Загрузите файл с выполненным домашним заданием:</p>
-                    
-                    <div className="submission-options">
-                      <div className="submission-option">
-                        <h3>Загрузить файл</h3>
-                        <div className="file-upload">
-                          <input
-                            type="file"
-                            id="homework-file"
-                            onChange={handleFileChange}
-                            disabled={submitting}
-                            accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.txt,.zip,.rar"
-                            required
-                          />
-                          <label 
-                            htmlFor="homework-file" 
-                            className={submitting ? "disabled" : ""}
-                          >
-                            {file ? `📎 ${file.name}` : "📁 Выберите файл"}
-                          </label>
-                        </div>
-                        {file && (
-                          <div style={{ marginTop: '8px' }}>
-                            <div style={{ fontSize: '12px', color: '#666' }}>
-                              Размер: {Math.round(file.size / 1024)} KB
-                            </div>
-                            <button 
-                              type="button" 
-                              onClick={() => { setFile(null); }}
-                              style={{ 
-                                marginTop: '5px', 
-                                padding: '5px 10px', 
-                                fontSize: '12px',
-                                background: '#dc3545',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              Удалить файл
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                </div>
+              )}
+              
+              <h3>Сдача домашнего задания</h3>
+              
+              {/* Отладочная информация (только в development) */}
+              {process.env.NODE_ENV === 'development' && (
+                <div style={{ 
+                  marginTop: '20px', 
+                  padding: '10px', 
+                  backgroundColor: '#f8f9fa', 
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px',
+                  fontSize: '12px'
+                }}>
+                  <strong>Debug Info:</strong><br/>
+                  submitted: {submitted.toString()}<br/>
+                  homeworkStatus: {JSON.stringify(homeworkStatus, null, 2)}
+                </div>
+              )}
+              
+              {/* Форма отправки домашнего задания */}
+              {submitted || (homeworkStatus && homeworkStatus.submitted) ? (
+                <div className="hw-submitted">
+                  <div className="submitted-icon">✅</div>
+                  <h3>Домашнее задание уже отправлено</h3>
+                  <p>Преподаватель скоро его проверит</p>
+                  
+                  {/* Показываем статус проверки если есть */}
+                  {homeworkStatus && homeworkStatus.graded && (
+                    <div className="homework-grade-info">
+                      <p><strong>Оценка:</strong> {homeworkStatus.grade}/5</p>
+                      {homeworkStatus.coins > 0 && (
+                        <p><strong>Получено монет:</strong> {homeworkStatus.coins}</p>
+                      )}
                     </div>
-                    
+                  )}
+                  
+                  {/* Кнопка "Отправить еще раз" */}
+                  <div className="resubmit-section" style={{ marginTop: '20px' }}>
                     <button 
-                      className="btn-primary"
-                      onClick={handleSubmit}
-                      disabled={!file || submitting}
+                      className="btn-secondary"
+                      onClick={() => {
+                        console.log('[StudentLessonPage] User clicked "Submit again"');
+                        setSubmitted(false);
+                        setFile(null);
+                        setStudentComment(''); // Очищаем комментарий при повторной отправке
+                      }}
                       style={{
-                        marginTop: '20px',
-                        width: '100%',
-                        padding: '12px'
+                        padding: '10px 20px',
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
                       }}
                     >
-                      {submitting ? 'Отправка...' : 'Отправить домашнее задание'}
+                      📤 Отправить еще раз
                     </button>
+                    <p style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
+                      Вы можете отправить новую версию домашнего задания
+                    </p>
                   </div>
-                )}
-              </div>
-            )}
+                </div>
+              ) : (
+                <div className="hw-form">
+                  <p>Загрузите файл с выполненным домашним заданием:</p>
+                  
+                  <div className="submission-options">
+                    <div className="submission-option">
+                      <h3>Загрузить файл</h3>
+                      <div className="file-upload">
+                        <input
+                          type="file"
+                          id="homework-file"
+                          onChange={handleFileChange}
+                          disabled={submitting}
+                          accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.txt,.zip,.rar"
+                          required
+                        />
+                        <label 
+                          htmlFor="homework-file" 
+                          className={submitting ? "disabled" : ""}
+                        >
+                          {file ? `📎 ${file.name}` : "📁 Выберите файл"}
+                        </label>
+                      </div>
+                      {file && (
+                        <div style={{ marginTop: '8px' }}>
+                          <div style={{ fontSize: '12px', color: '#666' }}>
+                            Размер: {Math.round(file.size / 1024)} KB
+                          </div>
+                          <button 
+                            type="button" 
+                            onClick={() => { 
+                              setFile(null); 
+                              setStudentComment(''); // Очищаем комментарий при удалении файла
+                            }}
+                            style={{ 
+                              marginTop: '5px', 
+                              padding: '5px 10px', 
+                              fontSize: '12px',
+                              background: '#dc3545',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Удалить файл
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Поле для комментария студента */}
+                  <div className="student-comment-section" style={{ marginTop: '20px' }}>
+                    <h3>Комментарий к домашнему заданию (необязательно)</h3>
+                    <textarea
+                      value={studentComment}
+                      onChange={(e) => setStudentComment(e.target.value)}
+                      placeholder="Напишите комментарий к вашему домашнему заданию (например, вопросы, пояснения или что хотели бы подчеркнуть)..."
+                      disabled={submitting}
+                      rows={3}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        fontSize: '14px',
+                        resize: 'vertical',
+                        boxSizing: 'border-box'
+                      }}
+                      maxLength={500}
+                    />
+                    <div style={{ 
+                      fontSize: '12px', 
+                      color: '#666', 
+                      marginTop: '5px',
+                      textAlign: 'right'
+                    }}>
+                      {studentComment.length}/500 символов
+                    </div>
+                    {studentComment.trim() && (
+                      <div style={{ 
+                        marginTop: '10px', 
+                        padding: '8px', 
+                        backgroundColor: '#f8f9fa', 
+                        border: '1px solid #dee2e6',
+                        borderRadius: '4px',
+                        fontSize: '12px'
+                      }}>
+                        <strong>Ваш комментарий будет виден преподавателю:</strong><br/>
+                        "{studentComment.trim()}"
+                      </div>
+                    )}
+                  </div>
+                  
+                  <button 
+                    className="btn-primary"
+                    onClick={handleSubmit}
+                    disabled={!file || submitting}
+                    style={{
+                      marginTop: '20px',
+                      width: '100%',
+                      padding: '12px'
+                    }}
+                  >
+                    {submitting 
+                      ? 'Отправка...' 
+                      : studentComment.trim() 
+                        ? 'Отправить домашнее задание с комментарием'
+                        : 'Отправить домашнее задание'
+                    }
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

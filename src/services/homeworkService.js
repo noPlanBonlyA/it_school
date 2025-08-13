@@ -29,11 +29,7 @@ export const submitHomework = async (courseId, lessonId, formData) => {
   try {
     console.log('[HomeworkService] Submitting homework:', { courseId, lessonId });
     
-    const response = await api.post(`/courses/${courseId}/lessons/${lessonId}/homework`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
+    const response = await api.post(`/courses/${courseId}/lessons/${lessonId}/homework`, formData);
     
     console.log('[HomeworkService] Homework submitted successfully:', response.data);
     return response.data;

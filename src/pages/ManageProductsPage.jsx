@@ -109,6 +109,11 @@ export default function ManageProductsPage() {
     if (!form.price || isNaN(form.price) || Number(form.price) < 0) {
       newErrors.price = 'Цена должна быть положительным числом';
     }
+
+    // Проверяем изображение только для создания нового товара
+    if (!editingProduct && !imageFile) {
+      newErrors.image = 'Изображение обязательно для нового товара';
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -136,12 +141,17 @@ export default function ManageProductsPage() {
         price: Number(form.price),
         is_pinned: form.is_pinned
       };
+
+      console.log('Submitting product:', productData);
+      console.log('Image file:', imageFile);
       
       if (editingProduct) {
-        await updateProduct(editingProduct.id, productData, imageFile);
+        const result = await updateProduct(editingProduct.id, productData, imageFile);
+        console.log('Update result:', result);
         alert('Товар успешно обновлен!');
       } else {
-        await createProduct(productData, imageFile);
+        const result = await createProduct(productData, imageFile);
+        console.log('Create result:', result);
         alert('Товар успешно создан!');
       }
       
@@ -151,7 +161,23 @@ export default function ManageProductsPage() {
       
     } catch (error) {
       console.error('Error saving product:', error);
-      alert('Ошибка сохранения товара');
+      
+      // Более детальная обработка ошибок
+      let errorMessage = 'Ошибка сохранения товара';
+      
+      if (error.response?.data?.detail) {
+        if (Array.isArray(error.response.data.detail)) {
+          errorMessage = error.response.data.detail.map(err => err.msg).join(', ');
+        } else {
+          errorMessage = error.response.data.detail;
+        }
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(`Ошибка: ${errorMessage}`);
     } finally {
       setSaving(false);
     }
@@ -193,9 +219,25 @@ export default function ManageProductsPage() {
   };
 
   const getProductImage = (product) => {
+    // Отладочная информация
+    console.log('Admin - Product photo data:', product.photo);
+    
     if (product.photo?.url) {
-      return product.photo.url;
+      const photoUrl = product.photo.url;
+      console.log('Admin - Photo URL found:', photoUrl);
+      
+      // Если URL уже абсолютный, возвращаем как есть
+      if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
+        return photoUrl;
+      }
+      // Если относительный путь, добавляем базовый URL
+      const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+      const fullUrl = `${baseURL}${photoUrl.startsWith('/') ? '' : '/'}${photoUrl}`;
+      console.log('Admin - Generated full URL:', fullUrl);
+      return fullUrl;
     }
+    
+    console.log('Admin - No photo found for product:', product.name);
     return null;
   };
 
@@ -390,12 +432,14 @@ export default function ManageProductsPage() {
                 </div>
 
                 <div className="form-group">
-                  <label>Изображение товара</label>
+                  <label>Изображение товара {!editingProduct && '*'}</label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
+                    className={errors.image ? 'error' : ''}
                   />
+                  {errors.image && <span className="error-text">{errors.image}</span>}
                   {previewUrl && (
                     <div className="image-preview">
                       <img src={previewUrl} alt="Предпросмотр" />

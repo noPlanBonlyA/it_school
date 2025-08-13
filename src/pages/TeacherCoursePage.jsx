@@ -23,14 +23,41 @@ export default function TeacherCoursePage() {
     (async () => {
       try {
         setLoading(true);
-        const courseData = await getCourse(courseId);
-        setCourse(courseData);
         
-        // ИСПРАВЛЕНО: используем getCourseLessons вместо listLessons
-        const lessonsData = await getCourseLessons(courseId);
-        setLessons(lessonsData);
+        // Загружаем курс
+        let courseData = null;
+        try {
+          courseData = await getCourse(courseId);
+          setCourse(courseData);
+          console.log('[TeacherCoursePage] Course loaded successfully:', courseData);
+        } catch (courseError) {
+          console.error('[TeacherCoursePage] Error loading course:', courseError);
+          setError('Ошибка загрузки данных курса');
+          return;
+        }
+        
+        // Загружаем уроки
+        try {
+          const lessonsData = await getCourseLessons(courseId);
+          
+          // ДОБАВЛЕНО: дополнительная проверка типа данных
+          console.log('[TeacherCoursePage] Lessons data received:', lessonsData);
+          console.log('[TeacherCoursePage] Lessons data type:', typeof lessonsData);
+          console.log('[TeacherCoursePage] Is array:', Array.isArray(lessonsData));
+          
+          // Убеждаемся, что у нас есть массив
+          const validLessons = Array.isArray(lessonsData) ? lessonsData : [];
+          console.log('[TeacherCoursePage] Valid lessons:', validLessons);
+          
+          setLessons(validLessons);
+        } catch (lessonsError) {
+          console.error('[TeacherCoursePage] Error loading lessons:', lessonsError);
+          // Не прерываем загрузку при ошибке уроков, просто оставляем пустой массив
+          setLessons([]);
+        }
+        
       } catch (error) {
-        console.error('Error loading course data:', error);
+        console.error('[TeacherCoursePage] Unexpected error during loading:', error);
         setError('Ошибка загрузки данных курса');
       } finally {
         setLoading(false);
@@ -61,6 +88,27 @@ export default function TeacherCoursePage() {
   /* ───── Создание урока ───── */
   const handleCreateLesson = () => {
     navigate(`/courses/${courseId}/lessons/create`);
+  };
+
+  /* ───── Тестирование API ───── */
+  const handleTestApi = async () => {
+    console.log('[TeacherCoursePage] Testing API...');
+    try {
+      const response = await fetch(`${window.location.protocol}//${window.location.hostname}:8080/api/courses/${courseId}/lessons`);
+      console.log('[TeacherCoursePage] Raw fetch response:', response);
+      
+      const text = await response.text();
+      console.log('[TeacherCoursePage] Response text:', text);
+      
+      try {
+        const json = JSON.parse(text);
+        console.log('[TeacherCoursePage] Parsed JSON:', json);
+      } catch (parseError) {
+        console.error('[TeacherCoursePage] JSON parse error:', parseError);
+      }
+    } catch (fetchError) {
+      console.error('[TeacherCoursePage] Fetch error:', fetchError);
+    }
   };
 
   // ДОБАВЛЕНО: обработка ошибок в render
@@ -120,6 +168,13 @@ export default function TeacherCoursePage() {
                 >
                   <span className="btn-icon">⚙️</span> Управление курсом
                 </button>
+                <button
+                  className="btn-secondary"
+                  onClick={handleTestApi}
+                  style={{backgroundColor: '#ff6b6b', color: 'white'}}
+                >
+                  🔍 Тест API
+                </button>
               </div>
             </div>
 
@@ -143,7 +198,7 @@ export default function TeacherCoursePage() {
                 </div>
               ) : (
                 <div className="lessons-grid">
-                  {lessons.map(lesson => {
+                  {Array.isArray(lessons) && lessons.map(lesson => {
                     const status = getStatusBadge(lesson);
                     
                     return (
