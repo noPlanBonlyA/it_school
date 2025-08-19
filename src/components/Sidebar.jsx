@@ -234,7 +234,10 @@ export default function Sidebar({ activeItem, userRole }) {
         <div className="logo" onClick={() => handleItemClick('/home')}>
           <img src={logoImage} alt="Пайтишкино" style={{height: '40px', width: 'auto'}} />
         </div>
-        <ul className="sidebar-list">{main.map(renderItem)}</ul>
+        
+        <div className="sidebar-main-content">
+          <ul className="sidebar-list">{main.map(renderItem)}</ul>
+        </div>
 
         <hr className="divider" />
 

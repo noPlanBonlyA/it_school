@@ -82,7 +82,7 @@
     cursor: pointer;
   }
   .suggestions li:hover {
-    background: #F5F6FA;
+    background: #F0F9FF;
   }
   
   /* Ошибки и успех */

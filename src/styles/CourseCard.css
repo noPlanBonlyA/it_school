@@ -18,21 +18,17 @@
 .section-label {
   font-size: 24px;
   font-weight: 700;
-  background: linear-gradient(135deg, #00B18F 0%, #0369a1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #00B18F;
   margin: 0;
 }
 
 .course-count {
-  background: linear-gradient(135deg, #00B18F 0%, #0369a1 100%);
+  background: #00B18F;
   color: white;
   padding: 6px 16px;
   border-radius: 20px;
   font-size: 14px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 177, 143, 0.3);
 }
 
 /* Карточка курса */
@@ -152,18 +148,18 @@
 }
 
 .course-info-footer .author {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+  background: rgba(0, 177, 143, 0.1);
+  color: #00B18F;
 }
 
 .course-info-footer .age {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  background: rgba(0, 177, 143, 0.1);
+  color: #00B18F;
 }
 
 .course-info-footer .status {
-  background: rgba(251, 146, 60, 0.1);
-  color: #f59e0b;
+  background: rgba(0, 177, 143, 0.1);
+  color: #00B18F;
 }
 
 /* Пустое состояние */

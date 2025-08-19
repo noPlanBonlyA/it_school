@@ -87,9 +87,9 @@
   max-height: 92vh;
 }
 
-/* Красивый заголовок с градиентным фоном */
+/* Красивый заголовок с нашим цветом */
 .event-modal-header {
-  background: linear-gradient(135deg, #00B18F 0%, #0369a1 100%);
+  background: #00B18F;
   padding: 32px;
   padding-top: 40px;
   padding-bottom: 28px;
@@ -175,17 +175,6 @@
   overflow: hidden;
 }
 
-.info-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: linear-gradient(180deg, #00B18F 0%, #0369a1 100%);
-  border-radius: 0 2px 2px 0;
-}
-
 .info-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
@@ -211,7 +200,6 @@
   font-size: 16px;
   line-height: 1.5;
   font-weight: 600;
-  padding-left: 28px;
   font-family: 'Mont', sans-serif;
 }
 
@@ -276,7 +264,7 @@
   gap: 12px;
   padding: 16px 32px;
   
-  background: linear-gradient(135deg, #00B18F 0%, #0369a1 100%);
+  background: #00B18F;
   box-shadow: 
     0 8px 16px rgba(0, 177, 143, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -309,7 +297,7 @@
 }
 
 .event-btn-primary:hover {
-  background: linear-gradient(135deg, #00A081 0%, #0284c7 100%);
+  background: #03836A;
   box-shadow: 
     0 12px 24px rgba(0, 177, 143, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -722,5 +710,305 @@
   .lesson-control-btn {
     padding: 12px 16px !important;
     font-size: 14px !important;
+  }
+}
+
+/* Стили для модального окна проведения урока */
+.modal-overlay.conduct-lesson-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-content.large {
+  background: linear-gradient(145deg, #ffffff 0%, #fafbfc 100%);
+  border-radius: 24px;
+  box-shadow: 
+    0 32px 64px rgba(15, 23, 42, 0.3),
+    0 0 0 1px rgba(148, 163, 184, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  padding: 0;
+  max-width: 1000px;
+  width: 95%;
+  max-height: 95vh;
+  overflow: hidden;
+  position: relative;
+  animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px 32px;
+  border-radius: 24px 24px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.close-modal {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.modal-body {
+  padding: 32px;
+  max-height: calc(95vh - 200px);
+  overflow-y: auto;
+}
+
+.conduct-lesson-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.homework-upload-section {
+  background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.homework-upload-section h3 {
+  margin: 0 0 20px 0;
+  color: #334155;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.homework-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.homework-form input,
+.homework-form textarea {
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.homework-form input:focus,
+.homework-form textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.homework-form input[type="file"] {
+  padding: 8px 12px;
+  background: #f8fafc;
+}
+
+.homework-content-section h4,
+.homework-file-section h4 {
+  margin: 16px 0 8px 0;
+  color: #475569;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.students-grades-section {
+  background: linear-gradient(145deg, #fefefe 0%, #f8fafc 100%);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.students-grades-section h3 {
+  margin: 0 0 20px 0;
+  color: #334155;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.students-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.student-grade-item {
+  background: white;
+  border: 2px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.student-grade-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transform: translateY(-1px);
+}
+
+.student-info h4 {
+  margin: 0 0 16px 0;
+  color: #1e293b;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.grade-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.grade-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.grade-controls input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 4px;
+}
+
+.grade-controls input[type="number"],
+.grade-controls textarea {
+  padding: 8px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.grade-controls input[type="number"]:focus,
+.grade-controls textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+  color: white;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(100, 116, 139, 0.4);
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #64748b;
+}
+
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Адаптивность для модального окна проведения урока */
+@media (max-width: 768px) {
+  .modal-content.large {
+    width: 98%;
+    margin: 10px;
+  }
+  
+  .modal-header {
+    padding: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+  
+  .grade-controls {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
   }
 }

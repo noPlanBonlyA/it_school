@@ -434,20 +434,6 @@ export default function StudentLessonPage() {
               )}
             </div>
             
-            {/* Debug панель (только в development) */}
-            {process.env.NODE_ENV === 'development' && lesson && (
-              <div className="debug-panel">
-                <details>
-                  <summary>🔧 Debug Info (dev only)</summary>
-                  <pre>{JSON.stringify(lesson, null, 2)}</pre>
-                  <p><strong>Student Material URL:</strong> {lesson.student_material_url || 'Не найден'}</p>
-                  <p><strong>Student Additional Material URL:</strong> {lesson.student_additional_material_url || 'Не найден'}</p>
-                  <p><strong>Homework Material URL:</strong> {lesson.homework_material_url || 'Не найден'}</p>
-                  <p><strong>Homework Additional Material URL:</strong> {lesson.homework_additional_material_url || 'Не найден'}</p>
-                </details>
-              </div>
-            )}
-
             {/* Блок домашнего задания */}
             <div className="block">
               <h2>Домашнее задание</h2>
@@ -522,22 +508,6 @@ export default function StudentLessonPage() {
               )}
               
               <h3>Сдача домашнего задания</h3>
-              
-              {/* Отладочная информация (только в development) */}
-              {process.env.NODE_ENV === 'development' && (
-                <div style={{ 
-                  marginTop: '20px', 
-                  padding: '10px', 
-                  backgroundColor: '#f8f9fa', 
-                  border: '1px solid #dee2e6',
-                  borderRadius: '4px',
-                  fontSize: '12px'
-                }}>
-                  <strong>Debug Info:</strong><br/>
-                  submitted: {submitted.toString()}<br/>
-                  homeworkStatus: {JSON.stringify(homeworkStatus, null, 2)}
-                </div>
-              )}
               
               {/* Форма отправки домашнего задания */}
               {submitted || (homeworkStatus && homeworkStatus.submitted) ? (

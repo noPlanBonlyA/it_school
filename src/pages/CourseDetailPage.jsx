@@ -10,6 +10,8 @@ import '../styles/CourseDetailPage.css';
 import { getCourse, getCourseLessons, deleteLessonWithMaterials, getLessonWithMaterials, updateLessonWithMaterials } from '../services/lessonService';
 
 import LessonEditor from '../components/LessonEditor';
+import MaterialUploader from '../components/MaterialUploader';
+import LessonContentViewer from '../components/LessonContentViewer';
 
 export default function CourseDetailPage() {
   const { courseId } = useParams();
@@ -27,6 +29,12 @@ export default function CourseDetailPage() {
   const [editLessonName, setEditLessonName] = useState('');
   const [editLessonDateTime, setEditLessonDateTime] = useState('');
   const [updating, setUpdating] = useState(false);
+  
+  // ───── просмотр содержимого урока ───── */
+  const [viewingLesson, setViewingLesson] = useState(null);
+  
+  // ───── изменения материалов ───── */
+  const [materialChanges, setMaterialChanges] = useState({});
 
   const fullName = `${user.first_name || ''} ${user.surname || ''}`.trim() || user.username || 'Пользователь';
 
@@ -153,22 +161,66 @@ export default function CourseDetailPage() {
     setEditingLesson(null);
   };
 
+  // ───── обработчик изменения материалов ───── */
+  const handleMaterialChange = (materialType, materialData) => {
+    setMaterialChanges(prev => ({
+      ...prev,
+      [materialType]: materialData
+    }));
+  };
+
   // ───── редактирование урока ───── */
-  const startEditLesson = (lesson) => {
-    setEditingLesson(lesson);
-    setEditLessonName(lesson.name);
-    // Преобразуем ISO дату в формат для datetime-local
-    if (lesson.holding_date) {
-      const date = new Date(lesson.holding_date);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      setEditLessonDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
-    } else {
-      setEditLessonDateTime('');
+  const startEditLesson = async (lesson) => {
+    try {
+      setLoading(true);
+      console.log('[CourseDetailPage] Loading lesson materials for quick edit:', lesson.id);
+      
+      // Загружаем полные данные урока с материалами
+      const lessonWithMaterials = await getLessonWithMaterials(courseId, lesson.id);
+      
+      setEditingLesson(lessonWithMaterials);
+      setEditLessonName(lessonWithMaterials.name);
+      
+      // Преобразуем ISO дату в формат для datetime-local
+      if (lessonWithMaterials.holding_date) {
+        const date = new Date(lessonWithMaterials.holding_date);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        setEditLessonDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
+      } else {
+        setEditLessonDateTime('');
+      }
+    } catch (error) {
+      console.error('[CourseDetailPage] Error loading lesson materials for quick edit:', error);
+      // Fallback - используем базовые данные урока
+      setEditingLesson(lesson);
+      setEditLessonName(lesson.name);
+      if (lesson.holding_date) {
+        const date = new Date(lesson.holding_date);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        setEditLessonDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
+      } else {
+        setEditLessonDateTime('');
+      }
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // ───── просмотр содержимого урока ───── */
+  const viewLessonContent = (lesson) => {
+    setViewingLesson(lesson);
+  };
+
+  const closeContentViewer = () => {
+    setViewingLesson(null);
   };
 
   const handleSaveEditedLesson = async () => {
@@ -180,85 +232,45 @@ export default function CourseDetailPage() {
     try {
       setUpdating(true);
       
-      // Обновляем урок с пустыми материалами (только название)
-      const updateData = {
+      // Подготавливаем данные для обновления
+      const formData = new FormData();
+      
+      // Базовые данные урока
+      const lessonData = {
         name: editLessonName,
-        teacher_material_name: '',
-        teacher_material_text: '',
-        student_material_name: '',
-        student_material_text: '',
-        homework_material_name: '',
-        homework_material_text: '',
+        teacher_material_name: editingLesson.teacher_material_name || '',
+        teacher_material_text: editingLesson.teacher_material_text || '',
+        student_material_name: editingLesson.student_material_name || '',
+        student_material_text: editingLesson.student_material_text || '',
+        homework_material_name: editingLesson.homework_material_name || '',
+        homework_material_text: editingLesson.homework_material_text || '',
         id: editingLesson.id,
         teacher_material_id: editingLesson.teacher_material_id,
         student_material_id: editingLesson.student_material_id
       };
-      
-      await updateLessonWithMaterials(courseId, editingLesson.id, updateData);
 
-      // Обновляем даты через schedule API
-      if (editLessonDateTime) {
-        const isoDate = new Date(editLessonDateTime).toISOString();
-        
-        // Получаем lesson-groups для этого урока через schedule API
-        const scheduleResponse = await fetch('http://localhost:8080/api/schedule/', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        
-        if (scheduleResponse.ok) {
-          const scheduleData = await scheduleResponse.json();
-          console.log('[CourseDetail] Schedule data for lesson update:', scheduleData);
-          
-          // ИСПРАВЛЕНО: Обработка различных форматов ответа API
-          let scheduleArray = [];
-          if (scheduleData && Array.isArray(scheduleData.lessons)) {
-            scheduleArray = scheduleData.lessons;
-          } else if (Array.isArray(scheduleData)) {
-            scheduleArray = scheduleData;
-          } else {
-            console.warn('[CourseDetail] Unexpected schedule data format for lesson update:', scheduleData);
-          }
-          
-          const lessonGroups = Array.isArray(scheduleArray) 
-            ? scheduleArray.filter(item => item.lesson_id === editingLesson.id)
-            : [];
-          
-          console.log('[CourseDetail] Found lesson groups for update:', lessonGroups);
-          
-          // Обновляем дату во всех lesson-groups этого урока
-          if (Array.isArray(lessonGroups) && lessonGroups.length > 0) {
-            await Promise.all(lessonGroups.map(async lessonGroup => {
-            try {
-              const response = await fetch(`http://localhost:8080/api/courses/lesson-group/${lessonGroup.id}`, {
-                method: 'PUT',
-                headers: {
-                  'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  lesson_id: editingLesson.id,
-                  group_id: lessonGroup.group_id,
-                  holding_date: isoDate,
-                  is_opened: lessonGroup.is_opened
-                })
-              });
-              
-              if (response.ok) {
-                console.log('[CourseDetail] ✅ Updated lesson-group:', lessonGroup.id);
-              }
-            } catch (e) {
-              console.error('Error updating lesson-group:', e);
-            }
-          }));
-          } // Закрытие if (Array.isArray(lessonGroups) && lessonGroups.length > 0)
-        } // Закрытие if (scheduleResponse.ok)
-      } // Закрытие if (editLessonDateTime)
+      // Применяем изменения материалов
+      Object.keys(materialChanges).forEach(materialType => {
+        const change = materialChanges[materialType];
+        if (change.type === 'text') {
+          lessonData[`${materialType}_material_text`] = change.text;
+          lessonData[`${materialType}_material_name`] = change.name;
+        } else if (change.type === 'file') {
+          // Для файлов нужно использовать FormData
+          formData.append(`${materialType}_additional_material_file`, change.file);
+          lessonData[`${materialType}_material_name`] = change.name;
+        }
+      });
+
+      formData.append('data', JSON.stringify(lessonData));
+      
+      // Используем API для обновления урока с материалами
+      await updateLessonWithMaterials(courseId, editingLesson.id, formData);
 
       setEditingLesson(null);
       setEditLessonName('');
       setEditLessonDateTime('');
+      setMaterialChanges({});
       
       await reloadLessons();
       alert('✅ Урок успешно обновлен!');
@@ -274,6 +286,8 @@ export default function CourseDetailPage() {
     setEditingLesson(null);
     setEditLessonName('');
     setEditLessonDateTime('');
+    setMaterialChanges({});
+    setViewingLesson(null);
   };
 
   // ───── удаление урока ───── */
@@ -374,7 +388,7 @@ export default function CourseDetailPage() {
             {/* ───── модальное окно быстрого редактирования ───── */}
             {editingLesson && (
               <div className="modal-overlay">
-                <div className="modal-content">
+                <div className="modal-content-large">
                   <div className="modal-header">
                     <h3>Редактирование урока</h3>
                     <button className="modal-close" onClick={cancelEdit}>×</button>
@@ -389,13 +403,42 @@ export default function CourseDetailPage() {
                         placeholder="Введите название урока"
                       />
                     </div>
-                    
-                    <div className="field">
-                      <label>Дата и время проведения</label>
-                      <input
-                        type="datetime-local"
-                        value={editLessonDateTime}
-                        onChange={e => setEditLessonDateTime(e.target.value)}
+
+                    {/* Управление материалами урока */}
+                    <div className="lesson-materials-editor">
+                      <h4>Материалы урока:</h4>
+                      
+                      <MaterialUploader
+                        materialType="teacher"
+                        currentMaterial={{
+                          name: editingLesson.teacher_material_name,
+                          text: editingLesson.teacher_material_text
+                        }}
+                        onMaterialChange={handleMaterialChange}
+                        icon="📚"
+                        title="Материал преподавателя"
+                      />
+
+                      <MaterialUploader
+                        materialType="student"
+                        currentMaterial={{
+                          name: editingLesson.student_material_name,
+                          text: editingLesson.student_material_text
+                        }}
+                        onMaterialChange={handleMaterialChange}
+                        icon="�"
+                        title="Учебный материал"
+                      />
+
+                      <MaterialUploader
+                        materialType="homework"
+                        currentMaterial={{
+                          name: editingLesson.homework_material_name,
+                          text: editingLesson.homework_material_text
+                        }}
+                        onMaterialChange={handleMaterialChange}
+                        icon="📝"
+                        title="Домашнее задание"
                       />
                     </div>
                   </div>
@@ -436,6 +479,20 @@ export default function CourseDetailPage() {
               </div>
             )}
 
+            {/* ───── модальное окно просмотра содержимого урока ───── */}
+            {viewingLesson && (
+              <div className="modal-overlay">
+                <div className="modal-content-large">
+                  <LessonContentViewer
+                    courseId={courseId}
+                    lessonId={viewingLesson.id}
+                    lessonName={viewingLesson.name}
+                    onClose={closeContentViewer}
+                  />
+                </div>
+              </div>
+            )}
+
             {/* ───── список уроков ───── */}
             <div className="lessons-section">
               <div className="lessons-header">
@@ -466,11 +523,11 @@ export default function CourseDetailPage() {
                                   ✏️
                                 </button>
                                 <button
-                                  className="btn-icon btn-quick-edit"
-                                  onClick={() => startEditLesson(lesson)}
-                                  title="Быстрое редактирование"
+                                  className="btn-icon btn-view-content"
+                                  onClick={() => viewLessonContent(lesson)}
+                                  title="Посмотреть содержимое урока"
                                 >
-                                  📝
+                                  �️
                                 </button>
                                 <button
                                   className="btn-icon btn-danger"
@@ -485,29 +542,34 @@ export default function CourseDetailPage() {
                         </div>
                         
                         <div className="lesson-meta">
-                          <div className="lesson-date">
-                            <span className="meta-label">📅</span>
-                            <span className="meta-value">
-                              {lesson.holding_date
-                                ? new Date(lesson.holding_date).toLocaleString('ru-RU', {
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                  })
-                                : 'Дата не назначена'}
-                            </span>
-                          </div>
+                          {lesson.holding_date && (
+                            <div className="lesson-date">
+                              <span className="meta-label">📅</span>
+                              <span className="meta-value">
+                                {new Date(lesson.holding_date).toLocaleString('ru-RU', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </div>
+                          )}
                           
-                          <div className="lesson-materials">
-                            <span className="meta-label">📚</span>
-                            <span className="meta-value">
-                              {lesson.teacher_material_id ? 'Материал преподавателя' : ''}
-                              {lesson.student_material_id ? (lesson.teacher_material_id ? ' • ' : '') + 'Учебный материал' : ''}
-                              {!lesson.teacher_material_id && !lesson.student_material_id && 'Материалы не добавлены'}
-                            </span>
-                          </div>
+                          {(lesson.teacher_material_id || lesson.student_material_id) && (
+                            <div className="lesson-materials">
+                              <span className="meta-label">📚</span>
+                              <span className="meta-value">
+                                {(() => {
+                                  const materials = [];
+                                  if (lesson.teacher_material_id) materials.push('Материал преподавателя');
+                                  if (lesson.student_material_id) materials.push('Учебный материал');
+                                  return materials.join(' • ');
+                                })()}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

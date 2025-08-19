@@ -22,7 +22,7 @@ const TeacherLessonMaterials = ({ courseId, lessonId }) => {
 
       console.log('[TeacherLessonMaterials] Loading materials for course:', courseId, 'lesson:', lessonId);
       
-      // Используем эндпоинт teacher-info для получения информации об уроке
+      // Используем эндпоинт teacher-info для получения информации об уроке для учителя
       const lessonData = await getLessonInfoForTeacher(courseId, lessonId);
       console.log('[TeacherLessonMaterials] Materials loaded:', lessonData);
       
@@ -133,19 +133,32 @@ const TeacherLessonMaterials = ({ courseId, lessonId }) => {
         {!lessonInfo?.homework?.url && 
          !lessonInfo?.homework_additional_material?.url && 
          !lessonInfo?.teacher_material?.url && 
-         !lessonInfo?.teacher_additional_material?.url ? (
+         !lessonInfo?.teacher_additional_material?.url &&
+         !lessonInfo?.student_material?.url &&
+         !lessonInfo?.student_additional_material?.url ? (
           <div className="no-materials-info">
             <p>📋 Материалы для урока "{lessonInfo?.name}" пока не добавлены.</p>
             <p>Вы можете добавить материалы через панель управления курсом.</p>
           </div>
         ) : (
           <div className="materials-grid">
+            {/* Материалы для студентов */}
+            {(lessonInfo?.student_material?.url || lessonInfo?.student_additional_material?.url) && 
+              renderMaterialCard(
+                "Материалы для студентов", 
+                lessonInfo?.student_material?.url, 
+                lessonInfo?.student_additional_material?.url,
+                lessonInfo?.student_material?.name || "Материалы для студентов",
+                lessonInfo?.student_additional_material?.name || "Дополнительные материалы для студентов"
+              )
+            }
+            
             {/* Домашнее задание */}
             {(lessonInfo?.homework?.url || lessonInfo?.homework_additional_material?.url) && 
               renderMaterialCard(
                 "Домашнее задание", 
-                lessonInfo?.homework?.url, 
-                lessonInfo?.homework_additional_material?.url,
+                lessonInfo?.homework?.url, // основной текст ДЗ (HTML)
+                lessonInfo?.homework_additional_material?.url, // дополнительный файл для ДЗ
                 lessonInfo?.homework?.name || "Домашнее задание",
                 lessonInfo?.homework_additional_material?.name || "Дополнительные материалы к ДЗ"
               )
@@ -170,6 +183,8 @@ const TeacherLessonMaterials = ({ courseId, lessonId }) => {
           <div className="notes-content">
             <p>Этот урок содержит следующие компоненты:</p>
             <ul>
+              <li>Материалы для студентов: {lessonInfo?.student_material ? '✅ Добавлены' : '❌ Не добавлены'}</li>
+              <li>Дополнительные материалы для студентов: {lessonInfo?.student_additional_material ? '✅ Добавлены' : '❌ Не добавлены'}</li>
               <li>Домашнее задание: {lessonInfo?.homework ? '✅ Добавлено' : '❌ Не добавлено'}</li>
               <li>Дополнительные материалы к ДЗ: {lessonInfo?.homework_additional_material ? '✅ Добавлены' : '❌ Не добавлены'}</li>
               <li>Материалы для учителя: {lessonInfo?.teacher_material ? '✅ Добавлены' : '❌ Не добавлены'}</li>

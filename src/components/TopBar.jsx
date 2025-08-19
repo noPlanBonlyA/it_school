@@ -238,18 +238,19 @@ export default function Topbar({ userName, userRole, pageTitle, onBellClick, onP
               {showNotifications && (
                 <div className="notification-dropdown">
                   <div className="notification-header">
-                    <h3>Уведомления</h3>
-                    <div className="notification-actions">
+                    <div className="notification-header-left">
                       {notifications.length > 0 && (
                         <button 
-                          className={`clear-all-btn ${notifications.length > 0 ? 'has-notifications' : ''}`}
+                          className="clear-all-btn"
                           onClick={handleClearAllNotifications}
                           type="button"
-                          title={`Очистить все (${notifications.length} уведомлений)`}
+                          title={`Очистить все уведомления (${notifications.length})`}
                         >
-                          🗑️ Очистить все
+                          Очистить все
                         </button>
                       )}
+                    </div>
+                    <div className="notification-header-right">
                       <button 
                         className="close-btn"
                         onClick={() => setShowNotifications(false)}
@@ -275,9 +276,7 @@ export default function Topbar({ userName, userRole, pageTitle, onBellClick, onP
                       </div>
                     ) : notifications.length === 0 ? (
                       <div className="no-notifications">
-                        Нет уведомлений
-                        <br />
-                        <small>Профиль ID: {userProfile?.id}</small>
+                        📭 Нет уведомлений
                       </div>
                     ) : (
                       notifications.map(notification => (

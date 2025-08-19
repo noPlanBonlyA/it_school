@@ -174,7 +174,7 @@ export default function StudentCoursesPage() {
           <section className="courses-section other-courses">
             <div className="section-header">
               <h2 className="section-label">Доступные для записи</h2>
-              <span className="course-count">{otherCourses.length}</span>
+              <span className="course-count">{otherCourses.length} курсов</span>
             </div>
             
             <div className="courses-grid">

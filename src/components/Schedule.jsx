@@ -786,67 +786,129 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
     );
   }
 
+  // Определяем мобильное устройство
+  const isMobile = () => {
+    return window.innerWidth <= 768;
+  };
+
+  // Рендеринг для мобильных устройств с улучшенной структурой
+  const renderMobileScheduleItem = (event, index) => (
+    <li 
+      key={event.id || index} 
+      className={`schedule-item ${getStatusClass(event)} ${getEventType(event) === 'event' ? 'is-event' : 'is-lesson'}`}
+      onClick={(e) => {
+        if (onCardClick) {
+          onCardClick(e);
+        }
+        onSelect && onSelect(event);
+      }}
+    >
+      {/* Верхняя строка: время и статус */}
+      <div className="schedule-top-row">
+        <div className="time">
+          {formatTime(event.start_datetime || event.start)}
+        </div>
+        <div className="schedule-status">
+          {getStatusText(event)}
+        </div>
+      </div>
+      
+      {/* Основная информация о занятии */}
+      <div className="schedule-main-info">
+        <div className="title">
+          {getEventDisplayName(event)}
+        </div>
+        <div className="schedule-course-info">
+          {getEventSubtitle(event)}
+        </div>
+      </div>
+      
+      {/* Дополнительные детали */}
+      <div className="schedule-details">
+        {event.group_name && (
+          <div className="schedule-detail-item">
+            <span className="icon">👥</span>
+            <span>{event.group_name}</span>
+          </div>
+        )}
+        {event.teacher_name && (
+          <div className="schedule-detail-item">
+            <span className="icon">👩‍🏫</span>
+            <span>{event.teacher_name}</span>
+          </div>
+        )}
+        {event.auditorium && (
+          <div className="schedule-detail-item">
+            <span className="icon">📍</span>
+            <span>{event.auditorium}</span>
+          </div>
+        )}
+      </div>
+    </li>
+  );
+
+  // Рендеринг для десктопных устройств (существующий)
+  const renderDesktopScheduleItem = (event, index) => (
+    <div 
+      key={event.id || index} 
+      className={`schedule-item ${getStatusClass(event)} ${getEventType(event) === 'event' ? 'is-event' : 'is-lesson'}`}
+      onClick={(e) => {
+        if (onCardClick) {
+          onCardClick(e);
+        }
+        onSelect && onSelect(event);
+      }}
+    >
+      <div className="schedule-time-block">
+        <div className="schedule-date">
+          {formatDate(event.start_datetime || event.start)}
+        </div>
+        <div className="schedule-time">
+          {formatTime(event.start_datetime || event.start)}
+        </div>
+        <div className="schedule-countdown">
+          {getTimeUntil(event.start_datetime || event.start)}
+        </div>
+      </div>
+      
+      <div className="schedule-content">
+        <div className="schedule-lesson-name">
+          {getEventDisplayName(event)}
+        </div>
+        <div className="schedule-course-name">
+          {getEventSubtitle(event)}
+        </div>
+        {event.group_name && (
+          <div className="schedule-group">
+            👥 {event.group_name}
+          </div>
+        )}
+        {event.teacher_name && (
+          <div className="schedule-teacher">
+            👩‍🏫 {event.teacher_name}
+          </div>
+        )}
+        {event.auditorium && (
+          <div className="schedule-auditorium">
+            📍 {event.auditorium}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="schedule-container">
-      {events.map((event, index) => (
-        <div 
-          key={event.id || index} 
-          className={`schedule-item ${getStatusClass(event)} ${getEventType(event) === 'event' ? 'is-event' : 'is-lesson'}`}
-          onClick={(e) => {
-            // Останавливаем всплытие события, если есть обработчик для карточки
-            if (onCardClick) {
-              onCardClick(e);
-            }
-            onSelect && onSelect(event);
-          }}
-        >
-          <div className="schedule-time-block">
-            <div className="schedule-date">
-              {formatDate(event.start_datetime || event.start)}
-            </div>
-            <div className="schedule-time">
-              {formatTime(event.start_datetime || event.start)}
-            </div>
-            <div className="schedule-countdown">
-              {getTimeUntil(event.start_datetime || event.start)}
-            </div>
-          </div>
-          
-          <div className="schedule-content">
-            <div className="schedule-lesson-name">
-              {getEventDisplayName(event)}
-            </div>
-            <div className="schedule-course-name">
-              {getEventSubtitle(event)}
-            </div>
-            {event.group_name && (
-              <div className="schedule-group">
-                👥 {event.group_name}
-              </div>
-            )}
-            {event.teacher_name && (
-              <div className="schedule-teacher">
-                👩‍🏫 {event.teacher_name}
-              </div>
-            )}
-            {event.auditorium && (
-              <div className="schedule-auditorium">
-                📍 {event.auditorium}
-              </div>
-            )}
-          </div>
-          
-          <div className="schedule-status">
-            <div className={`status-indicator ${getStatusClass(event)}`}>
-              {event.is_opened ? '🟢' : new Date() < new Date(event.start_datetime || event.start) ? '🟡' : '🔴'}
-            </div>
-            <div className="status-text">
-              {getStatusText(event)}
-            </div>
-          </div>
-        </div>
-      ))}
-
+      {isMobile() ? (
+        // Мобильный вид с улучшенной структурой
+        <ul className="schedule-list">
+          {events.map((event, index) => renderMobileScheduleItem(event, index))}
+        </ul>
+      ) : (
+        // Десктопный вид (существующий)
+        events.map((event, index) => renderDesktopScheduleItem(event, index))
+      )}
+      
       {/* Виджет с подробностями выбранного события */}
       {selectedEvent && (
         <div className="event-details">

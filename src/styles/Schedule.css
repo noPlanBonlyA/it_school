@@ -50,6 +50,19 @@
   backdrop-filter: blur(10px);
 }
 
+/* Добавляем фон #00B18F сверху виджета */
+.event-details::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
+  border-radius: 20px 20px 0 0;
+  z-index: -1;
+}
+
 @keyframes slideInRight {
   from {
     opacity: 0;
@@ -59,6 +72,66 @@
     opacity: 1;
     transform: translateY(-50%) translateX(0) scale(1);
   }
+}
+
+/* Заголовок события на зеленом фоне */
+.event-details .event-header {
+  position: relative;
+  z-index: 1;
+  padding: 24px 24px 20px;
+  margin-bottom: 0;
+}
+
+.event-details .event-header h2 {
+  color: #FFFFFF;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+  padding-right: 50px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.event-details .status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.event-details .close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: #FFFFFF;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.event-details .close-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 
@@ -83,17 +156,6 @@
   overflow: hidden;
 }
 
-.event-details .info-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 3px;
-  height: 100%;
-  background: linear-gradient(180deg, #00B18F 0%, #0369a1 100%);
-  border-radius: 0 2px 2px 0;
-}
-
 .event-details .info-item:hover {
   transform: translateX(4px);
   box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
@@ -109,7 +171,6 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   flex-shrink: 0;
-  padding-left: 8px; /* Сдвигаем подписи правее */
 }
 
 .event-details .info-item span {
@@ -352,37 +413,49 @@
 @media (max-width: 768px) {
   /* Компактный список расписания для главной страницы */
   .schedule-list li {
-    padding: 8px 12px;
-    border-radius: 10px;
-    margin-bottom: 6px;
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(0, 177, 143, 0.1);
-    transition: all 0.3s ease;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.8) 100%);
+    border: 1px solid rgba(0, 177, 143, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 177, 143, 0.08);
+    backdrop-filter: blur(10px);
   }
   
   .schedule-list li:hover {
-    background: rgba(0, 177, 143, 0.05);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 177, 143, 0.1);
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.08) 0%, rgba(232, 248, 245, 0.9) 100%);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 177, 143, 0.15);
+    border-color: rgba(0, 177, 143, 0.3);
   }
   
   .schedule-list .time {
-    width: 55px;
-    font-size: 13px;
+    width: 60px;
+    font-size: 14px;
     font-weight: 700;
     color: #00B18F;
+    text-align: center;
+    padding: 4px 8px;
+    background: rgba(0, 177, 143, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 177, 143, 0.2);
+    min-width: 60px;
   }
   
   .schedule-list .title {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
-    line-height: 1.3;
+    line-height: 1.4;
+    color: #1f2937;
+    margin-bottom: 2px;
   }
   
   .schedule-list .meta {
-    font-size: 11px;
-    color: #666;
+    font-size: 12px;
+    color: #6b7280;
     white-space: nowrap;
+    font-weight: 500;
   }
 
   .event-details {
@@ -552,6 +625,29 @@
   padding-right: 4px;
 }
 
+/* Мобильная адаптация для контейнера расписания */
+@media (max-width: 768px) {
+  .schedule-container {
+    gap: 8px;
+    max-height: 350px;
+    padding: 8px;
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.6) 0%, rgba(255, 255, 255, 0.4) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 177, 143, 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(0, 177, 143, 0.05);
+  }
+}
+
+@media (max-width: 480px) {
+  .schedule-container {
+    max-height: 300px;
+    padding: 6px;
+    gap: 6px;
+    border-radius: 12px;
+  }
+}
+
 .schedule-container::-webkit-scrollbar {
   width: 4px;
 }
@@ -568,6 +664,45 @@
 
 .schedule-container::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+/* Улучшенный скроллбар для мобильных */
+@media (max-width: 768px) {
+  .schedule-container::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .schedule-container::-webkit-scrollbar-track {
+    background: rgba(0, 177, 143, 0.1);
+    border-radius: 6px;
+    margin: 4px 0;
+  }
+  
+  .schedule-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.4) 0%, rgba(3, 131, 106, 0.6) 100%);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .schedule-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.6) 0%, rgba(3, 131, 106, 0.8) 100%);
+    box-shadow: 0 2px 4px rgba(0, 177, 143, 0.2);
+  }
+}
+
+@media (max-width: 480px) {
+  .schedule-container::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .schedule-container::-webkit-scrollbar-track {
+    border-radius: 4px;
+  }
+  
+  .schedule-container::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+  }
 }
 
 .schedule-empty {
@@ -597,6 +732,60 @@
   opacity: 0.8;
 }
 
+/* Мобильная адаптация для пустого состояния */
+@media (max-width: 768px) {
+  .schedule-empty {
+    padding: 30px 16px;
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+    border-radius: 16px;
+    border: 2px dashed rgba(0, 177, 143, 0.2);
+    margin: 8px;
+  }
+  
+  .empty-icon {
+    font-size: 56px;
+    margin-bottom: 18px;
+    opacity: 0.8;
+    filter: drop-shadow(0 2px 4px rgba(0, 177, 143, 0.1));
+  }
+  
+  .schedule-empty p {
+    font-size: 17px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 10px;
+  }
+  
+  .empty-subtitle {
+    font-size: 15px;
+    opacity: 0.9;
+    color: #6b7280;
+    font-weight: 500;
+  }
+}
+
+@media (max-width: 480px) {
+  .schedule-empty {
+    padding: 24px 12px;
+    margin: 6px;
+    border-radius: 12px;
+  }
+  
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 14px;
+  }
+  
+  .schedule-empty p {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  
+  .empty-subtitle {
+    font-size: 14px;
+  }
+}
+
 .schedule-item {
   display: flex;
   align-items: center;
@@ -609,6 +798,35 @@
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+}
+
+/* Мобильная адаптация для элементов расписания */
+@media (max-width: 768px) {
+  .schedule-item {
+    padding: 14px 16px;
+    gap: 14px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+    border-left: 5px solid #e5e7eb;
+    box-shadow: 0 3px 12px rgba(0, 177, 143, 0.08);
+    backdrop-filter: blur(8px);
+    margin-bottom: 6px;
+  }
+  
+  .schedule-item:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 177, 143, 0.15);
+    background: linear-gradient(135deg, rgba(232, 248, 245, 0.95) 0%, rgba(240, 253, 249, 0.9) 100%);
+  }
+}
+
+@media (max-width: 480px) {
+  .schedule-item {
+    padding: 12px 14px;
+    gap: 12px;
+    border-radius: 12px;
+    border-left-width: 4px;
+  }
 }
 
 .schedule-item::before {
@@ -650,12 +868,12 @@
 
 /* Стили для мероприятий */
 .schedule-item.is-event {
-  border-left-color: #8b5cf6;
-  background: linear-gradient(135deg, #f3e8ff 0%, #faf5ff 100%);
-  border: 2px solid #e9d5ff;
-  border-left: 6px solid #8b5cf6;
+  border-left-color: #00B18F;
+  background: linear-gradient(135deg, #E8F8F5 0%, #F0FDF9 100%);
+  border: 2px solid #A7F3D0;
+  border-left: 6px solid #00B18F;
   position: relative;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 177, 143, 0.15);
 }
 
 .schedule-item.is-event::before {
@@ -701,14 +919,14 @@
 }
 
 .schedule-item.is-event .schedule-item-content p {
-  color: #8b5cf6;
+  color: #00B18F;
   font-weight: 500;
 }
 
 /* Стили для обычных уроков */
 .schedule-item.is-lesson {
-  border-left-color: #3b82f6;
-  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+  border-left-color: #03836A;
+  background: linear-gradient(135deg, #E8F8F5 0%, #F8FCFB 100%);
 }
 
 .schedule-item.is-lesson:hover {
@@ -732,6 +950,27 @@
   background: rgba(255, 255, 255, 0.7);
   border-radius: 8px;
   backdrop-filter: blur(10px);
+}
+
+/* Мобильная адаптация для блока времени */
+@media (max-width: 768px) {
+  .schedule-time-block {
+    width: 75px;
+    padding: 10px 8px;
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.1) 0%, rgba(232, 248, 245, 0.8) 100%);
+    border-radius: 12px;
+    border: 2px solid rgba(0, 177, 143, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 177, 143, 0.1);
+  }
+}
+
+@media (max-width: 480px) {
+  .schedule-time-block {
+    width: 70px;
+    padding: 8px 6px;
+    border-radius: 10px;
+    border-width: 1px;
+  }
 }
 
 .schedule-date {
@@ -759,6 +998,51 @@
   display: inline-block;
 }
 
+/* Мобильная адаптация для элементов времени */
+@media (max-width: 768px) {
+  .schedule-date {
+    font-size: 11px;
+    font-weight: 600;
+    color: #00B18F;
+    margin-bottom: 3px;
+  }
+  
+  .schedule-time {
+    font-size: 17px;
+    font-weight: 800;
+    color: #03836A;
+    margin-bottom: 3px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .schedule-countdown {
+    font-size: 9px;
+    padding: 2px 5px;
+    background: rgba(0, 177, 143, 0.15);
+    border-radius: 8px;
+    color: #00B18F;
+    font-weight: 600;
+    border: 1px solid rgba(0, 177, 143, 0.2);
+  }
+}
+
+@media (max-width: 480px) {
+  .schedule-date {
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+  
+  .schedule-time {
+    font-size: 16px;
+    margin-bottom: 2px;
+  }
+  
+  .schedule-countdown {
+    font-size: 8px;
+    padding: 1px 4px;
+  }
+}
+
 .schedule-content {
   flex: 1;
   min-width: 0;
@@ -777,7 +1061,7 @@
 
 .schedule-course-name {
   font-size: 12px;
-  color: #3b82f6;
+  color: #03836A;
   font-weight: 500;
   margin-bottom: 4px;
   overflow: hidden;
@@ -787,7 +1071,7 @@
 
 .schedule-group {
   font-size: 11px;
-  color: #6366f1;
+  color: #00B18F;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -812,6 +1096,74 @@
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+/* Мобильная адаптация для контента */
+@media (max-width: 768px) {
+  .schedule-lesson-name {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    line-height: 1.4;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    max-height: 2.8em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .schedule-course-name {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #00B18F;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+  
+  .schedule-group {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: #059669;
+  }
+  
+  .schedule-teacher {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: #e11d48;
+  }
+  
+  .schedule-auditorium {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7c3aed;
+  }
+}
+
+@media (max-width: 480px) {
+  .schedule-lesson-name {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  
+  .schedule-course-name {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  
+  .schedule-group,
+  .schedule-teacher,
+  .schedule-auditorium {
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
 }
 
 /* Анимации */
@@ -841,7 +1193,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  background: linear-gradient(90deg, #00B18F, #03836A);
 }
 
 .homework-upload-section h3 {
@@ -1029,7 +1381,7 @@
   align-self: flex-start;
   margin-top: 16px;
   padding: 10px 20px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, #00B18F, #03836A);
   color: white;
   border: none;
   border-radius: 8px;
@@ -1251,7 +1603,7 @@
   width: auto;
   margin-right: 8px;
   transform: scale(1.2);
-  accent-color: #6366f1;
+  accent-color: #00B18F;
 }
 
 .grade-controls input[type="number"] {
@@ -1264,8 +1616,8 @@
 
 .grade-controls input[type="number"]:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: #00B18F;
+  box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1);
 }
 
 .grade-controls textarea {
@@ -1281,8 +1633,8 @@
 
 .grade-controls textarea:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: #00B18F;
+  box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1);
 }
 
 .modal-actions {
@@ -1364,8 +1716,8 @@
 
 /* Дополнительные стили для особых состояний */
 .schedule-item.current {
-  border-left-color: #8b5cf6;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-left-color: #00B18F;
+  background: linear-gradient(135deg, #E8F8F5 0%, #D1F2EB 100%);
   animation: glow 2s infinite;
 }
 

@@ -33,12 +33,7 @@ const LessonMaterials = ({ courseId, lessonId, studentId = null }) => {
 
   const renderMaterialCard = (title, materialUrl, additionalMaterialUrl, materialName = "Материал", additionalMaterialName = "Дополнительный материал") => {
     if (!materialUrl && !additionalMaterialUrl) {
-      return (
-        <div className="material-card empty">
-          <h4>{title}</h4>
-          <p className="no-material">Материалы не добавлены</p>
-        </div>
-      );
+      return null; // Не показываем пустые карточки материалов
     }
 
     return (

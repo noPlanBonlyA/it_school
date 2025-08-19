@@ -348,6 +348,46 @@ export const getLessonInfoForStudent = async (courseId, lessonId) => {
 };
 
 /**
+ * Удаление конкретного материала урока
+ */
+export const deleteLessonMaterial = async (courseId, lessonId, materialType) => {
+  try {
+    console.log('[LessonService] Deleting lesson material:', { courseId, lessonId, materialType });
+    
+    const response = await api.delete(`/courses/${courseId}/lessons/${lessonId}/materials/${materialType}`);
+    
+    console.log('[LessonService] Material deleted successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[LessonService] Error deleting material:', error);
+    throw error;
+  }
+};
+
+/**
+ * Обновление только названия урока без затрагивания материалов
+ */
+export const updateLessonNameOnly = async (courseId, lessonId, name) => {
+  try {
+    console.log('[LessonService] Updating lesson name only:', { courseId, lessonId, name });
+    
+    const response = await api.put(`/courses/${courseId}/lessons/${lessonId}`, {
+      name: name
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log('[LessonService] Lesson name updated successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[LessonService] Error updating lesson name:', error);
+    throw error;
+  }
+};
+
+/**
  * Умное получение материалов урока с автоматическим выбором эндпоинта
  * @param {string} courseId - ID курса
  * @param {string} lessonId - ID урока
@@ -358,45 +398,16 @@ export const getSmartLessonMaterials = async (courseId, lessonId, userRole = 'st
   try {
     console.log('[LessonService] Getting smart lesson materials:', { courseId, lessonId, userRole });
     
-    if (userRole === 'student') {
-      try {
-        // Сначала пробуем эндпоинт для студентов
-        const response = await api.get(`/courses/${courseId}/lessons/${lessonId}/student-materials`);
-        console.log('[LessonService] Student materials loaded:', response.data);
-        
-        // Адаптируем структуру данных для совместимости с компонентом
-        const adaptedData = {
-          id: response.data.id,
-          name: response.data.name,
-          course_id: response.data.course_id,
-          // Извлекаем URL из объектов материалов
-          student_material_url: response.data.student_material?.url || null,
-          student_additional_material_url: response.data.student_additional_material?.url || null,
-          homework_material_url: response.data.homework?.url || null,
-          homework_additional_material_url: response.data.homework_additional_material?.url || null,
-          // Сохраняем исходные объекты для дополнительной информации
-          student_material: response.data.student_material || null,
-          student_additional_material: response.data.student_additional_material || null,
-          homework: response.data.homework || null,
-          homework_additional_material: response.data.homework_additional_material || null,
-          _isStudentEndpoint: true
-        };
-        
-        return adaptedData;
-      } catch (studentError) {
-        console.log('[LessonService] Student endpoint failed, trying full endpoint:', studentError);
-        
-        // Если студенческий эндпоинт не работает, пробуем полный
-        const response = await api.get(`/courses/${courseId}/lessons-with-materials/${lessonId}`);
-        console.log('[LessonService] Full materials loaded for student:', response.data);
-        return { ...response.data, _isStudentEndpoint: false };
-      }
-    } else {
-      // Для преподавателей и админов используем полный эндпоинт
-      const response = await api.get(`/courses/${courseId}/lessons-with-materials/${lessonId}`);
-      console.log('[LessonService] Full materials loaded for teacher:', response.data);
-      return { ...response.data, _isStudentEndpoint: false };
-    }
+    // Для всех ролей используем полный эндпоинт, так как student-materials возвращает только {id, name}
+    const response = await api.get(`/courses/${courseId}/lessons-with-materials/${lessonId}`);
+    console.log('[LessonService] Full materials loaded:', response.data);
+    
+    // Маркируем данные в зависимости от роли пользователя
+    return { 
+      ...response.data, 
+      _isStudentEndpoint: userRole === 'student',
+      _userRole: userRole
+    };
   } catch (error) {
     console.error('[LessonService] Error getting smart lesson materials:', error);
     throw error;

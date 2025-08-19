@@ -88,19 +88,26 @@
 }
 
 .btn-back {
-  padding: 10px 20px;
-  background: #6c757d;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #00B18F;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
-  transition: background 0.2s ease;
-  margin-bottom: 20px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 177, 143, 0.3);
 }
 
 .btn-back:hover {
-  background: #5a6268;
+  background: #03836A;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 177, 143, 0.4);
 }
 
 .course-overview {
@@ -112,6 +119,8 @@
 
 .course-info {
   flex: 1;
+  padding-right: 32px;
+  padding-top: 16px;
 }
 
 .course-info h1 {
@@ -140,10 +149,10 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: #f8f9fa;
+  background: rgba(0, 177, 143, 0.1);
+  color: #00B18F;
   border-radius: 20px;
   font-size: 0.9em;
-  color: #495057;
   font-weight: 500;
 }
 
@@ -190,8 +199,8 @@
 }
 
 .lessons-count {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: #00B18F;
+  color: white;
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 14px;
@@ -206,61 +215,98 @@
 
 .lesson-card {
   background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   border: 1px solid #e9ecef;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  cursor: pointer;
 }
 
 .lesson-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  border-color: #3b82f6;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  border-color: #00B18F;
+}
+
+.lesson-card.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lesson-card.disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: #e9ecef;
 }
 
 .lesson-number {
   position: absolute;
-  top: -10px;
+  top: -12px;
   left: 20px;
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  width: 36px;
+  height: 36px;
+  background: #00B18F;
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 14px;
-  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(0, 177, 143, 0.3);
+  z-index: 1;
+}
+
+.lesson-number.locked {
+  background: #adb5bd;
+  box-shadow: 0 4px 12px rgba(173, 181, 189, 0.3);
 }
 
 .lesson-content {
   margin-left: 0;
+  padding-top: 8px;
 }
 
 .lesson-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 15px;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
 .lesson-title {
   margin: 0;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: #1f2937;
   flex: 1;
   padding-right: 20px;
 }
 
+.lesson-right {
+  display: flex;
+  align-items: center;
+}
+
+.lesson-arrow {
+  font-size: 24px;
+  color: #00B18F;
+  font-weight: bold;
+}
+
+.lesson-locked {
+  font-size: 20px;
+  color: #adb5bd;
+}
+
 .lesson-actions {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
 }
 
 .btn-icon {
@@ -285,6 +331,16 @@
 .btn-edit {
   background: #e3f2fd;
   color: #1976d2;
+}
+
+.btn-view-content {
+  background: #e8f5e8;
+  color: #27ae60;
+}
+
+.btn-view-content:hover {
+  background: #d4edda;
+  color: #1e7e34;
 }
 
 .btn-edit:hover {
@@ -340,27 +396,31 @@
 
 .no-lessons {
   text-align: center;
-  padding: 60px 20px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  border: 2px dashed #dee2e6;
+  padding: 60px 40px;
+  background: linear-gradient(145deg, #ffffff 0%, #fafbfc 100%);
+  border-radius: 20px;
+  border: 2px dashed #cbd5e1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 
 .empty-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.8;
 }
 
 .no-lessons h3 {
-  color: #495057;
-  margin-bottom: 8px;
-  font-size: 20px;
+  color: #1e293b;
+  margin-bottom: 12px;
+  font-size: 24px;
+  font-weight: 600;
 }
 
 .no-lessons p {
-  color: #6c757d;
+  color: #64748b;
   margin: 0;
-  font-size: 14px;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .lesson-number.locked {
@@ -397,8 +457,8 @@
 }
 
 .lesson-status.available {
-  color: #198754;
-  background-color: #d1e7dd;
+  color: #00B18F;
+  background-color: rgba(0, 177, 143, 0.1);
 }
 
 .lesson-status.unavailable {
@@ -592,12 +652,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   backdrop-filter: blur(4px);
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .modal-content {
@@ -613,13 +675,16 @@
 
 .modal-content-large {
   background: white;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 900px;
-  max-height: 90vh;
+  border-radius: 8px;
+  width: 70vw;
+  height: 75vh;
+  max-width: 1000px;
+  max-height: 800px;
   overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   animation: modalSlideIn 0.3s ease;
+  position: relative;
+  margin: auto;
 }
 
 @keyframes modalSlideIn {
@@ -673,10 +738,131 @@
   padding: 24px;
 }
 
+/* Стили для предварительного просмотра материалов в модальном окне */
+.lesson-materials-preview {
+  margin-top: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.lesson-materials-preview h4 {
+  margin: 0 0 20px 0;
+  color: #343a40;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #28a745;
+}
+
+.material-section {
+  margin-bottom: 20px;
+  padding: 18px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.material-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.material-section:last-child {
+  margin-bottom: 0;
+}
+
+.material-section h5 {
+  margin: 0 0 16px 0;
+  color: #495057;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.material-item {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.material-item:last-child {
+  margin-bottom: 0;
+}
+
+.material-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.material-value {
+  color: #495057;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #e7f3ff 0%, #f0f8ff 100%);
+  border-radius: 8px;
+  border: 1px solid #b3d9ff;
+  border-left: 4px solid #007bff;
+}
+
+.material-text-preview {
+  color: #495057;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 16px;
+  background: linear-gradient(135deg, #fff8e1 0%, #fffbf0 100%);
+  border-radius: 8px;
+  border: 1px solid #ffd54f;
+  border-left: 4px solid #ff9800;
+  white-space: pre-wrap;
+  max-height: 150px;
+  overflow-y: auto;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.no-materials {
+  text-align: center;
+  padding: 32px 24px;
+  color: #6c757d;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  border: 2px dashed #ced4da;
+}
+
+.no-materials p {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.no-materials p:last-child {
+  margin: 0;
+  font-size: 14px;
+  color: #868e96;
+  font-weight: 400;
+}
+
 .modal-footer {
   display: flex;
   gap: 12px;
-  justify-content: flex-end;
+  justify-content: center;
   padding: 20px 24px;
   border-top: 1px solid #e9ecef;
   background: #f8f9fa;
@@ -854,9 +1040,12 @@
   
   .modal-content,
   .modal-content-large {
-    margin: 20px;
-    width: calc(100% - 40px);
+    margin: 10px auto;
+    width: calc(100vw - 20px);
+    height: calc(100vh - 20px);
     max-width: none;
+    max-height: none;
+    border-radius: 8px;
   }
   
   .modal-header {
@@ -876,4 +1065,64 @@
   .modal-footer button {
     width: 100%;
   }
+
+  /* Адаптивные стили для материалов в модальном окне */
+  .lesson-materials-preview {
+    margin-top: 16px;
+    padding: 16px;
+  }
+
+  .lesson-materials-preview h4 {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .material-section {
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+
+  .material-section h5 {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+
+  .material-text-preview {
+    padding: 12px;
+    max-height: 100px;
+    font-size: 13px;
+  }
+
+  .material-value {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .no-materials {
+    padding: 20px 16px;
+  }
+
+  .no-materials p {
+    font-size: 14px;
+  }
+
+  .no-materials p:last-child {
+    font-size: 13px;
+  }
+}
+
+/* Lesson Materials Editor Styles */
+.lesson-materials-editor {
+  margin-top: 20px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.lesson-materials-editor h4 {
+  margin: 0 0 16px 0;
+  color: #495057;
+  font-size: 18px;
+  font-weight: 600;
 }

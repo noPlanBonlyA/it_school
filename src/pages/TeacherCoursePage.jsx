@@ -86,30 +86,10 @@ export default function TeacherCoursePage() {
   };
 
   /* ───── Создание урока ───── */
-  const handleCreateLesson = () => {
-    navigate(`/courses/${courseId}/lessons/create`);
-  };
+  // Удалено: функция создания урока
 
   /* ───── Тестирование API ───── */
-  const handleTestApi = async () => {
-    console.log('[TeacherCoursePage] Testing API...');
-    try {
-      const response = await fetch(`${window.location.protocol}//${window.location.hostname}:8080/api/courses/${courseId}/lessons`);
-      console.log('[TeacherCoursePage] Raw fetch response:', response);
-      
-      const text = await response.text();
-      console.log('[TeacherCoursePage] Response text:', text);
-      
-      try {
-        const json = JSON.parse(text);
-        console.log('[TeacherCoursePage] Parsed JSON:', json);
-      } catch (parseError) {
-        console.error('[TeacherCoursePage] JSON parse error:', parseError);
-      }
-    } catch (fetchError) {
-      console.error('[TeacherCoursePage] Fetch error:', fetchError);
-    }
-  };
+  // Удалено: функция тестирования API
 
   // ДОБАВЛЕНО: обработка ошибок в render
   if (error) {
@@ -154,28 +134,6 @@ export default function TeacherCoursePage() {
                   <p className="course-description">{course.description}</p>
                 )}
               </div>
-              
-              <div className="course-actions">
-                <button
-                  className="btn-primary"
-                  onClick={handleCreateLesson}
-                >
-                  <span className="btn-icon">+</span> Добавить урок
-                </button>
-                <button
-                  className="btn-secondary"
-                  onClick={() => navigate(`/courses/${courseId}`)}
-                >
-                  <span className="btn-icon">⚙️</span> Управление курсом
-                </button>
-                <button
-                  className="btn-secondary"
-                  onClick={handleTestApi}
-                  style={{backgroundColor: '#ff6b6b', color: 'white'}}
-                >
-                  🔍 Тест API
-                </button>
-              </div>
             </div>
 
             <div className="teacher-lessons-container">
@@ -188,13 +146,7 @@ export default function TeacherCoursePage() {
                 <div className="empty-lessons">
                   <div className="empty-icon">📚</div>
                   <h3>В этом курсе пока нет уроков</h3>
-                  <p>Нажмите кнопку "Добавить урок", чтобы создать первый урок для курса</p>
-                  <button
-                    className="btn-primary create-lesson-btn"
-                    onClick={handleCreateLesson}
-                  >
-                    Создать первый урок
-                  </button>
+                  <p>В данном курсе уроки еще не созданы</p>
                 </div>
               ) : (
                 <div className="lessons-grid">
@@ -205,7 +157,6 @@ export default function TeacherCoursePage() {
                       <div
                         key={lesson.id}
                         className="teacher-lesson-card"
-                        onClick={() => navigate(`/courses/${courseId}/teacher/lessons/${lesson.id}`)}
                       >
                         <div className="lesson-card-header">
                           <span className={`status-badge ${status.class}`}>
@@ -241,27 +192,6 @@ export default function TeacherCoursePage() {
                                 <i className="homework-icon">📝</i> {lesson.homework_count || 0}
                               </span>
                             </div>
-                          </div>
-                          
-                          <div className="lesson-actions">
-                            <button 
-                              className="lesson-action-btn view-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/courses/${courseId}/teacher/lessons/${lesson.id}`);
-                              }}
-                            >
-                              Просмотр
-                            </button>
-                            <button
-                              className="lesson-action-btn edit-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/courses/${courseId}/lessons/${lesson.id}/edit`);
-                              }}
-                            >
-                              Изменить
-                            </button>
                           </div>
                         </div>
                       </div>

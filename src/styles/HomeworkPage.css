@@ -165,6 +165,39 @@
     overflow-y: auto;
     padding: 0;
   }
+
+  /* Мобильная адаптация списка домашек */
+  @media (max-width: 768px) {
+    .submissions-content {
+      max-height: 400px;
+    }
+    
+    .submissions-content::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .submissions-content::-webkit-scrollbar-track {
+      background: rgba(0, 177, 143, 0.1);
+      border-radius: 3px;
+    }
+    
+    .submissions-content::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, rgba(0, 177, 143, 0.6) 0%, rgba(3, 131, 106, 0.8) 100%);
+      border-radius: 3px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .submissions-content {
+      max-height: 350px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .submissions-content {
+      max-height: 300px;
+    }
+  }
   
   .submission-item {
     border-bottom: 1px solid #eee;
@@ -668,6 +701,104 @@
   
   /* Адаптивность для мобильных */
   @media (max-width: 768px) {
+    .homework-page {
+      padding: 12px;
+    }
+    
+    .homework-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: auto;
+      min-height: auto;
+    }
+    
+    .column {
+      min-width: auto;
+      max-height: 400px;
+      overflow: hidden;
+    }
+    
+    .column h2 {
+      padding: 12px 16px;
+      font-size: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    
+    /* Мобильная адаптация колонок */
+    .groups-col,
+    .topics-col,
+    .submissions-col {
+      flex: none;
+      min-width: auto;
+    }
+    
+    .groups-list,
+    .topics-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .groups-list li,
+    .topics-list li {
+      padding: 12px 16px;
+      border-left: none;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .groups-list li.selected,
+    .topics-list li.selected {
+      border-left: 4px solid #00B18F;
+      background-color: rgba(0, 177, 143, 0.1);
+    }
+    
+    /* Улучшенная типографика для мобильных */
+    .group-name,
+    .lesson-title {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    
+    .group-meta,
+    .lesson-meta,
+    .lesson-date {
+      font-size: 13px;
+      margin-top: 4px;
+      color: #666;
+    }
+    
+    /* Мобильная адаптация элементов домашек */
+    .submission-header {
+      padding: 14px 16px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    
+    .submission-header .homework-status {
+      align-self: flex-end;
+      margin-top: -8px;
+    }
+    
+    .student-name {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    
+    .student-meta {
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .status-badge {
+      font-size: 11px;
+      padding: 3px 6px;
+    }
+    
     .coins-input-group {
       padding: 10px 14px;
     }
@@ -683,20 +814,24 @@
     .details-buttons {
       flex-direction: column;
       padding: 15px;
+      gap: 8px;
     }
     
     .btn-primary,
     .btn-secondary {
       padding: 14px 16px;
-      font-size: 0.9rem;
+      font-size: 14px;
+      width: 100%;
+      justify-content: center;
     }
     
     .comment-field textarea {
       min-height: 100px;
+      font-size: 14px;
     }
     
     .notification-preview {
-      font-size: 0.85rem;
+      font-size: 13px;
     }
     
     /* Мобильные стили для скролла */
@@ -712,12 +847,306 @@
     
     .archive-buttons {
       padding: 12px;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .btn-warning {
+      width: 100%;
+      justify-content: center;
+      padding: 12px 16px;
     }
     
     /* Увеличиваем размер скроллбара на мобильных */
     .submission-details::-webkit-scrollbar,
     .archive-details::-webkit-scrollbar {
       width: 12px;
+    }
+    
+    .groups-list::-webkit-scrollbar,
+    .topics-list::-webkit-scrollbar,
+    .submissions-content::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .groups-list::-webkit-scrollbar-track,
+    .topics-list::-webkit-scrollbar-track,
+    .submissions-content::-webkit-scrollbar-track {
+      background: rgba(0, 177, 143, 0.1);
+      border-radius: 3px;
+    }
+    
+    .groups-list::-webkit-scrollbar-thumb,
+    .topics-list::-webkit-scrollbar-thumb,
+    .submissions-content::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, rgba(0, 177, 143, 0.6) 0%, rgba(3, 131, 106, 0.8) 100%);
+      border-radius: 3px;
+    }
+  }
+
+  /* Стили для маленьких телефонов */
+  @media (max-width: 480px) {
+    .homework-page {
+      padding: 8px;
+    }
+    
+    .homework-grid {
+      gap: 12px;
+    }
+    
+    .column {
+      border-radius: 8px;
+      max-height: 350px;
+    }
+    
+    .column h2 {
+      padding: 10px 12px;
+      font-size: 0.95rem;
+    }
+    
+    .groups-list,
+    .topics-list {
+      max-height: 250px;
+    }
+    
+    .groups-list li,
+    .topics-list li {
+      padding: 10px 12px;
+    }
+    
+    .group-name,
+    .lesson-title {
+      font-size: 14px;
+    }
+    
+    .group-meta,
+    .lesson-meta,
+    .lesson-date {
+      font-size: 12px;
+    }
+    
+    .submission-header {
+      padding: 12px;
+    }
+    
+    .student-name {
+      font-size: 14px;
+    }
+    
+    .student-meta {
+      font-size: 12px;
+    }
+    
+    .status-badge {
+      font-size: 10px;
+      padding: 2px 5px;
+    }
+    
+    .submission-details,
+    .archive-details {
+      max-height: 300px;
+      padding: 12px;
+    }
+    
+    .homework-grading-section {
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .coins-field label {
+      font-size: 14px;
+    }
+    
+    .coins-input-group {
+      padding: 8px 12px;
+    }
+    
+    .coins-input-group input {
+      font-size: 16px; /* Предотвращает zoom на iOS */
+    }
+    
+    .coins-icon {
+      font-size: 1.2rem;
+    }
+    
+    .coins-hint {
+      font-size: 12px;
+    }
+    
+    .comment-field label {
+      font-size: 14px;
+    }
+    
+    .comment-field textarea {
+      min-height: 80px;
+      font-size: 14px;
+      padding: 10px 12px;
+    }
+    
+    .notification-preview {
+      font-size: 12px;
+      padding: 8px 10px;
+    }
+    
+    .details-buttons,
+    .archive-buttons {
+      padding: 12px;
+      gap: 6px;
+    }
+    
+    .btn-primary,
+    .btn-secondary,
+    .btn-warning {
+      padding: 12px 14px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+    
+    .archive-section {
+      padding: 12px;
+      border-radius: 8px;
+    }
+    
+    .archive-section h3 {
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+    
+    .archive-header {
+      padding: 10px 12px;
+    }
+    
+    .archive-toggle {
+      padding: 4px 8px;
+      font-size: 11px;
+      margin-left: 8px;
+    }
+    
+    .btn-ungrade {
+      width: 28px;
+      height: 28px;
+      font-size: 12px;
+    }
+    
+    .homework-files,
+    .student-comments {
+      margin: 15px 0;
+      padding: 12px;
+    }
+    
+    .homework-files h4,
+    .student-comments h4 {
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    
+    .file-item {
+      padding: 6px 10px;
+    }
+    
+    .file-name {
+      font-size: 13px;
+    }
+    
+    .file-link {
+      font-size: 12px;
+    }
+    
+    .student-comment-item {
+      padding: 8px;
+    }
+    
+    .comment-text {
+      font-size: 13px;
+    }
+    
+    .comment-date {
+      font-size: 10px;
+    }
+    
+    .scroll-hint {
+      bottom: 60px;
+      right: 12px;
+      padding: 6px 10px;
+      font-size: 11px;
+      border-radius: 16px;
+    }
+    
+    .grade-info {
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    
+    .grade-summary strong {
+      font-size: 13px;
+    }
+    
+    .coins-earned {
+      font-size: 11px;
+    }
+    
+    .graded-date {
+      font-size: 11px;
+    }
+    
+    /* Компактные плейсхолдеры */
+    .placeholder {
+      padding: 30px 15px;
+      font-size: 14px;
+    }
+    
+    .loading {
+      height: 150px;
+      font-size: 14px;
+    }
+    
+    .error {
+      padding: 15px;
+      margin: 8px;
+      font-size: 14px;
+    }
+  }
+
+  /* Дополнительные стили для очень узких экранов */
+  @media (max-width: 360px) {
+    .homework-page {
+      padding: 6px;
+    }
+    
+    .homework-grid {
+      gap: 10px;
+    }
+    
+    .column {
+      max-height: 300px;
+    }
+    
+    .column h2 {
+      padding: 8px 10px;
+      font-size: 0.9rem;
+    }
+    
+    .groups-list,
+    .topics-list {
+      max-height: 200px;
+    }
+    
+    .submission-details,
+    .archive-details {
+      max-height: 250px;
+      padding: 10px;
+    }
+    
+    .btn-primary,
+    .btn-secondary,
+    .btn-warning {
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    
+    .details-buttons,
+    .archive-buttons {
+      padding: 10px;
     }
   }
   
@@ -739,6 +1168,31 @@
   background: #03836A;
   transform: translate(1px, 1px);
   box-shadow: 1px 1px 0.3px #03836A;
+}
+
+/* Мобильная адаптация кнопки архива */
+@media (max-width: 768px) {
+  .submissions-section h2 {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  
+  .archive-toggle {
+    margin-left: 0;
+    align-self: flex-start;
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .archive-toggle {
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
 }
 
 .submissions-section {

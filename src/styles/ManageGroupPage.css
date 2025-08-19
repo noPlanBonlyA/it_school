@@ -10,6 +10,14 @@
   padding: 24px;
   background-color: #f7f8fc;
   min-height: 100vh;
+  margin-left: 220px; /* Отступ от сайдбара на десктопе */
+}
+
+/* Адаптация для контента */
+.content-area {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 h1 {
@@ -22,16 +30,25 @@ h1 {
 .create-group-block {
   background: #ffffff;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 32px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 16px rgba(0, 177, 143, 0.1);
+  border: 2px solid rgba(0, 177, 143, 0.1);
+}
+
+.create-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .create-group-block h2 {
-  margin-top: 0;
+  margin: 0;
   font-size: 20px;
   color: #1e1e2f;
-  margin-bottom: 16px;
+  font-family: 'Mont', sans-serif;
+  font-weight: 700;
 }
 
 .create-group-form {
@@ -73,6 +90,23 @@ h1 {
   min-height: 60px;
 }
 
+.create-group-btn {
+  background: #00B18F;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Mont', sans-serif;
+}
+
+.create-group-btn:hover {
+  background: #00A081;
+}
+
 .error-text {
   color: #dc2626;
   font-size: 12px;
@@ -80,10 +114,24 @@ h1 {
 }
 
 /* Блок списка групп */
+.groups-list-block {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 177, 143, 0.1);
+  border: 2px solid rgba(0, 177, 143, 0.1);
+}
+
+.groups-list-header {
+  margin-bottom: 20px;
+}
+
 .groups-list-block h2 {
   font-size: 20px;
   color: #1e1e2f;
-  margin-bottom: 16px;
+  margin: 0;
+  font-family: 'Mont', sans-serif;
+  font-weight: 700;
 }
 
 .groups-list {
@@ -626,4 +674,625 @@ mark { background:#ffecb5; border-radius:2px; padding:0 2px; }
   background: rgba(108, 117, 125, 0.05);
   color: #6c757d;
   border: 1px solid rgba(108, 117, 125, 0.2);
+}
+
+/* ============================================
+   МОБИЛЬНАЯ АДАПТАЦИЯ
+   ============================================ */
+
+/* Планшеты и мобильные устройства */
+@media (max-width: 768px) {
+  .groups-page {
+    flex-direction: column;
+  }
+  
+  .main-content {
+    margin-left: 0; /* Убираем отступ от сайдбара */
+    padding: 16px 12px;
+  }
+  
+  .content-area {
+    padding: 0;
+  }
+  
+  /* Заголовок страницы */
+  h1 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  /* Блок создания группы */
+  .create-group-block {
+    padding: 16px;
+    margin-bottom: 24px;
+    border-radius: 10px;
+  }
+  
+  .create-group-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .create-group-block h2 {
+    font-size: 18px;
+  }
+  
+  .create-group-form {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .create-group-form .field {
+    flex: 1 1 auto;
+  }
+  
+  .create-group-form label {
+    font-size: 15px;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  
+  .create-group-form input,
+  .create-group-form textarea {
+    padding: 12px 14px;
+    font-size: 16px; /* Увеличиваем для лучшей читаемости */
+    border-radius: 8px;
+    border: 2px solid #e5e7eb;
+  }
+  
+  .create-group-form input:focus,
+  .create-group-form textarea:focus {
+    border-color: #00B18F;
+    box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1);
+  }
+  
+  .create-group-btn {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    background: #00B18F;
+    color: white;
+    border: none;
+    margin-top: 8px;
+  }
+  
+  .create-group-btn:hover {
+    background: #00A081;
+  }
+  
+  /* Список групп */
+  .groups-list-block {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(0, 177, 143, 0.1);
+  }
+  
+  .groups-list-block h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  
+  .groups-list {
+    gap: 16px;
+  }
+  
+  .group-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+    border-radius: 10px;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0, 177, 143, 0.08);
+    border: 1px solid rgba(0, 177, 143, 0.1);
+  }
+  
+  .group-info h3 {
+    font-size: 16px;
+    margin: 0 0 8px 0;
+    color: #1e1e2f;
+  }
+  
+  .group-info p {
+    font-size: 14px;
+    margin: 4px 0;
+    line-height: 1.4;
+  }
+  
+  .group-actions {
+    justify-content: space-between;
+    gap: 8px;
+  }
+  
+  .btn-primary,
+  .btn-danger {
+    flex: 1;
+    padding: 10px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .btn-primary {
+    background: #00B18F;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background: #00A081;
+  }
+  
+  .btn-danger {
+    background: #ef4444;
+    color: white;
+  }
+  
+  .btn-danger:hover {
+    background: #dc2626;
+  }
+  
+  /* Пустое состояние */
+  .empty-state {
+    padding: 40px 20px !important;
+    text-align: center !important;
+  }
+  
+  .empty-state h3 {
+    font-size: 16px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .empty-state p {
+    font-size: 14px !important;
+  }
+  
+  /* Модальное окно */
+  .modal-overlay {
+    padding: 16px 8px;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+  
+  .modal-content {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    border-radius: 10px;
+    max-height: calc(100vh - 32px);
+  }
+  
+  .modal-content.large {
+    width: 100%;
+    max-width: none;
+  }
+  
+  .modal-header {
+    padding: 16px 20px;
+    flex-wrap: wrap;
+  }
+  
+  .modal-header h2 {
+    font-size: 18px;
+    margin: 0;
+    word-break: break-word;
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .modal-close-btn {
+    font-size: 24px;
+    padding: 4px;
+    margin-left: 8px;
+  }
+  
+  .modal-body {
+    padding: 16px 20px;
+  }
+  
+  .modal-body.grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  /* Панели */
+  .panel {
+    margin-bottom: 20px;
+  }
+  
+  .panel.parameters {
+    padding: 16px;
+    border-radius: 8px;
+  }
+  
+  .panel h3 {
+    font-size: 16px;
+    margin: 0 0 16px 0;
+  }
+  
+  /* Поля формы */
+  .field {
+    margin-bottom: 16px;
+  }
+  
+  .field label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #374151;
+  }
+  
+  .field input,
+  .field textarea {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+  
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: #00B18F;
+    box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1);
+  }
+  
+  .save-changes-btn {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    background: #00B18F;
+    color: white;
+    border: none;
+    margin-top: 12px;
+  }
+  
+  .save-changes-btn:disabled {
+    background: #d1d5db;
+    color: #9ca3af;
+  }
+  
+  /* Секции участников */
+  .section {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .section-header h4 {
+    font-size: 16px;
+    margin: 0;
+    color: #1f2937;
+  }
+  
+  .section-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    background: #00B18F;
+    color: white;
+    align-self: stretch;
+  }
+  
+  .section-btn:hover {
+    background: #00A081;
+  }
+  
+  /* Форма добавления */
+  .add-form {
+    background: #f9fafb;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .add-form input {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+  }
+  
+  .add-form input:focus {
+    outline: none;
+    border-color: #00B18F;
+    box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1);
+  }
+  
+  /* Контейнер списка */
+  .list-container {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: white;
+  }
+  
+  .list-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    gap: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  
+  .list-item:last-child {
+    border-bottom: none;
+  }
+  
+  .list-item:hover:not(.disabled) {
+    background: #f9fafb;
+  }
+  
+  .list-item.selected {
+    background: #e0f2ff;
+  }
+  
+  .list-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .list-item input[type="checkbox"],
+  .list-item input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer;
+  }
+  
+  .list-item.disabled input {
+    cursor: not-allowed;
+  }
+  
+  /* Кнопка отправки */
+  .submit-btn {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    background: #00B18F;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .submit-btn:disabled {
+    background: #d1d5db;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+  
+  .submit-btn:hover:not(:disabled) {
+    background: #00A081;
+  }
+  
+  /* Контейнер участников */
+  .members-container {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+  }
+  
+  .member-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 14px;
+  }
+  
+  .member-card:last-child {
+    border-bottom: none;
+  }
+  
+  .member-remove-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+  }
+  
+  .member-remove-btn:hover {
+    background: #dc2626;
+  }
+  
+  /* Состояния загрузки и пустоты */
+  .loading-state,
+  .empty-state {
+    text-align: center;
+    padding: 20px;
+    color: #6b7280;
+    font-size: 14px;
+  }
+  
+  /* Информация о расписании */
+  .schedule-info {
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin: 8px 0;
+  }
+  
+  .schedule-info-compact {
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 480px) {
+  .main-content {
+    padding: 12px 8px;
+  }
+  
+  .create-group-block,
+  .groups-list-block {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+  
+  h1 {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+  
+  .create-group-block h2,
+  .groups-list-block h2 {
+    font-size: 16px;
+  }
+  
+  .group-card {
+    padding: 12px;
+  }
+  
+  .group-info h3 {
+    font-size: 15px;
+  }
+  
+  .group-info p {
+    font-size: 13px;
+  }
+  
+  .btn-primary,
+  .btn-danger {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .modal-header {
+    padding: 12px 16px;
+  }
+  
+  .modal-header h2 {
+    font-size: 16px;
+  }
+  
+  .modal-body {
+    padding: 12px 16px;
+  }
+  
+  .panel.parameters {
+    padding: 12px;
+  }
+  
+  .field input,
+  .field textarea,
+  .add-form input {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+  
+  .list-item {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  
+  .member-card {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .member-remove-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    min-width: 24px;
+  }
+  
+  .submit-btn,
+  .save-changes-btn,
+  .create-group-btn,
+  .section-btn {
+    padding: 10px 16px;
+    font-size: 15px;
+  }
+}
+
+/* Дополнительные улучшения для сенсорных устройств */
+@media (max-width: 768px) {
+  /* Увеличиваем области клика */
+  .group-card {
+    min-height: 60px;
+  }
+  
+  .btn-primary,
+  .btn-danger,
+  .submit-btn,
+  .save-changes-btn,
+  .section-btn {
+    min-height: 44px; /* Минимальная высота для удобного нажатия */
+  }
+  
+  /* Убираем hover-эффекты на мобильных */
+  .list-item:hover {
+    background: none;
+  }
+  
+  .list-item:active {
+    background: #f3f4f6;
+  }
+  
+  /* Улучшенная прокрутка */
+  .list-container,
+  .members-container {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Адаптивные скроллбары */
+  .list-container::-webkit-scrollbar,
+  .members-container::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .list-container::-webkit-scrollbar-thumb,
+  .members-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 177, 143, 0.3);
+    border-radius: 2px;
+  }
 }

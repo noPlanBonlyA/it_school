@@ -20,7 +20,7 @@ export default function ManagePointsPage() {
 
   return (
     <div className="app-layout">
-      <Sidebar activeItem="points" userRole={user?.role} />
+      <Sidebar activeItem="managePoints" userRole={user?.role} />
       
       <div className="main-content">
         <SmartTopBar 

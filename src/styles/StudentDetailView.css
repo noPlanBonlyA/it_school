@@ -126,7 +126,7 @@
 .close-btn {
   background: none;
   border: none;
-  color: white;
+  color: rgb(99, 99, 99);
   font-size: 28px;
   cursor: pointer;
   padding: 8px;

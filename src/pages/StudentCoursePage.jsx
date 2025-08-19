@@ -182,14 +182,14 @@ export default function StudentCoursePage() {
           </button>
           
           {course && (
-            <>
+            <div className="course-overview">
               <div className="course-info">
                 <h1>{course.name}</h1>
                 <p className="course-description">{course.description}</p>
                 <div className="course-meta">
-                  <span className="course-author">Автор: {course.author_name || 'Не указан'}</span>
+                  <span className="course-author">👩‍🏫 {course.author_name || 'Не указан'}</span>
                   {course.age_category && (
-                    <span className="course-category">Категория: {course.age_category}</span>
+                    <span className="course-category">👥 {course.age_category}</span>
                   )}
                 </div>
               </div>
@@ -205,12 +205,17 @@ export default function StudentCoursePage() {
                   />
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
 
         <div className="lessons-section">
-          <h2>Уроки курса</h2>
+          <div className="lessons-header">
+            <h2>Уроки курса</h2>
+            {lessons.length > 0 && (
+              <span className="lessons-count">{lessons.length} уроков</span>
+            )}
+          </div>
           
           {lessons.length === 0 ? (
             <div className="no-lessons">
@@ -227,29 +232,30 @@ export default function StudentCoursePage() {
                 return (
                   <div 
                     key={lesson.id} 
-                    className={`lesson-item ${!isOpen ? 'disabled' : ''}`}
+                    className={`lesson-card ${!isOpen ? 'disabled' : ''}`}
                     onClick={() => handleLessonClick(lesson.id)}
                   >
-                    <div className="lesson-left">
-                      <div className={`lesson-number ${!isOpen ? 'locked' : ''}`}>
-                        {isOpen ? (index + 1) : '🔒'}
-                      </div>
-                      <div className="lesson-info">
-                        <h3 className="lesson-title">{lesson.name}</h3>
-                        <div className="lesson-meta">
-                          <span className={`lesson-status ${status.class}`}>
-                            {status.text}
-                          </span>
-                        </div>
-                      </div>
+                    <div className={`lesson-number ${!isOpen ? 'locked' : ''}`}>
+                      {isOpen ? (index + 1) : '🔒'}
                     </div>
                     
-                    <div className="lesson-right">
-                      {isOpen ? (
-                        <div className="lesson-arrow">→</div>
-                      ) : (
-                        <div className="lesson-locked">🔒</div>
-                      )}
+                    <div className="lesson-content">
+                      <div className="lesson-header">
+                        <h3 className="lesson-title">{lesson.name}</h3>
+                        <div className="lesson-right">
+                          {isOpen ? (
+                            <div className="lesson-arrow">→</div>
+                          ) : (
+                            <div className="lesson-locked">🔒</div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="lesson-meta">
+                        <span className={`lesson-status ${status.class}`}>
+                          {status.text}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 );

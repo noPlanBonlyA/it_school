@@ -1,13 +1,21 @@
 .sidebar {
+  position: fixed !important; /* Принудительно фиксированное позиционирование */
+  top: 0;
+  left: 0;
   width: 240px;
   height: 100vh;
-  padding: 32px 16px;
+  padding: 20px 16px 16px 16px;
   box-sizing: border-box;
   background: #FFFFFF;
   border-right: 1px solid #E0E0E0;
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  overflow-y: auto; /* Вертикальная прокрутка при необходимости */
+  overflow-x: hidden; /* Полностью убираем горизонтальную прокрутку */
+  min-height: 100vh; /* Гарантируем полную высоту */
+  z-index: 1000; /* Увеличиваем z-index для надежности */
+  transform: translateZ(0); /* Активируем аппаратное ускорение */
 }
 
 
@@ -18,14 +26,23 @@
   padding: 0;
 }
 
+.sidebar-main-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden; /* Убираем горизонтальную прокрутку */
+  min-height: 0;
+  margin-bottom: 8px;
+}
+
 .sidebar-list.bottom {
   margin-top: auto;
+  flex-shrink: 0;
 }
 
 .divider {
   border: none;
   border-top: 1px solid rgba(0, 177, 143, 0.2);
-  margin: 32px 0;
+  margin: 16px 0;
   background: linear-gradient(90deg, transparent 0%, rgba(0, 177, 143, 0.3) 50%, transparent 100%);
   height: 1px;
 }
@@ -33,8 +50,8 @@
 .sidebar-item {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  margin-bottom: 16px;
+  padding: 10px 16px;
+  margin-bottom: 8px;
   border-left: 3px solid transparent;
   cursor: pointer;
   opacity: 0.3;
@@ -60,6 +77,9 @@
   font-weight: 600;
   font-size: 14px;
   color: #202224;
+  white-space: nowrap; /* Не переносим текст */
+  overflow: hidden; /* Скрываем переполнение */
+  text-overflow: ellipsis; /* Добавляем многоточие при переполнении */
 }
 
 .sidebar-item:hover {
@@ -90,9 +110,11 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 48px;
+  margin-bottom: 24px;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap; /* Не переносим текст */
+  overflow: hidden; /* Скрываем переполнение */
 }
 
 .logo:hover {
@@ -174,13 +196,15 @@
     border-right: 1px solid rgba(224, 224, 224, 0.3);
     transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 4px 0 40px rgba(0, 0, 0, 0.15);
-    overflow-y: auto;
+    overflow-y: auto; /* Вертикальная прокрутка при необходимости */
+    overflow-x: hidden; /* Полностью убираем горизонтальную прокрутку */
     /* Полностью исключаем из layout */
     margin: 0;
-    padding: 0;
+    padding: 16px 0 20px 0;
     transform: translateZ(0); /* Включаем аппаратное ускорение */
     /* Важно: убираем из flex-контейнера */
-    display: block !important;
+    display: flex !important;
+    flex-direction: column;
     flex: none !important;
     min-width: 0 !important;
   }
@@ -198,6 +222,14 @@
     color: #00B18F;
     font-weight: 700;
     padding: 0 20px;
+  }
+  
+  .sidebar-main-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden; /* Убираем горизонтальную прокрутку */
+    min-height: 0;
+    padding: 0 4px;
   }
   
   .sidebar-item {
@@ -245,10 +277,19 @@
   .sidebar-item .label {
     font-size: 16px;
     font-weight: 600;
+    white-space: nowrap; /* Не переносим текст */
+    overflow: hidden; /* Скрываем переполнение */
+    text-overflow: ellipsis; /* Добавляем многоточие при переполнении */
   }
   
   .divider {
     margin: 24px 16px;
+  }
+  
+  .sidebar-list.bottom {
+    margin-top: auto;
+    flex-shrink: 0;
+    padding: 0 4px 0 4px;
   }
 }
 
@@ -257,6 +298,7 @@
   .sidebar {
     width: calc(100vw - 40px);
     max-width: 300px;
+    padding: 12px 0 16px 0;
   }
   
   .mobile-menu-toggle {
@@ -272,7 +314,12 @@
   
   .sidebar .logo {
     font-size: 24px;
-    margin-top: 50px;
+    margin-top: 60px;
+    margin-bottom: 24px;
+  }
+  
+  .sidebar-main-content {
+    padding: 0 2px;
   }
   
   .sidebar-item {
@@ -281,5 +328,9 @@
   
   .sidebar-item .label {
     font-size: 15px;
+  }
+  
+  .sidebar-list.bottom {
+    padding: 0 2px;
   }
 }

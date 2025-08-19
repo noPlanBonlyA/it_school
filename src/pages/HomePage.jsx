@@ -11,8 +11,7 @@ import EventModal from '../components/EventModal';
 import { useAuth }          from '../contexts/AuthContext';
 import userService          from '../services/userService';
 import { getUserScheduleOptimized } from '../services/scheduleService';
-import { createNotificationForStudent } from '../services/notificationService';
-import { findStudentByUser, debugAllStudents } from '../services/studentService';
+import { findStudentByUser } from '../services/studentService';
 import api from '../api/axiosInstance';
 
 import '../styles/HomePage.css';
@@ -158,68 +157,6 @@ export default function HomePage() {
   const fio = [fullUser.first_name, fullUser.surname]
                 .filter(Boolean).join(' ');
 
-  // Временная функция для тестирования профиля
-  const testProfile = async () => {
-    try {
-      if (user?.id) {
-        const studentProfile = await findStudentByUser(user.id);
-        console.log('Student profile test:', studentProfile);
-        alert(`Профиль найден: ID ${studentProfile?.id || 'не найден'}`);
-      }
-    } catch (error) {
-      console.error('Profile test error:', error);
-      alert(`Ошибка профиля: ${error.message}`);
-    }
-  };
-
-  const testNotification = async () => {
-    try {
-      if (user?.id) {
-        const studentProfile = await findStudentByUser(user.id);
-        if (studentProfile?.id) {
-          await createNotificationForStudent(
-            studentProfile.id, 
-            `Тестовое уведомление ${new Date().toLocaleTimeString()}`
-          );
-          alert('Уведомление отправлено!');
-        } else {
-          alert('Профиль студента не найден!');
-        }
-      }
-    } catch (error) {
-      console.error('Error sending test notification:', error);
-      alert('Ошибка отправки уведомления');
-    }
-  };
-
-  // Отладочная функция для проверки всех студентов
-  const debugStudents = async () => {
-    try {
-      const students = await debugAllStudents();
-      console.log('All students debug:', students);
-      alert(`Найдено студентов: ${students.length}. Смотри консоль для деталей.`);
-    } catch (error) {
-      console.error('Debug students error:', error);
-      alert(`Ошибка отладки: ${error.message}`);
-    }
-  };
-
-  // Тест загрузки монет
-  const testCoinsReload = async () => {
-    try {
-      setCoinsLoading(true);
-      const response = await api.get('/students/me');
-      console.log('Coins reload test:', response.data);
-      setStudentData(response.data);
-      alert(`Монеты обновлены: ${response.data.points}`);
-    } catch (error) {
-      console.error('Coins reload error:', error);
-      alert(`Ошибка обновления монет: ${error.message}`);
-    } finally {
-      setCoinsLoading(false);
-    }
-  };
-
   return (
     <div className="app-layout">
       <Sidebar activeItem="dashboard" userRole={fullUser.role} />
@@ -233,35 +170,7 @@ export default function HomePage() {
           onProfileClick={() => navigate('/profile')}
         />
 
-        {/* Временные кнопки для тестирования */}
-        {fullUser?.role === 'student' && (
-          <div className="debug-buttons">
-            <button 
-              onClick={debugStudents}
-              className="debug-btn purple"
-            >
-              Отладка студентов
-            </button>
-            <button 
-              onClick={testProfile}
-              className="debug-btn success"
-            >
-              Тест профиля
-            </button>
-            <button 
-              onClick={testNotification}
-              className="debug-btn info"
-            >
-              Тест уведомления
-            </button>
-            <button 
-              onClick={testCoinsReload}
-              className="debug-btn warning"
-            >
-              Обновить монеты
-            </button>
-          </div>
-        )}
+
 
         <section className="cards">
           {/* Расписание - всегда первое */}
@@ -339,23 +248,7 @@ export default function HomePage() {
                 Подробнее
               </button>
             </div>
-            {/* Убираем дополнительную информацию на мобильных через CSS */}
-            <div className="bestcoins-header desktop-only">
-              {user?.role === 'student' && (
-                <div className="coins-info">
-                  {coinsLoading ? (
-                    <span className="coins-loading">Загрузка...</span>
-                  ) : (
-                    <div className="coins-details">
-                      <span className="coins-source">Данные из: /students/me</span>
-                      <span className="coins-updated">
-                        Обновлено: {new Date().toLocaleTimeString()}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+
             <BestCoins 
               amount={getCoinsAmount()} 
               loading={user?.role === 'student' ? coinsLoading : false}

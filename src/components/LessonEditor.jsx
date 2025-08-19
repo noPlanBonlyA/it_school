@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { 
   createLessonWithMaterials, 
   updateLessonWithMaterials,
+  updateLessonNameOnly,
+  deleteLessonMaterial,
   createLessonWithAutoSchedule,
   createLessonWithMaterialsTextAndAutoSchedule
 } from '../services/lessonService';
@@ -30,10 +32,17 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
   // Опция автоматического расписания
   const [useAutoSchedule, setUseAutoSchedule] = useState(true);
   
+  // Состояние для отслеживания удаленных материалов
+  const [deletedMaterials, setDeletedMaterials] = useState(new Set());
+  
   const [loading, setLoading] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleDeleteMaterial = (materialType) => {
+    setDeletedMaterials(prev => new Set([...prev, materialType]));
   };
 
   const handleFileChange = (type, file) => {
@@ -79,6 +88,36 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
         ...(teacherMaterialText && { teacher_material_text: teacherMaterialText }),
         ...(studentMaterialText && { student_material_text: studentMaterialText })
       };
+
+      // При редактировании урока добавляем флаги сохранения существующих материалов
+      if (lesson) {
+        // Сохраняем существующие основные материалы, если новые не предоставлены и они не помечены для удаления
+        if (!teacherMaterialText && lesson.teacher_material_url && !deletedMaterials.has('teacher_material')) {
+          lessonData.keep_existing_teacher_material = true;
+        }
+        if (!studentMaterialText && lesson.student_material_url && !deletedMaterials.has('student_material')) {
+          lessonData.keep_existing_student_material = true;
+        }
+        if (lesson.homework_material_url && !deletedMaterials.has('homework_material')) {
+          lessonData.keep_existing_homework_material = true;
+        }
+
+        // Сохраняем существующие дополнительные материалы, если новые файлы не загружены и они не помечены для удаления
+        if (!teacherAdditionalMaterialFile && lesson.teacher_additional_material_url && !deletedMaterials.has('teacher_additional_material')) {
+          lessonData.keep_existing_teacher_additional_material = true;
+        }
+        if (!studentAdditionalMaterialFile && lesson.student_additional_material_url && !deletedMaterials.has('student_additional_material')) {
+          lessonData.keep_existing_student_additional_material = true;
+        }
+        if (lesson.homework_additional_material_url && !deletedMaterials.has('homework_additional_material')) {
+          lessonData.keep_existing_homework_additional_material = true;
+        }
+
+        // Добавляем список материалов для удаления
+        if (deletedMaterials.size > 0) {
+          lessonData.delete_materials = Array.from(deletedMaterials);
+        }
+      }
       
       // Добавляем JSON данные
       submitData.append('data', JSON.stringify(lessonData));
@@ -243,9 +282,23 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
                 </label>
               </div>
               
-              {lesson?.teacher_material && (
+              {lesson?.teacher_material && !deletedMaterials.has('teacher_material') && (
                 <div className="current-material">
-                  Текущий материал: {lesson.teacher_material.name}
+                  <span>Текущий материал: {lesson.teacher_material.name}</span>
+                  <button 
+                    type="button"
+                    onClick={() => handleDeleteMaterial('teacher_material')}
+                    className="btn-danger btn-mini"
+                    style={{marginLeft: '10px'}}
+                  >
+                    🗑️ Удалить
+                  </button>
+                </div>
+              )}
+              
+              {deletedMaterials.has('teacher_material') && (
+                <div className="deleted-material">
+                  ✅ Материал будет удален при сохранении
                 </div>
               )}
             </div>
@@ -290,6 +343,26 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
                   </div>
                 )}
               </div>
+              
+              {lesson?.teacher_additional_material_url && !deletedMaterials.has('teacher_additional_material') && (
+                <div className="current-material">
+                  <span>Текущий доп. материал: {lesson.teacher_additional_material_name || 'Файл'}</span>
+                  <button 
+                    type="button"
+                    onClick={() => handleDeleteMaterial('teacher_additional_material')}
+                    className="btn-danger btn-mini"
+                    style={{marginLeft: '10px'}}
+                  >
+                    🗑️ Удалить
+                  </button>
+                </div>
+              )}
+              
+              {deletedMaterials.has('teacher_additional_material') && (
+                <div className="deleted-material">
+                  ✅ Дополнительный материал будет удален при сохранении
+                </div>
+              )}
             </div>
           </div>
 
@@ -329,9 +402,23 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
                 </label>
               </div>
               
-              {lesson?.student_material && (
+              {lesson?.student_material && !deletedMaterials.has('student_material') && (
                 <div className="current-material">
-                  Текущий материал: {lesson.student_material.name}
+                  <span>Текущий материал: {lesson.student_material.name}</span>
+                  <button 
+                    type="button"
+                    onClick={() => handleDeleteMaterial('student_material')}
+                    className="btn-danger btn-mini"
+                    style={{marginLeft: '10px'}}
+                  >
+                    🗑️ Удалить
+                  </button>
+                </div>
+              )}
+              
+              {deletedMaterials.has('student_material') && (
+                <div className="deleted-material">
+                  ✅ Материал будет удален при сохранении
                 </div>
               )}
             </div>
@@ -376,6 +463,26 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
                   </div>
                 )}
               </div>
+              
+              {lesson?.student_additional_material_url && !deletedMaterials.has('student_additional_material') && (
+                <div className="current-material">
+                  <span>Текущий доп. материал: {lesson.student_additional_material_name || 'Файл'}</span>
+                  <button 
+                    type="button"
+                    onClick={() => handleDeleteMaterial('student_additional_material')}
+                    className="btn-danger btn-mini"
+                    style={{marginLeft: '10px'}}
+                  >
+                    🗑️ Удалить
+                  </button>
+                </div>
+              )}
+              
+              {deletedMaterials.has('student_additional_material') && (
+                <div className="deleted-material">
+                  ✅ Дополнительный материал будет удален при сохранении
+                </div>
+              )}
             </div>          </div>
 
         </div>

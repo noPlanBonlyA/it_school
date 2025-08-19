@@ -4,6 +4,8 @@ body, html, #root {
   padding: 0;
   height: 100%;
   font-family: 'Nunito Sans', sans-serif;
+  background-color: #FFFFFF;
+  overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
 }
 
 a {
@@ -20,6 +22,36 @@ button {
 .container {
   display: flex;
   height: 100%;
+}
+
+/* Универсальный layout для всех страниц */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  font-family: 'Mont', 'Nunito Sans', sans-serif;
+  background: #FFFFFF;
+  position: relative; /* Создаем контекст позиционирования */
+  overflow: hidden; /* Предотвращаем горизонтальную прокрутку */
+}
+
+/* Основной контент всех страниц */
+.main-content {
+  margin-left: 240px; /* Отступ для фиксированного сайдбара */
+  flex: 1;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease; /* Плавный переход */
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  position: relative; /* Убеждаемся в правильном позиционировании */
+  z-index: 1; /* Контент ниже сайдбара */
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0; /* На мобильных убираем отступ */
+  }
 }
 
 /* Стили для уроков */

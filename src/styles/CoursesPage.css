@@ -3,7 +3,7 @@
 .courses-page {
   display: flex;
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: #FFFFFF;
 }
 
 .main-content {
@@ -96,7 +96,7 @@
 }
 
 .course-count {
-  background: #3b82f6;
+  background: #00B18F;
   color: white;
   padding: 4px 12px;
   border-radius: 16px;

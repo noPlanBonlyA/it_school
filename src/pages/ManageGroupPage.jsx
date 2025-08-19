@@ -31,6 +31,7 @@ import {
 import api from '../api/axiosInstance';
 import '../styles/ManageUserPage.css';
 import '../styles/ManageGroupPage.css';
+import '../styles/ManageGroupPage-mobile.css';
 import '../styles/AutoScheduleModal.css';
 import '../styles/GroupManagement.css';
 
@@ -421,7 +422,7 @@ export default function ManageGroupPage() {
   };
 
   const rmStudent = async sid => {
-    if (!window.confirm('Удалить студента?')) return;
+    if (!window.confirm('Удалить студента из группы?')) return;
     try {
       await removeStudentFromGroup(sel.id, sid);
       const fr = await refresh(sel.id);
@@ -458,7 +459,7 @@ export default function ManageGroupPage() {
   };
 
   const rmTeacher = async tid => {
-    if (!window.confirm('Удалить преподавателя?')) return;
+    if (!window.confirm('Удалить преподавателя из группы?')) return;
     try {
       await removeTeacherFromGroup(sel.id, tid);
       const fr = await refresh(sel.id);
@@ -629,7 +630,6 @@ export default function ManageGroupPage() {
           <div className="block create-group-block">
             <div className="create-group-header">
               <h2>Создать новую группу</h2>
-              <DefaultScheduleSettings />
             </div>
             <div className="create-group-form">
               <div className="field">
@@ -704,21 +704,21 @@ export default function ManageGroupPage() {
         {/*— modal —*/}
         {show && sel && (
           <div className="modal-overlay">
-            <div className="modal-content">
+            <div className="modal-content large">
 
               {/* header */}
               <div className="modal-header">
                 <h2>Управление группой: {sel.name}</h2>
-                <button className="modal-close-btn" onClick={close}>
+                <button className="close-modal" onClick={close}>
                   ×
                 </button>
               </div>
 
               {/* body */}
-              <div className="modal-body">
+              <div className="modal-body grid">
 
                 {/* panel: parameters */}
-                <div className="panel">
+                <div className="panel parameters">
                   <h3>Параметры группы</h3>
                   <div>
                     {['name','description'].map(f=>(
@@ -754,7 +754,7 @@ export default function ManageGroupPage() {
                 </div>
 
                 {/* panel: members */}
-                <div className="panel">
+                <div className="panel members">
                   <h3 style={{ marginTop: 0 }}>Участники</h3>
 
                   {/*─ teacher ─*/}
@@ -763,7 +763,7 @@ export default function ManageGroupPage() {
                       <h4>Преподаватель</h4>
                       {!sel.teacher && (
                         <button 
-                          className="section-btn btn-primary" 
+                          className="btn-mini" 
                           onClick={async()=>{
                             const n=!addTea; setAddTea(n); setAddStu(false); setAddCou(false);
                             if(n) await loadTea();
@@ -775,7 +775,7 @@ export default function ManageGroupPage() {
                     </div>
 
                     {sel.teacher ? (
-                      <div className="member-card">
+                      <div className="member-item">
                         <span>
                           {sel.teacher.first_name} {sel.teacher.surname} 
                           <em style={{ color: '#6b7280', marginLeft: '8px' }}>
@@ -783,7 +783,7 @@ export default function ManageGroupPage() {
                           </em>
                         </span>
                         <button 
-                          className="member-remove-btn" 
+                          className="remove-btn" 
                           onClick={()=>rmTeacher(sel.teacher.id)}
                           title="Удалить преподавателя"
                         >
@@ -791,38 +791,40 @@ export default function ManageGroupPage() {
                         </button>
                       </div>
                     ) : addTea && (
-                      <div className="add-form">
-                        <input 
-                          placeholder="Поиск преподавателя..." 
-                          value={tFil} 
-                          onChange={e=>setTFil(e.target.value)}
-                        />
-                        <div className="list-container">
-                          {teaLoaded
-                            ? fTea.length ? fTea.map(t=>(
-                                <label 
-                                  key={t.profileId}
-                                  className={`list-item ${chosenT===t.userId ? 'selected' : ''}`}
-                                >
-                                  <input 
-                                    type="radio" 
-                                    name="teacher"
-                                    checked={chosenT===t.userId}
-                                    onChange={()=>setChosenT(t.userId)}
-                                  />
-                                  {hi(`${t.first_name} ${t.surname}`,tFil)} ({hi(t.username,tFil)})
-                                </label>
-                              )) : <div className="empty-state">Преподаватели не найдены</div>
-                            : <div className="loading-state">Загрузка преподавателей...</div>}
+                      <>
+                        <div className="add-panel">
+                          <input 
+                            placeholder="Поиск преподавателя..." 
+                            value={tFil} 
+                            onChange={e=>setTFil(e.target.value)}
+                          />
+                          <div className="scroll-list">
+                            {teaLoaded
+                              ? fTea.length ? fTea.map(t=>(
+                                  <label 
+                                    key={t.profileId}
+                                    className={`row-select ${chosenT===t.userId ? 'selected' : ''}`}
+                                  >
+                                    <input 
+                                      type="radio" 
+                                      name="teacher"
+                                      checked={chosenT===t.userId}
+                                      onChange={()=>setChosenT(t.userId)}
+                                    />
+                                    {hi(`${t.first_name} ${t.surname}`,tFil)} ({hi(t.username,tFil)})
+                                  </label>
+                                )) : <div className="empty-text">Преподаватели не найдены</div>
+                              : <div className="empty-text">Загрузка преподавателей...</div>}
+                          </div>
+                          <button 
+                            className="btn-mini" 
+                            disabled={!chosenT} 
+                            onClick={assignTeacher}
+                          >
+                            Назначить преподавателя
+                          </button>
                         </div>
-                        <button 
-                          className="submit-btn" 
-                          disabled={!chosenT} 
-                          onClick={assignTeacher}
-                        >
-                          Назначить преподавателя
-                        </button>
-                      </div>
+                      </>
                     )}
                   </div>
 
@@ -831,7 +833,7 @@ export default function ManageGroupPage() {
                     <div className="section-header">
                       <h4>Студенты ({sel.students.length})</h4>
                       <button 
-                        className="section-btn btn-primary" 
+                        className="btn-mini" 
                         onClick={async()=>{
                           const n=!addStu; setAddStu(n); setAddTea(false); setAddCou(false);
                           if(n) await loadStu();
@@ -842,19 +844,19 @@ export default function ManageGroupPage() {
                     </div>
 
                     {addStu && (
-                      <div className="add-form">
+                      <div className="add-panel">
                         <input 
                           placeholder="Поиск студентов..." 
                           value={sFil} 
                           onChange={e=>setSFil(e.target.value)}
                         />
-                        <div className="list-container">
+                        <div className="scroll-list">
                           {stuLoaded
                             ? fStu.length ? fStu.map(s=>(
                                 (s.username||s.first_name||s.surname) && (
                                   <label 
                                     key={s.profileId}
-                                    className={`list-item ${s.already ? 'disabled' : ''} ${chk.has(s.profileId) ? 'selected' : ''}`}
+                                    className={`row-select ${s.already ? 'disabled' : ''} ${chk.has(s.profileId) ? 'selected' : ''}`}
                                   >
                                     <input 
                                       type="checkbox" 
@@ -872,11 +874,11 @@ export default function ManageGroupPage() {
                                     {s.already && <em style={{ color: '#ef4444' }}> — уже в группе</em>}
                                   </label>
                                 )
-                              )) : <div className="empty-state">Студенты не найдены</div>
-                            : <div className="loading-state">Загрузка студентов...</div>}
+                              )) : <div className="empty-text">Студенты не найдены</div>
+                            : <div className="empty-text">Загрузка студентов...</div>}
                         </div>
                         <button 
-                          className="submit-btn" 
+                          className="btn-mini" 
                           disabled={chk.size===0} 
                           onClick={addStudents}
                         >
@@ -885,9 +887,9 @@ export default function ManageGroupPage() {
                       </div>
                     )}
 
-                    <div className="members-container">
+                    <div className="scroll-list">
                       {sel.students.length ? sel.students.map(st=>(
-                        <div key={st.id} className="member-card">
+                        <div key={st.id} className="member-item">
                           <span>
                             {st.first_name} {st.surname}
                             <em style={{ color: '#6b7280', marginLeft: '8px' }}>
@@ -895,14 +897,14 @@ export default function ManageGroupPage() {
                             </em>
                           </span>
                           <button 
-                            className="member-remove-btn" 
+                            className="remove-btn" 
                             onClick={()=>rmStudent(st.id)}
                             title="Удалить студента"
                           >
                             ×
                           </button>
                         </div>
-                      )) : <div className="empty-state">Студенты не добавлены</div>}
+                      )) : <div className="empty-text">Студенты не добавлены</div>}
                     </div>
                   </div>
 
@@ -919,7 +921,7 @@ export default function ManageGroupPage() {
                           />
                         )}
                         <button 
-                          className="section-btn btn-primary" 
+                          className="btn-mini" 
                           onClick={async()=>{
                             const n=!addCou; setAddCou(n); setAddStu(false); setAddTea(false);
                             if(n) await loadCou();
@@ -931,33 +933,30 @@ export default function ManageGroupPage() {
                     </div>
 
                     {/* уже привязанные */}
-                    <div className="courses-container">
+                    <div className="scroll-list">
                       {sel.courses?.length ? sel.courses.map(c=>(
-                        <div key={c.id} className="member-card">
+                        <div key={c.id} className="member-item course">
                           <span>
                             {c.name}
-                            <em style={{ color: '#6b7280', marginLeft: '8px', fontSize: '12px' }}>
-                              (ID: {c.id})
-                            </em>
                           </span>
                         </div>
-                      )) : <div className="empty-state">Курсы не добавлены</div>}
+                      )) : <div className="empty-text">Курсы не добавлены</div>}
                     </div>
 
                     {/* выбор нового */}
                     {addCou && !schedulingMode && (
-                      <div className="add-form">
+                      <div className="add-panel">
                         <input 
                           placeholder="Поиск курсов..." 
                           value={cFil} 
                           onChange={e=>setCFil(e.target.value)}
                         />
-                        <div className="list-container">
+                        <div className="scroll-list">
                           {couLoaded
                             ? fCou.length ? fCou.map(c=>(
                                 <label 
                                   key={c.id}
-                                  className={`list-item ${c.already ? 'disabled' : ''} ${chosenC===c.id ? 'selected' : ''}`}
+                                  className={`row-select ${c.already ? 'disabled' : ''} ${chosenC===c.id ? 'selected' : ''}`}
                                 >
                                   <input 
                                     type="radio" 
@@ -968,11 +967,11 @@ export default function ManageGroupPage() {
                                   {hi(c.name,cFil)}
                                   {c.already && <em style={{ color: '#ef4444' }}> — уже привязан</em>}
                                 </label>
-                              )) : <div className="empty-state">Курсы не найдены</div>
-                            : <div className="loading-state">Загрузка курсов...</div>}
+                              )) : <div className="empty-text">Курсы не найдены</div>
+                            : <div className="empty-text">Загрузка курсов...</div>}
                         </div>
                         <button 
-                          className="submit-btn" 
+                          className="btn-mini" 
                           disabled={!chosenC} 
                           onClick={addCourse}
                         >
@@ -995,8 +994,8 @@ export default function ManageGroupPage() {
                                 Урок {index + 1}: {lesson.name}
                               </h5>
                               
-                              <div className="schedule-lesson-grid">
-                                <div className="schedule-lesson-field">
+                              <div className="schedule-lesson-fields">
+                                <div className="field">
                                   <label>Дата и время начала:</label>
                                   <input
                                     type="datetime-local"
@@ -1006,7 +1005,7 @@ export default function ManageGroupPage() {
                                   />
                                 </div>
                                 
-                                <div className="schedule-lesson-field">
+                                <div className="field">
                                   <label>Дата и время окончания:</label>
                                   <input
                                     type="datetime-local"
@@ -1016,7 +1015,7 @@ export default function ManageGroupPage() {
                                   />
                                 </div>
                                 
-                                <div className="schedule-lesson-field schedule-auditorium-field">
+                                <div className="field">
                                   <label>Аудитория (необязательно):</label>
                                   <input
                                     type="text"

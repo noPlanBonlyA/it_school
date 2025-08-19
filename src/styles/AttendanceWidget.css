@@ -22,6 +22,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .attendance-header h3 {
@@ -29,11 +31,29 @@
   color: #1f2937;
   font-size: 1.25rem;
   font-weight: 600;
+  flex-shrink: 0;
 }
 
 .attendance-summary {
   font-size: 0.875rem;
   color: #6b7280;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Мобильная адаптация заголовка */
+@media (max-width: 480px) {
+  .attendance-header {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 8px;
+  }
+  
+  .attendance-summary {
+    text-align: left;
+    width: 100%;
+  }
 }
 
 .summary-text strong {
@@ -52,6 +72,18 @@
 /* Адаптивная сетка для будущих уроков */
 .attendance-stats-grid:has(.future-lessons) {
   grid-template-columns: repeat(5, 1fr);
+}
+
+/* Улучшенная адаптация для мобильных */
+@media (max-width: 480px) {
+  .attendance-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .attendance-stats-grid:has(.future-lessons) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .stat-item {
@@ -308,6 +340,9 @@
   border: 1px solid transparent;
   font-size: 12px;
   font-weight: 500;
+  /* Улучшения для сенсорных устройств */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .day-cell:hover {
@@ -315,6 +350,31 @@
   z-index: 5;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   position: relative;
+}
+
+/* Улучшенные стили для сенсорных устройств */
+@media (hover: none) and (pointer: coarse) {
+  .day-cell:hover {
+    transform: none;
+  }
+  
+  .day-cell:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+  
+  .nav-button:hover {
+    transform: none;
+  }
+  
+  .nav-button:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+  
+  .stat-item:hover {
+    transform: none;
+  }
 }
 
 .day-number {
@@ -471,18 +531,22 @@
   background: rgba(255, 255, 255, 0.5);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-wrap: wrap;
 }
 
 .legend-label {
   font-size: 0.75rem;
   color: #6b7280;
   font-weight: 500;
+  margin: 0 4px;
 }
 
 .legend-colors {
   display: flex;
   gap: 16px;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .legend-item {
@@ -492,6 +556,7 @@
   padding: 4px 8px;
   border-radius: 6px;
   transition: background-color 0.2s ease;
+  white-space: nowrap;
 }
 
 .legend-item:hover {
@@ -516,41 +581,81 @@
 @media (max-width: 768px) {
   .attendance-widget {
     padding: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .attendance-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .attendance-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .attendance-summary {
+    font-size: 0.8rem;
   }
   
   .attendance-stats-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
+    margin-bottom: 24px;
   }
   
   .attendance-stats-grid:has(.future-lessons) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .stat-item {
+    padding: 12px 8px;
   }
   
   .stat-number {
     font-size: 1.25rem;
   }
   
+  .stat-label {
+    font-size: 0.8rem;
+  }
+  
+  /* Календарный контейнер */
+  .calendar-container {
+    padding: 16px;
+    border-radius: 10px;
+  }
+  
   /* Месячный календарь на мобильных */
   .month-navigation {
-    padding: 10px;
-    gap: 15px;
+    padding: 12px;
+    gap: 12px;
+    flex-wrap: wrap;
   }
   
   .nav-button {
-    padding: 6px 8px;
+    padding: 8px 12px;
     font-size: 14px;
-    min-width: 35px;
+    min-width: 40px;
   }
   
   .current-month {
     font-size: 16px;
-    min-width: 150px;
+    min-width: 140px;
+    order: -1;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .today-button {
+    font-size: 12px;
+    padding: 6px 12px;
   }
   
   .day-cell {
-    width: 35px;
-    height: 35px;
+    width: 32px;
+    height: 32px;
     font-size: 11px;
   }
   
@@ -562,6 +667,8 @@
     width: 10px;
     height: 10px;
     font-size: 7px;
+    bottom: 1px;
+    right: 1px;
   }
   
   .weekday-label {
@@ -570,66 +677,146 @@
   }
   
   .calendar-legend {
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-direction: column;
+    gap: 12px;
     padding: 12px;
+    margin-top: 16px;
   }
   
-  .legend-item span {
+  .legend-label {
     font-size: 0.7rem;
+    font-weight: 600;
+    order: 1;
+  }
+  
+  .legend-colors {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    order: 2;
+  }
+  
+  .legend-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 4px;
+    min-width: 50px;
+    padding: 6px 4px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.05);
   }
   
   .legend-item .day-cell {
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
+  }
+  
+  .legend-item span {
+    font-size: 0.65rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
   }
 }
 
 @media (max-width: 480px) {
+  .attendance-widget {
+    padding: 12px;
+    border-radius: 12px;
+  }
+  
+  .attendance-header {
+    margin-bottom: 16px;
+  }
+  
+  .attendance-header h3 {
+    font-size: 1rem;
+  }
+  
+  .attendance-summary {
+    font-size: 0.75rem;
+  }
+  
   .attendance-stats-grid {
     grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .stat-item {
+    padding: 10px 6px;
+    border-radius: 8px;
+  }
+  
+  .stat-number {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+  }
+  
+  .stat-label {
+    font-size: 0.7rem;
+    line-height: 1.2;
+  }
+  
+  .calendar-container {
+    padding: 12px;
+    border-radius: 8px;
   }
   
   .month-navigation {
     padding: 8px;
-    gap: 10px;
+    gap: 8px;
+    border-radius: 8px;
   }
   
   .current-month {
     font-size: 14px;
-    min-width: 120px;
+    min-width: 100%;
+    margin-bottom: 12px;
   }
   
   .nav-button {
-    padding: 5px 6px;
+    padding: 6px 8px;
     font-size: 12px;
-    min-width: 30px;
+    min-width: 32px;
+    border-radius: 6px;
   }
   
   .today-button {
-    padding: 5px 8px;
-    font-size: 11px;
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+  
+  .weekdays-header {
+    margin-bottom: 8px;
+    gap: 1px;
+  }
+  
+  .weekday-label {
+    font-size: 9px;
+    padding: 4px 1px;
+    font-weight: 700;
   }
   
   .day-cell {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     font-size: 10px;
+    border-radius: 4px;
   }
   
   .day-number {
     font-size: 9px;
+    font-weight: 700;
   }
   
   .lesson-indicator {
     width: 8px;
     height: 8px;
     font-size: 6px;
-  }
-  
-  .weekday-label {
-    font-size: 9px;
-    padding: 4px 1px;
+    bottom: 1px;
+    right: 1px;
   }
   
   .calendar-week {
@@ -638,5 +825,257 @@
   
   .calendar-weeks {
     gap: 1px;
+  }
+  
+  .calendar-legend {
+    margin-top: 16px;
+    padding: 10px;
+    border-radius: 8px;
+    gap: 8px;
+  }
+  
+  .legend-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  
+  .legend-colors {
+    gap: 8px;
+  }
+  
+  .legend-item {
+    padding: 6px;
+    border-radius: 4px;
+    min-width: 50px;
+  }
+  
+  .legend-item .day-cell {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .legend-item span {
+    font-size: 0.65rem;
+    font-weight: 600;
+  }
+}
+
+/* Дополнительная адаптация для очень маленьких экранов */
+@media (max-width: 360px) {
+  .attendance-widget {
+    padding: 8px;
+    border-radius: 10px;
+  }
+  
+  .attendance-header {
+    margin-bottom: 12px;
+  }
+  
+  .attendance-header h3 {
+    font-size: 0.9rem;
+  }
+  
+  .attendance-summary {
+    font-size: 0.7rem;
+  }
+  
+  .attendance-stats-grid {
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  
+  .stat-item {
+    padding: 8px 4px;
+    border-radius: 6px;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .stat-number {
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+  }
+  
+  .stat-label {
+    font-size: 0.6rem;
+    line-height: 1.1;
+    text-align: center;
+  }
+  
+  .calendar-container {
+    padding: 8px;
+    border-radius: 6px;
+  }
+  
+  .month-navigation {
+    padding: 6px;
+    gap: 4px;
+    border-radius: 6px;
+  }
+  
+  .nav-button {
+    padding: 4px 6px;
+    font-size: 11px;
+    min-width: 26px;
+    border-radius: 4px;
+  }
+  
+  .today-button {
+    padding: 4px 6px;
+    font-size: 8px;
+  }
+  
+  .current-month {
+    font-size: 11px;
+    margin-bottom: 8px;
+    font-weight: 800;
+  }
+  
+  .weekdays-header {
+    margin-bottom: 6px;
+    gap: 1px;
+  }
+  
+  .weekday-label {
+    font-size: 7px;
+    padding: 2px 1px;
+    font-weight: 800;
+  }
+  
+  .day-cell {
+    width: 22px;
+    height: 22px;
+    font-size: 8px;
+    border-radius: 3px;
+  }
+  
+  .day-number {
+    font-size: 7px;
+    font-weight: 800;
+  }
+  
+  .lesson-indicator {
+    width: 6px;
+    height: 6px;
+    font-size: 4px;
+    bottom: 0;
+    right: 0;
+  }
+  
+  .calendar-week {
+    gap: 1px;
+  }
+  
+  .calendar-weeks {
+    gap: 1px;
+  }
+  
+  .calendar-legend {
+    margin-top: 12px;
+    padding: 8px;
+    border-radius: 6px;
+    gap: 6px;
+  }
+  
+  .legend-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+  }
+  
+  .legend-colors {
+    gap: 6px;
+  }
+  
+  .legend-item {
+    min-width: 40px;
+    padding: 3px 2px;
+    border-radius: 3px;
+  }
+  
+  .legend-item .day-cell {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .legend-item span {
+    font-size: 0.55rem;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+}
+
+/* Адаптация для горизонтальной ориентации мобильных устройств */
+@media (max-width: 768px) and (orientation: landscape) {
+  .attendance-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  
+  .attendance-stats-grid:has(.future-lessons) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  
+  .stat-item {
+    padding: 8px 6px;
+  }
+  
+  .stat-number {
+    font-size: 1rem;
+  }
+  
+  .stat-label {
+    font-size: 0.7rem;
+  }
+  
+  .month-navigation {
+    padding: 8px;
+  }
+  
+  .current-month {
+    font-size: 14px;
+    min-width: auto;
+    margin-bottom: 0;
+  }
+  
+  .day-cell {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .calendar-legend {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .legend-colors {
+    gap: 8px;
+  }
+  
+  .legend-item {
+    flex-direction: row;
+    min-width: auto;
+    gap: 4px;
+  }
+}
+
+/* Улучшенная читаемость для устройств с высокой плотностью пикселей */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .day-number {
+    font-weight: 600;
+  }
+  
+  .weekday-label {
+    font-weight: 700;
+  }
+  
+  .stat-number {
+    font-weight: 800;
+  }
+  
+  .legend-item span {
+    font-weight: 600;
   }
 }

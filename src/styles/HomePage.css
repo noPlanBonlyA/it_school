@@ -1,36 +1,23 @@
-/* ---------- Общий layout (как на главной) ---------- */
-.app-layout {
-  display: flex;
-  height: 100vh;
-  font-family: 'Mont', 'Nunito Sans', sans-serif;
-  background: #F8FCFB;
-}
-
-/* Основная область справа от Sidebar */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  margin: 0;
-  padding: 0;
-  padding-top: 20px !important; /* Минимальный отступ от TopBar */
-  background: 
-    linear-gradient(135deg, rgba(248, 252, 251, 0.85) 0%, rgba(248, 252, 251, 0.9) 100%),
-    url('../images/bg_new.png'),
-    linear-gradient(135deg, rgba(0, 177, 143, 0.05) 0%, rgba(3, 131, 106, 0.1) 100%),
-    #F8FCFB;
-  background-size: cover, cover, 100% 100%, 100% 100%;
-  background-position: center, center, center, center;
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
-  background-attachment: fixed;
-  min-height: 100vh;
-}
+/* ---------- Специфические стили для главной страницы ---------- */
 
 /* Убираем возможный внешний отступ у Topbar, чтобы он прилегал к верху */
 .topbar {
   margin: 0;
   padding: 0;
+}
+
+/* Основная область на главной странице */
+.main-content {
+  padding-top: 20px !important; /* Минимальный отступ от TopBar */
+  background: #FFFFFF !important;
+  opacity: 1 !important;
+}
+
+/* Адаптивность для мобильных устройств - убираем отступ сайдбара */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+  }
 }
 
 /* Сетка карточек - новая структура с широкими новостями */
@@ -60,6 +47,42 @@
   max-height: 500px; /* Добавили максимальную высоту */
 }
 
+/* Контейнер расписания с прокруткой для десктопа */
+.card.schedule .schedule-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.card.schedule .schedule-container > div:not(.schedule-list) {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Красивый скроллбар для расписания на десктопе */
+.card.schedule .schedule-container > div:not(.schedule-list)::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card.schedule .schedule-container > div:not(.schedule-list)::-webkit-scrollbar-track {
+  background: rgba(0, 177, 143, 0.1);
+  border-radius: 10px;
+  margin: 4px 0;
+}
+
+.card.schedule .schedule-container > div:not(.schedule-list)::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.4) 0%, rgba(3, 131, 106, 0.6) 100%);
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card.schedule .schedule-container > div:not(.schedule-list)::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.6) 0%, rgba(3, 131, 106, 0.8) 100%);
+}
+
 /* Новости - занимают всю правую колонку (теперь шире) */
 .card.news {
   grid-column: 2; /* Правая колонка (широкая) */
@@ -85,18 +108,23 @@
 /* Общие стили для всех карточек */
 .card {
   background: #FFFFFF;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 177, 143, 0.1);
+  border-radius: 20px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 2px 16px rgba(0, 177, 143, 0.12);
   padding: 24px;
-  border: 1px solid rgba(0, 177, 143, 0.1);
+  border: 2px solid rgba(0, 177, 143, 0.15);
   position: relative;
   z-index: 1;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 177, 143, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.12),
+    0 4px 24px rgba(0, 177, 143, 0.2);
+  border-color: rgba(0, 177, 143, 0.25);
 }
 
 /* Стили для кликабельных карточек */
@@ -316,13 +344,12 @@
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   margin-bottom: 12px; /* Уменьшили отступ между новостями */
-  border: 1px solid rgba(0, 177, 143, 0.1);
+  border: 2px solid rgba(0, 177, 143, 0.12);
   box-shadow: 
-    0 4px 20px rgba(0, 177, 143, 0.08),
-    0 1px 3px rgba(0, 0, 0, 0.05);
+    0 6px 24px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 177, 143, 0.1);
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(10px);
   break-inside: avoid; /* Предотвращаем разрыв новости между колонками */
 }
 
@@ -342,9 +369,9 @@
 .news-row:hover {
   transform: translateY(-6px) scale(1.02);
   box-shadow: 
-    0 12px 40px rgba(0, 177, 143, 0.15),
-    0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: rgba(0, 177, 143, 0.2);
+    0 16px 48px rgba(0, 0, 0, 0.12),
+    0 4px 16px rgba(0, 177, 143, 0.2);
+  border-color: rgba(0, 177, 143, 0.25);
 }
 
 .news-row:hover::before {
@@ -352,10 +379,10 @@
 }
 
 .news-row.pinned {
-  border: 2px solid #ffc107;
+  border: 3px solid #ffc107;
   box-shadow: 
-    0 4px 20px rgba(255, 193, 7, 0.2),
-    0 0 0 1px rgba(255, 193, 7, 0.1);
+    0 8px 32px rgba(255, 193, 7, 0.25),
+    0 2px 8px rgba(255, 193, 7, 0.15);
   background: linear-gradient(145deg, #fffef7 0%, #fefce8 100%);
 }
 
@@ -371,9 +398,9 @@
 
 .news-row.pinned:hover {
   box-shadow: 
-    0 12px 40px rgba(255, 193, 7, 0.25),
-    0 4px 12px rgba(255, 193, 7, 0.1);
-  border-color: rgba(255, 193, 7, 0.4);
+    0 16px 48px rgba(255, 193, 7, 0.3),
+    0 4px 16px rgba(255, 193, 7, 0.2);
+  border-color: rgba(255, 193, 7, 0.5);
 }
 
 .news-thumb {
@@ -583,7 +610,7 @@
   color: #919191;
 }
 
-/* Стили для мини-виджета события */
+/* Мини-виджет события с красивыми границами */
 .event-details {
   position: absolute;
   top: 0;
@@ -591,14 +618,14 @@
   right: 0;
   bottom: 0;
   background: #FFFFFF;
-  border-radius: 16px;
+  border-radius: 20px;
   box-shadow: 
-    0 8px 32px rgba(0, 177, 143, 0.15),
-    0 0 0 1px rgba(0, 177, 143, 0.1);
+    0 16px 48px rgba(0, 0, 0, 0.12),
+    0 4px 16px rgba(0, 177, 143, 0.2);
   padding: 24px;
   overflow-y: auto;
   z-index: 10;
-  border: 1px solid rgba(0, 177, 143, 0.1);
+  border: 2px solid rgba(0, 177, 143, 0.2);
   animation: slideInFromBottom 0.4s ease-out;
 }
 
@@ -627,22 +654,22 @@
   font-size: 16px;
   cursor: pointer;
   color: #00B18F;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   transition: all 0.3s ease;
-  border: 1px solid rgba(0, 177, 143, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 177, 143, 0.1);
+  border: 2px solid rgba(0, 177, 143, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 177, 143, 0.15);
 }
 
 .close-btn:hover {
   background: rgba(0, 177, 143, 0.2);
   color: #03836A;
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 177, 143, 0.2);
+  box-shadow: 0 6px 16px rgba(0, 177, 143, 0.25);
 }
 
 .event-header {
@@ -752,7 +779,6 @@
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
   border-radius: 12px;
   border: 1px solid rgba(59, 130, 246, 0.2);
-  backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
 }
@@ -946,9 +972,172 @@
     grid-column: 1;
     grid-row: 1; /* Расписание первое */
     order: 1;
-    /* Убираем фиксированную высоту */
-    min-height: auto;
-    max-height: none;
+    /* Убираем фиксированную высоту, но добавляем максимальную */
+    min-height: 250px;
+    max-height: 60vh; /* Максимум 60% высоты экрана */
+    overflow: hidden;
+  }
+  
+  /* Улучшенные стили расписания для мобильных */
+  .card.schedule .schedule-container {
+    padding: 8px;
+    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 400px; /* Ограничиваем максимальную высоту */
+    overflow: hidden;
+  }
+  
+  .card.schedule .schedule-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    overflow-y: auto; /* Добавляем вертикальный скролл */
+    padding-right: 4px; /* Отступ для скроллбара */
+  }
+  
+  .card.schedule .schedule-list li {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.8) 100%);
+    border: 1px solid rgba(0, 177, 143, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 177, 143, 0.08);
+    transition: all 0.3s ease;
+    gap: 8px;
+    cursor: pointer;
+  }
+  
+  .card.schedule .schedule-list li:hover {
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.08) 0%, rgba(232, 248, 245, 0.9) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 177, 143, 0.15);
+    border-color: rgba(0, 177, 143, 0.3);
+  }
+  
+  /* Верхняя строка с временем и статусом */
+  .card.schedule .schedule-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  
+  .card.schedule .schedule-list .time {
+    background: rgba(0, 177, 143, 0.1);
+    color: #00B18F;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px solid rgba(0, 177, 143, 0.2);
+    min-width: auto;
+  }
+  
+  .card.schedule .schedule-status {
+    background: #e8f5e8;
+    color: #2d5a2d;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Основная информация о занятии */
+  .card.schedule .schedule-main-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .card.schedule .schedule-list .title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.3;
+    margin: 0;
+  }
+  
+  .card.schedule .schedule-course-info {
+    color: #00B18F;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  
+  /* Дополнительная информация */
+  .card.schedule .schedule-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  
+  .card.schedule .schedule-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+  
+  .card.schedule .schedule-detail-item .icon {
+    font-size: 12px;
+    opacity: 0.8;
+  }
+  
+  /* Красивый скроллбар для виджета расписания */
+  .card.schedule .schedule-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .card.schedule .schedule-list::-webkit-scrollbar-track {
+    background: rgba(0, 177, 143, 0.1);
+    border-radius: 8px;
+    margin: 4px 0;
+  }
+  
+  .card.schedule .schedule-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.4) 0%, rgba(3, 131, 106, 0.6) 100%);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .card.schedule .schedule-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.6) 0%, rgba(3, 131, 106, 0.8) 100%);
+  }
+  
+  .card.schedule .schedule-list .meta {
+    display: none; /* Скрываем старую мета-информацию */
+  }
+  
+  /* Пустое состояние расписания для мобильных */
+  .card.schedule .schedule-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+  }
+  
+  .card.schedule .schedule-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+  }
+  
+  .card.schedule .schedule-empty p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #374151;
   }
   
   .card.news {
@@ -974,8 +1163,10 @@
     padding: 20px;
     border-radius: 20px;
     margin-bottom: 0;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.08),
+      0 2px 16px rgba(0, 177, 143, 0.12);
+    border: 2px solid rgba(0, 177, 143, 0.15);
   }
   
   .card h3 {
@@ -1162,6 +1353,19 @@
   .card.coins {
     min-height: 120px !important; /* Еще меньше на маленьких экранах */
     max-height: 150px;
+  }
+  
+  .card.schedule {
+    min-height: 200px !important; /* Компактнее на маленьких экранах */
+    max-height: 50vh !important; /* Еще меньше максимальной высоты */
+  }
+  
+  .card.schedule .schedule-container {
+    max-height: 180px !important; /* Ограничиваем высоту контейнера */
+  }
+  
+  .card.schedule .schedule-list::-webkit-scrollbar {
+    width: 4px; /* Еще более тонкий скроллбар */
   }
   
   .card.news {

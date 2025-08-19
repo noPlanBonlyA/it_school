@@ -814,6 +814,43 @@
   resize: vertical;
 }
 
+/* Стили для отображения существующих материалов */
+.current-material {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(0, 177, 143, 0.1);
+  border: 1px solid rgba(0, 177, 143, 0.2);
+  border-radius: 8px;
+  margin-top: 12px;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.current-material span {
+  font-weight: 500;
+}
+
+.deleted-material {
+  padding: 12px 16px;
+  background: rgba(46, 204, 113, 0.1);
+  border: 1px solid rgba(46, 204, 113, 0.2);
+  border-radius: 8px;
+  margin-top: 12px;
+  color: #27ae60;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-mini {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  min-width: auto;
+  height: auto;
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
   .lessons-grid {
