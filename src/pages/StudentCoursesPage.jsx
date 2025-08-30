@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import Sidebar   from '../components/Sidebar';
+import Sidebar from '../components/Sidebar';
 import SmartTopBar from '../components/SmartTopBar';
 import CourseProgressBar from '../components/CourseProgressBar';
+import CourseImage from '../components/CourseImage';
 import { useAuth } from '../contexts/AuthContext';
-
 import { listStudentCourses, getAllCoursesFiltered, getStudentLessonProgress } from '../services/courseService';
 import '../styles/CourseCard.css';
+import '../styles/CourseImageStyles.css';
+import '../styles/MobileImageFixes.css';
 
 export default function StudentCoursesPage() {
   const navigate      = useNavigate();
@@ -68,13 +69,6 @@ export default function StudentCoursesPage() {
       ? course.age_category.join(', ') 
       : course.age_category;
 
-    let imageUrl = '';
-    if (course.photo?.url) {
-      imageUrl = course.photo.url.startsWith('http')
-        ? course.photo.url
-        : `${window.location.protocol}//${window.location.hostname}:8080${course.photo.url}`;
-    }
-
     // Получаем прогресс по урокам для этого курса
     const courseProgress = course.progress || 0;
     const courseLessons = lessonProgress.filter(lesson => {
@@ -90,13 +84,12 @@ export default function StudentCoursesPage() {
         onClick={disabled ? openDisabled : () => openCourse(course.id)}
         style={disabled ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
       >
-        {imageUrl ? (
-          <img src={imageUrl} alt={course.name} />
-        ) : (
-          <div className="course-placeholder">
-            <span>📚</span>
-          </div>
-        )}
+        <CourseImage
+          src={course.photo?.url}
+          alt={course.name}
+          className="course-card-image"
+          placeholder="📚"
+        />
         <div className="meta">
           <h3>{course.name}</h3>
           <p>{course.description?.substring(0, 60)}...</p>
@@ -114,7 +107,7 @@ export default function StudentCoursesPage() {
           <div className="course-info-footer">
             {course.author_name && <span className="author">👩‍🏫 {course.author_name}</span>}
             {ageCategory && <span className="age">👥 {ageCategory}</span>}
-            {disabled && <span className="status">� Запись</span>}
+            {disabled && <span className="status">🔒 Запись</span>}
           </div>
         </div>
       </div>

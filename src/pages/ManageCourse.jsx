@@ -290,7 +290,7 @@ export default function ManageCoursesPage() {
 
   /* ---------- UI ---------- */
   return (
-    <div className="app-layout">
+    <div className="manage-courses app-layout">
       <Sidebar activeItem="manage-courses" userRole={user.role} />
 
       <div className="main-content">

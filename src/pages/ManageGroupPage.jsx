@@ -618,7 +618,7 @@ export default function ManageGroupPage() {
 
   /* ────────────── RENDER ───────────────────*/
   return (
-    <div className="groups-page app-layout manage-users">
+    <div className="groups-page app-layout manage-users manage-groups">
       <Sidebar activeItem="manage-groups" userRole={user.role}/>
       <div className="main-content">
         <SmartTopBar pageTitle="Управление группами" />

@@ -2109,3 +2109,497 @@
     margin: 20px auto;
   }
 }
+
+/* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ДЛЯ МОДАЛЬНОГО ОКНА ПРОВЕДЕНИЯ УРОКА ===== */
+
+/* Базовые стили для мобильной адаптации */
+@media (max-width: 768px) {
+  .modal-overlay.conduct-lesson-modal {
+    padding: 0 !important;
+    padding-left: 0 !important;
+    background: rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .modal-content.large {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    max-height: 100vh !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    animation: slideUpMobile 0.3s ease !important;
+  }
+  
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100vh);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .modal-overlay.conduct-lesson-modal .modal-header {
+    padding: 16px 20px !important;
+    background: linear-gradient(135deg, #00B18F 0%, #03836A 100%) !important;
+    color: white !important;
+    border-bottom: none !important;
+    text-align: center !important;
+    position: relative !important;
+    min-height: 70px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .modal-header h2 {
+    color: white !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    padding-right: 50px !important;
+    text-align: center !important;
+    line-height: 1.4 !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .close-modal {
+    position: absolute !important;
+    top: 16px !important;
+    right: 16px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    font-size: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-left: 0 !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .close-modal:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    transform: scale(1.1) !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .modal-body {
+    padding: 16px !important;
+    background: #f8f9fa !important;
+    overflow-y: auto !important;
+    max-height: calc(100vh - 70px) !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .conduct-lesson-content {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: center !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Стили для секции домашнего задания на мобильных */
+@media (max-width: 768px) {
+  .modal-overlay.conduct-lesson-modal .homework-upload-section {
+    background: white !important;
+    border-radius: 16px !important;
+    padding: 20px !important;
+    margin-bottom: 16px !important;
+    box-shadow: 0 4px 16px rgba(0, 177, 143, 0.1) !important;
+    border: 2px solid rgba(0, 177, 143, 0.15) !important;
+    width: 100% !important;
+    max-width: 500px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-upload-section h3 {
+    text-align: center !important;
+    color: #00B18F !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    margin-bottom: 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-form input[type="text"] {
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    background: white !important;
+    transition: all 0.3s ease !important;
+    text-align: center !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-form input[type="text"]:focus {
+    border-color: #00B18F !important;
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgba(0, 177, 143, 0.1) !important;
+    transform: scale(1.02) !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-content-section,
+  .modal-overlay.conduct-lesson-modal .homework-file-section {
+    background: #f8f9fa !important;
+    border: 2px solid #e9ecef !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-content-section h4,
+  .modal-overlay.conduct-lesson-modal .homework-file-section h4 {
+    color: #374151 !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin-bottom: 10px !important;
+    text-align: center !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-content-section textarea {
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    min-height: 80px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    resize: vertical !important;
+    font-family: inherit !important;
+    text-align: center !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-content-section textarea:focus {
+    border-color: #00B18F !important;
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgba(0, 177, 143, 0.1) !important;
+    text-align: left !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-file-section input[type="file"] {
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+    border: 2px dashed #00B18F !important;
+    border-radius: 12px !important;
+    background: rgba(0, 177, 143, 0.05) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-form .btn-secondary {
+    padding: 16px 24px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #00B18F 0%, #03836A 100%) !important;
+    color: white !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    margin-top: 16px !important;
+    text-align: center !important;
+    box-shadow: 0 6px 20px rgba(0, 177, 143, 0.3) !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-form .btn-secondary:hover {
+    background: linear-gradient(135deg, #03836A 0%, #026B58 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(0, 177, 143, 0.4) !important;
+  }
+}
+
+/* Стили для секции студентов на мобильных */
+@media (max-width: 768px) {
+  .modal-overlay.conduct-lesson-modal .students-grades-section {
+    background: white !important;
+    border-radius: 16px !important;
+    padding: 20px !important;
+    margin-bottom: 16px !important;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.1) !important;
+    border: 2px solid rgba(245, 158, 11, 0.15) !important;
+    width: 100% !important;
+    max-width: 500px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .students-grades-section h3 {
+    text-align: center !important;
+    color: #d97706 !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    margin-bottom: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .students-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .student-grade-item {
+    background: #f8f9fa !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    padding: 20px !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .student-grade-item:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+    border-color: #00B18F !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .student-grade-item .student-info h4 {
+    color: #374151 !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    margin-bottom: 16px !important;
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .grade-controls {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: stretch !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .grade-controls label {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    font-size: 14px !important;
+    color: #374151 !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .grade-controls input[type="checkbox"] {
+    width: auto !important;
+    margin: 0 auto !important;
+    transform: scale(1.5) !important;
+    accent-color: #00B18F !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .grade-controls input[type="number"] {
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    background: white !important;
+    text-align: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .grade-controls input[type="number"]:focus {
+    border-color: #00B18F !important;
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgba(0, 177, 143, 0.1) !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .grade-controls textarea {
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    background: white !important;
+    min-height: 80px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    resize: vertical !important;
+    font-family: inherit !important;
+    text-align: center !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .grade-controls textarea:focus {
+    border-color: #00B18F !important;
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgba(0, 177, 143, 0.1) !important;
+    text-align: left !important;
+  }
+}
+
+/* Стили для кнопок действий на мобильных */
+@media (max-width: 768px) {
+  .modal-overlay.conduct-lesson-modal .modal-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 20px !important;
+    background: white !important;
+    border-top: 2px solid #e9ecef !important;
+    margin-top: auto !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 100 !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .modal-actions .btn-primary {
+    padding: 16px 24px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #00B18F 0%, #03836A 100%) !important;
+    color: white !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    text-align: center !important;
+    box-shadow: 0 6px 20px rgba(0, 177, 143, 0.3) !important;
+    order: 1 !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .modal-actions .btn-primary:hover {
+    background: linear-gradient(135deg, #03836A 0%, #026B58 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(0, 177, 143, 0.4) !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .modal-actions .btn-secondary {
+    padding: 16px 24px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+    background: #6b7280 !important;
+    color: white !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    text-align: center !important;
+    order: 2 !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .modal-actions .btn-secondary:hover {
+    background: #4b5563 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  }
+}
+
+/* Стили для индикатора загрузки на мобильных */
+@media (max-width: 768px) {
+  .modal-overlay.conduct-lesson-modal .loading-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 60px 20px !important;
+    gap: 20px !important;
+    background: white !important;
+    border-radius: 16px !important;
+    margin: 20px !important;
+    box-shadow: 0 4px 16px rgba(0, 177, 143, 0.1) !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .loader {
+    width: 60px !important;
+    height: 60px !important;
+    border: 4px solid #e9ecef !important;
+    border-top: 4px solid #00B18F !important;
+    border-radius: 50% !important;
+    animation: spin 1s linear infinite !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .loading-container p {
+    color: #00B18F !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    margin: 0 !important;
+  }
+}
+
+/* Дополнительные стили для очень маленьких экранов */
+@media (max-width: 480px) {
+  .modal-overlay.conduct-lesson-modal .modal-header {
+    padding: 12px 16px !important;
+    min-height: 60px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .modal-header h2 {
+    font-size: 16px !important;
+    padding-right: 45px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .close-modal {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 18px !important;
+    top: 14px !important;
+    right: 14px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .modal-body {
+    padding: 12px !important;
+    max-height: calc(100vh - 60px) !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .conduct-lesson-content {
+    gap: 12px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-upload-section,
+  .modal-overlay.conduct-lesson-modal .students-grades-section {
+    padding: 16px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-upload-section h3,
+  .modal-overlay.conduct-lesson-modal .students-grades-section h3 {
+    font-size: 16px !important;
+    margin-bottom: 14px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-form input[type="text"],
+  .modal-overlay.conduct-lesson-modal .homework-content-section textarea,
+  .modal-overlay.conduct-lesson-modal .homework-file-section input[type="file"],
+  .modal-overlay.conduct-lesson-modal .grade-controls input[type="number"],
+  .modal-overlay.conduct-lesson-modal .grade-controls textarea {
+    padding: 12px 14px !important;
+    font-size: 15px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-content-section textarea,
+  .modal-overlay.conduct-lesson-modal .grade-controls textarea {
+    min-height: 60px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .homework-form .btn-secondary,
+  .modal-overlay.conduct-lesson-modal .modal-actions .btn-primary,
+  .modal-overlay.conduct-lesson-modal .modal-actions .btn-secondary {
+    padding: 14px 20px !important;
+    font-size: 15px !important;
+  }
+  
+  .modal-overlay.conduct-lesson-modal .modal-actions {
+    padding: 16px !important;
+    gap: 10px !important;
+  }
+}

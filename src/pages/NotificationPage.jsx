@@ -8,8 +8,7 @@ import '../styles/NotificationPage.css';
 import { 
   createNotificationForAllStudents, 
   createNotificationForStudent,
-  createNotificationForGroup,
-  debugAllStudents
+  createNotificationForGroup
 } from '../services/notificationService';
 import { getAllGroups } from '../services/groupService';
 import api from '../api/axiosInstance';
@@ -160,18 +159,6 @@ export default function NotificationPage() {
     }
   };
 
-  // Отладочная функция
-  const handleDebugStudents = async () => {
-    try {
-      const students = await debugAllStudents();
-      console.log('[NotificationPage] Debug - all students:', students);
-      alert(`Найдено студентов: ${students.length}. Смотрите консоль для деталей.`);
-    } catch (error) {
-      console.error('[NotificationPage] Debug error:', error);
-      alert('Ошибка отладки: ' + error.message);
-    }
-  };
-
   if (loading) {
     return (
       <div className="notification-app">
@@ -193,20 +180,7 @@ export default function NotificationPage() {
         <SmartTopBar pageTitle="Рассылка уведомлений" />
 
         <div className="notification-page-container">
-          <div className="notification-header">
-            <h1 className="notification-title">📢 Рассылка уведомлений</h1>
-            <p className="notification-subtitle">Отправьте важные сообщения студентам, преподавателям или администраторам</p>
-          </div>
-
           <div className="notification-content">
-            {/* Отладочная кнопка */}
-            <button
-              onClick={handleDebugStudents}
-              className="debug-toggle"
-            >
-              🔍 Отладка студентов
-            </button>
-
             <div className="notification-form-card">
               {/* Тип отправки */}
               <div className="form-section">

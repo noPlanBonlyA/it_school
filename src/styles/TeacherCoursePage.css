@@ -243,3 +243,254 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Адаптивные стили для мобильных устройств */
+@media (max-width: 768px) {
+  .teacher-course-header {
+    margin-bottom: 24px;
+    gap: 12px;
+  }
+  
+  .course-title-section h1 {
+    font-size: 24px;
+  }
+  
+  .course-description {
+    font-size: 14px;
+  }
+  
+  .teacher-lessons-container {
+    padding: 16px;
+    margin: 0 4px;
+    border-radius: 12px;
+  }
+  
+  .section-header {
+    margin-bottom: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .section-title {
+    font-size: 18px;
+  }
+  
+  .lessons-count {
+    align-self: flex-start;
+    font-size: 12px;
+  }
+  
+  .lessons-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .teacher-lesson-card {
+    border-radius: 12px;
+  }
+  
+  .lesson-card-header {
+    padding: 10px 14px;
+  }
+  
+  .lesson-card-body {
+    padding: 14px;
+  }
+  
+  .lesson-title {
+    font-size: 16px;
+  }
+  
+  .lesson-desc {
+    font-size: 13px;
+    height: 52px; /* примерно 2.5 строки для мобильных */
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+  
+  .lesson-card-footer {
+    padding: 10px 14px;
+  }
+  
+  .lesson-date {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  
+  .lesson-stats {
+    gap: 8px;
+  }
+  
+  .materials-count, .homework-count {
+    font-size: 12px;
+  }
+  
+  .date-icon, .materials-icon, .homework-icon {
+    font-size: 12px;
+  }
+  
+  .empty-lessons {
+    padding: 32px 16px;
+  }
+  
+  .empty-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+  }
+  
+  .empty-lessons h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  
+  .empty-lessons p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .teacher-course-header {
+    margin-bottom: 20px;
+  }
+  
+  .course-title-section h1 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  
+  .course-description {
+    font-size: 13px;
+  }
+  
+  .teacher-lessons-container {
+    padding: 12px;
+    margin: 0 2px;
+  }
+  
+  .section-header {
+    margin-bottom: 12px;
+  }
+  
+  .section-title {
+    font-size: 16px;
+  }
+  
+  .lessons-grid {
+    gap: 10px;
+  }
+  
+  .lesson-card-header {
+    padding: 8px 12px;
+  }
+  
+  .status-badge {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+  
+  .lesson-number {
+    font-size: 12px;
+  }
+  
+  .lesson-card-body {
+    padding: 12px;
+  }
+  
+  .lesson-title {
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  
+  .lesson-desc {
+    font-size: 12px;
+    height: 42px; /* примерно 2 строки */
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+  
+  .lesson-card-footer {
+    padding: 8px 12px;
+  }
+  
+  .lesson-date {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  
+  .lesson-stats {
+    gap: 6px;
+  }
+  
+  .materials-count, .homework-count {
+    font-size: 11px;
+  }
+  
+  .date-icon, .materials-icon, .homework-icon {
+    font-size: 11px;
+    margin-right: 3px;
+  }
+  
+  .empty-lessons {
+    padding: 24px 12px;
+  }
+  
+  .empty-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  
+  .empty-lessons h3 {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  
+  .empty-lessons p {
+    font-size: 13px;
+  }
+  
+  .loading-container {
+    height: 200px;
+  }
+  
+  .loader {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 350px) {
+  .course-title-section h1 {
+    font-size: 18px;
+  }
+  
+  .teacher-lessons-container {
+    padding: 10px;
+  }
+  
+  .section-title {
+    font-size: 15px;
+  }
+  
+  .lesson-title {
+    font-size: 14px;
+  }
+  
+  .lesson-desc {
+    font-size: 11px;
+    height: 36px;
+  }
+  
+  .empty-lessons {
+    padding: 20px 8px;
+  }
+  
+  .empty-lessons h3 {
+    font-size: 15px;
+  }
+  
+  .empty-lessons p {
+    font-size: 12px;
+  }
+}

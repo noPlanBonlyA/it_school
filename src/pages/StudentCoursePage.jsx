@@ -4,11 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
+import CourseImage from '../components/CourseImage';
 import { useAuth } from '../contexts/AuthContext';
 import { getCourse, getCourseLessons } from '../services/courseService';
 import { getUserScheduleOptimized } from '../services/scheduleService';
 import { getCoursesPath, getCoursesTitle } from '../utils/navigationUtils';
 import '../styles/CourseDetailPage.css';
+import '../styles/CourseImageStyles.css';
+import '../styles/MobileImageFixes.css';
 
 export default function StudentCoursePage() {
   const { courseId } = useParams();
@@ -195,15 +198,12 @@ export default function StudentCoursePage() {
               </div>
               
               {course.photo?.url && (
-                <div className="course-image">
-                  <img 
-                    src={course.photo.url.startsWith('http') 
-                      ? course.photo.url 
-                      : `${window.location.protocol}//${window.location.hostname}:8080${course.photo.url}`
-                    } 
-                    alt={course.name} 
-                  />
-                </div>
+                <CourseImage
+                  src={course.photo.url}
+                  alt={course.name}
+                  className="course-detail-image"
+                  placeholder="📚"
+                />
               )}
             </div>
           )}

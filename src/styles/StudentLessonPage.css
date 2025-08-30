@@ -452,9 +452,9 @@
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  color: #475569;
-  border: 1px solid rgba(0, 177, 143, 0.2);
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+  color: white;
+  border: none;
   border-radius: 12px;
   padding: 14px 28px;
   font-size: 16px;
@@ -463,19 +463,51 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  border: none;
 }
 
-.btn-secondary:hover {
-  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-  border-color: rgba(0, 177, 143, 0.3);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  color: #334155;
+.btn-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+}
+
+.btn-secondary:hover::before {
+  opacity: 1;
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+.btn-secondary:disabled {
+  background: #dee2e6;
+  color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary:disabled::before {
+  display: none;
 }
 
 /* Нет домашнего задания */
@@ -639,15 +671,6 @@
   border-radius: 8px;
   border: 1px dashed #dee2e6;
   text-align: center;
-}
-
-.btn-secondary {
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background-color: #5a6268 !important;
-  transform: translateY(-1px);
 }
 
 .hw-submitted {

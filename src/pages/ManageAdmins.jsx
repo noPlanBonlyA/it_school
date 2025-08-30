@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate }                from 'react-router-dom';
 import Sidebar                        from '../components/Sidebar';
 import SmartTopBar                    from '../components/SmartTopBar';
+import SuccessNotification from '../components/SuccessNotification';
 import { useAuth }                    from '../contexts/AuthContext';
 
 import {
@@ -33,6 +34,42 @@ export default function ManageAdminsPage() {
   const [showCreateConfirm, setShowCreateConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+
+  /* ---------- форматирование телефона ---------- */
+  const formatPhoneNumber = (value) => {
+    const digits = value.replace(/\D/g, '');
+    
+    if (digits.startsWith('7')) {
+      const formatted = digits.slice(0, 11);
+      if (formatted.length <= 1) return '+7';
+      if (formatted.length <= 4) return `+7 (${formatted.slice(1)}`;
+      if (formatted.length <= 7) return `+7 (${formatted.slice(1, 4)}) ${formatted.slice(4)}`;
+      if (formatted.length <= 9) return `+7 (${formatted.slice(1, 4)}) ${formatted.slice(4, 7)}-${formatted.slice(7)}`;
+      return `+7 (${formatted.slice(1, 4)}) ${formatted.slice(4, 7)}-${formatted.slice(7, 9)}-${formatted.slice(9, 11)}`;
+    }
+    
+    if (digits.startsWith('8')) {
+      const withSeven = '7' + digits.slice(1);
+      return formatPhoneNumber(withSeven);
+    }
+    
+    if (digits.length === 0) {
+      return '+7';
+    }
+    
+    const withSeven = '7' + digits;
+    return formatPhoneNumber(withSeven);
+  };
+
+  const handlePhoneChange = (e, isEdit = false) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    if (isEdit) {
+      setEdit(s => ({ ...s, phone_number: formatted }));
+    } else {
+      setForm(s => ({ ...s, phone_number: formatted }));
+    }
+  };
 
   /* ---------- load ---------- */
   useEffect(()=>{load();},[]);
@@ -63,25 +100,32 @@ export default function ManageAdminsPage() {
     if (creating) return;
     setCreating(true); setErrors({});
     try{
+      // Очищаем номер телефона от форматирования для отправки на бэкенд
+      const cleanPhoneNumber = form.phone_number.replace(/\D/g, '');
+      const formattedPhoneForBackend = cleanPhoneNumber.startsWith('7') 
+        ? `+${cleanPhoneNumber}` 
+        : `+7${cleanPhoneNumber}`;
+
       // Используем новый метод создания администратора с form-data
       const result = await createAdminWithUser({
         first_name: form.first_name,
         surname: form.surname,
         patronymic: form.patronymic,
-        birth_date: form.birth_date || null,
+        birth_date: form.birth_date || '',  // Отправляем пустую строку вместо null
         email: form.email,
-        phone_number: form.phone_number,
+        phone_number: formattedPhoneForBackend,  // Отправляем очищенный номер
         password: form.password,
         role: 'admin'
       });
       
-      alert('Администратор создан');
+      setShowSuccessNotification(true);
       setAdmins(prev=>[...prev, result.user]);
       setForm({ first_name:'',surname:'',patronymic:'',birth_date:'',
                 email:'',phone_number:'',password:'' });
     }catch(e){
+      console.error('Create admin error:', e);
       if(e.response?.data?.username)setErrors({username:e.response.data.username});
-      else alert('Ошибка создания');
+      else alert('Ошибка создания: ' + (e.response?.data?.detail || e.message));
     }finally{
       setCreating(false); setShowCreateConfirm(false);
     }
@@ -95,14 +139,20 @@ export default function ManageAdminsPage() {
     if (!edit) return;
     setErrors({});
     try {
+      // Очищаем номер телефона от форматирования для отправки на бэкенд
+      const cleanPhoneNumber = (edit.phone_number || '').replace(/\D/g, '');
+      const formattedPhoneForBackend = cleanPhoneNumber.startsWith('7') 
+        ? `+${cleanPhoneNumber}` 
+        : `+7${cleanPhoneNumber}`;
+
       // Убираем username из запроса
       await updateUser(edit.id, {
         first_name: edit.first_name,
         surname: edit.surname,
         patronymic: edit.patronymic,
-        birth_date: edit.birth_date || null,
+        birth_date: edit.birth_date || '',  // Отправляем пустую строку вместо null
         email: edit.email,
-        phone_number: edit.phone_number,
+        phone_number: formattedPhoneForBackend,  // Отправляем очищенный номер
         role: edit.role || 'admin'
         // username НЕ передаем
       });
@@ -111,6 +161,7 @@ export default function ManageAdminsPage() {
       setEdit(null);
     } catch (e) {
       console.error('Error saving admin:', e);
+      alert('Ошибка сохранения: ' + (e.response?.data?.detail || e.message));
       alert('Ошибка сохранения');
     }
   };
@@ -136,16 +187,33 @@ export default function ManageAdminsPage() {
         <div className="block">
           <h2>Создать администратора</h2>
           <div className="user-form form-grid">
-            {['first_name','surname','patronymic','birth_date',
-              'email','phone_number','password'].map(f=>(
-              <div className="field" key={f}>
-                <label>{f.replace('_',' ')}</label>
+            {[
+              {key: 'first_name', label: 'Имя'},
+              {key: 'surname', label: 'Фамилия'},
+              {key: 'patronymic', label: 'Отчество'},
+              {key: 'birth_date', label: 'Дата рождения'},
+              {key: 'email', label: 'Email'},
+              {key: 'password', label: 'Пароль'}
+            ].map(({key, label})=>(
+              <div className="field" key={key}>
+                <label>{label}</label>
                 <input
-                  type={f==='password'?'password':f==='birth_date'?'date':'text'}
-                  value={form[f]}
-                  onChange={e=>setForm(s=>({...s,[f]:e.target.value}))}/>
+                  type={key==='password'?'password':key==='birth_date'?'date':'text'}
+                  value={form[key]}
+                  onChange={e=>setForm(s=>({...s,[key]:e.target.value}))}/>
               </div>
             ))}
+            {/* Отдельно обрабатываем phone_number */}
+            <div className="field">
+              <label>Номер телефона</label>
+              <input
+                type="tel"
+                placeholder="+7 (999) 999-99-99"
+                value={form.phone_number}
+                onChange={(e) => handlePhoneChange(e, false)}
+                onFocus={!form.phone_number ? (e) => setForm(s => ({ ...s, phone_number: '+7' })) : undefined}
+              />
+            </div>
             <div className="buttons" style={{gridColumn:'1 / -1'}}>
               <button className="btn-primary" onClick={()=>setShowCreateConfirm(true)}>
                 Создать
@@ -179,17 +247,33 @@ export default function ManageAdminsPage() {
 
           {edit&&(
             <div className="user-form form-grid" style={{marginTop:20}}>
-              {['first_name','surname','patronymic','birth_date',
-                'email','phone_number'].map(f=>(  // Убираем 'username' из редактируемых полей
-                <div className="field" key={f}>
-                  <label>{f.replace('_',' ')}</label>
-                  <input type={f==='birth_date'?'date':'text'}
-                         value={edit[f]||''}
-                         onChange={e=>setEdit(s=>({...s,[f]:e.target.value}))}
-                         disabled={f === 'username'}  // Делаем поле только для чтения
-                         style={f === 'username' ? {backgroundColor:'#f5f5f5'} : {}}/>
+              {[
+                {key: 'first_name', label: 'Имя'},
+                {key: 'surname', label: 'Фамилия'},
+                {key: 'patronymic', label: 'Отчество'},
+                {key: 'birth_date', label: 'Дата рождения'},
+                {key: 'email', label: 'Email'}
+              ].map(({key, label})=>(
+                <div className="field" key={key}>
+                  <label>{label}</label>
+                  <input type={key==='birth_date'?'date':'text'}
+                         value={edit[key]||''}
+                         onChange={e=>setEdit(s=>({...s,[key]:e.target.value}))}
+                         disabled={key === 'username'}  // Делаем поле только для чтения
+                         style={key === 'username' ? {backgroundColor:'#f5f5f5'} : {}}/>
                 </div>
               ))}
+              {/* Отдельно обрабатываем phone_number */}
+              <div className="field">
+                <label>Номер телефона</label>
+                <input
+                  type="tel"
+                  placeholder="+7 (999) 999-99-99"
+                  value={edit.phone_number || ''}
+                  onChange={(e) => handlePhoneChange(e, true)}
+                  onFocus={!edit.phone_number ? (e) => setEdit(s => ({ ...s, phone_number: '+7' })) : undefined}
+                />
+              </div>
               {/* Показываем username только для отображения */}
               <div className="field">
                 <label>Логин (только чтение)</label>
@@ -231,6 +315,14 @@ export default function ManageAdminsPage() {
             </div>
           </div>
         )}
+        
+        {/* УВЕДОМЛЕНИЕ ОБ УСПЕШНОМ СОЗДАНИИ */}
+        <SuccessNotification
+          isOpen={showSuccessNotification}
+          onClose={() => setShowSuccessNotification(false)}
+          title="Администратор создан!"
+          message="Новый администратор успешно добавлен в систему"
+        />
       </div>
     </div>
   );

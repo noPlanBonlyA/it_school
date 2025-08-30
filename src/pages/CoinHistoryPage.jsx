@@ -20,7 +20,7 @@ export default function CoinHistoryPage() {
 
   return (
     <div className="app-layout">
-      <Sidebar activeItem="profile" userRole={user?.role} />
+      <Sidebar activeItem="coinHistory" userRole={user?.role} />
       
       <div className="main-content">
         <SmartTopBar 

@@ -1,5 +1,11 @@
 /* ---------- Специфические стили для главной страницы ---------- */
 
+/* Глобальный белый фон для всех элементов */
+body, html, #root, .app-layout, .main-content {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+}
+
 /* Убираем возможный внешний отступ у Topbar, чтобы он прилегал к верху */
 .topbar {
   margin: 0;
@@ -11,6 +17,8 @@
   padding-top: 20px !important; /* Минимальный отступ от TopBar */
   background: #FFFFFF !important;
   opacity: 1 !important;
+  min-height: 100vh; /* Минимальная высота на весь экран */
+  overscroll-behavior: contain; /* Предотвращаем показ серого фона при overscroll */
 }
 
 /* Адаптивность для мобильных устройств - убираем отступ сайдбара */
@@ -911,11 +919,22 @@
 
 /* Адаптивность для мобильных */
 @media (max-width: 768px) {
+  /* Убираем любой серый фон на мобильных */
+  body, html, #root {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+    overscroll-behavior: none; /* Убираем overscroll полностью */
+    -webkit-overscroll-behavior: none; /* Для Safari */
+  }
+  
   .app-layout {
     flex-direction: row !important; /* Возвращаем row для мобильных */
     min-height: 100vh;
     position: relative;
     overflow-x: hidden; /* Скрываем горизонтальный скролл */
+    background: #FFFFFF !important; /* Обеспечиваем белый фон */
+    overscroll-behavior: contain; /* Предотвращаем показ серого фона */
+    -webkit-overscroll-behavior: contain; /* Для Safari */
   }
   
   .main-content {
@@ -925,6 +944,7 @@
     padding-left: 0 !important;
     padding-right: 0 !important;
     min-height: 100vh;
+    background: #FFFFFF !important; /* Белый фон */
     /* Контент всегда занимает всю ширину экрана */
     box-sizing: border-box;
     flex: 1; /* Занимает всю доступную ширину */
@@ -937,6 +957,7 @@
     gap: 16px;
     padding: 16px !important;
     margin-top: 0px !important;
+    background: #FFFFFF !important; /* Белый фон для контейнера карточек */
     /* Разрешаем натуральную высоту карточек */
     grid-auto-rows: auto;
     /* Убираем ограничения по высоте */
@@ -1330,6 +1351,14 @@
 
 /* Адаптивность для очень маленьких экранов */
 @media (max-width: 480px) {
+  /* Убираем серый фон и на очень маленьких экранах */
+  body, html, #root, .app-layout, .main-content {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+    overscroll-behavior: none !important;
+    -webkit-overscroll-behavior: none !important;
+  }
+  
   .main-content {
     padding-top: 85px !important; /* Еще больше отступ для очень маленьких экранов */
   }

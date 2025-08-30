@@ -1,0 +1,180 @@
+/* Специальные мобильные исправления для изображений курсов */
+
+/* Основные исправления для изображений */
+.course-image,
+.course-image-container,
+.course-card img,
+.course-card .course-image-container {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Исправления для мобильных браузеров */
+@media (max-width: 768px) {
+  /* Основные контейнеры изображений */
+  .course-image,
+  .course-image-container,
+  .course-card img,
+  .course-card .course-image-container {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+  
+  /* Предотвращаем деформацию на iOS */
+  .course-image img,
+  .course-image-container img,
+  .course-card img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Исправления для контейнеров в детальной странице */
+  .course-overview {
+    align-items: center;
+  }
+  
+  .course-image {
+    flex-shrink: 0;
+    align-self: center;
+    margin: 0 auto;
+    display: block;
+  }
+  
+  /* Убираем transform при hover на мобильных */
+  .course-card:hover img,
+  .course-image:hover img,
+  .course-image-container:hover img {
+    transform: none !important;
+    -webkit-transform: none !important;
+  }
+  
+  /* Специальные исправления для Safari на iOS */
+  @supports (-webkit-appearance: none) {
+    .course-image img,
+    .course-image-container img,
+    .course-card img {
+      image-rendering: -webkit-optimize-contrast;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+  }
+}
+
+/* Дополнительные исправления для очень маленьких экранов */
+@media (max-width: 480px) {
+  .course-image,
+  .course-image-container {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+  
+  .course-card {
+    overflow: hidden;
+  }
+  
+  .course-card img {
+    border-radius: 10px !important;
+  }
+  
+  /* Убираем любые анимации на маленьких экранах */
+  .course-card,
+  .course-card img,
+  .course-image,
+  .course-image img,
+  .course-image-container,
+  .course-image-container img {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Исправления для Android браузеров */
+@media screen and (-webkit-min-device-pixel-ratio: 1) {
+  .course-image img,
+  .course-image-container img,
+  .course-card img {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+}
+
+/* Исправления для высокой плотности пикселей */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .course-image img,
+  .course-image-container img,
+  .course-card img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Принудительные стили для предотвращения искажений */
+.course-image,
+.course-image-container,
+.course-card .course-image-container {
+  position: relative !important;
+  overflow: hidden !important;
+  display: block !important;
+}
+
+.course-image img,
+.course-image-container img {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+/* Альтернативные стили для случаев, когда абсолютное позиционирование создает проблемы */
+.course-card img {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+/* Исправления для placeholder'ов */
+.course-placeholder,
+.course-image-placeholder {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+/* Убираем пробелы под изображениями */
+.course-image,
+.course-image-container,
+.course-card img {
+  vertical-align: top;
+  line-height: 0;
+}
+
+.course-card {
+  line-height: 1.4;
+}
+
+.course-card .meta {
+  line-height: 1.5;
+}

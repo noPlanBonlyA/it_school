@@ -535,14 +535,14 @@ export default function StudentLessonPage() {
                         setSubmitted(false);
                         setFile(null);
                         setStudentComment(''); // Очищаем комментарий при повторной отправке
-                      }}
-                      style={{
-                        padding: '10px 20px',
-                        backgroundColor: '#6c757d',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer'
+                        // Сбрасываем статус домашнего задания, чтобы показать форму
+                        setHomeworkStatus(prevStatus => ({
+                          ...prevStatus,
+                          submitted: false,
+                          graded: false,
+                          grade: null,
+                          coins: null
+                        }));
                       }}
                     >
                       📤 Отправить еще раз

@@ -4,6 +4,7 @@ import { useNavigate }                from 'react-router-dom';
 import Sidebar                        from '../components/Sidebar';
 import SmartTopBar from '../components/SmartTopBar';
 import StudentDetailView from '../components/StudentDetailView';
+import SuccessNotification from '../components/SuccessNotification';
 import { useAuth }                    from '../contexts/AuthContext';
 
 import {
@@ -44,6 +45,47 @@ export default function ManageStudentsPage() {
   const [busyCreate, setBusyCreate] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+
+  /* ---------- форматирование телефона ---------- */
+  const formatPhoneNumber = (value) => {
+    // Убираем все символы кроме цифр
+    const digits = value.replace(/\D/g, '');
+    
+    // Если начинается с 7, добавляем +
+    if (digits.startsWith('7')) {
+      const formatted = digits.slice(0, 11);
+      if (formatted.length <= 1) return '+7';
+      if (formatted.length <= 4) return `+7 (${formatted.slice(1)}`;
+      if (formatted.length <= 7) return `+7 (${formatted.slice(1, 4)}) ${formatted.slice(4)}`;
+      if (formatted.length <= 9) return `+7 (${formatted.slice(1, 4)}) ${formatted.slice(4, 7)}-${formatted.slice(7)}`;
+      return `+7 (${formatted.slice(1, 4)}) ${formatted.slice(4, 7)}-${formatted.slice(7, 9)}-${formatted.slice(9, 11)}`;
+    }
+    
+    // Если начинается с 8, заменяем на +7
+    if (digits.startsWith('8')) {
+      const withSeven = '7' + digits.slice(1);
+      return formatPhoneNumber(withSeven);
+    }
+    
+    // Если пустое поле, возвращаем +7
+    if (digits.length === 0) {
+      return '+7';
+    }
+    
+    // Если не начинается с 7 или 8, добавляем +7 в начало
+    const withSeven = '7' + digits;
+    return formatPhoneNumber(withSeven);
+  };
+
+  const handlePhoneChange = (e, isEdit = false) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    if (isEdit) {
+      setEdit(s => ({ ...s, phone_number: formatted }));
+    } else {
+      setForm(s => ({ ...s, phone_number: formatted }));
+    }
+  };
 
   /* ---------- загрузка ---------- */
   useEffect(()=>{ load(); },[]);
@@ -87,26 +129,33 @@ export default function ManageStudentsPage() {
     if(busyCreate) return;
     setBusyCreate(true); setErrors({});
     try{
+      // Очищаем номер телефона от форматирования для отправки на бэкенд
+      const cleanPhoneNumber = form.phone_number.replace(/\D/g, '');
+      const formattedPhoneForBackend = cleanPhoneNumber.startsWith('7') 
+        ? `+${cleanPhoneNumber}` 
+        : `+7${cleanPhoneNumber}`;
+
       // Используем новый метод создания студента с form-data
       const result = await createStudent({
         first_name: form.first_name,
         surname: form.surname,
         patronymic: form.patronymic,
-        birth_date: form.birth_date || null,
+        birth_date: form.birth_date || '',  // Отправляем пустую строку вместо null
         email: form.email,
-        phone_number: form.phone_number,
+        phone_number: formattedPhoneForBackend,  // Отправляем очищенный номер
         password: form.password,
         points: form.points === '' ? 0 : +form.points
       });
       
-      alert('Студент создан');
+      setShowSuccessNotification(true);
 
       setStudents(prev=>[...prev,{ user: result.user, student: result.student }]);
       setForm({ first_name:'',surname:'',patronymic:'',birth_date:'',
                 email:'',phone_number:'',password:'',points:'' });
     }catch(e){
+      console.error('Create student error:', e);
       if(e.response?.data?.username) setErrors({ username:e.response.data.username });
-      else alert('Ошибка создания');
+      else alert('Ошибка создания: ' + (e.response?.data?.detail || e.message));
     }finally{
       setBusyCreate(false); setShowCreate(false);
     }
@@ -134,14 +183,20 @@ export default function ManageStudentsPage() {
     if(!edit) return;
     setErrors({});
     try{
+      // Очищаем номер телефона от форматирования для отправки на бэкенд
+      const cleanPhoneNumber = (edit.phone_number || '').replace(/\D/g, '');
+      const formattedPhoneForBackend = cleanPhoneNumber.startsWith('7') 
+        ? `+${cleanPhoneNumber}` 
+        : `+7${cleanPhoneNumber}`;
+
       // 1. Обновляем пользователя
       await updateUser(edit.id, {
         first_name: edit.first_name, 
         surname: edit.surname, 
         patronymic: edit.patronymic,
-        birth_date: edit.birth_date || null, 
+        birth_date: edit.birth_date || '', 
         email: edit.email, 
-        phone_number: edit.phone_number,
+        phone_number: formattedPhoneForBackend,  // Отправляем очищенный номер
         role: 'student'
       });
       
@@ -162,9 +217,9 @@ export default function ManageStudentsPage() {
       // Более детальная обработка ошибок
       if (e.response?.status === 422) {
         console.error('Validation error details:', e.response.data);
-        alert('Ошибка валидации данных. Проверьте консоль для деталей.');
+        alert('Ошибка валидации данных: ' + (e.response?.data?.detail || 'Проверьте консоль для деталей.'));
       } else {
-        alert('Ошибка сохранения');
+        alert('Ошибка сохранения: ' + (e.response?.data?.detail || e.message));
       }
     }
   };
@@ -194,14 +249,36 @@ export default function ManageStudentsPage() {
         <div className="block">
           <h2>Создать студента</h2>
           <div className="user-form form-grid">
-            {['first_name','surname','patronymic','birth_date',
-              'email','phone_number','password'].map(f=>(
-              <div className="field" key={f}>
-                <label>{f.replace('_',' ')}</label>
-                <input type={f==='password'?'password':f==='birth_date'?'date':'text'}
-                       value={form[f]} onChange={e=>setForm(s=>({...s,[f]:e.target.value}))}/>
+            {[
+              {key: 'first_name', label: 'Имя'},
+              {key: 'surname', label: 'Фамилия'},
+              {key: 'patronymic', label: 'Отчество'},
+              {key: 'birth_date', label: 'Дата рождения'},
+              {key: 'email', label: 'Email'}
+            ].map(({key, label})=>(
+              <div className="field" key={key}>
+                <label>{label}</label>
+                <input type={key==='birth_date'?'date':'text'}
+                       value={form[key]} onChange={e=>setForm(s=>({...s,[key]:e.target.value}))}/>
               </div>
             ))}
+            <div className="field">
+              <label>Номер телефона</label>
+              <input type="tel"
+                     value={form.phone_number}
+                     placeholder="+7 (___) ___-__-__"
+                     onChange={handlePhoneChange}
+                     onFocus={e => {
+                       if (!e.target.value) {
+                         setForm(s => ({ ...s, phone_number: '+7' }));
+                       }
+                     }}/>
+            </div>
+            <div className="field">
+              <label>Пароль</label>
+              <input type="password"
+                     value={form.password} onChange={e=>setForm(s=>({...s,password:e.target.value}))}/>
+            </div>
             <div className="field">
               <label>Очки</label>
               <input type="number" 
@@ -258,15 +335,32 @@ export default function ManageStudentsPage() {
 
           {edit && (
             <div className="user-form form-grid" style={{marginTop:20}}>
-              {['first_name','surname','patronymic','birth_date',
-                'email','phone_number'].map(f=>(  // Убрали 'username' из редактируемых полей
-                <div className="field" key={f}>
-                  <label>{f.replace('_',' ')}</label>
-                  <input type={f==='birth_date'?'date':'text'}
-                         value={edit[f]||''}
-                         onChange={e=>setEdit(s=>({...s,[f]:e.target.value}))}/>
+              {[
+                {key: 'first_name', label: 'Имя'},
+                {key: 'surname', label: 'Фамилия'},
+                {key: 'patronymic', label: 'Отчество'},
+                {key: 'birth_date', label: 'Дата рождения'},
+                {key: 'email', label: 'Email'}
+              ].map(({key, label})=>(
+                <div className="field" key={key}>
+                  <label>{label}</label>
+                  <input type={key==='birth_date'?'date':'text'}
+                         value={edit[key]||''}
+                         onChange={e=>setEdit(s=>({...s,[key]:e.target.value}))}/>
                 </div>
               ))}
+              <div className="field">
+                <label>Номер телефона</label>
+                <input type="tel"
+                       value={edit.phone_number||''}
+                       placeholder="+7 (___) ___-__-__"
+                       onChange={e => handlePhoneChange(e, true)}
+                       onFocus={e => {
+                         if (!e.target.value) {
+                           setEdit(s => ({ ...s, phone_number: '+7' }));
+                         }
+                       }}/>
+              </div>
               {/* Показываем username только для отображения */}
               <div className="field">
                 <label>Логин (только чтение)</label>
@@ -327,6 +421,14 @@ export default function ManageStudentsPage() {
             }} 
           />
         )}
+        
+        {/* ---------- уведомление об успешном создании ---------- */}
+        <SuccessNotification
+          isOpen={showSuccessNotification}
+          onClose={() => setShowSuccessNotification(false)}
+          title="Студент создан!"
+          message="Новый студент успешно добавлен в систему"
+        />
       </div>
     </div>
   );

@@ -45,13 +45,20 @@ export default function ShopPage() {
       setLoading(true);
       const studentCoins = studentData?.points || 0;
       
+      console.log('🪙 Student coins:', studentCoins);
+      console.log('🪙 Type of studentCoins:', typeof studentCoins);
+      
       // Загружаем доступные товары
       const availableData = await getAvailableProducts(studentCoins, 50, 0);
+      console.log('✅ Available products received:', availableData);
+      console.log('✅ Available products array:', availableData.objects?.map(p => ({ name: p.name, price: p.price, priceType: typeof p.price })));
       const sortedAvailable = sortProducts(availableData.objects || []);
       setAvailableProducts(sortedAvailable);
       
       // Загружаем недоступные товары
       const notAvailableData = await getNotAvailableProducts(studentCoins, 50, 0);
+      console.log('❌ Not available products received:', notAvailableData);
+      console.log('❌ Not available products array:', notAvailableData.objects?.map(p => ({ name: p.name, price: p.price, priceType: typeof p.price })));
       const sortedNotAvailable = sortProducts(notAvailableData.objects || []);
       setNotAvailableProducts(sortedNotAvailable);
       
@@ -84,6 +91,33 @@ export default function ShopPage() {
       loadProducts();
     }
   }, [studentData?.points, loadProducts]);
+
+  // Закрытие модальных окон по Escape
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        if (showPurchaseModal) {
+          setShowPurchaseModal(false);
+          setSelectedProduct(null);
+        }
+        if (showSuccessModal) {
+          setShowSuccessModal(false);
+          setSelectedProduct(null);
+        }
+      }
+    };
+
+    if (showPurchaseModal || showSuccessModal) {
+      document.addEventListener('keydown', handleEscape);
+      // Блокируем прокрутку страницы когда модальное окно открыто
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [showPurchaseModal, showSuccessModal]);
 
   const loadStudentData = async () => {
     try {
@@ -378,8 +412,13 @@ export default function ShopPage() {
 
         {/* Модальное окно покупки */}
         {showPurchaseModal && selectedProduct && (
-          <div className="modal-overlay">
-            <div className="modal-content">
+          <div className="modal-overlay" onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowPurchaseModal(false);
+              setSelectedProduct(null);
+            }
+          }}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h2>Подтверждение покупки</h2>
                 <button 
@@ -388,6 +427,7 @@ export default function ShopPage() {
                     setShowPurchaseModal(false);
                     setSelectedProduct(null);
                   }}
+                  aria-label="Закрыть"
                 >
                   ×
                 </button>
@@ -459,8 +499,13 @@ export default function ShopPage() {
 
         {/* Модальное окно успешной покупки */}
         {showSuccessModal && selectedProduct && (
-          <div className="modal-overlay">
-            <div className="modal-content success-modal">
+          <div className="modal-overlay" onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowSuccessModal(false);
+              setSelectedProduct(null);
+            }
+          }}>
+            <div className="modal-content success-modal" onClick={(e) => e.stopPropagation()}>
               <div className="success-header">
                 <div className="success-icon">🎉</div>
                 <h2>Отличный выбор!</h2>
@@ -472,7 +517,7 @@ export default function ShopPage() {
                     <strong>"{selectedProduct.name}"</strong>
                   </div>
                   <p className="instruction">
-                    Обратитесь к администратору для покупки.
+                    Обратитесь к&nbsp;администратору для&nbsp;покупки.
                   </p>
                 </div>
               </div>
@@ -485,7 +530,7 @@ export default function ShopPage() {
                     setSelectedProduct(null);
                   }}
                 >
-                  Понятно, спасибо! 👍
+                  Понятно, спасибо!&nbsp;👍
                 </button>
               </div>
             </div>

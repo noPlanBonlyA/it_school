@@ -3,6 +3,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import TopBar from './TopBar';
+import MobileNotifications from './MobileNotifications';
 import { getPageTitle } from '../utils/pageUtils';
 
 /**
@@ -23,13 +24,17 @@ export default function SmartTopBar({ pageTitle: manualPageTitle, ...props }) {
     .join(' ') : 'Пользователь';
 
   return (
-    <TopBar
-      userName={fullName}
-      userRole={user?.role || 'guest'}
-      pageTitle={finalPageTitle}
-      onBellClick={() => {}}
-      onProfileClick={() => navigate('/profile')}
-      {...props}
-    />
+    <>
+      <TopBar
+        userName={fullName}
+        userRole={user?.role || 'guest'}
+        pageTitle={finalPageTitle}
+        onBellClick={() => {}}
+        onProfileClick={() => navigate('/profile')}
+        {...props}
+      />
+      {/* Мобильные уведомления отображаются независимо от TopBar */}
+      <MobileNotifications />
+    </>
   );
 }

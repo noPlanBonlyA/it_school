@@ -2,7 +2,7 @@
 .notification-app {
   display: flex;
   min-height: 100vh;
-  background: #F8F9FA;
+  background: #FFFFFF; /* Изменили с серого на белый */
   font-family: 'Mont', 'Nunito Sans', sans-serif;
 }
 
@@ -13,14 +13,17 @@
   margin-left: 220px; /* Увеличили отступ от сайдбара */
   overflow-x: hidden;
   padding-right: 20px; /* Добавили отступ справа */
+  background: #FFFFFF; /* Добавили белый фон */
 }
 
 .notification-page-container {
   padding: 50px 40px 40px 40px; /* Увеличили боковые отступы */
   max-width: 1200px;
-  margin: 0;
+  margin: 0 auto; /* Центрируем контейнер */
   width: 100%;
   box-sizing: border-box;
+  display: flex;
+  justify-content: center; /* Центрируем содержимое */
 }
 
 .notification-header {
@@ -51,14 +54,16 @@
   gap: 24px;
   margin-left: 0; /* Убираем дополнительные отступы */
   margin-right: 0;
+  max-width: 700px; /* Ограничиваем максимальную ширину */
+  width: 100%;
 }
 
 .notification-form-card {
   background: #FFFFFF;
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 8px 24px rgba(0, 177, 143, 0.08);
-  border: 2px solid #E8F5F2;
+  box-shadow: 0 2px 8px rgba(0, 177, 143, 0.04); /* Уменьшили тень */
+  border: 1px solid #F0F0F0; /* Уменьшили границу */
   width: 100%;
   box-sizing: border-box;
 }
@@ -418,6 +423,8 @@
   .notification-page-container {
     padding: 16px 12px;
     max-width: 100%;
+    margin: 0 auto; /* Сохраняем центрирование на мобильных */
+    justify-content: center; /* Сохраняем центрирование */
   }
   
   .notification-header {
@@ -685,6 +692,8 @@
 @media (max-width: 360px) {
   .notification-page-container {
     padding: 10px 6px;
+    margin: 0 auto; /* Центрирование */
+    justify-content: center; /* Центрирование содержимого */
   }
   
   .notification-form-card {

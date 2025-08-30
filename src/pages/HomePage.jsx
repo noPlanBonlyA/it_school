@@ -226,7 +226,7 @@ export default function HomePage() {
                           {/* Кнопка открытия модального окна */}
                           <div className="news-expand-btn">
                             <span>📰</span>
-                            <span>Читать полностью</span>
+                            <span>Читать</span>
                           </div>
                         </div>
                       </div>

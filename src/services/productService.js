@@ -10,9 +10,11 @@ import api from '../api/axiosInstance';
  */
 export const getAvailableProducts = async (price, limit = 10, offset = 0) => {
   try {
+    console.log('🔗 API call getAvailableProducts:', { price, limit, offset, priceType: typeof price });
     const response = await api.get('/products/available', {
       params: { price, limit, offset }
     });
+    console.log('📦 Available products API response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching available products:', error);
@@ -28,9 +30,11 @@ export const getAvailableProducts = async (price, limit = 10, offset = 0) => {
  */
 export const getNotAvailableProducts = async (price, limit = 10, offset = 0) => {
   try {
+    console.log('🔗 API call getNotAvailableProducts:', { price, limit, offset, priceType: typeof price });
     const response = await api.get('/products/not-available', {
       params: { price, limit, offset }
     });
+    console.log('📦 Not available products API response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching not available products:', error);
@@ -80,6 +84,9 @@ export const createProduct = async (productData, imageFile = null) => {
     
     // ИСПРАВЛЕНО: product_data с полем photo (как в новостях)
     const finalProductData = { ...productData };
+    
+    console.log('🛠️ Creating product - original data:', productData);
+    console.log('🛠️ Creating product - final data:', finalProductData);
     
     // Если есть файл, добавляем поле photo с именем
     if (imageFile && imageFile instanceof File) {

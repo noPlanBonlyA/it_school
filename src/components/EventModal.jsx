@@ -375,9 +375,6 @@ export default function EventModal({ event, onClose, userRole }) {
         <div className="modal-content large">
           <div className="modal-header">
             <h2>Провести урок: {conductingLesson.lesson_name}</h2>
-            <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-              Курс ID: {conductingLesson.course_id || 'НЕ ОПРЕДЕЛЕН'} | Урок ID: {conductingLesson.lesson_id || 'НЕ ОПРЕДЕЛЕН'}
-            </div>
             <button className="close-modal" onClick={() => setConductingLesson(null)}>×</button>
           </div>
           

@@ -1,7 +1,7 @@
 // src/components/ConfirmModal.jsx
 
 import React from 'react';
-import '../styles/ConfirmModal.css';
+import './ConfirmModal.css';
 
 export default function ConfirmModal({ 
   isOpen, 
@@ -15,29 +15,16 @@ export default function ConfirmModal({
 }) {
   if (!isOpen) return null;
 
-  const getIcon = () => {
-    switch (type) {
-      case 'danger':
-        return '⚠️';
-      case 'warning':
-        return '⚡';
-      case 'success':
-        return '✅';
-      default:
-        return '❓';
-    }
-  };
-
   const getConfirmButtonClass = () => {
     switch (type) {
       case 'danger':
-        return 'btn-danger';
+        return 'confirm-btn confirm-btn-danger';
       case 'warning':
-        return 'btn-warning';
+        return 'confirm-btn confirm-btn-danger';
       case 'success':
-        return 'btn-success';
+        return 'confirm-btn confirm-btn-primary';
       default:
-        return 'btn-primary';
+        return 'confirm-btn confirm-btn-primary';
     }
   };
 
@@ -45,23 +32,22 @@ export default function ConfirmModal({
     <div className="confirm-modal-overlay" onClick={onClose}>
       <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
         <div className="confirm-modal-header">
-          <div className="confirm-icon">{getIcon()}</div>
-          <h3 className="confirm-title">{title}</h3>
+          <h3>{title}</h3>
         </div>
         
         <div className="confirm-modal-body">
-          <p className="confirm-message">{message}</p>
+          <p>{message}</p>
         </div>
         
         <div className="confirm-modal-footer">
           <button
-            className="btn btn-secondary"
+            className="confirm-btn confirm-btn-secondary"
             onClick={onClose}
           >
             {cancelText}
           </button>
           <button
-            className={`btn ${getConfirmButtonClass()}`}
+            className={getConfirmButtonClass()}
             onClick={onConfirm}
           >
             {confirmText}

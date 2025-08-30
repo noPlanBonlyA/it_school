@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import SmartTopBar from '../components/SmartTopBar';
+import ProductModal from '../components/ProductModal';
+import ConfirmModal from '../components/ConfirmModal';
 import {
   getAllProducts,
   createProduct,
@@ -12,6 +14,7 @@ import {
   deleteProduct
 } from '../services/productService';
 import '../styles/ManageProductsPage.css';
+import '../styles/ManageProductsPageMobile.css';
 
 export default function ManageProductsPage() {
   const navigate = useNavigate();
@@ -41,6 +44,20 @@ export default function ManageProductsPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+
+  // Блокировка скролла при открытом модальном окне
+  useEffect(() => {
+    if (showCreateForm || showDeleteConfirm) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    // Очистка при размонтировании компонента
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showCreateForm, showDeleteConfirm]);
 
   // Проверка прав доступа
   useEffect(() => {
@@ -142,8 +159,10 @@ export default function ManageProductsPage() {
         is_pinned: form.is_pinned
       };
 
-      console.log('Submitting product:', productData);
-      console.log('Image file:', imageFile);
+      console.log('📝 Form price value:', form.price, 'type:', typeof form.price);
+      console.log('📝 Converted price:', Number(form.price), 'type:', typeof Number(form.price));
+      console.log('📝 Submitting product:', productData);
+      console.log('📝 Image file:', imageFile);
       
       if (editingProduct) {
         const result = await updateProduct(editingProduct.id, productData, imageFile);
@@ -218,6 +237,7 @@ export default function ManageProductsPage() {
     }
   };
 
+  // Закрытие модального окна по клику на оверлей
   const getProductImage = (product) => {
     // Отладочная информация
     console.log('Admin - Product photo data:', product.photo);
@@ -366,141 +386,39 @@ export default function ManageProductsPage() {
         </div>
 
         {/* Модальное окно создания/редактирования */}
-        {showCreateForm && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2>{editingProduct ? 'Редактировать товар' : 'Создать товар'}</h2>
-                <button 
-                  className="close-modal"
-                  onClick={() => {
-                    setShowCreateForm(false);
-                    resetForm();
-                  }}
-                >
-                  ×
-                </button>
-              </div>
-              
-              <form onSubmit={handleSubmit} className="product-form">
-                <div className="form-group">
-                  <label>Название товара *</label>
-                  <input
-                    type="text"
-                    value={form.name}
-                    onChange={(e) => setForm({...form, name: e.target.value})}
-                    className={errors.name ? 'error' : ''}
-                    placeholder="Введите название товара"
-                  />
-                  {errors.name && <span className="error-text">{errors.name}</span>}
-                </div>
-
-                <div className="form-group">
-                  <label>Описание *</label>
-                  <textarea
-                    value={form.description}
-                    onChange={(e) => setForm({...form, description: e.target.value})}
-                    className={errors.description ? 'error' : ''}
-                    placeholder="Введите описание товара"
-                    rows={4}
-                  />
-                  {errors.description && <span className="error-text">{errors.description}</span>}
-                </div>
-
-                <div className="form-group">
-                  <label>Цена (в монетах) *</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={form.price}
-                    onChange={(e) => setForm({...form, price: e.target.value})}
-                    className={errors.price ? 'error' : ''}
-                    placeholder="Введите цену"
-                  />
-                  {errors.price && <span className="error-text">{errors.price}</span>}
-                </div>
-
-                <div className="form-group">
-                  <label className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={form.is_pinned}
-                      onChange={(e) => setForm({...form, is_pinned: e.target.checked})}
-                    />
-                    <span className="checkbox-text">Закрепить товар (отображать в начале списка)</span>
-                  </label>
-                </div>
-
-                <div className="form-group">
-                  <label>Изображение товара {!editingProduct && '*'}</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className={errors.image ? 'error' : ''}
-                  />
-                  {errors.image && <span className="error-text">{errors.image}</span>}
-                  {previewUrl && (
-                    <div className="image-preview">
-                      <img src={previewUrl} alt="Предпросмотр" />
-                    </div>
-                  )}
-                </div>
-
-                <div className="form-actions">
-                  <button 
-                    type="submit" 
-                    className="btn-primary"
-                    disabled={saving}
-                  >
-                    {saving ? 'Сохранение...' : (editingProduct ? 'Обновить' : 'Создать')}
-                  </button>
-                  <button 
-                    type="button" 
-                    className="btn-secondary"
-                    onClick={() => {
-                      setShowCreateForm(false);
-                      resetForm();
-                    }}
-                  >
-                    Отмена
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        <ProductModal
+          isOpen={showCreateForm}
+          product={editingProduct}
+          form={form}
+          setForm={setForm}
+          imageFile={imageFile}
+          setImageFile={setImageFile}
+          previewUrl={previewUrl}
+          setPreviewUrl={setPreviewUrl}
+          errors={errors}
+          saving={saving}
+          onSubmit={handleSubmit}
+          onClose={() => {
+            setShowCreateForm(false);
+            resetForm();
+          }}
+          onImageChange={handleImageChange}
+        />
 
         {/* Модальное окно подтверждения удаления */}
-        {showDeleteConfirm && (
-          <div className="modal-overlay">
-            <div className="modal-content small">
-              <div className="modal-header">
-                <h2>Подтверждение удаления</h2>
-              </div>
-              <div className="modal-body">
-                <p>Вы уверены, что хотите удалить товар "{productToDelete?.name}"?</p>
-              </div>
-              <div className="modal-actions">
-                <button 
-                  className="btn-danger"
-                  onClick={confirmDelete}
-                >
-                  Удалить
-                </button>
-                <button 
-                  className="btn-secondary"
-                  onClick={() => {
-                    setShowDeleteConfirm(false);
-                    setProductToDelete(null);
-                  }}
-                >
-                  Отмена
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ConfirmModal
+          isOpen={showDeleteConfirm}
+          onClose={() => {
+            setShowDeleteConfirm(false);
+            setProductToDelete(null);
+          }}
+          onConfirm={confirmDelete}
+          title="Подтверждение удаления"
+          message={`Вы уверены, что хотите удалить товар "${productToDelete?.name}"?`}
+          confirmText="Удалить"
+          cancelText="Отмена"
+          type="danger"
+        />
       </div>
     </div>
   );

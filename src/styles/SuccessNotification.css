@@ -1,0 +1,115 @@
+/* src/styles/SuccessNotification.css */
+
+.success-notification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.success-notification {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px 25px;
+  box-shadow: 0 15px 40px rgba(0, 177, 143, 0.15);
+  max-width: 350px;
+  width: 90%;
+  text-align: center;
+  animation: slideInUp 0.3s ease-out;
+  border: 2px solid rgba(0, 177, 143, 0.1);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.success-content {
+  margin-bottom: 25px;
+}
+
+.success-title {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #202224;
+  margin: 0 0 12px 0;
+  background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.success-message {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.success-ok-btn {
+  background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 32px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 177, 143, 0.3);
+  min-width: 100px;
+}
+
+.success-ok-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 177, 143, 0.4);
+}
+
+.success-ok-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 177, 143, 0.3);
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .success-notification {
+    padding: 25px 20px;
+    margin: 20px;
+    max-width: 300px;
+  }
+  
+  .success-title {
+    font-size: 20px;
+  }
+  
+  .success-message {
+    font-size: 14px;
+  }
+  
+  .success-ok-btn {
+    padding: 12px 28px;
+    font-size: 15px;
+  }
+}
