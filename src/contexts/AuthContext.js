@@ -11,7 +11,7 @@ export function AuthProvider({ children }) {
 
   // 1) При монтировании — пробуем подгрузить профиль пользователя
   useEffect(() => {
-    api.get('/users/me')  // ✅ Правильный эндпоинт согласно API
+    api.get('/users/me')  
       .then(({ data }) => setUser(data))
       .catch(() => setUser(null));
   }, []);
@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (user) {
       const id = setInterval(() => {
-        api.post('/users/refresh')  // ✅ Правильный эндпоинт согласно API
+        api.post('/users/refresh')  
           .then(({ data }) => setUser(data))
           .catch(() => setUser(null));
       }, 4 * 60 * 1000);
@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
   // 4) logout
   const logout = async () => {
     try {
-      await api.post('/users/logout');  // ✅ Правильный эндпоинт согласно API
+      await api.post('/users/logout');  
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
