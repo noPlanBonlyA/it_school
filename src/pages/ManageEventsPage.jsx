@@ -14,6 +14,7 @@ import {
   getEventWithUsers
 } from '../services/eventService';
 import '../styles/ManageEventsPage.css';
+import '../styles/EventModals.css'; // новый импорт
 
 export default function ManageEventsPage() {
   const navigate = useNavigate();
@@ -316,34 +317,34 @@ export default function ManageEventsPage() {
 
         {/* Модальное окно подтверждения удаления */}
         {showDeleteConfirm && (
-          <div className="modal-overlay">
-            <div className="modal-content small">
-              <div className="modal-header">
-                <h2>Подтверждение удаления</h2>
-              </div>
-              <div className="modal-body">
-                <p>Вы уверены, что хотите удалить мероприятие "{eventToDelete?.name}"?</p>
-                <p className="warning-text">Это действие нельзя отменить.</p>
-              </div>
-              <div className="modal-actions">
-                <button 
-                  className="btn-danger"
-                  onClick={confirmDelete}
-                >
-                  Удалить
-                </button>
-                <button 
-                  className="btn-secondary"
-                  onClick={() => {
-                    setShowDeleteConfirm(false);
-                    setEventToDelete(null);
-                  }}
-                >
-                  Отмена
-                </button>
-              </div>
-            </div>
-          </div>
+          <div className="events-modal-overlay">
+             <div className="modal-content small">
+               <div className="modal-header">
+                 <h2>Подтверждение удаления</h2>
+               </div>
+               <div className="modal-body">
+                 <p>Вы уверены, что хотите удалить мероприятие "{eventToDelete?.name}"?</p>
+                 <p className="warning-text">Это действие нельзя отменить.</p>
+               </div>
+               <div className="modal-actions">
+                 <button 
+                   className="btn-danger"
+                   onClick={confirmDelete}
+                 >
+                   Удалить
+                 </button>
+                 <button 
+                   className="btn-secondary"
+                   onClick={() => {
+                     setShowDeleteConfirm(false);
+                     setEventToDelete(null);
+                   }}
+                 >
+                   Отмена
+                 </button>
+               </div>
+             </div>
+           </div>
         )}
       </div>
     </div>

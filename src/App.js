@@ -41,10 +41,23 @@ import { NotificationsProvider } from './contexts/NotificationsContext';
 /**
  * Обёртка приватного маршрута:
  * если пользователь не залогинен — редирект на /login
+ * если данные ещё загружаются — показываем загрузку
  */
 function PrivateRoute({ children }) {
   const { user } = useAuth();
-  return user ? children : <Navigate to="/login" />;
+  
+  // Если user === undefined, значит ещё идёт загрузка
+  if (user === undefined) {
+    return <div style={{ padding: '20px', textAlign: 'center' }}>Загрузка...</div>;
+  }
+  
+  // Если user === null, значит не авторизован
+  if (user === null) {
+    return <Navigate to="/login" />;
+  }
+  
+  // Если user есть, показываем контент
+  return children;
 }
 
 export default function App() {

@@ -47,6 +47,8 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  height: auto;
+  min-height: 300px;
 }
 
 .course-card:hover {
@@ -70,31 +72,42 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
-/* Обложка */
-.course-card img {
+/* Контейнер для изображения - обеспечивает правильное позиционирование */
+.course-image-container {
+  position: relative;
   width: 100%;
   height: 180px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Обложка - фиксированная высота и правильное позиционирование */
+.course-card .course-image {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center;
   border-radius: 16px;
-  margin-bottom: 12px;
   transition: transform 0.3s ease;
+  display: block;
+  background: #f8fafc;
 }
 
-.course-card:hover img {
+.course-card:hover .course-image {
   transform: scale(1.02);
 }
 
 .course-placeholder {
   width: 100%;
-  height: 180px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   border-radius: 16px;
-  margin-bottom: 12px;
   border: 2px dashed #cbd5e1;
+  flex-shrink: 0;
 }
 
 .course-placeholder span {
@@ -102,13 +115,15 @@
   opacity: 0.7;
 }
 
-/* Текст под обложкой */
+/* Текст под обложкой - правильная структура */
 .course-card .meta {
   margin-top: 0;
   padding: 0;
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  min-height: 80px;
 }
 
 .course-card .meta h3 {
@@ -117,6 +132,8 @@
   font-weight: 700;
   color: #1e293b;
   line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .course-card .meta p {
@@ -130,6 +147,8 @@
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .course-info-footer {
@@ -257,16 +276,20 @@
     margin: 0 auto;
   }
 
-  .course-card img,
-  .course-placeholder {
+  .course-image-container {
     height: 200px;
     border-radius: 12px;
     margin-bottom: 10px;
   }
 
-  .course-card img {
+  .course-card .course-image {
+    border-radius: 12px;
     object-fit: cover;
     object-position: center;
+  }
+
+  .course-placeholder {
+    border-radius: 12px;
   }
 
   .course-card .meta h3 {
@@ -335,11 +358,18 @@
     border-radius: 14px;
   }
 
-  .course-card img,
-  .course-placeholder {
+  .course-image-container {
     height: 180px;
     border-radius: 10px;
     margin-bottom: 8px;
+  }
+
+  .course-card .course-image {
+    border-radius: 10px;
+  }
+
+  .course-placeholder {
+    border-radius: 10px;
   }
 
   .course-card .meta h3 {
@@ -397,8 +427,7 @@
     padding: 10px;
   }
 
-  .course-card img,
-  .course-placeholder {
+  .course-image-container {
     height: 160px;
   }
 

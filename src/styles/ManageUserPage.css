@@ -23,10 +23,10 @@
   margin-top: 0;
 }
 
-/* Контент под Topbar с отступом */
+/* Контент под Topbar с уменьшенным отступом */
 .content-area {
   flex: 1;
-  padding: 24px;
+  padding: 16px 24px; /* Уменьшили с 24px до 16px сверху */
   background: transparent;
   overflow-y: auto;
 }
@@ -36,7 +36,7 @@ h1 {
   font-size: 32px;
   font-weight: 700;
   color: #03836A;
-  margin-bottom: 32px;
+  margin-bottom: 24px; /* Уменьшили с 32px до 24px */
   text-shadow: 0 2px 4px rgba(0, 177, 143, 0.1);
 }
 
@@ -44,8 +44,8 @@ h1 {
 .block {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 16px;
-  padding: 28px;
-  margin-bottom: 24px;
+  padding: 24px; /* Уменьшили с 28px до 24px */
+  margin-bottom: 20px; /* Уменьшили с 24px до 20px */
   box-shadow: 
     0 8px 32px rgba(0, 177, 143, 0.12),
     0 4px 16px rgba(0, 0, 0, 0.08),
@@ -64,7 +64,7 @@ h1 {
 }
 
 .block h2 {
-  margin: 0 0 24px 0;
+  margin: 0 0 20px 0; /* Уменьшили с 24px до 20px */
   font-size: 24px;
   font-weight: 600;
   color: #03836A;
@@ -76,7 +76,7 @@ h1 {
   display: flex;
   gap: 16px;
   align-items: center;
-  margin-bottom: 28px;
+  margin-bottom: 24px; /* Уменьшили с 28px до 24px */
   flex-wrap: wrap;
 }
 
@@ -180,7 +180,7 @@ h1 {
 /* Блок поиска */
 .search-block {
   position: relative;
-  margin-bottom: 24px;
+  margin-bottom: 20px; /* Уменьшили с 24px до 20px */
 }
 
 .search-block input {
@@ -228,6 +228,7 @@ h1 {
   overflow-y: auto;
   z-index: 100;
   backdrop-filter: blur(8px);
+  padding-bottom: 20px; /* Добавили отступ снизу */
 }
 
 /* Кастомный скроллбар для suggestions */
@@ -258,6 +259,11 @@ h1 {
   transition: all 0.2s ease;
 }
 
+.suggestions li:last-child {
+  border-bottom: none;
+  margin-bottom: 8px; /* Дополнительный отступ для последнего элемента */
+}
+
 .suggestions li:hover {
   background: linear-gradient(135deg, rgba(0, 177, 143, 0.08), rgba(3, 131, 106, 0.05));
   color: #03836A;
@@ -284,6 +290,7 @@ h1 {
 
 .suggestion-item:last-child {
   border-bottom: none;
+  margin-bottom: 8px; /* Дополнительный отступ для последнего элемента */
 }
 
 .suggestion-info {
@@ -401,7 +408,7 @@ h1 {
 .buttons {
   display: flex;
   gap: 16px;
-  margin-top: 24px;
+  margin-top: 20px; /* Уменьшили с 24px до 20px */
   grid-column: 1 / -1;
   flex-wrap: wrap;
   justify-content: flex-start;
@@ -780,79 +787,88 @@ input[type="tel"]::placeholder {
   }
 }
 
-/* Высокоприоритетные стили для компактного модального окна */
+/* Красивые стили для модального окна подтверждения */
 .manage-users .modal-overlay .modal-content {
-  background: white !important;
-  border-radius: 6px !important;
-  width: 120px !important;
-  max-width: 120px !important;
-  min-width: 120px !important;
+  background: linear-gradient(135deg, #ffffff 0%, #fafbff 100%) !important;
+  border-radius: 16px !important;
+  width: 320px !important;
+  max-width: 400px !important;
+  min-width: 280px !important;
   max-height: 90vh !important;
   overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;
   box-shadow: 
-    0 6px 12px rgba(0, 177, 143, 0.15),
-    0 2px 6px rgba(0, 0, 0, 0.1) !important;
-  animation: slideIn 0.25s ease-out !important;
-  border: 1px solid rgba(0, 177, 143, 0.1) !important;
+    0 20px 60px rgba(0, 177, 143, 0.15),
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 2px solid rgba(0, 177, 143, 0.1) !important;
   font-family: 'Montserrat', sans-serif !important;
   margin: auto !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 .modal-content {
-  background: white;
-  border-radius: 6px;
-  width: 100%;
-  max-width: 140px;
-  min-width: 140px;
+  background: linear-gradient(135deg, #ffffff 0%, #fafbff 100%);
+  border-radius: 16px;
+  width: 320px;
+  max-width: 400px;
+  min-width: 280px;
   max-height: 90vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   box-shadow: 
-    0 6px 12px rgba(0, 177, 143, 0.15),
-    0 2px 6px rgba(0, 0, 0, 0.1);
-  animation: slideIn 0.25s ease-out;
-  border: 1px solid rgba(0, 177, 143, 0.1);
+    0 20px 60px rgba(0, 177, 143, 0.15),
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(0, 177, 143, 0.1);
   font-family: 'Montserrat', sans-serif;
+  backdrop-filter: blur(8px);
 }
 
-/* Высокоприоритетные стили для текста в модальном окне */
+/* Улучшенные стили для текста в модальном окне */
 .manage-users .modal-overlay .modal-content p {
-  padding: 6px 4px 3px 4px !important;
+  padding: 32px 28px 20px 28px !important;
   margin: 0 !important;
-  font-size: 10px !important;
-  font-weight: 500 !important;
-  color: #2d3748 !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: #1f2937 !important;
   text-align: center !important;
-  line-height: 1.1 !important;
+  line-height: 1.4 !important;
   font-family: 'Montserrat', sans-serif !important;
+  background: rgba(0, 177, 143, 0.02) !important;
+  border-bottom: 1px solid rgba(0, 177, 143, 0.08) !important;
 }
 
 .modal-content.small {
-  max-width: 120px;
-  min-width: 120px;
+  max-width: 320px;
+  min-width: 280px;
 }
 
 .modal-content p {
-  padding: 8px 6px 4px 6px;
+  padding: 32px 28px 20px 28px;
   margin: 0;
-  font-size: 11px;
-  font-weight: 500;
-  color: #2d3748;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
   text-align: center;
-  line-height: 1.2;
+  line-height: 1.4;
   font-family: 'Montserrat', sans-serif;
+  background: rgba(0, 177, 143, 0.02);
+  border-bottom: 1px solid rgba(0, 177, 143, 0.08);
 }
 
-/* Высокоприоритетные стили для кнопок в модальном окне */
+/* Улучшенные стили для кнопок в модальном окне */
 .manage-users .modal-overlay .modal-buttons {
   display: flex !important;
-  gap: 3px !important;
-  padding: 0 4px 4px 4px !important;
+  gap: 16px !important;
+  padding: 20px 28px 28px 28px !important;
   justify-content: center !important;
-  flex-wrap: wrap !important;
+  flex-wrap: nowrap !important;
+  background: rgba(248, 250, 252, 0.6) !important;
 }
 
 .manage-users .modal-overlay .modal-buttons button {
@@ -860,67 +876,69 @@ input[type="tel"]::placeholder {
   flex-direction: row !important;
   justify-content: center !important;
   align-items: center !important;
-  padding: 3px 6px !important;
-  gap: 1px !important;
+  padding: 12px 24px !important;
+  gap: 8px !important;
   
-  min-width: 35px !important;
-  max-width: 45px !important;
-  height: 18px !important;
+  min-width: 100px !important;
+  max-width: 140px !important;
+  height: 44px !important;
   
   border: none !important;
-  border-radius: 3px !important;
+  border-radius: 12px !important;
   cursor: pointer !important;
   
   font-family: 'Montserrat', sans-serif !important;
   font-style: normal !important;
   font-weight: 600 !important;
-  font-size: 8px !important;
-  line-height: 9px !important;
+  font-size: 14px !important;
+  line-height: 18px !important;
   text-transform: none !important;
-  letter-spacing: 0.1px !important;
+  letter-spacing: 0.3px !important;
   
-  transition: all 0.15s ease !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   position: relative !important;
   flex: none !important;
   flex-grow: 0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
 }
 
 .modal-buttons {
   display: flex;
-  gap: 4px;
-  padding: 0 6px 6px 6px;
+  gap: 16px;
+  padding: 20px 28px 28px 28px;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  background: rgba(248, 250, 252, 0.6);
 }
 
 /* КРИТИЧЕСКИ ВАЖНЫЕ стили - максимальный приоритет */
 div.manage-users div.modal-overlay div.modal-content {
-  width: 140px !important;
-  max-width: 140px !important;
-  min-width: 140px !important;
+  width: 320px !important;
+  max-width: 400px !important;
+  min-width: 280px !important;
   height: auto !important;
   max-height: none !important;
   min-height: auto !important;
 }
 
 div.manage-users div.modal-overlay div.modal-content p {
-  padding: 8px 6px 6px 6px !important;
-  font-size: 11px !important;
-  line-height: 1.2 !important;
+  padding: 32px 28px 20px 28px !important;
+  font-size: 18px !important;
+  line-height: 1.4 !important;
 }
 
 div.manage-users div.modal-overlay div.modal-buttons {
-  padding: 0 6px 8px 6px !important;
-  gap: 6px !important;
+  padding: 20px 28px 28px 28px !important;
+  gap: 16px !important;
 }
 
 div.manage-users div.modal-overlay div.modal-buttons button {
-  min-width: 50px !important;
-  max-width: 60px !important;
-  height: 28px !important;
-  padding: 6px 10px !important;
-  font-size: 10px !important;
-  line-height: 11px !important;
+  min-width: 100px !important;
+  max-width: 140px !important;
+  height: 44px !important;
+  padding: 12px 24px !important;
+  font-size: 14px !important;
+  line-height: 18px !important;
 }
 
 .modal-buttons button {
@@ -929,74 +947,77 @@ div.manage-users div.modal-overlay div.modal-buttons button {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  padding: 4px 8px;
-  gap: 2px;
+  padding: 12px 24px;
+  gap: 8px;
   
-  min-width: 40px;
-  max-width: 50px;
-  height: 22px;
+  min-width: 100px;
+  max-width: 140px;
+  height: 44px;
   
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
   cursor: pointer;
   
   /* Текст */
   font-family: 'Montserrat', sans-serif;
   font-style: normal;
   font-weight: 600;
-  font-size: 9px;
-  line-height: 10px;
+  font-size: 14px;
+  line-height: 18px;
   text-transform: none;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.3px;
   
-  /* Упрощенные анимации */
-  transition: all 0.15s ease;
+  /* Улучшенные анимации */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   
   /* Flex настройки */
   flex: none;
   flex-grow: 0;
+  
+  /* Тень */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .modal-buttons .btn-primary {
-  background: #00B18F;
-  box-shadow: 3px 3px 0px #03836A;
+  background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
+  box-shadow: 0 6px 20px rgba(0, 177, 143, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1);
   color: white;
 }
 
 .modal-buttons .btn-primary:hover:not(:disabled) {
-  background: #03836A;
-  box-shadow: 2px 2px 0px #03836A;
-  transform: translate(1px, 1px);
+  background: linear-gradient(135deg, #03836A 0%, #00B18F 100%);
+  box-shadow: 0 8px 24px rgba(0, 177, 143, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
 .modal-buttons .btn-primary:active {
-  background: #03836A;
-  box-shadow: 1px 1px 0px #03836A;
-  transform: translate(2px, 2px);
+  background: linear-gradient(135deg, #03836A 0%, #00B18F 100%);
+  box-shadow: 0 4px 16px rgba(0, 177, 143, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(0);
 }
 
 .modal-buttons .btn-primary:disabled {
-  background: #9ca3af;
-  box-shadow: 3px 3px 0px #6b7280;
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  box-shadow: 0 4px 16px rgba(156, 163, 175, 0.2);
   cursor: not-allowed;
   transform: none;
   color: #d1d5db;
 }
 
 .modal-buttons .btn-secondary {
-  background: #f8f9fa;
-  color: #6b7280;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #495057;
   border: 2px solid rgba(0, 177, 143, 0.2);
-  box-shadow: 2px 2px 0px rgba(0, 177, 143, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 177, 143, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .modal-buttons .btn-secondary:hover {
-  background: rgba(0, 177, 143, 0.1);
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.08) 0%, rgba(3, 131, 106, 0.05) 100%);
   color: #03836A;
   border-color: rgba(0, 177, 143, 0.4);
-  box-shadow: 1px 1px 0px rgba(0, 177, 143, 0.3);
-  transform: translate(1px, 1px);
+  box-shadow: 0 6px 20px rgba(0, 177, 143, 0.2), 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .modal-buttons .btn-secondary:hover::before {
@@ -1004,27 +1025,27 @@ div.manage-users div.modal-overlay div.modal-buttons button {
 }
 
 .modal-buttons .btn-secondary:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px rgba(0, 177, 143, 0.4);
+  transform: translateY(0);
+  box-shadow: 0 4px 16px rgba(0, 177, 143, 0.2), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 /* Кнопка danger в модалке */
 .modal-buttons .btn-danger {
-  background: #E9515A;
-  box-shadow: 3px 3px 0px #dc2626;
+  background: linear-gradient(135deg, #E9515A 0%, #dc2626 100%);
+  box-shadow: 0 6px 20px rgba(233, 81, 90, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1);
   color: white;
 }
 
 .modal-buttons .btn-danger:hover {
-  background: #dc2626;
-  box-shadow: 2px 2px 0px #dc2626;
-  transform: translate(1px, 1px);
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 8px 24px rgba(233, 81, 90, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
 .modal-buttons .btn-danger:active {
-  background: #b91c1c;
-  box-shadow: 1px 1px 0px #b91c1c;
-  transform: translate(2px, 2px);
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  box-shadow: 0 4px 16px rgba(233, 81, 90, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(0);
 }
 
 .modal-header {
@@ -1062,22 +1083,22 @@ div.manage-users div.modal-overlay div.modal-buttons button {
   }
   
   .content-area {
-    padding: 16px;
+    padding: 12px 16px; /* Уменьшили отступы на мобильных */
   }
   
   .block {
-    padding: 20px;
-    margin-bottom: 16px;
+    padding: 18px; /* Уменьшили с 20px до 18px */
+    margin-bottom: 14px; /* Уменьшили с 16px до 14px */
   }
   
   h1 {
     font-size: 24px;
-    margin-bottom: 20px;
+    margin-bottom: 16px; /* Уменьшили с 20px до 16px */
   }
   
   .block h2 {
     font-size: 20px;
-    margin-bottom: 16px;
+    margin-bottom: 14px; /* Уменьшили с 16px до 14px */
   }
   
   .user-form.form-grid {
@@ -1096,70 +1117,73 @@ div.manage-users div.modal-overlay div.modal-buttons button {
     gap: 12px;
   }
   
-  /* МОБИЛЬНЫЕ стили с максимальным приоритетом */
+  /* МОБИЛЬНЫЕ стили для модальных окон с максимальным приоритетом */
   div.manage-users div.modal-overlay div.modal-content {
-    margin: 6px !important;
-    max-width: 120px !important;
-    min-width: 120px !important;
-    width: 120px !important;
-    border-radius: 4px !important;
+    margin: 20px !important;
+    max-width: calc(100vw - 40px) !important;
+    min-width: 280px !important;
+    width: auto !important;
+    border-radius: 12px !important;
     max-height: none !important;
     min-height: auto !important;
     height: auto !important;
   }
   
   div.manage-users div.modal-overlay div.modal-content p {
-    padding: 6px 4px 4px 4px !important;
-    font-size: 10px !important;
-    line-height: 1.1 !important;
+    padding: 24px 20px 16px 20px !important;
+    font-size: 16px !important;
+    line-height: 1.3 !important;
     text-align: center !important;
   }
   
   div.manage-users div.modal-overlay div.modal-buttons {
-    padding: 0 4px 6px 4px !important;
-    flex-direction: column !important;
-    gap: 4px !important;
+    padding: 16px 20px 24px 20px !important;
+    flex-direction: row !important;
+    gap: 12px !important;
+    justify-content: center !important;
   }
   
   div.manage-users div.modal-overlay div.modal-buttons button {
-    width: 100% !important;
-    padding: 8px 10px !important;
-    font-size: 10px !important;
-    font-weight: 600 !important;
-    border-radius: 4px !important;
-    min-height: 30px !important;
-    height: 30px !important;
+    flex: 1 !important;
     max-width: none !important;
-    min-width: auto !important;
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    min-width: 100px !important;
   }
 
   .modal-content {
-    margin: 6px;
-    max-width: 120px;
-    min-width: 120px;
-    border-radius: 4px;
+    margin: 20px;
+    max-width: calc(100vw - 40px);
+    min-width: 280px;
+    border-radius: 12px;
   }
   
   .modal-content p {
-    padding: 6px 4px 3px 4px;
-    font-size: 10px;
-    line-height: 1.1;
+    padding: 24px 20px 16px 20px;
+    font-size: 16px;
+    line-height: 1.3;
     text-align: center;
   }
   
   .modal-buttons {
-    padding: 0 4px 4px 4px;
-    flex-direction: column;
-    gap: 3px;
+    padding: 16px 20px 24px 20px;
+    flex-direction: row;
+    gap: 12px;
+    justify-content: center;
   }
   
   .modal-buttons button {
-    width: 100%;
-    padding: 4px 6px;
-    font-size: 9px;
+    flex: 1;
+    max-width: none;
+    padding: 12px 16px;
+    font-size: 14px;
     font-weight: 600;
-    border-radius: 3px;
-    min-height: 20px; /* Удобно для касания */
+    border-radius: 10px;
+    min-height: 44px; /* Удобно для касания */
   }
 }
 
@@ -1181,12 +1205,18 @@ div.manage-users div.modal-overlay div.modal-buttons button {
   
   .suggestions {
     max-height: 180px;
+    padding-bottom: 16px; /* Больше отступ на мобильных */
   }
   
   .suggestion-item,
   .suggestions li {
     padding: 10px 16px;
     font-size: 13px;
+  }
+  
+  .suggestion-item:last-child,
+  .suggestions li:last-child {
+    margin-bottom: 6px; /* Дополнительный отступ на мобильных */
   }
 }
 
@@ -1205,100 +1235,84 @@ div.manage-users div.modal-overlay div.modal-buttons button {
     min-width: 28px;
     height: 24px;
   }
+  
+  .suggestions {
+    padding-bottom: 18px; /* Больше отступ на планшетах */
+  }
+  
+  .suggestion-item:last-child,
+  .suggestions li:last-child {
+    margin-bottom: 6px; /* Дополнительный отступ на планшетах */
+  }
 }
 
-/* Специальные стили для модальных окон курсов */
+/* Очень компактные стили для модальных окон курсов */
 .manage-courses .modal-overlay .modal-content {
-  background: white !important;
-  border-radius: 8px !important;
-  width: 200px !important;
-  max-width: 200px !important;
-  min-width: 200px !important;
-  max-height: 90vh !important;
+  width: 280px !important;
+  max-width: 300px !important;
+  min-width: 260px !important;
+  height: auto !important;
+  max-height: 180px !important;
+  padding: 0 !important;
   overflow: hidden !important;
-  display: flex !important;
-  flex-direction: column !important;
-  box-shadow: 
-    0 6px 12px rgba(0, 177, 143, 0.15),
-    0 2px 6px rgba(0, 0, 0, 0.1) !important;
-  animation: slideIn 0.25s ease-out !important;
-  border: 1px solid rgba(0, 177, 143, 0.1) !important;
-  font-family: 'Montserrat', sans-serif !important;
-  margin: auto !important;
 }
 
 .manage-courses .modal-overlay .modal-content p {
-  padding: 8px 8px 4px 8px !important;
+  padding: 8px 12px 4px 12px !important;
   margin: 0 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.1 !important;
+}
+
+.manage-courses .modal-overlay .modal-content p span {
   font-size: 11px !important;
-  font-weight: 500 !important;
-  color: #2d3748 !important;
-  text-align: center !important;
-  line-height: 1.2 !important;
-  font-family: 'Montserrat', sans-serif !important;
+  margin-top: 2px !important;
+  display: block !important;
 }
 
 .manage-courses .modal-overlay .modal-buttons {
-  display: flex !important;
+  padding: 4px 12px 8px 12px !important;
   gap: 6px !important;
-  padding: 4px 8px 8px 8px !important;
-  justify-content: center !important;
-  align-items: center !important;
+  margin: 0 !important;
 }
 
 .manage-courses .modal-overlay .modal-buttons button {
-  flex: 1 !important;
-  min-width: 65px !important;
+  min-width: 60px !important;
   max-width: 85px !important;
   height: 28px !important;
-  padding: 6px 8px !important;
-  font-size: 10px !important;
-  font-weight: 500 !important;
-  border-radius: 4px !important;
-  border: none !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  font-family: 'Montserrat', sans-serif !important;
-  text-align: center !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.manage-courses .modal-overlay .modal-buttons button:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
-
-.manage-courses .modal-overlay .modal-buttons button:active {
-  transform: translateY(0) !important;
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
 }
 
 /* Мобильная адаптация для модальных окон курсов */
 @media (max-width: 768px) {
   .manage-courses .modal-overlay .modal-content {
-    width: 180px !important;
-    max-width: 180px !important;
-    min-width: 180px !important;
+    width: auto !important;
+    max-width: 90vw !important;
+    min-width: 300px !important;
+    margin: 20px !important;
   }
   
   .manage-courses .modal-overlay .modal-content p {
-    padding: 8px 6px 4px 6px !important;
-    font-size: 10px !important;
-    line-height: 1.1 !important;
+    padding: 16px 20px 10px 20px !important;
+    font-size: 15px !important;
+    line-height: 1.3 !important;
   }
   
   .manage-courses .modal-overlay .modal-buttons {
-    padding: 4px 6px 8px 6px !important;
-    gap: 4px !important;
+    padding: 10px 20px 16px 20px !important;
+    gap: 10px !important;
   }
   
   .manage-courses .modal-overlay .modal-buttons button {
-    height: 26px !important;
-    padding: 4px 6px !important;
-    font-size: 9px !important;
-    min-width: 55px !important;
-    max-width: 75px !important;
+    height: 36px !important;
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+    min-width: 90px !important;
+    max-width: 130px !important;
   }
 }
 

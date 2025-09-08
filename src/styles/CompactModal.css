@@ -1,0 +1,311 @@
+/* Компактные модальные окна подтверждения для курсов */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+/* Основные стили для компактного модального окна */
+.compact-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0;
+  }
+  to { 
+    opacity: 1;
+  }
+}
+
+@keyframes slideInCompact {
+  from { 
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Компактное модальное окно */
+.compact-modal-content {
+  background: linear-gradient(135deg, #ffffff 0%, #fafbff 100%);
+  border-radius: 16px;
+  width: 320px;
+  max-width: 340px;
+  min-width: 300px;
+  height: auto;
+  min-height: auto;
+  max-height: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 
+    0 12px 40px rgba(0, 177, 143, 0.12),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  animation: slideInCompact 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 177, 143, 0.1);
+  font-family: 'Montserrat', sans-serif;
+  backdrop-filter: blur(8px);
+}
+
+/* Заголовок модального окна */
+.compact-modal-content p {
+  padding: 20px 24px 12px 24px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  text-align: center;
+  line-height: 1.3;
+  font-family: 'Montserrat', sans-serif;
+  background: rgba(0, 177, 143, 0.02);
+  border-bottom: 1px solid rgba(0, 177, 143, 0.08);
+}
+
+/* Подзаголовок в модальном окне */
+.compact-modal-content p span {
+  font-size: 13px;
+  font-weight: 400;
+  color: #6b7280;
+  display: block;
+  margin-top: 4px;
+  line-height: 1.2;
+}
+
+/* Кнопки в компактном модальном окне */
+.compact-modal-buttons {
+  display: flex;
+  gap: 10px;
+  padding: 12px 24px 20px 24px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+  background: rgba(248, 250, 252, 0.4);
+}
+
+.compact-modal-buttons button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 18px;
+  gap: 6px;
+  
+  flex: 1;
+  width: 100px;
+  min-width: 100px;
+  max-width: 120px;
+  height: 36px;
+  
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 16px;
+  text-transform: none;
+  letter-spacing: 0.2px;
+  text-align: center;
+  
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Основная кнопка (создать, сохранить) */
+.compact-modal-buttons .btn-primary {
+  background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
+  color: white;
+  box-shadow: 0 3px 12px rgba(0, 177, 143, 0.25);
+}
+
+.compact-modal-buttons .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #03836A 0%, #00B18F 100%);
+  box-shadow: 0 4px 16px rgba(0, 177, 143, 0.35);
+  transform: translateY(-1px);
+}
+
+.compact-modal-buttons .btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 177, 143, 0.25);
+}
+
+.compact-modal-buttons .btn-primary:disabled {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  box-shadow: 0 2px 8px rgba(156, 163, 175, 0.15);
+  cursor: not-allowed;
+  transform: none;
+  color: #d1d5db;
+}
+
+/* Кнопка удаления */
+.compact-modal-buttons .btn-danger {
+  background: linear-gradient(135deg, #E9515A 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 3px 12px rgba(233, 81, 90, 0.25);
+}
+
+.compact-modal-buttons .btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 4px 16px rgba(233, 81, 90, 0.35);
+  transform: translateY(-1px);
+}
+
+.compact-modal-buttons .btn-danger:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(233, 81, 90, 0.25);
+}
+
+/* Вторичная кнопка (отмена) */
+.compact-modal-buttons .btn-secondary {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #495057;
+  border: 1px solid rgba(0, 177, 143, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 177, 143, 0.08);
+}
+
+.compact-modal-buttons .btn-secondary:hover {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.06) 0%, rgba(3, 131, 106, 0.03) 100%);
+  color: #03836A;
+  border-color: rgba(0, 177, 143, 0.3);
+  box-shadow: 0 3px 12px rgba(0, 177, 143, 0.15);
+  transform: translateY(-1px);
+}
+
+.compact-modal-buttons .btn-secondary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 177, 143, 0.08);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .compact-modal-content {
+    margin: 20px;
+    max-width: calc(100vw - 40px);
+    min-width: 280px;
+    width: auto;
+    border-radius: 12px;
+  }
+  
+  .compact-modal-content p {
+    padding: 18px 20px 10px 20px;
+    font-size: 15px;
+    line-height: 1.3;
+  }
+  
+  .compact-modal-content p span {
+    font-size: 12px;
+    margin-top: 3px;
+  }
+  
+  .compact-modal-buttons {
+    padding: 10px 20px 18px 20px;
+    gap: 8px;
+    align-items: center;
+  }
+  
+  .compact-modal-buttons button {
+    flex: 1;
+    width: auto;
+    min-width: 110px;
+    max-width: none;
+    padding: 11px 16px;
+    font-size: 13px;
+    height: 38px;
+    text-align: center;
+  }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 480px) {
+  .compact-modal-content {
+    margin: 16px;
+    max-width: calc(100vw - 32px);
+    min-width: 260px;
+  }
+  
+  .compact-modal-content p {
+    padding: 16px 18px 8px 18px;
+    font-size: 14px;
+  }
+  
+  .compact-modal-content p span {
+    font-size: 11px;
+  }
+  
+  .compact-modal-buttons {
+    padding: 8px 18px 16px 18px;
+    gap: 6px;
+    align-items: center;
+  }
+  
+  .compact-modal-buttons button {
+    flex: 1;
+    width: auto;
+    min-width: 95px;
+    padding: 10px 14px;
+    font-size: 12px;
+    height: 36px;
+    text-align: center;
+  }
+}
+
+/* Специальные стили для разных типов модальных окон */
+
+/* Модальное окно создания (зеленый акцент) */
+.compact-modal-content.create-modal p {
+  border-bottom-color: rgba(0, 177, 143, 0.12);
+  background: rgba(0, 177, 143, 0.03);
+}
+
+/* Модальное окно обновления (синий акцент) */
+.compact-modal-content.update-modal p {
+  border-bottom-color: rgba(59, 130, 246, 0.12);
+  background: rgba(59, 130, 246, 0.03);
+}
+
+/* Модальное окно удаления (красный акцент) */
+.compact-modal-content.delete-modal p {
+  border-bottom-color: rgba(239, 68, 68, 0.12);
+  background: rgba(239, 68, 68, 0.03);
+}
+
+/* Анимация загрузки для кнопок */
+.compact-modal-buttons button:disabled {
+  position: relative;
+  overflow: hidden;
+}
+
+.compact-modal-buttons button:disabled::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}

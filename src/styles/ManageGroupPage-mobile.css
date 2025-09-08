@@ -391,7 +391,8 @@
     font-size: 16px;
     border: 2px solid #e5e7eb;
     border-radius: 12px;
-    background: #fafbfc;
+    background: #ffffff !important;
+    color: #374151 !important;
     transition: all 0.3s ease;
     font-family: inherit;
   }
@@ -401,7 +402,8 @@
     outline: none;
     border-color: #00B18F;
     box-shadow: 0 0 0 4px rgba(0, 177, 143, 0.1);
-    background: white;
+    background: #ffffff !important;
+    color: #374151 !important;
     transform: translateY(-1px);
   }
   
@@ -502,27 +504,25 @@
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   }
   
-  .add-panel input {
+  .add-form input {
     width: 100%;
-    padding: 16px 18px;
+    padding: 12px 14px;
     font-size: 16px;
     border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    background: #fafbfc;
-    transition: all 0.3s ease;
-    font-family: inherit;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    background: #ffffff !important;
+    color: #374151 !important;
   }
   
-  .add-panel input:focus {
+  .add-form input:focus {
     outline: none;
     border-color: #00B18F;
-    box-shadow: 0 0 0 4px rgba(0, 177, 143, 0.1);
-    background: white;
-    transform: translateY(-1px);
-  }
-  
-  /* Ограничиваем высоту скролла в панели добавления */
+    box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1);
+    background: #ffffff !important;
+    color: #374151 !important;
+  }  /* Ограничиваем высоту скролла в панели добавления */
   .add-panel .scroll-list {
     max-height: 350px;
     overflow-y: auto;

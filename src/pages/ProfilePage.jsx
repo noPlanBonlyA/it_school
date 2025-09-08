@@ -3,22 +3,29 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
 import AttendanceWidget from '../components/AttendanceWidget';
+import { useAuth } from '../contexts/AuthContext';
 import { getMe } from '../services/userService';
 import api from '../api/axiosInstance';
 import '../styles/ProfilePage.css';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
+  const { user: authUser, updateUser } = useAuth();
   const [user, setUser] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
 
   useEffect(() => {
-    getMe()
-      .then(setUser)
-      .catch(() => alert('Не удалось загрузить профиль'));
-  }, []);
+    // Используем данные из AuthContext если они есть, иначе загружаем
+    if (authUser) {
+      setUser(authUser);
+    } else {
+      getMe()
+        .then(setUser)
+        .catch(() => alert('Не удалось загрузить профиль'));
+    }
+  }, [authUser]);
 
   // Обработка выбора файла
   const handleFileSelect = (event) => {
@@ -91,10 +98,24 @@ export default function ProfilePage() {
 
       console.log('[ProfilePage] Avatar uploaded successfully:', response.data);
 
-      // Обновляем пользователя
-      setUser(response.data);
+      // Обновляем пользователя в AuthContext и локальном состоянии
+      try {
+        const updatedUser = await updateUser();
+        setUser(updatedUser);
+        console.log('[ProfilePage] User data updated successfully');
+      } catch (updateError) {
+        console.warn('[ProfilePage] Failed to update user context, using response data:', updateError);
+        // Если не удалось обновить через AuthContext, используем данные из ответа
+        setUser(response.data);
+      }
+      
       setSelectedFile(null);
       setPreviewUrl(null);
+      
+      // Очищаем input
+      const fileInput = document.getElementById('avatar-input');
+      if (fileInput) fileInput.value = '';
+      
       alert('Аватар успешно обновлен!');
       
     } catch (error) {
@@ -106,6 +127,8 @@ export default function ProfilePage() {
                           'Неизвестная ошибка';
       
       alert('Ошибка загрузки аватара: ' + errorMessage);
+      
+      // При ошибке не очищаем выбранный файл, чтобы пользователь мог попробовать снова
     } finally {
       setUploading(false);
     }

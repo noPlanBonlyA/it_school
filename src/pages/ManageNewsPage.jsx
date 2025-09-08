@@ -259,14 +259,15 @@ export default function ManageNewsPage() {
               />
             </div>
             <div className="field">
-              <label>
+              <div className="checkbox-field">
                 <input
                   type="checkbox"
+                  id="pin-create"
                   checked={form.is_pinned}
                   onChange={e => setForm(f => ({ ...f, is_pinned: e.target.checked }))}
                 />
-                Закрепить новость
-              </label>
+                <label htmlFor="pin-create">Закрепить новость</label>
+              </div>
             </div>
             <div className="field">
               <label>Картинка (опционально)</label>
@@ -367,14 +368,15 @@ export default function ManageNewsPage() {
                 />
               </div>
               <div className="field">
-                <label>
+                <div className="checkbox-field">
                   <input
                     type="checkbox"
+                    id="pin-edit"
                     checked={editItem.is_pinned}
                     onChange={e => setEditItem(i => ({ ...i, is_pinned: e.target.checked }))}
                   />
-                  Закрепить
-                </label>
+                  <label htmlFor="pin-edit">Закрепить новость</label>
+                </div>
               </div>
               <div className="field">
                 <label>Изображение</label>

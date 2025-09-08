@@ -18,7 +18,7 @@
 
 .notification-page-container {
   padding: 50px 40px 40px 40px; /* Увеличили боковые отступы */
-  max-width: 1200px;
+  max-width: 1400px; /* Увеличили с 1200px до 1400px */
   margin: 0 auto; /* Центрируем контейнер */
   width: 100%;
   box-sizing: border-box;
@@ -54,14 +54,14 @@
   gap: 24px;
   margin-left: 0; /* Убираем дополнительные отступы */
   margin-right: 0;
-  max-width: 700px; /* Ограничиваем максимальную ширину */
+  max-width: 900px; /* Увеличили с 700px до 900px */
   width: 100%;
 }
 
 .notification-form-card {
   background: #FFFFFF;
   border-radius: 16px;
-  padding: 32px;
+  padding: 40px; /* Увеличили с 32px до 40px */
   box-shadow: 0 2px 8px rgba(0, 177, 143, 0.04); /* Уменьшили тень */
   border: 1px solid #F0F0F0; /* Уменьшили границу */
   width: 100%;
@@ -406,6 +406,58 @@
   font-size: 18px;
   color: #00B18F;
   font-weight: 600;
+}
+
+/* Стили для больших экранов (десктопы) */
+@media (min-width: 1200px) {
+  .notification-page-container {
+    padding: 60px 60px 50px 60px; /* Ещё больше отступы */
+    max-width: 1600px; /* Максимальная ширина для больших экранов */
+  }
+  
+  .notification-content {
+    max-width: 1000px; /* Ещё шире контент */
+  }
+  
+  .notification-form-card {
+    padding: 48px; /* Ещё больше внутренние отступы */
+  }
+  
+  .form-section {
+    margin-bottom: 32px; /* Больше отступы между секциями */
+  }
+  
+  .radio-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* Три колонки на больших экранах */
+    gap: 16px;
+  }
+  
+  .form-select,
+  .form-textarea {
+    font-size: 17px; /* Чуть больше шрифт */
+  }
+  
+  .send-button {
+    max-width: 600px; /* Ещё шире кнопка */
+    font-size: 26px; /* Больше шрифт кнопки */
+    padding: 24px 48px;
+    height: 80px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .notification-page-container {
+    padding: 70px 80px 60px 80px; /* Максимальные отступы */
+  }
+  
+  .notification-content {
+    max-width: 1200px; /* Максимальная ширина контента */
+  }
+  
+  .notification-form-card {
+    padding: 56px; /* Максимальные внутренние отступы */
+  }
 }
 
 /* Адаптивность */

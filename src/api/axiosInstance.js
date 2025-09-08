@@ -60,8 +60,12 @@ api.interceptors.response.use(
     }
     
     const url = err.config?.url || '';
-    // автоматический редирект только для всех 401, кроме /users/me
-    if (err.response?.status === 401 && !url.endsWith('/users/me')) {
+    // автоматический редирект только для критических 401, кроме /users/me и /users/refresh
+    if (err.response?.status === 401 && 
+        !url.endsWith('/users/me') && 
+        !url.endsWith('/users/refresh') &&
+        !url.includes('/users/')) { // избегаем редиректов при обновлении профиля
+      console.log('[API] 401 error, redirecting to login');
       window.location.href = '/login';
     }
     return Promise.reject(err);

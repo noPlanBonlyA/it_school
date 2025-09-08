@@ -124,6 +124,123 @@
     margin-top: 4px;
   }
   
+  /* Стилизация чекбокса "Закрепить" */
+  .checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 12px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .checkbox-field:hover {
+    background: #F1F5F9;
+    border-color: #CBD5E1;
+  }
+  
+  .checkbox-field input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #4880FF;
+    cursor: pointer;
+    margin: 0;
+  }
+  
+  .checkbox-field label {
+    margin: 0;
+    font-weight: 500;
+    font-size: 14px;
+    color: #334155;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .checkbox-field label::after {
+    content: "📌";
+    font-size: 14px;
+    opacity: 0.7;
+  }
+  
+  .checkbox-field input[type="checkbox"]:checked + label {
+    color: #4880FF;
+    font-weight: 600;
+  }
+  
+  .checkbox-field input[type="checkbox"]:checked + label::after {
+    opacity: 1;
+  }
+  
+  /* Инлайн чекбокс для размещения рядом с заголовком */
+  .checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin-top: auto;
+    height: fit-content;
+  }
+  
+  .checkbox-inline:hover {
+    background: #F1F5F9;
+    border-color: #CBD5E1;
+  }
+  
+  .checkbox-inline input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #4880FF;
+    cursor: pointer;
+    margin: 0;
+  }
+  
+  .checkbox-inline label {
+    margin: 0;
+    font-weight: 500;
+    font-size: 13px;
+    color: #334155;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  
+  .checkbox-inline label::after {
+    content: "📌";
+    font-size: 12px;
+    opacity: 0.7;
+  }
+  
+  .checkbox-inline input[type="checkbox"]:checked + label {
+    color: #4880FF;
+    font-weight: 600;
+  }
+  
+  .checkbox-inline input[type="checkbox"]:checked + label::after {
+    opacity: 1;
+  }
+  
+  /* Строка с заголовком и чекбоксом */
+  .title-row {
+    display: flex;
+    gap: 16px;
+    align-items: end;
+  }
+  
+  .title-row .field {
+    flex: 1;
+  }
+  
   /* Поле поиска */
   .search-block {
     position: relative;

@@ -8,6 +8,7 @@ import {
   removeUserFromEvent,
   getEventWithUsers
 } from '../services/eventService';
+import '../styles/EventModals.css'; // новый импорт
 
 export default function EventEditModal({ event, onSave, onClose }) {
   const [formData, setFormData] = useState({
@@ -38,6 +39,12 @@ export default function EventEditModal({ event, onSave, onClose }) {
 
   useEffect(() => {
     loadParticipantsData();
+  }, []);
+
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = originalOverflow; };
   }, []);
 
   const loadParticipantsData = async () => {
@@ -176,7 +183,7 @@ export default function EventEditModal({ event, onSave, onClose }) {
   );
 
   return (
-    <div className="modal-overlay">
+    <div className="events-modal-overlay">
       <div className="modal-content large">
         <div className="modal-header">
           <h2>Редактировать мероприятие</h2>
@@ -276,7 +283,7 @@ export default function EventEditModal({ event, onSave, onClose }) {
               <div className="participants-section">
                 <div className="section-header">
                   <div className="header-content">
-                    <h3>Текущие участники</h3>
+                    <h3>👥 Текущие участники</h3>
                     <p>Участников: <strong>{eventUsers.length}</strong></p>
                   </div>
                 </div>
@@ -320,7 +327,7 @@ export default function EventEditModal({ event, onSave, onClose }) {
               <div className="participants-section">
                 <div className="section-header">
                   <div className="header-content">
-                    <h3>Добавить участников</h3>
+                    <h3>➕ Добавить участников</h3>
                     <p>Выберите пользователей или группы для добавления в мероприятие</p>
                   </div>
                 </div>

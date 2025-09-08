@@ -393,12 +393,16 @@
   margin-bottom: 14px;
   transition: all 0.2s ease;
   box-sizing: border-box;
+  background: #ffffff !important;
+  color: #374151 !important;
 }
 
 .add-form input:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #ffffff !important;
+  color: #374151 !important;
 }
 
 .add-form .list-container {
@@ -514,6 +518,8 @@
   border-radius: 6px;
   font-size: 14px;
   transition: all 0.2s ease;
+  background: #ffffff !important;
+  color: #374151 !important;
 }
 
 .field input:focus,
@@ -521,6 +527,8 @@
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #ffffff !important;
+  color: #374151 !important;
 }
 
 .field textarea {

@@ -4,6 +4,7 @@ import { getAllUsers } from '../services/userService';
 import { getAllGroups } from '../services/groupService';
 import { addEventForGroup, addEventForUsers } from '../services/eventService';
 import api from '../api/axiosInstance';
+import '../styles/EventModals.css'; // добавлен импорт новых стилей
 
 export default function EventCreateModal({ onSave, onClose }) {
   const [formData, setFormData] = useState({
@@ -246,7 +247,7 @@ export default function EventCreateModal({ onSave, onClose }) {
     );
   };
 
-  // Получаем отфильтрованные курсы
+  // Получаем отфильтованные курсы
   const getSearchFilteredCourses = () => {
     if (!Array.isArray(courses)) return [];
     if (!searchTerm) return courses;
@@ -273,8 +274,14 @@ export default function EventCreateModal({ onSave, onClose }) {
     return <span className={`role-badge ${roleInfo.class}`}>{roleInfo.text}</span>;
   };
 
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = originalOverflow; };
+  }, []);
+
   return (
-    <div className="modal-overlay">
+    <div className="events-modal-overlay">
       <div className="modal-content large">
         <div className="modal-header">
           <h2>Создать мероприятие</h2>
@@ -284,7 +291,7 @@ export default function EventCreateModal({ onSave, onClose }) {
         <div className="modal-body">
           {/* Основная информация о мероприятии */}
           <div className="event-form-section">
-            <h3>Основная информация</h3>
+            <h3>📅 Основная информация</h3>
             
             <div className="form-group">
               <label>Название мероприятия *</label>
@@ -355,7 +362,7 @@ export default function EventCreateModal({ onSave, onClose }) {
           </div>
           <div className="participant-type-selector">
             <div className="selector-header">
-              <h3>Выберите тип участников</h3>
+              <h3>👥 Выберите тип участников</h3>
               <p>Кто будет участвовать в мероприятии?</p>
             </div>
             
@@ -448,7 +455,7 @@ export default function EventCreateModal({ onSave, onClose }) {
                 className={`type-option ${selectedParticipantType === 'courses' ? 'selected' : ''}`}
                 onClick={() => setSelectedParticipantType('courses')}
               >
-                <div className="option-icon">�</div>
+                <div className="option-icon">📚</div>
                 <div className="option-content">
                   <h4>Курсы</h4>
                   <p>Назначить мероприятие участникам курсов</p>
@@ -472,7 +479,7 @@ export default function EventCreateModal({ onSave, onClose }) {
             <div className="participants-section">
               <div className="section-header">
                 <div className="header-content">
-                  <h3>Выберите студентов</h3>
+                  <h3>🎓 Выберите студентов</h3>
                   <p>Выбрано: <strong>{selectedUsers.length}</strong> из {getFilteredUsers('student').length}</p>
                 </div>
                 <div className="header-actions">
@@ -549,7 +556,7 @@ export default function EventCreateModal({ onSave, onClose }) {
             <div className="participants-section">
               <div className="section-header">
                 <div className="header-content">
-                  <h3>Выберите преподавателей</h3>
+                  <h3>👨‍🏫 Выберите преподавателей</h3>
                   <p>Выбрано: <strong>{selectedUsers.length}</strong> из {getFilteredUsers('teacher').length}</p>
                 </div>
                 <div className="header-actions">
@@ -626,7 +633,7 @@ export default function EventCreateModal({ onSave, onClose }) {
             <div className="participants-section">
               <div className="section-header">
                 <div className="header-content">
-                  <h3>Выберите группы</h3>
+                  <h3>🏫 Выберите группы</h3>
                   <p>Выбрано групп: <strong>{selectedGroups.length}</strong></p>
                 </div>
                 <div className="header-actions">
@@ -694,7 +701,7 @@ export default function EventCreateModal({ onSave, onClose }) {
             <div className="participants-section">
               <div className="section-header">
                 <div className="header-content">
-                  <h3>Выберите курсы</h3>
+                  <h3>📚 Выберите курсы</h3>
                   <p>Выбрано курсов: <strong>{selectedCourses.length}</strong></p>
                 </div>
                 <div className="header-actions">

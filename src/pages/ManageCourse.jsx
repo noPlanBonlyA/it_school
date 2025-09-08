@@ -15,6 +15,7 @@ import {
 
 import '../styles/ManageUserPage.css';   // старая сетка + модалки
 import '../styles/CourseGrid.css';       // сетка карточек
+import '../styles/CompactModal.css';     // компактные модальные окна
 
 /*
  * ИСПРАВЛЕНО: age_category теперь передается как массив в API
@@ -546,15 +547,15 @@ export default function ManageCoursesPage() {
         {/* ---------------- MODALS ---------------- */}
         {/* create */}
         {showConfirmCreate && (
-          <div className="modal-overlay">
-            <div className="modal-content">
+          <div className="compact-modal-overlay">
+            <div className="compact-modal-content create-modal">
               <p>
                 🎯 Создать новый курс<br />
-                <span style={{ fontSize: '14px', fontWeight: '400', color: '#6b7280' }}>
+                <span>
                   "{form.name}"
                 </span>
               </p>
-              <div className="modal-buttons">
+              <div className="compact-modal-buttons">
                 <button className="btn-primary" onClick={handleCreate} disabled={uploading}>
                   {uploading ? 'Создание...' : '✨ Создать'}
                 </button>
@@ -567,15 +568,15 @@ export default function ManageCoursesPage() {
         )}
         {/* update */}
         {showConfirmUpdate && (
-          <div className="modal-overlay">
-            <div className="modal-content">
+          <div className="compact-modal-overlay">
+            <div className="compact-modal-content update-modal">
               <p>
                 📝 Сохранить изменения<br />
-                <span style={{ fontSize: '14px', fontWeight: '400', color: '#6b7280' }}>
+                <span>
                   Курс "{edit.name}" будет обновлен
                 </span>
               </p>
-              <div className="modal-buttons">
+              <div className="compact-modal-buttons">
                 <button className="btn-primary" onClick={handleUpdate} disabled={uploading}>
                   {uploading ? 'Сохранение...' : '💾 Сохранить'}
                 </button>
@@ -588,16 +589,16 @@ export default function ManageCoursesPage() {
         )}
         {/* delete */}
         {showConfirmDelete && (
-          <div className="modal-overlay">
-            <div className="modal-content">
+          <div className="compact-modal-overlay">
+            <div className="compact-modal-content delete-modal">
               <p>
                 🗑️ Удалить курс<br />
-                <span style={{ fontSize: '14px', fontWeight: '400', color: '#ef4444' }}>
+                <span>
                   Курс "{edit.name}" будет удален безвозвратно
                 </span>
               </p>
-              <div className="modal-buttons">
-                <button className="btn-primary" onClick={handleDelete} style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
+              <div className="compact-modal-buttons">
+                <button className="btn-danger" onClick={handleDelete}>
                   🗑️ Удалить
                 </button>
                 <button className="btn-secondary" onClick={() => setShowConfirmDelete(false)}>

@@ -986,6 +986,10 @@ body, html, #root, .app-layout, .main-content {
     overflow: visible;
     max-height: none;
     height: auto;
+    /* ИСПРАВЛЕНО: В мобильной версии новости в один столбик */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
   
   /* Новый порядок карточек на мобильных */
@@ -1436,6 +1440,10 @@ body, html, #root, .app-layout, .main-content {
   .news-row {
     border-radius: 16px;
     margin-bottom: 12px;
+    /* МОБИЛЬНЫЕ: новости в один столбик для лучшей читаемости */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
   }
   
   .news-scroll-container::-webkit-scrollbar {

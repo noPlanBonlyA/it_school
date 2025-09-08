@@ -1,0 +1,450 @@
+/* Модальное окно */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 10px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.course-management-modal {
+  width: 95%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  margin: 2vh auto;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.course-management-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  border-radius: 12px 12px 0 0;
+}
+
+.course-management-modal .modal-header h2 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.course-management-modal .modal-body {
+  padding: 0;
+}
+
+/* Вкладки */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+  text-align: center;
+}
+
+.tab:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.tab.active {
+  color: #00B18F;
+  border-bottom-color: #00B18F;
+  background: white;
+}
+
+/* Контент вкладок */
+.tab-content {
+  padding: 16px 20px 20px;
+}
+
+.loading-section {
+  padding: 30px;
+  text-align: center;
+  color: #666;
+}
+
+/* Текущее расписание */
+.current-schedule {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 20px;
+  border-left: 4px solid #00B18F;
+}
+
+.schedule-info p {
+  margin: 6px 0;
+  color: #495057;
+  font-size: 14px;
+}
+
+.schedule-info strong {
+  color: #2c3e50;
+  min-width: 120px;
+  display: inline-block;
+}
+
+.no-schedule {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  text-align: center;
+  color: #856404;
+}
+
+/* Форма расписания */
+.schedule-form {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.form-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field.full-width {
+  flex: 100%;
+}
+
+.form-field label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+.form-field input,
+.form-field select {
+  padding: 8px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: border-color 0.2s;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: #00B18F;
+  box-shadow: 0 0 0 2px rgba(0, 177, 143, 0.2);
+}
+
+/* Предварительный просмотр */
+.schedule-preview {
+  background: #e7f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 6px;
+  padding: 10px;
+  margin: 12px 0;
+}
+
+.schedule-preview p {
+  margin: 0;
+  color: #0066cc;
+  font-size: 13px;
+}
+
+/* Кнопка изменения расписания */
+.reschedule-btn {
+  background: #00B18F !important;
+  color: white !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s !important;
+  width: 100% !important;
+  margin-top: 14px !important;
+}
+
+.reschedule-btn:hover {
+  background: #009876 !important;
+}
+
+.reschedule-btn:disabled {
+  background: #6c757d !important;
+  cursor: not-allowed !important;
+}
+
+/* Опасная зона */
+.danger-zone {
+  border: 2px solid #dc3545;
+  border-radius: 8px;
+  padding: 16px;
+  background: #f8f9fa;
+}
+
+.danger-zone h3 {
+  color: #dc3545;
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1.1em;
+}
+
+.warning-info {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.warning-info ul {
+  margin: 6px 0 0 0;
+  padding-left: 18px;
+}
+
+.warning-info li {
+  margin-bottom: 3px;
+  color: #856404;
+  font-size: 13px;
+}
+
+.warning-message {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.warning-message p {
+  margin: 0;
+  color: #721c24;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Кнопка удаления */
+.remove-course-btn {
+  background: #dc3545 !important;
+  color: white !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s !important;
+  width: 100% !important;
+}
+
+.remove-course-btn:hover {
+  background: #c82333 !important;
+}
+
+.remove-course-btn:disabled {
+  background: #6c757d !important;
+  cursor: not-allowed !important;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .course-management-modal {
+    width: 98%;
+    margin: 1vh auto;
+    max-height: 90vh;
+    border-radius: 8px;
+  }
+  
+  .course-management-modal .modal-header {
+    padding: 12px 16px;
+  }
+  
+  .course-management-modal .modal-header h2 {
+    font-size: 1.1em;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .tabs {
+    flex-direction: row; /* Оставляем горизонтальное расположение */
+  }
+  
+  .tab {
+    padding: 12px 8px;
+    font-size: 13px;
+    text-align: center;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .tab-content {
+    padding: 12px 16px 16px;
+  }
+  
+  .schedule-form {
+    padding: 12px;
+  }
+  
+  .danger-zone {
+    padding: 12px;
+  }
+  
+  .schedule-info strong {
+    min-width: 100px;
+    font-size: 13px;
+  }
+  
+  .form-field input,
+  .form-field select {
+    padding: 10px;
+    font-size: 14px; /* Увеличиваем для мобильных */
+  }
+  
+  /* Улучшаем кнопки для планшетов */
+  .reschedule-btn,
+  .remove-course-btn {
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+    min-height: 46px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .course-management-modal {
+    width: 100%;
+    margin: 0;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  
+  .course-management-modal .modal-header h2 {
+    font-size: 1em;
+    line-height: 1.2;
+  }
+  
+  .tab {
+    padding: 10px 6px;
+    font-size: 12px;
+    min-height: 44px; /* Минимальная высота для тач-интерфейса */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .tab-content {
+    padding: 10px 12px 12px;
+  }
+  
+  .current-schedule,
+  .schedule-form,
+  .danger-zone {
+    padding: 10px;
+  }
+  
+  .form-field label {
+    font-size: 12px;
+  }
+  
+  .schedule-info p {
+    font-size: 13px;
+  }
+  
+  .warning-info li {
+    font-size: 12px;
+  }
+  
+  /* Увеличиваем кнопки для мобильных */
+  .reschedule-btn,
+  .remove-course-btn {
+    padding: 14px 20px !important;
+    font-size: 14px !important;
+    min-height: 48px !important;
+  }
+}

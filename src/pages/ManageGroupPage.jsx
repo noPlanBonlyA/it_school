@@ -8,6 +8,7 @@ import AutoScheduleModal from '../components/AutoScheduleModal';
 import GroupScheduleInfo from '../components/GroupScheduleInfo';
 import DefaultScheduleSettings from '../components/DefaultScheduleSettings';
 import RefreshScheduleButton from '../components/RefreshScheduleButton';
+import CourseManagementModal from '../components/CourseManagementModal';
 import { useAuth } from '../contexts/AuthContext';
 
 import {
@@ -21,6 +22,7 @@ import { getAllUsers }       from '../services/userService';
 import { findStudentByUser } from '../services/studentService';
 import { findTeacherByUser } from '../services/teacherService';
 import { getAllCourses }     from '../services/courseService';
+import { getGroupCoursesWithSchedule } from '../services/groupCourseManagementService';
 
 import { 
   createAutoSchedule,
@@ -114,6 +116,10 @@ export default function ManageGroupPage() {
   // Новые состояния для автоматического расписания
   const [showAutoSchedule, setShowAutoSchedule] = useState(false);
   const [selectedCourseForAuto, setSelectedCourseForAuto] = useState(null);
+  
+  // Состояние для управления курсами
+  const [showCourseManagement, setShowCourseManagement] = useState(false);
+  const [selectedCourseForManagement, setSelectedCourseForManagement] = useState(null);
 
   /* ─── initial groups load ────────*/
   useEffect(() => { 
@@ -295,7 +301,19 @@ export default function ManageGroupPage() {
     
     console.log('[ManageGroupPage] Save called with:', { sel, edit });
     
-    const body = {};
+    // Создаем базовый объект с обязательными полями
+    const body = {
+      name: sel.name || '',
+      start_date: sel.start_date || new Date().toISOString().split('T')[0],
+      end_date: sel.end_date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    };
+    
+    // Добавляем описание если оно есть
+    if (sel.description !== undefined) {
+      body.description = sel.description || '';
+    }
+    
+    // Применяем изменения из формы
     ['name','description'].forEach(f=>{
       const oldValue = sel[f] || '';
       const newValue = edit[f] || '';
@@ -306,15 +324,10 @@ export default function ManageGroupPage() {
       }
     });
     
-    console.log('[ManageGroupPage] Changes detected:', body);
-    
-    if (!Object.keys(body).length) {
-      console.log('[ManageGroupPage] No changes to save');
-      return;
-    }
+    console.log('[ManageGroupPage] Full body to send:', body);
     
     // Валидация данных перед отправкой
-    if (body.name !== undefined && (!body.name || body.name.length < 1)) {
+    if (!body.name || body.name.length < 1) {
       alert('Название группы не может быть пустым');
       return;
     }
@@ -611,6 +624,69 @@ export default function ManageGroupPage() {
         [field]: value
       }
     }));
+  };
+
+  /* ────────────── COURSE MANAGEMENT ───────────────────*/
+  const handleCourseManagement = (course) => {
+    setSelectedCourseForManagement(course);
+    setShowCourseManagement(true);
+  };
+
+  const handleCourseUpdated = async (updateInfo) => {
+    console.log('[ManageGroup] Course update notification:', updateInfo);
+    
+    try {
+      // Обновляем информацию о группе после изменения курса
+      const fr = await refresh(sel.id);
+      if (fr) {
+        // Получаем актуальный список курсов группы
+        const actualCourses = await getGroupCoursesWithSchedule(sel.id);
+        
+        // Обновляем группу с актуальными курсами
+        const updatedGroup = {
+          ...fr,
+          courses: actualCourses
+        };
+        
+        setSel(updatedGroup); 
+        setGroups(gs => gs.map(g => g.id === updatedGroup.id ? updatedGroup : g));
+        
+        // Если курс был удален, дополнительно обновляем через задержку
+        if (updateInfo?.type === 'removed') {
+          console.log(`[ManageGroup] Course ${updateInfo.courseName} was removed, doing additional refresh`);
+          
+          setTimeout(async () => {
+            try {
+              const delayedRefresh = await refresh(sel.id);
+              if (delayedRefresh) {
+                const delayedCourses = await getGroupCoursesWithSchedule(sel.id);
+                const finalGroup = {
+                  ...delayedRefresh,
+                  courses: delayedCourses
+                };
+                setSel(finalGroup);
+                setGroups(gs => gs.map(g => g.id === finalGroup.id ? finalGroup : g));
+              }
+            } catch (delayedError) {
+              console.error('Error in delayed refresh:', delayedError);
+            }
+          }, 1500);
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing group after course update:', error);
+      
+      // Даже при ошибке попробуем базовое обновление
+      try {
+        const fallbackRefresh = await refresh(sel.id);
+        if (fallbackRefresh) {
+          setSel(fallbackRefresh);
+          setGroups(gs => gs.map(g => g.id === fallbackRefresh.id ? fallbackRefresh : g));
+        }
+      } catch (fallbackError) {
+        console.error('Fallback refresh also failed:', fallbackError);
+      }
+    }
   };
 
   /* ────────────── UI helpers ───────────────────*/
@@ -939,6 +1015,15 @@ export default function ManageGroupPage() {
                           <span>
                             {c.name}
                           </span>
+                          <div className="course-actions">
+                            <button 
+                              className="btn-mini course-manage-btn"
+                              onClick={() => handleCourseManagement(c)}
+                              title="Управление курсом"
+                            >
+                              ⚙️
+                            </button>
+                          </div>
                         </div>
                       )) : <div className="empty-text">Курсы не добавлены</div>}
                     </div>
@@ -1068,6 +1153,18 @@ export default function ManageGroupPage() {
           groupId={sel?.id}
           courseName={selectedCourseForAuto?.name}
           lessonCount={selectedCourseForAuto?.lessonCount}
+        />
+
+        {/* Модал управления курсом */}
+        <CourseManagementModal
+          isOpen={showCourseManagement}
+          onClose={() => {
+            setShowCourseManagement(false);
+            setSelectedCourseForManagement(null);
+          }}
+          groupId={sel?.id}
+          course={selectedCourseForManagement}
+          onCourseUpdated={handleCourseUpdated}
         />
       </div>
     </div>
