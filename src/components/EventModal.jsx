@@ -524,18 +524,25 @@ export default function EventModal({ event, onClose, userRole }) {
         
         <div className="event-modal-content">
           <div className="event-modal-header">
-            <h2 className="event-modal-title">{event.lesson_name}</h2>
+            <h2 className="event-modal-title">
+              {event.lesson_name || event.name || event.event_name || 'Без названия'}
+            </h2>
             <div className={`event-modal-status ${event.is_opened ? 'opened' : 'closed'}`}>
-              {event.is_opened ? '🟢 Открыт' : '🔴 Закрыт'}
+              {event.lesson_id && !event.event_id ? 
+                (event.is_opened ? '🟢 Открыт' : '🔴 Закрыт') : 
+                '🎉 Мероприятие'
+              }
             </div>
           </div>
 
           <div className="event-modal-info">
             <div className="info-grid">
-              <div className="info-item">
-                <div className="info-label">📚 Курс</div>
-                <div className="info-value">{event.course_name}</div>
-              </div>
+              {event.course_name && (
+                <div className="info-item">
+                  <div className="info-label">📚 Курс</div>
+                  <div className="info-value">{event.course_name}</div>
+                </div>
+              )}
               
               {event.group_name && (
                 <div className="info-item">
@@ -593,8 +600,8 @@ export default function EventModal({ event, onClose, userRole }) {
             </div>
           )}
 
-          {/* Кнопки для преподавателей и администраторов */}
-          {(userRole === 'teacher' || userRole === 'admin' || userRole === 'superadmin') && event.lesson_id && (
+          {/* Кнопки для преподавателей и администраторов - только для уроков */}
+          {(userRole === 'teacher' || userRole === 'admin' || userRole === 'superadmin') && event.lesson_id && !event.event_id && (
             <div className="event-modal-actions">
               <button 
                 className="event-btn-primary"
@@ -623,8 +630,8 @@ export default function EventModal({ event, onClose, userRole }) {
             </div>
           )}
 
-          {/* Кнопки для студентов */}
-          {event.is_opened && userRole === 'student' && (
+          {/* Кнопки для студентов - только для уроков */}
+          {event.is_opened && userRole === 'student' && event.lesson_id && !event.event_id && (
             <div className="event-modal-actions">
               <button 
                 className="event-btn-primary"
@@ -635,8 +642,8 @@ export default function EventModal({ event, onClose, userRole }) {
             </div>
           )}
 
-          {/* Сообщение для студента если урок закрыт */}
-          {!event.is_opened && userRole === 'student' && event.lesson_id && (
+          {/* Сообщение для студента если урок закрыт - только для уроков */}
+          {!event.is_opened && userRole === 'student' && event.lesson_id && !event.event_id && (
             <div className="event-modal-actions">
               <p style={{ 
                 color: '#6b7280', 
@@ -650,7 +657,7 @@ export default function EventModal({ event, onClose, userRole }) {
           )}
 
           {/* Информация для мероприятий */}
-          {!event.lesson_id && event.event_id && (
+          {(!event.lesson_id || event.event_id) && (
             <div className="event-modal-actions">
               <p style={{ 
                 color: '#8b5cf6', 

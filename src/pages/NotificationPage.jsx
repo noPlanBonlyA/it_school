@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import SmartTopBar from '../components/SmartTopBar';
+import SearchableSelect from '../components/SearchableSelect';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/NotificationPage.css';
 import { 
@@ -227,19 +228,36 @@ export default function NotificationPage() {
                   <label className="form-label">
                     👤 Выберите студента:
                   </label>
-                  <select
+                  <SearchableSelect
+                    items={students}
                     value={selectedStudentId}
-                    onChange={(e) => setSelectedStudentId(e.target.value)}
-                    className="form-select"
-                  >
-                    <option value="">-- Выберите студента --</option>
-                    {students.map(student => (
-                      <option key={student.id} value={student.id}>
-                        {`${student.user?.first_name || ''} ${student.user?.surname || ''}`.trim() || student.user?.username || 'Без имени'}
-                        {student.user?.username && ` (${student.user.username})`}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedStudentId}
+                    placeholder="Поиск студента по имени или username..."
+                    displayField="user.first_name"
+                    valueField="id"
+                    icon="👤"
+                    noResultsText="Студенты не найдены"
+                    renderItem={(student) => {
+                      const fio = [student.user?.first_name, student.user?.surname].filter(Boolean).join(' ');
+                      return (
+                        <div className="student-item">
+                          <div className="student-main">
+                            {fio || student.user?.username || 'Без имени'}
+                          </div>
+                          {fio && student.user?.username && (
+                            <div className="student-secondary">
+                              @{student.user.username}
+                            </div>
+                          )}
+                          {student.user?.email && (
+                            <div className="student-email">
+                              📧 {student.user.email}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }}
+                  />
                   {students.length === 0 && (
                     <div className="form-help-text">
                       Студенты не найдены
@@ -254,18 +272,36 @@ export default function NotificationPage() {
                   <label className="form-label">
                     👥 Выберите группу:
                   </label>
-                  <select
+                  <SearchableSelect
+                    items={groups}
                     value={selectedGroupId}
-                    onChange={(e) => setSelectedGroupId(e.target.value)}
-                    className="form-select"
-                  >
-                    <option value="">-- Выберите группу --</option>
-                    {groups.map(group => (
-                      <option key={group.id} value={group.id}>
-                        {group.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedGroupId}
+                    placeholder="Поиск группы по названию..."
+                    displayField="name"
+                    valueField="id"
+                    icon="👥"
+                    noResultsText="Группы не найдены"
+                    renderItem={(group) => (
+                      <div className="group-item">
+                        <div className="group-main">
+                          {group.name}
+                        </div>
+                        {group.description && (
+                          <div className="group-secondary">
+                            {group.description}
+                          </div>
+                        )}
+                        <div className="group-meta">
+                          {group.course_name && (
+                            <span className="group-course">📚 {group.course_name}</span>
+                          )}
+                          {group.students_count !== undefined && (
+                            <span className="group-students">👤 {group.students_count} студентов</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  />
                   {groups.length === 0 && (
                     <div className="form-help-text">
                       Группы не найдены

@@ -107,26 +107,6 @@ const StudentDetailView = ({ student, onClose }) => {
             </div>
           </div>
         </div>
-
-        {data.performance && (
-          <div className="overview-section">
-            <h4>Успеваемость</h4>
-            <div className="performance-summary">
-              <div className="perf-item">
-                <span className="perf-label">Средний балл:</span>
-                <span className="perf-value">{data.performance.averageGrade.toFixed(1)}</span>
-              </div>
-              <div className="perf-item">
-                <span className="perf-label">Выполнено заданий:</span>
-                <span className="perf-value">{data.performance.completedTasks}/{data.performance.totalTasks}</span>
-              </div>
-              <div className="perf-item">
-                <span className="perf-label">Процент посещаемости:</span>
-                <span className="perf-value">{data.performance.attendanceRate}%</span>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     );
   };
@@ -300,12 +280,7 @@ const StudentDetailView = ({ student, onClose }) => {
     <div className="student-detail-modal">
       <div className="modal-backdrop" onClick={onClose}></div>
       <div className="modal-container">
-        <div className="modal-header">
-          <h3>Детальная информация о студенте</h3>
-          <button className="close-btn" onClick={onClose}>×</button>
-        </div>
-
-        <div className="student-detail-content">
+        <div className="modal-header-with-tabs">
           <div className="tabs-nav">
             {tabs.map(tab => (
               <button
@@ -317,7 +292,10 @@ const StudentDetailView = ({ student, onClose }) => {
               </button>
             ))}
           </div>
+          <button className="close-btn" onClick={onClose}>×</button>
+        </div>
 
+        <div className="student-detail-content">
           <div className="tab-content">
             {renderTabContent()}
           </div>

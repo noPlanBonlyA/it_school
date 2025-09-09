@@ -495,14 +495,6 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
           >
             {loading ? 'Сохранение...' : (lesson ? '💾 Обновить урок' : '✨ Создать урок')}
           </button>
-          <button 
-            type="button" 
-            className="btn-secondary"
-            onClick={onCancel}
-            disabled={loading}
-          >
-            Отмена
-          </button>
         </div>
       </form>
     </div>

@@ -740,7 +740,84 @@
   }
 }
 
-/* Дополнительные улучшения для очень маленьких экранов */
+/* Стили для SearchableSelect компонентов */
+.student-item,
+.group-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.student-main,
+.group-main {
+  font-size: 1rem;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.student-secondary,
+.group-secondary {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.student-email {
+  font-size: 0.75rem;
+  color: #3b82f6;
+  font-weight: 400;
+}
+
+.group-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.group-course,
+.group-students {
+  font-size: 0.75rem;
+  color: #059669;
+  background: #d1fae5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.group-students {
+  color: #3b82f6;
+  background: #dbeafe;
+}
+
+/* Адаптация SearchableSelect под общий стиль страницы */
+.notification-form-card .searchable-select .searchable-input-container {
+  border-color: #E2E8F0;
+  border-radius: 12px;
+  min-height: 54px;
+}
+
+.notification-form-card .searchable-select .searchable-input-container:hover {
+  border-color: #CBD5E0;
+}
+
+.notification-form-card .searchable-select.open .searchable-input-container,
+.notification-form-card .searchable-select .searchable-input-container:focus-within {
+  border-color: #00B18F;
+  box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1);
+}
+
+.notification-form-card .searchable-select .searchable-input {
+  font-family: 'Mont', sans-serif;
+  font-size: 16px;
+  padding: 16px 8px;
+}
+
+.notification-form-card .searchable-select .searchable-dropdown {
+  border-color: #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 177, 143, 0.15);
+}
 @media (max-width: 360px) {
   .notification-page-container {
     padding: 10px 6px;

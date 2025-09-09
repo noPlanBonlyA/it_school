@@ -36,6 +36,10 @@ export default function ManageCoursesPage() {
   const [filtered, setFiltered] = useState([]);
   const [showSug, setShowSug] = useState(false);
 
+  /* поиск для блока "Все курсы" */
+  const [allCoursesSearch, setAllCoursesSearch] = useState('');
+  const [filteredAllCourses, setFilteredAllCourses] = useState([]);
+
   /* создание */
   const [form, setForm] = useState({
     name: '',
@@ -72,6 +76,13 @@ export default function ManageCoursesPage() {
       courses.filter(c => (c.name || '').toLowerCase().includes(search.toLowerCase()))
     );
   }, [search, courses]);
+
+  /* фильтрация для блока "Все курсы" */
+  useEffect(() => {
+    setFilteredAllCourses(
+      courses.filter(c => (c.name || '').toLowerCase().includes(allCoursesSearch.toLowerCase()))
+    );
+  }, [allCoursesSearch, courses]);
 
   /* ---------- обработка файлов ---------- */
   const handleFileSelect = (file, isEdit = false) => {
@@ -386,6 +397,45 @@ export default function ManageCoursesPage() {
           </div>
         </div>
 
+        {/* ---------------- COURSES GRID ---------------- */}
+        {courses.length > 0 && (
+          <div className="block">
+            <h2>Все курсы</h2>
+            
+            {/* Поиск по всем курсам */}
+            <div className="search-block" style={{ marginBottom: '20px' }}>
+              <input
+                placeholder="Поиск курсов по названию..."
+                value={allCoursesSearch}
+                onChange={e => setAllCoursesSearch(e.target.value)}
+                style={{ 
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  border: '2px solid rgba(0, 177, 143, 0.2)',
+                  fontSize: '14px'
+                }}
+              />
+            </div>
+
+            <div className="card-grid">
+              {(allCoursesSearch ? filteredAllCourses : courses).map(c => (
+                <CourseCard
+                  key={c.id}
+                  course={c}
+                  onOpen={id => navigate(`/courses/${id}`)}
+                />
+              ))}
+            </div>
+            
+            {allCoursesSearch && filteredAllCourses.length === 0 && (
+              <p style={{ textAlign: 'center', color: '#666', marginTop: '20px' }}>
+                Курсы не найдены по запросу "{allCoursesSearch}"
+              </p>
+            )}
+          </div>
+        )}
+
         {/* ---------------- SEARCH / EDIT / DELETE ---------------- */}
         <div className="block">
           <h2>Найти / Изменить / Удалить</h2>
@@ -527,22 +577,6 @@ export default function ManageCoursesPage() {
             </div>
           )}
         </div>
-
-        {/* ---------------- COURSES GRID ---------------- */}
-        {courses.length > 0 && (
-          <div className="block">
-            <h2>Все курсы</h2>
-            <div className="card-grid">
-              {courses.map(c => (
-                <CourseCard
-                  key={c.id}
-                  course={c}
-                  onOpen={id => navigate(`/courses/${id}`)}
-                />
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* ---------------- MODALS ---------------- */}
         {/* create */}

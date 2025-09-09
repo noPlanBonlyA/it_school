@@ -117,7 +117,10 @@ export default function CourseDetailPage() {
   const loadEverything = useCallback(async () => {
     try {
       setLoading(true);
-      setCourse(await getCourse(courseId));
+      const courseData = await getCourse(courseId);
+      console.log('[CourseDetailPage] Course data loaded:', courseData);
+      console.log('[CourseDetailPage] Course photo:', courseData.photo);
+      setCourse(courseData);
       await reloadLessons();
     } catch (error) {
       console.error('Error loading course data:', error);
@@ -129,9 +132,9 @@ export default function CourseDetailPage() {
   useEffect(() => { loadEverything(); }, [loadEverything]);
 
   // ───── МОДАЛЬНОЕ ОКНО для продвинутого создания урока ───── */
-  const handleOpenLessonEditor = async () => {
-    setEditingLesson(null);
-    setShowLessonEditor(true);
+  const handleOpenLessonEditor = () => {
+    // Переходим на страницу создания урока
+    navigate(`/courses/${courseId}/lessons/create`);
   };
 
   const handleEditLesson = async (lesson) => {
@@ -335,19 +338,60 @@ export default function CourseDetailPage() {
         {course ? (
           <>
             <div className="course-header">
-              <button 
-                className="btn-back"
-                onClick={() => navigate(getCoursesPath(user.role))}
-              >
-                ← Вернуться к {getCoursesTitle(user.role)}
-              </button>
-              
-              <div className="course-overview">
-                <div className="course-info">
-                  <h1>{course.name}</h1>
+              <div className="course-header-top">
+                {/* Кнопка вернуться слева */}
+                <button 
+                  className="btn-back"
+                  onClick={() => navigate(getCoursesPath(user.role))}
+                >
+                  ← Вернуться к {getCoursesTitle(user.role)}
+                </button>
+              </div>
+
+              <div className="course-main-info">
+                {course.photo?.url ? (
+                  <div className="course-image">
+                    <img 
+                      src={course.photo.url.startsWith('http') 
+                        ? course.photo.url 
+                        : `${window.location.protocol}//${window.location.hostname}:8080${course.photo.url}`
+                      } 
+                      alt={course.name}
+                      onLoad={() => console.log('[CourseDetailPage] Image loaded successfully:', course.photo.url)}
+                      onError={(e) => {
+                        console.error('[CourseDetailPage] Image failed to load:', course.photo.url);
+                        console.error('[CourseDetailPage] Image error event:', e);
+                        // Попробуем другие варианты URL
+                        const img = e.target;
+                        if (!img.dataset.retried) {
+                          img.dataset.retried = 'true';
+                          // Попробуем без протокола
+                          if (course.photo.url.startsWith('/')) {
+                            img.src = `http://localhost:8080${course.photo.url}`;
+                          }
+                        } else {
+                          // Если и второй раз не загрузилось, показываем placeholder
+                          img.style.display = 'none';
+                          const placeholder = document.createElement('div');
+                          placeholder.className = 'course-image-placeholder';
+                          placeholder.innerHTML = '📚 Изображение недоступно';
+                          img.parentElement.appendChild(placeholder);
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="course-image">
+                    <div className="course-image-placeholder">📚</div>
+                  </div>
+                )}
+
+                <div className="course-content">
+                  <h1 className="course-title">{course.name}</h1>
                   {course.description && (
                     <p className="course-description">{course.description}</p>
                   )}
+                  
                   <div className="course-meta">
                     {course.author_name && (
                       <span className="course-author">👨‍🏫 {course.author_name}</span>
@@ -357,29 +401,16 @@ export default function CourseDetailPage() {
                     )}
                   </div>
                 </div>
-                
-                {course.photo?.url && (
-                  <div className="course-image">
-                    <img 
-                      src={course.photo.url.startsWith('http') 
-                        ? course.photo.url 
-                        : `${window.location.protocol}//${window.location.hostname}:8080${course.photo.url}`
-                      } 
-                      alt={course.name} 
-                    />
-                  </div>
-                )}
               </div>
               
+              {/* Кнопка для мобильной версии */}
               {(user.role === 'admin' || user.role === 'superadmin') && (
-                <div className="course-actions">
-                  <button 
-                    className="btn-primary"
-                    onClick={handleOpenLessonEditor}
-                  >
-                    📝 Создать урок с файлами
-                  </button>
-                </div>
+                <button 
+                  className="btn-primary btn-create-lesson-mobile"
+                  onClick={handleOpenLessonEditor}
+                >
+                  📝 Создать урок с файлами
+                </button>
               )}
             </div>
 
@@ -516,25 +547,25 @@ export default function CourseDetailPage() {
                             {(user.role === 'admin' || user.role === 'superadmin') && (
                               <>
                                 <button
-                                  className="btn-icon btn-edit"
+                                  className="btn-text btn-edit"
                                   onClick={() => handleEditLesson(lesson)}
                                   title="Редактировать урок"
                                 >
-                                  ✏️
+                                  Редактировать
                                 </button>
                                 <button
-                                  className="btn-icon btn-view-content"
+                                  className="btn-text btn-view-content"
                                   onClick={() => viewLessonContent(lesson)}
                                   title="Посмотреть содержимое урока"
                                 >
-                                  �️
+                                  Содержимое
                                 </button>
                                 <button
-                                  className="btn-icon btn-danger"
+                                  className="btn-text btn-danger"
                                   onClick={() => handleDeleteLesson(lesson)}
                                   title="Удалить урок"
                                 >
-                                  🗑️
+                                  Удалить
                                 </button>
                               </>
                             )}

@@ -9,11 +9,13 @@ import SchedulePage         from './pages/SchedudlePage';
 import CoinHistoryPage      from './pages/CoinHistoryPage';
 
 import ManageGroupPage      from './pages/ManageGroupPage';
+import GroupDetailPage      from './pages/GroupDetailPage';
 import ManageStudentsPage   from './pages/ManageStudents';
 import ManageTeachersPage   from './pages/ManageTeachers';
 import ManageAdminsPage     from './pages/ManageAdmins';
 import ManageCoursePage     from './pages/ManageCourse';
 import ManageEventsPage     from './pages/ManageEventsPage';
+import CreateEventPage      from './pages/CreateEventPage';
 import ManagePointsPage     from './pages/ManagePointsPage';
 
 import StudentCoursesPage   from './pages/StudentCoursesPage';
@@ -25,6 +27,7 @@ import TeacherCoursePage    from './pages/TeacherCoursePage';
 import TeacherLessonPage    from './pages/TeacherLessonPage';
 
 import CourseDetailPage     from './pages/CourseDetailPage';
+import CreateLessonPage     from './pages/CreateLessonPage';
 import HomeWorkPage         from './pages/HomeWorkPage';
 import ForgotPasswordPage   from './pages/ForgotPassword';
 import ResetPasswordPage    from './pages/ResetPassword';
@@ -89,17 +92,20 @@ export default function App() {
 
           {/* «конструктор» курса / уроков */}
           <Route path="/courses/:courseId" element={<PrivateRoute><CourseDetailPage /></PrivateRoute>} />
+          <Route path="/courses/:courseId/lessons/create" element={<PrivateRoute><CreateLessonPage /></PrivateRoute>} />
 
           <Route path="/homework" element={<PrivateRoute><HomeWorkPage /></PrivateRoute>} />
 
           {/* ───────────────── ADMIN / SUPERADMIN ───────────────── */}
           <Route path="/groups" element={<PrivateRoute><ManageGroupPage /></PrivateRoute>} />
+          <Route path="/groups/:groupId" element={<PrivateRoute><GroupDetailPage /></PrivateRoute>} />
           <Route path="/schedule" element={<PrivateRoute><SchedulePage /></PrivateRoute>} />
           <Route path="/manage-users" element={<PrivateRoute><ManageStudentsPage /></PrivateRoute>} />
           <Route path="/manage-teachers" element={<PrivateRoute><ManageTeachersPage /></PrivateRoute>} />
           <Route path="/manage-admins" element={<PrivateRoute><ManageAdminsPage /></PrivateRoute>} />
           <Route path="/manage-courses" element={<PrivateRoute><ManageCoursePage /></PrivateRoute>} />
           <Route path="/manage-events" element={<PrivateRoute><ManageEventsPage /></PrivateRoute>} />
+          <Route path="/create-event" element={<PrivateRoute><CreateEventPage /></PrivateRoute>} />
           <Route path="/manage-products" element={<PrivateRoute><ManageProductsPage /></PrivateRoute>} />
           <Route path="/manage-points" element={<PrivateRoute><ManagePointsPage /></PrivateRoute>} />
           <Route path="/news" element={<PrivateRoute><ManageNewsPage /></PrivateRoute>} />

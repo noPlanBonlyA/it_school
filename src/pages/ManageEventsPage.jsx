@@ -4,11 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import SmartTopBar from '../components/SmartTopBar';
-import EventCreateModal from '../components/EventCreateModal';
 import EventEditModal from '../components/EventEditModal';
 import {
   getAllEvents,
-  createEvent,
   updateEvent,
   deleteEvent,
   getEventWithUsers
@@ -28,7 +26,6 @@ export default function ManageEventsPage() {
   
   // UI состояния
   const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -80,16 +77,8 @@ export default function ManageEventsPage() {
     }
   };
 
-  const handleCreate = async (eventData) => {
-    try {
-      const createdEvent = await createEvent(eventData);
-      setShowCreateModal(false);
-      await loadEvents();
-      return createdEvent; // Возвращаем созданное событие для использования в EventCreateModal
-    } catch (error) {
-      console.error('Error creating event:', error);
-      throw error; // Пробрасываем ошибку, чтобы EventCreateModal мог её обработать
-    }
+  const handleCreate = () => {
+    navigate('/create-event');
   };
 
   const handleEdit = async (event) => {
@@ -193,7 +182,7 @@ export default function ManageEventsPage() {
             </div>
             <button 
               className="btn-primary"
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => navigate('/create-event')}
             >
               + Создать мероприятие
             </button>
@@ -294,14 +283,6 @@ export default function ManageEventsPage() {
             )}
           </div>
         </div>
-
-        {/* Модальное окно создания */}
-        {showCreateModal && (
-          <EventCreateModal
-            onSave={handleCreate}
-            onClose={() => setShowCreateModal(false)}
-          />
-        )}
 
         {/* Модальное окно редактирования */}
         {showEditModal && editingEvent && (

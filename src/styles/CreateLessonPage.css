@@ -1,0 +1,194 @@
+/* Create Lesson Page Styles */
+.create-lesson-page {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Мобильный заголовок */
+.mobile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.mobile-header .back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-header .back-button:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+}
+
+.back-icon {
+  font-size: 16px;
+}
+
+.back-text {
+  font-size: 14px;
+}
+
+/* Десктопный заголовок */
+.desktop-header {
+  display: none;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  padding: 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.header-info h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+}
+
+.header-info p {
+  font-size: 16px;
+  color: #64748b;
+  margin: 0;
+}
+
+.back-to-course {
+  padding: 12px 20px;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-to-course:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* Контент страницы */
+.create-lesson-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.lesson-editor-container {
+  padding: 32px;
+}
+
+/* Стили кнопок для единообразия */
+.btn-secondary {
+  padding: 12px 20px;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* Адаптация для планшетов */
+@media (min-width: 769px) {
+  .mobile-header {
+    display: none;
+  }
+  
+  .desktop-header {
+    display: flex;
+  }
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 768px) {
+  .create-lesson-page {
+    padding: 16px;
+  }
+  
+  .mobile-header {
+    padding: 12px 16px;
+    border-radius: 8px;
+  }
+  
+  .mobile-header h1 {
+    font-size: 18px;
+  }
+  
+  .mobile-header .back-button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .create-lesson-content {
+    border-radius: 12px;
+  }
+  
+  .lesson-editor-container {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .create-lesson-page {
+    padding: 12px;
+  }
+  
+  .mobile-header {
+    padding: 10px 12px;
+    gap: 12px;
+  }
+  
+  .mobile-header h1 {
+    font-size: 16px;
+  }
+  
+  .lesson-editor-container {
+    padding: 16px;
+  }
+}

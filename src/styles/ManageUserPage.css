@@ -1440,3 +1440,44 @@ div.manage-users div.modal-overlay div.modal-buttons button {
     margin-right: 15px !important;
   }
 }
+
+/* Стили для manage-courses suggestions с высоким z-index */
+.manage-courses .search-block {
+  position: relative;
+}
+
+.manage-courses .suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.98);
+  border: 2px solid rgba(0, 177, 143, 0.15);
+  border-radius: 12px;
+  box-shadow: 
+    0 12px 32px rgba(0, 177, 143, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.1);
+  max-height: 350px;
+  overflow-y: auto;
+  z-index: 99999 !important; /* Максимальный z-index для курсов */
+  backdrop-filter: blur(8px);
+  padding-bottom: 20px;
+}
+
+.manage-courses .suggestions li {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 177, 143, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #333;
+}
+
+.manage-courses .suggestions li:last-child {
+  border-bottom: none;
+  border-radius: 0 0 12px 12px;
+}
+
+.manage-courses .suggestions li:hover {
+  background: rgba(0, 177, 143, 0.08);
+  color: #00b18f;
+}

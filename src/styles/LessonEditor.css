@@ -1,27 +1,32 @@
-/* Стили для редактора уроков - обновлены под фирменный дизайн */
+/* Стили для редактора уроков - обновлены для отдельной страницы */
 
 /* Основной контейнер редактора */
 .lesson-editor {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 177, 143, 0.1);
-  padding: 24px;
-  margin: 20px 0;
-  border: 1px solid rgba(0, 177, 143, 0.1);
+  width: 100%;
+  max-width: none;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  border: none;
 }
 
 /* Форма урока */
 .lesson-form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
+  width: 100%;
 }
 
 /* Секции формы */
 .form-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 177, 143, 0.1);
+  border: 1px solid rgba(0, 177, 143, 0.1);
 }
 
 /* Чекбокс для автоматического расписания */
@@ -82,17 +87,33 @@
 
 /* Секция материалов */
 .materials-section {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 177, 143, 0.1);
+  border: 1px solid rgba(0, 177, 143, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
+}
+
+.materials-section .section-title {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+  text-align: center;
+  padding-bottom: 16px;
+  border-bottom: 2px solid rgba(0, 177, 143, 0.1);
 }
 
 /* Категории материалов */
 .material-category {
-  background: linear-gradient(135deg, rgba(0, 177, 143, 0.05), rgba(3, 131, 106, 0.03));
-  border-radius: 12px;
-  padding: 20px;
-  border: 1px solid rgba(0, 177, 143, 0.1);
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.08), rgba(3, 131, 106, 0.05));
+  border-radius: 16px;
+  padding: 28px;
+  border: 1px solid rgba(0, 177, 143, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 177, 143, 0.08);
 }
 
 .category-title {
@@ -268,12 +289,14 @@
 
 /* Действия формы */
 .form-actions {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 177, 143, 0.1);
+  border: 1px solid rgba(0, 177, 143, 0.1);
   display: flex;
-  gap: 16px;
-  justify-content: flex-end;
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(0, 177, 143, 0.1);
+  justify-content: center;
+  margin-top: 0;
 }
 
 /* Кнопки */
@@ -281,22 +304,23 @@
   background: linear-gradient(135deg, #00B18F, #03836A);
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 18px 40px;
+  border-radius: 12px;
+  font-size: 18px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-width: 140px;
+  gap: 10px;
+  min-width: 220px;
   justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 177, 143, 0.25);
 }
 
 .btn-save:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 177, 143, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 177, 143, 0.4);
   background: linear-gradient(135deg, #00B18F, #007A67);
 }
 
@@ -304,31 +328,38 @@
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  box-shadow: 0 4px 16px rgba(0, 177, 143, 0.15);
 }
 
 .btn-secondary {
-  background: #f9fafb;
+  background: linear-gradient(135deg, #f9fafb, #f3f4f6);
   color: #374151;
   border: 2px solid #e5e7eb;
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 100px;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #f3f4f6;
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
   border-color: #d1d5db;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .btn-secondary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 /* Адаптивность */
@@ -417,7 +448,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   display: flex;
   align-items: center;
@@ -459,7 +490,7 @@
 }
 
 .material-badge.teacher {
-  background: #3b82f6;
+  background: #10b981;
 }
 
 .material-badge.student {
@@ -538,8 +569,8 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .form-textarea {
@@ -556,7 +587,7 @@
 
 .form-textarea:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: #10b981;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -604,12 +635,12 @@
   padding: 6px 12px;
   background: #f0f9ff;
   border-radius: 4px;
-  border-left: 3px solid #3b82f6;
+  border-left: 3px solid #10b981;
 }
 
 .file-size {
   font-size: 12px;
-  color: #1e40af;
+  color: #047857;
   font-weight: 500;
 }
 
@@ -685,7 +716,7 @@
 }
 
 .file-label:hover {
-  border-color: #3b82f6;
+  border-color: #10b981;
   background: #f8fafc;
 }
 
@@ -703,7 +734,7 @@
 }
 
 .file-label:hover .file-text {
-  color: #3b82f6;
+  color: #10b981;
 }
 
 .current-material {

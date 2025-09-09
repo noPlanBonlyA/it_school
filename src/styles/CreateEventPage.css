@@ -1,0 +1,1054 @@
+/* src/styles/CreateEventPage.css */
+
+.create-event-page {
+  padding: 20px 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: calc(100vh - 100px);
+}
+
+/* =================== ЗАГОЛОВКИ =================== */
+
+/* Мобильный заголовок */
+.mobile-header {
+  display: none;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.mobile-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  flex: 1;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.back-button:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: #f8fafc;
+}
+
+.back-icon {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.back-text {
+  font-size: 14px;
+}
+
+/* Десктопный заголовок */
+.desktop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  gap: 24px;
+}
+
+.header-info h1 {
+  margin: 0 0 4px 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.header-info p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.back-to-events {
+  padding: 12px 20px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.back-to-events:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: #f8fafc;
+}
+
+/* =================== ОСНОВНОЙ КОНТЕНТ =================== */
+
+.create-event-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Секции формы */
+.event-form-section {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.event-form-section h3 {
+  margin: 0 0 24px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Поля формы */
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 15px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  background: white;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group input.error,
+.form-group textarea.error {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.error-text {
+  color: #dc2626;
+  font-size: 14px;
+  margin-top: 6px;
+  display: block;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 16px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  transition: all 0.2s ease;
+}
+
+.checkbox-label:hover {
+  border-color: #3b82f6;
+  background: #f0f9ff;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: #3b82f6;
+}
+
+.checkbox-text {
+  font-weight: 500;
+  color: #374151;
+}
+
+/* =================== ВЫБОР УЧАСТНИКОВ =================== */
+
+.participant-type-selector {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.selector-header {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.selector-header h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.selector-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.type-options {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.type-option {
+  border: 2.5px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: white;
+  position: relative;
+}
+
+.type-option:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+.type-option.selected {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #eff6ff, #ffffff);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
+}
+
+.option-icon {
+  font-size: 2.5rem;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  border-radius: 16px;
+  flex-shrink: 0;
+}
+
+.type-option.selected .option-icon {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+
+.option-content {
+  flex: 1;
+}
+
+.option-content h4 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.option-content p {
+  margin: 0 0 8px 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.user-count {
+  display: inline-block;
+  background: #f3f4f6;
+  color: #374151;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.type-option.selected .user-count {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.option-radio {
+  flex-shrink: 0;
+}
+
+.option-radio input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+/* =================== УЧАСТНИКИ =================== */
+
+.participants-section {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.section-header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.header-content {
+  margin-bottom: 16px;
+}
+
+.header-content h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.header-content p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.modern-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+}
+
+.modern-checkbox input[type="checkbox"] {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.modern-checkbox input[type="checkbox"]:checked + .checkmark {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.modern-checkbox input[type="checkbox"]:checked + .checkmark::after {
+  content: '✓';
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.checkbox-text {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.btn-clear, .btn-select-all {
+  background: none;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-clear:hover, .btn-select-all:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.btn-clear {
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.btn-clear:hover {
+  background: #fef2f2;
+  border-color: #f87171;
+}
+
+/* Контейнер участников */
+.participants-container {
+  background: #f9fafb;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+}
+
+.search-box {
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  background: white;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.participants-grid.modern {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+/* Карточки участников */
+.participant-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  min-height: 80px;
+}
+
+.participant-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
+  transform: translateY(-1px);
+}
+
+.participant-card.selected {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #eff6ff, #ffffff);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.18);
+}
+
+.card-checkbox {
+  flex-shrink: 0;
+}
+
+.card-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.card-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.card-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-info h4 {
+  margin: 0 0 6px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-info p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.user-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.user-email {
+  font-size: 11px;
+  color: #9ca3af;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+/* Роли пользователей */
+.role-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.role-badge.role-student {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.role-badge.role-teacher {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.role-badge.role-admin {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.role-badge.role-superadmin {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.role-badge.role-default {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* =================== ОШИБКИ И СООБЩЕНИЯ =================== */
+
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+/* =================== КНОПКИ ДЕЙСТВИЙ =================== */
+
+.create-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  padding: 32px 0;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 32px;
+}
+
+.create-actions button {
+  min-width: 180px;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+}
+
+.create-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+.create-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.cancel-btn {
+  background: #f8fafc;
+  color: #475569;
+  border: 1.5px solid #e2e8f0;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.cancel-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* =================== СКРОЛЛБАРЫ =================== */
+
+.participants-grid.modern::-webkit-scrollbar {
+  width: 8px;
+}
+
+.participants-grid.modern::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.participants-grid.modern::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+  border-radius: 4px;
+}
+
+.participants-grid.modern::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+}
+
+/* =================== МОБИЛЬНАЯ АДАПТАЦИЯ =================== */
+
+@media (max-width: 768px) {
+  .create-event-page {
+    padding: 16px 12px;
+  }
+
+  /* Показываем мобильный заголовок */
+  .mobile-header {
+    display: flex;
+  }
+
+  /* Скрываем десктопный заголовок */
+  .desktop-header {
+    display: none;
+  }
+
+  /* Кнопка назад */
+  .back-button {
+    padding: 10px 14px;
+    border-radius: 10px;
+  }
+
+  .back-text {
+    display: none;
+  }
+
+  .back-icon {
+    font-size: 20px;
+  }
+
+  /* Секции формы */
+  .event-form-section,
+  .participant-type-selector,
+  .participants-section {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .event-form-section h3 {
+    font-size: 1.125rem;
+    margin-bottom: 20px;
+  }
+
+  /* Поля формы */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    padding: 14px 16px;
+    font-size: 16px; /* Предотвращает зум на iOS */
+    border-radius: 8px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Выбор типа участников */
+  .type-options {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .type-option {
+    padding: 18px;
+    gap: 16px;
+  }
+
+  .option-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.75rem;
+  }
+
+  .option-content h4 {
+    font-size: 1rem;
+  }
+
+  .option-content p {
+    font-size: 13px;
+  }
+
+  /* Участники */
+  .participants-grid.modern {
+    grid-template-columns: 1fr;
+    max-height: 400px;
+    gap: 12px;
+  }
+
+  .participant-card {
+    padding: 16px;
+    min-height: 70px;
+  }
+
+  .card-avatar {
+    width: 42px;
+    height: 42px;
+    font-size: 16px;
+  }
+
+  .card-info h4 {
+    font-size: 14px;
+  }
+
+  .card-info p {
+    font-size: 12px;
+  }
+
+  .participants-container {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .search-input {
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  /* Кнопки действий - фиксированные для мобильных */
+  .create-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    padding: 12px 16px;
+    margin: 0;
+    border-top: 1px solid #e5e7eb;
+    justify-content: stretch;
+    gap: 12px;
+    z-index: 100;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .create-actions button {
+    flex: 1;
+    min-width: auto;
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+
+  /* Добавляем отступ снизу для контента */
+  .create-event-content {
+    padding-bottom: 100px;
+  }
+
+  /* Адаптация checkbox */
+  .checkbox-label {
+    padding: 12px;
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .modern-checkbox {
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+  }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 480px) {
+  .create-event-page {
+    padding: 12px 8px;
+  }
+
+  .mobile-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .event-form-section,
+  .participant-type-selector,
+  .participants-section {
+    padding: 16px;
+  }
+
+  .type-option {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .option-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+  }
+
+  .option-content h4 {
+    font-size: 0.9rem;
+  }
+
+  .participants-grid.modern {
+    max-height: 350px;
+  }
+
+  .participant-card {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .card-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+  }
+
+  .create-actions {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .create-actions button {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+}
+
+/* Планшетная адаптация */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .create-event-page {
+    padding: 24px 20px;
+  }
+
+  .desktop-header {
+    margin-bottom: 28px;
+  }
+
+  .event-form-section,
+  .participant-type-selector,
+  .participants-section {
+    padding: 24px;
+  }
+
+  .participants-grid.modern {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  .type-options {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .create-actions button {
+    min-width: 160px;
+    padding: 14px 28px;
+  }
+}
+
+/* Очень большие экраны */
+@media (min-width: 1600px) {
+  .create-event-page {
+    padding: 40px 60px;
+  }
+
+  .participants-grid.modern {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+
+  .type-options {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+}
+
+/* =================== АНИМАЦИИ =================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.event-form-section,
+.participant-type-selector,
+.participants-section {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.participant-card {
+  animation: fadeInUp 0.2s ease-out;
+}
+
+.type-option {
+  animation: fadeInUp 0.2s ease-out;
+}
+
+/* =================== ACCESSIBILITY =================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus indicators */
+.back-button:focus,
+.create-btn:focus,
+.cancel-btn:focus,
+.type-option:focus,
+.participant-card:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .type-option,
+  .participant-card,
+  .event-form-section,
+  .participants-section {
+    border-width: 2px;
+  }
+  
+  .type-option.selected,
+  .participant-card.selected {
+    border-width: 3px;
+  }
+}

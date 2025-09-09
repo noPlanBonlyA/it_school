@@ -123,7 +123,7 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
 
   const getEventDisplayName = (event) => {
     if (getEventType(event) === 'event') {
-      return event.name || event.event_name || 'Мероприятие без названия';
+      return event.name || event.event_name || event.lesson_name || 'Мероприятие без названия';
     }
     return event.lesson_name || 'Урок';
   };
