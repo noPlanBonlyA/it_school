@@ -975,7 +975,7 @@
 }
 
 .form-field.full-width {
-  grid-column: 1 / -1;
+  grid-column: 1 \/ -1;
 }
 
 .form-field label {
@@ -1363,7 +1363,7 @@
   }
   
   .lesson-actions {
-    grid-column: 1 / -1;
+    grid-column: 1 \/ -1;
     justify-content: center;
   }
   

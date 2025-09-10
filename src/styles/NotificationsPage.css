@@ -41,7 +41,7 @@
     flex-direction: column;
   }
   .field-full {
-    grid-column: 1 / -1;
+    grid-column: 1 \/ -1;
   }
   .field label {
     font-weight: 600;
@@ -89,19 +89,19 @@
   .error-text {
     color: #E9515A;
     font-size: 13px;
-    grid-column: 1 / -1;
+    grid-column: 1 \/ -1;
     margin-top: 4px;
   }
   .success-text {
     color: #3B7FFF;
     font-size: 13px;
-    grid-column: 1 / -1;
+    grid-column: 1 \/ -1;
     margin-top: 4px;
   }
   
   /* Кнопки */
   .buttons-notif {
-    grid-column: 1 / -1;
+    grid-column: 1 \/ -1;
     display: flex;
     justify-content: flex-start;
   }

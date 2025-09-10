@@ -314,7 +314,7 @@
 
 /* Отсутствие результатов */
 .no-results {
-  grid-column: 1 / -1; /* Занимаем всю ширину сетки */
+  grid-column: 1 \/ -1; /* Занимаем всю ширину сетки */
   text-align: center;
   padding: 64px 32px;
   color: #6b7280;
