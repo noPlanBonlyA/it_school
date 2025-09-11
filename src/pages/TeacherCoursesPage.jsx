@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom';
 
 import Sidebar from '../components/Sidebar';
 import SmartTopBar from '../components/SmartTopBar';
+import CourseImage from '../components/CourseImage';
 import { useAuth } from '../contexts/AuthContext';
 
 import { getTeacherCourses } from '../services/courseService';
-import '../styles/CoursesPage.css';
+import '../styles/CourseCard.css';
+import '../styles/CourseImageStyles.css';
+import '../styles/MobileImageFixes.css';
 
 /**
  * Страница «Мои курсы» для преподавателя.
@@ -40,27 +43,33 @@ export default function TeacherCoursesPage() {
   const openCourse = id => navigate(`/courses/${id}/teacher`);
 
   /* ───── UI карточка ───── */
-  const Card = ({ course }) => {
-    const img = course.photo?.url
-      ? (course.photo.url.startsWith('http')
-          ? course.photo.url
-          : `${window.location.protocol}//${window.location.hostname}:8080${course.photo.url}`)
-      : '';
+  const renderCourseCard = (course) => {
+    // Обрабатываем age_category как массив или строку
+    const ageCategory = Array.isArray(course.age_category) 
+      ? course.age_category.join(', ') 
+      : course.age_category;
 
     return (
-      <div className="course-card" key={course.id} onClick={() => openCourse(course.id)}>
-        <div className="course-image-wrapper">
-          {img ? <img src={img} alt={course.name} className="course-image" />
-               : <div className="course-image placeholder">
-                   <span>📚</span>
-                 </div>}
-        </div>
-        <div className="course-body">
-          <h2 className="course-title">{course.name}</h2>
-          <p className="course-description">{course.description?.substring(0, 100)}...</p>
-          <button className="course-button" onClick={(e) => {e.stopPropagation(); openCourse(course.id);}}>
-            Открыть курс
-          </button>
+      <div 
+        key={course.id} 
+        className="course-card"
+        onClick={() => openCourse(course.id)}
+      >
+        <CourseImage
+          src={course.photo?.url}
+          alt={course.name}
+          className="course-card-image"
+          placeholder="📚"
+        />
+        <div className="meta">
+          <h3>{course.name}</h3>
+          <p>{course.description?.substring(0, 60)}...</p>
+          
+          <div className="course-info-footer">
+            {course.author_name && <span className="author">👩‍🏫 {course.author_name}</span>}
+            {ageCategory && <span className="age">👥 {ageCategory}</span>}
+            <span className="status">🎓 Преподаю</span>
+          </div>
         </div>
       </div>
     );
@@ -103,7 +112,7 @@ export default function TeacherCoursesPage() {
           
           {myCourses.length ? (
             <div className="courses-grid">
-              {myCourses.map(c => <Card course={c} key={c.id} />)}
+              {myCourses.map(course => renderCourseCard(course))}
             </div>
           ) : (
             <div className="empty-state">
@@ -112,23 +121,6 @@ export default function TeacherCoursesPage() {
               <p>Администратор должен назначить вас преподавателем курса или группы с курсами</p>
             </div>
           )}
-        </section>
-
-        <section className="info-section">
-          <div className="info-card">
-            <h3>Как получить доступ к курсам?</h3>
-            <ol>
-              <li>Администратор назначает вас преподавателем группы</li>
-              <li>К группе привязываются курсы</li>
-              <li>Вы получаете доступ к управлению этими курсами</li>
-              <li>Можете просматривать материалы и отслеживать прогресс студентов</li>
-            </ol>
-            <p>
-              <strong>Текущий статус:</strong> {myCourses.length > 0 
-                ? `Вы ведете ${myCourses.length} курс(ов)` 
-                : 'Курсы для преподавания не назначены'}
-            </p>
-          </div>
         </section>
       </div>
     </div>

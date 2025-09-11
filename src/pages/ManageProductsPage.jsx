@@ -276,9 +276,9 @@ export default function ManageProductsPage() {
 
   if (loading) {
     return (
-      <div className="app-layout">
+      <div className="app-layout" style={{ width: '100vw', minHeight: '100vh' }}>
         <Sidebar activeItem="manage-products" userRole={user?.role} />
-        <div className="main-content">
+        <div className="main-content" style={{ marginLeft: '250px', width: 'calc(100vw - 250px)', maxWidth: 'none' }}>
           <div className="loading-container">
             <div className="loader"></div>
             <p>Загрузка товаров...</p>
@@ -289,11 +289,11 @@ export default function ManageProductsPage() {
   }
 
   return (
-    <div className="app-layout">
+    <div className="app-layout" style={{ width: '100vw', minHeight: '100vh' }}>
       <Sidebar activeItem="manage-products" userRole={user?.role} />
-      <div className="main-content">
+      <div className="main-content" style={{ marginLeft: '250px', width: 'calc(100vw - 250px)', maxWidth: 'none' }}>
         <SmartTopBar />
-        <div className="manage-products-page">
+        <div className="manage-products-page" style={{ maxWidth: 'none', margin: '0', padding: '24px 40px', width: '100%' }}>
           <div className="page-header">
             <button 
               className="btn-primary"

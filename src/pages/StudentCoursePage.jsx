@@ -177,26 +177,17 @@ export default function StudentCoursePage() {
         />
 
         <div className="course-header">
-          <button 
-            className="btn-back"
-            onClick={() => navigate(getCoursesPath(user.role))}
-          >
-            ← Вернуться к {getCoursesTitle(user.role)}
-          </button>
+          <div className="course-header-top">
+            <button 
+              className="btn-back"
+              onClick={() => navigate(getCoursesPath(user.role))}
+            >
+              ← Вернуться к {getCoursesTitle(user.role)}
+            </button>
+          </div>
           
           {course && (
-            <div className="course-overview">
-              <div className="course-info">
-                <h1>{course.name}</h1>
-                <p className="course-description">{course.description}</p>
-                <div className="course-meta">
-                  <span className="course-author">👩‍🏫 {course.author_name || 'Не указан'}</span>
-                  {course.age_category && (
-                    <span className="course-category">👥 {course.age_category}</span>
-                  )}
-                </div>
-              </div>
-              
+            <div className="course-main-info">
               {course.photo?.url && (
                 <CourseImage
                   src={course.photo.url}
@@ -205,6 +196,17 @@ export default function StudentCoursePage() {
                   placeholder="📚"
                 />
               )}
+              
+              <div className="course-content">
+                <h1 className="course-title">{course.name}</h1>
+                <p className="course-description">{course.description}</p>
+                <div className="course-meta">
+                  <span className="course-author">👩‍🏫 {course.author_name || 'Не указан'}</span>
+                  {course.age_category && (
+                    <span className="course-category">👥 {course.age_category}</span>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>

@@ -103,6 +103,7 @@
   height: 24px;
   opacity: 0.8;
   transition: opacity 0.3s ease;
+  filter: brightness(0) saturate(100%) invert(53%) sepia(84%) saturate(1329%) hue-rotate(123deg) brightness(94%) contrast(86%);
 }
 
 .notification-btn:hover .bell-icon {

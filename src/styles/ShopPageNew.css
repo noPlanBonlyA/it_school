@@ -1,9 +1,10 @@
 /* src/styles/ShopPage.css */
 
 .shop-page {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 24px 40px;
+  max-width: none;
+  margin: 0;
+  width: 100%;
 }
 
 .page-header {
@@ -35,34 +36,110 @@
 /* Вкладки */
 .shop-tabs {
   display: flex;
-  gap: 4px;
-  margin-bottom: 24px;
-  background: #f3f4f6;
-  padding: 4px;
-  border-radius: 8px;
+  gap: 6px;
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  padding: 6px;
+  border-radius: 16px;
   width: fit-content;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
 }
 
 .tab-button {
   background: transparent;
   border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
+  padding: 14px 28px;
+  border-radius: 12px;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  color: #6b7280;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #64748b;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 180px;
+  justify-content: center;
+  text-transform: none;
+  letter-spacing: 0.02em;
 }
 
-.tab-button.active {
-  background: white;
-  color: #1f2937;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+/* Доступные товары - зеленая тематика */
+.tab-button:first-child {
+  background: transparent;
 }
 
-.tab-button:hover:not(.active) {
-  color: #374151;
+.tab-button:first-child.active {
+  background: linear-gradient(135deg, #00B18F, #10b981);
+  color: white;
+  box-shadow: 0 6px 20px rgba(0, 177, 143, 0.3);
+  transform: translateY(-1px);
+}
+
+.tab-button:first-child:hover:not(.active) {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.1), rgba(16, 185, 129, 0.1));
+  color: #00B18F;
+  box-shadow: 0 3px 10px rgba(0, 177, 143, 0.15);
+}
+
+/* Недоступные товары - оранжево-красная тематика */
+.tab-button:last-child {
+  background: transparent;
+}
+
+.tab-button:last-child.active {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.3);
+  transform: translateY(-1px);
+}
+
+.tab-button:last-child:hover:not(.active) {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1));
+  color: #f97316;
+  box-shadow: 0 3px 10px rgba(249, 115, 22, 0.15);
+}
+
+/* Общие стили для активных кнопок */
+.tab-button.active::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 14px;
+  background: inherit;
+  z-index: -1;
+  opacity: 0.8;
+  filter: blur(8px);
+}
+
+/* Добавляем иконки к табам */
+.tab-button:first-child::before {
+  content: '✅';
+  margin-right: 6px;
+  font-size: 14px;
+}
+
+.tab-button:last-child::before {
+  content: '🔒';
+  margin-right: 6px;
+  font-size: 14px;
+}
+
+.tab-button.active:first-child::before {
+  content: '💰';
+  margin-right: 6px;
+  font-size: 14px;
+}
+
+.tab-button.active:last-child::before {
+  content: '⏳';
+  margin-right: 6px;
+  font-size: 14px;
 }
 
 /* Контент */
@@ -86,34 +163,83 @@
 }
 
 .section-header {
-  margin-bottom: 24px;
+  margin-bottom: 32px;
+  padding: 24px;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Доступные товары - зеленая тематика */
+.products-section:has(.product-card.available) .section-header,
+.products-section .section-header:first-of-type {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.08), rgba(16, 185, 129, 0.05));
+  border: 1px solid rgba(0, 177, 143, 0.2);
+  border-left: 4px solid #00B18F;
+}
+
+/* Недоступные товары - оранжево-красная тематика */
+.products-section:has(.product-card.not-available) .section-header {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.08), rgba(234, 88, 12, 0.05));
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  border-left: 4px solid #f97316;
+}
+
+.section-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
 }
 
 .section-header h2 {
-  margin: 0 0 8px 0;
-  font-size: 1.5rem;
-  font-weight: 600;
+  margin: 0 0 12px 0;
+  font-size: 1.75rem;
+  font-weight: 700;
   color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Иконки для заголовков */
+.products-section:has(.product-card.available) .section-header h2::before,
+.products-section .section-header:first-of-type h2::before {
+  content: '💰';
+  font-size: 24px;
+  filter: drop-shadow(0 2px 4px rgba(0, 177, 143, 0.3));
+}
+
+.products-section:has(.product-card.not-available) .section-header h2::before {
+  content: '🎯';
+  font-size: 24px;
+  filter: drop-shadow(0 2px 4px rgba(249, 115, 22, 0.3));
 }
 
 .section-header p {
-  margin: 0 0 0 24px;
-  color: #6b7280;
+  margin: 0;
+  color: #64748b;
   font-size: 16px;
+  font-weight: 500;
+  line-height: 1.6;
 }
 
 /* Сетка товаров */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 24px;
   padding: 16px 0;
+  width: 100%;
 }
 
 /* Для больших экранов - показываем больше товаров в ряд */
-@media (min-width: 1400px) {
+@media (min-width: 1600px) {
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 20px;
   }
 }
@@ -494,18 +620,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  font-size: 14px;
+  gap: 3px;
+  font-size: 12px;
   font-weight: 600;
   color: #059669;
   background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 8px;
   border: 1px solid #00B18F;
   position: relative;
   overflow: hidden;
   text-align: center;
   line-height: 1.2;
+  flex-wrap: wrap;
 }
 
 .coins-needed::before {
@@ -520,7 +647,7 @@
 }
 
 .needed-icon {
-  font-size: 16px;
+  font-size: 12px;
   animation: pulse 2s infinite;
 }
 
@@ -535,45 +662,80 @@
 
 .needed-text {
   color: #92400e;
+  font-weight: 500;
 }
 
 .needed-amount {
   color: #dc2626;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 12px;
 }
 
 .needed-currency {
   color: #92400e;
-  font-size: 13px;
+  font-size: 11px;
 }
 
 /* Пустое состояние */
 .empty-state {
   text-align: center;
-  padding: 48px 24px;
-  color: #6b7280;
+  padding: 64px 32px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
+}
+
+.empty-state::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #00B18F, #10b981, #f97316);
 }
 
 .empty-icon {
-  font-size: 4rem;
-  margin-bottom: 16px;
+  font-size: 5rem;
+  margin-bottom: 24px;
   display: block;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  animation: gentle-bounce 3s ease-in-out infinite;
+}
+
+@keyframes gentle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
 .empty-state h3 {
-  margin: 0 0 8px 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #374151;
+  margin: 0 0 16px 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  background: linear-gradient(135deg, #00B18F, #f97316);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .empty-state p {
   margin: 0;
-  font-size: 16px;
-  max-width: 400px;
+  font-size: 18px;
+  max-width: 500px;
   margin: 0 auto;
-  line-height: 1.5;
+  line-height: 1.6;
+  color: #64748b;
+  font-weight: 500;
 }
 
 /* Загрузка */
@@ -848,7 +1010,52 @@
 /* Мобильная адаптация */
 @media (max-width: 768px) {
   .shop-page {
+    padding: 16px 20px;
+    width: 100%;
+  }
+  
+  /* Адаптация табов для мобильных */
+  .shop-tabs {
+    width: 100%;
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 24px;
+  }
+  
+  .tab-button {
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    min-width: 0;
+    flex: 1;
+    border-radius: 10px;
+  }
+  
+  .tab-button:first-child::before,
+  .tab-button:last-child::before,
+  .tab-button.active:first-child::before,
+  .tab-button.active:last-child::before {
+    font-size: 12px;
+    margin-right: 4px;
+  }
+  
+  /* Адаптация заголовков секций */
+  .section-header {
     padding: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .section-header h2 {
+    font-size: 1.5rem;
+    gap: 8px;
+  }
+  
+  .section-header h2::before {
+    font-size: 20px;
+  }
+  
+  .section-header p {
+    font-size: 14px;
   }
   
   .page-header {
@@ -860,6 +1067,7 @@
   .products-grid {
     grid-template-columns: 1fr;
     gap: 16px;
+    width: 100%;
   }
   
   .modal-content {
@@ -914,13 +1122,15 @@
   }
   
   .coins-needed {
-    font-size: 12px;
-    padding: 6px 8px;
+    font-size: 10px;
+    padding: 4px 6px;
     flex-wrap: wrap;
+    gap: 2px;
+    line-height: 1.1;
   }
   
   .needed-amount {
-    font-size: 13px;
+    font-size: 11px;
   }
 }
 
@@ -1004,7 +1214,8 @@
 /* Улучшенная мобильная адаптация */
 @media (max-width: 768px) {
   .shop-page {
-    padding: 16px;
+    padding: 16px 20px;
+    width: 100%;
   }
 
   .page-header {
@@ -1052,6 +1263,7 @@
   .products-grid {
     grid-template-columns: 1fr;
     gap: 16px;
+    width: 100%;
   }
 
   .product-card {
@@ -1112,19 +1324,23 @@
   }
 
   .empty-state {
-    padding: 40px 16px;
+    padding: 48px 20px;
+    border-radius: 16px;
   }
 
   .empty-icon {
-    font-size: 48px;
+    font-size: 4rem;
+    margin-bottom: 16px;
   }
 
   .empty-state h3 {
-    font-size: 18px;
+    font-size: 1.5rem;
+    margin-bottom: 12px;
   }
 
   .empty-state p {
-    font-size: 14px;
+    font-size: 16px;
+    max-width: 100%;
   }
 
   /* Модальное окно на мобильных */
@@ -1179,7 +1395,7 @@
 
 @media (max-width: 480px) {
   .shop-page {
-    padding: 12px;
+    padding: 12px 16px;
   }
 
   .tab-button {
@@ -1217,8 +1433,10 @@
   }
 
   .coins-needed {
-    font-size: 11px;
-    padding: 6px;
+    font-size: 9px;
+    padding: 4px 5px;
+    gap: 1px;
+    line-height: 1.0;
   }
 }
 

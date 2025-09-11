@@ -324,190 +324,111 @@ export default function StudentLessonPage() {
         />
         
         <div className="content-area student-lesson-page">
-          {/* Хлебные крошки */}
-          <div className="breadcrumb">
-            <button 
-              onClick={() => navigate('/courses')}
-              className="breadcrumb-link"
-            >
-              Курсы
-            </button>
-            <span className="breadcrumb-separator">›</span>
+          {/* Кнопка назад */}
+          <div className="back-button-container">
             <button 
               onClick={() => navigate(`/courses/${courseId}/student`)}
-              className="breadcrumb-link"
+              className="back-button"
             >
-              Курс
+              ← Назад к курсу
             </button>
-            <span className="breadcrumb-separator">›</span>
-            <span className="breadcrumb-current">{lesson?.name || 'Урок'}</span>
           </div>
 
-          {/* Заголовок урока */}
-          <div className="lesson-header">
-            <h1>{lesson?.name || 'Урок'}</h1>
-            <div className="lesson-meta">
-              <span className="lesson-status">
-                📚 Материалы урока
-              </span>
-            </div>
+          {/* Заголовок урока с новым дизайном */}
+          <div className="lesson-title-section">
+            <h1 className="lesson-title">{lesson?.name || 'Урок'}</h1>
           </div>
 
           {/* Содержимое урока */}
           <div className="lesson-content">
             
-            {/* Материалы урока */}
-            <div className="lesson-materials">
-              <h3>Материалы урока</h3>
+            {/* Материалы урока - новый дизайн */}
+            <div className="materials-section">
+              <div className="materials-header">
+                <h2 className="materials-title">📚 Материалы урока</h2>
+              </div>
               
-              {/* Основные материалы урока */}
+              {/* Основные материалы урока в одном айфрейме */}
               {lesson?.student_material_url ? (
-                <div className="material-card">
-                  <h4>📚 Учебный материал</h4>
-                  <div className="material-content">
+                <div className="main-material-container">
+                  <div className="material-iframe-wrapper">
                     <iframe 
                       src={lesson.student_material_url} 
-                      title="Учебный материал"
-                      style={{
-                        width: '100%',
-                        height: '400px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        marginBottom: '10px'
-                      }}
+                      title="Материалы урока"
+                      className="main-material-iframe"
                     />
-                    <a 
-                      href={lesson.student_material_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      style={{
-                        display: 'inline-block',
-                        padding: '8px 16px',
-                        backgroundColor: '#007bff',
-                        color: 'white',
-                        textDecoration: 'none',
-                        borderRadius: '4px',
-                        fontSize: '14px'
-                      }}
-                    >
-                      📄 Открыть в новой вкладке
-                    </a>
                   </div>
                 </div>
-              ) : null}
-
-              {/* Дополнительные материалы урока */}
-              {lesson?.student_additional_material_url ? (
-                <div className="material-card" style={{ marginTop: '20px' }}>
-                  <h4>📎 Дополнительные материалы урока</h4>
-                  <div className="material-content">
-                    <a 
-                      href={lesson.student_additional_material_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      style={{
-                        display: 'inline-block',
-                        padding: '12px 20px',
-                        backgroundColor: '#17a2b8',
-                        color: 'white',
-                        textDecoration: 'none',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        marginBottom: '10px'
-                      }}
-                    >
-                      📥 Скачать дополнительные материалы
-                    </a>
-                    <p style={{ fontSize: '12px', color: '#666', margin: '5px 0' }}>
-                      Дополнительные файлы и ресурсы для изучения урока
-                    </p>
-                  </div>
+              ) : (
+                <div className="no-materials-message">
+                  <div className="no-materials-icon">📋</div>
+                  <h3>Материалы урока пока не добавлены</h3>
+                  <p>Обратитесь к преподавателю за дополнительной информацией</p>
                 </div>
-              ) : null}
-
-              {/* Если нет ни основных, ни дополнительных материалов */}
-              {!lesson?.student_material_url && !lesson?.student_additional_material_url && (
-                <div className="no-materials">
-                  <p>📋 Материалы для этого урока пока не добавлены.</p>
-                  <p>Обратитесь к преподавателю за дополнительной информацией.</p>
+              )}
+              
+              {/* Кнопка скачивания дополнительных материалов по центру */}
+              {lesson?.student_additional_material_url && (
+                <div className="additional-materials-container">
+                  <a 
+                    href={lesson.student_additional_material_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="download-additional-btn"
+                  >
+                    📥 Скачать дополнительные материалы
+                  </a>
                 </div>
               )}
             </div>
             
-            {/* Блок домашнего задания */}
-            <div className="block">
-              <h2>Домашнее задание</h2>
+            {/* Блок домашнего задания - новый дизайн */}
+            <div className="homework-section">
+              <div className="homework-header">
+                <h2 className="homework-title">📋 Домашнее задание</h2>
+              </div>
               
-              {/* Показываем материал ДЗ если есть */}
-              {lesson?.homework_material_url && (
-                <div className="homework-material" style={{ marginBottom: '20px' }}>
-                  <h3>📝 Задание:</h3>
-                  <div className="material-card">
-                    <div className="material-content">
-                      <iframe 
-                        src={lesson.homework_material_url} 
-                        title="Домашнее задание"
-                        style={{
-                          width: '100%',
-                          height: '300px',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px',
-                          marginBottom: '10px'
-                        }}
-                      />
-                      <a 
-                        href={lesson.homework_material_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'inline-block',
-                          padding: '8px 16px',
-                          backgroundColor: '#28a745',
-                          color: 'white',
-                          textDecoration: 'none',
-                          borderRadius: '4px',
-                          fontSize: '14px'
-                        }}
-                      >
-                        📄 Открыть задание в новой вкладке
-                      </a>
+              {/* Материалы домашнего задания в едином блоке */}
+              {(lesson?.homework_material_url || lesson?.homework_additional_material_url) ? (
+                <div className="homework-material-container">
+                  {/* Основное задание */}
+                  {lesson?.homework_material_url && (
+                    <div className="homework-main-content">
+                      <div className="homework-iframe-wrapper">
+                        <iframe 
+                          src={lesson.homework_material_url} 
+                          title="Домашнее задание"
+                          className="homework-material-iframe"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* Дополнительные материалы ДЗ */}
-              {lesson?.homework_additional_material_url && (
-                <div className="homework-additional-material" style={{ marginBottom: '20px' }}>
-                  <h3>📎 Дополнительные материалы к домашнему заданию:</h3>
-                  <div className="material-card">
-                    <div className="material-content">
+                  )}
+                  
+                  {/* Дополнительные материалы по центру */}
+                  {lesson?.homework_additional_material_url && (
+                    <div className="homework-additional-container">
                       <a 
                         href={lesson.homework_additional_material_url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        style={{
-                          display: 'inline-block',
-                          padding: '12px 20px',
-                          backgroundColor: '#fd7e14',
-                          color: 'white',
-                          textDecoration: 'none',
-                          borderRadius: '4px',
-                          fontSize: '14px',
-                          marginBottom: '10px'
-                        }}
+                        className="download-homework-additional-btn"
                       >
-                        📥 Скачать дополнительные материалы к ДЗ
+                        📎 Скачать дополнительные материалы к заданию
                       </a>
-                      <p style={{ fontSize: '12px', color: '#666', margin: '5px 0' }}>
-                        Дополнительные файлы, шаблоны или ресурсы для выполнения домашнего задания
-                      </p>
                     </div>
-                  </div>
+                  )}
+                </div>
+              ) : (
+                <div className="no-homework-message">
+                  <div className="no-homework-icon">📝</div>
+                  <h3>Домашнее задание будет добавлено позже</h3>
+                  <p>Следите за обновлениями от преподавателя</p>
                 </div>
               )}
               
-              <h3>Сдача домашнего задания</h3>
+              {/* Раздел сдачи домашнего задания */}
+              <div className="homework-submission-section">
+                <h3 className="submission-title">✍️ Сдача домашнего задания</h3>
               
               {/* Форма отправки домашнего задания */}
               {submitted || (homeworkStatus && homeworkStatus.submitted) ? (
@@ -666,6 +587,7 @@ export default function StudentLessonPage() {
                   </button>
                 </div>
               )}
+              </div>
             </div>
           </div>
         </div>

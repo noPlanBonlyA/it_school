@@ -32,8 +32,8 @@
     0 0 0 1px rgba(148, 163, 184, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   padding: 0;
-  max-width: 640px;
-  width: 92%;
+  max-width: 800px;
+  width: 95%;
   max-height: 92vh;
   overflow: hidden;
   position: relative;
@@ -84,18 +84,24 @@
 .event-modal-content {
   padding: 0;
   overflow-y: auto;
-  max-height: 92vh;
+  max-height: 95vh;
+  scroll-behavior: smooth;
 }
 
 /* Красивый заголовок с нашим цветом */
 .event-modal-header {
   background: #00B18F;
-  padding: 32px;
-  padding-top: 40px;
-  padding-bottom: 28px;
+  padding: 40px 48px;
+  padding-top: 48px;
+  padding-bottom: 36px;
   color: white;
   position: relative;
   overflow: hidden;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .event-modal-header::before {
@@ -112,8 +118,8 @@
 }
 
 .event-modal-title {
-  margin: 0 0 20px 0;
-  font-size: 28px;
+  margin: 0 0 24px 0;
+  font-size: 32px;
   color: #ffffff;
   line-height: 1.3;
   font-weight: 700;
@@ -122,15 +128,16 @@
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: relative;
   z-index: 1;
+  width: 100%;
 }
 
 .event-modal-status {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  border-radius: 20px;
-  font-size: 13px;
+  gap: 10px;
+  padding: 14px 24px;
+  border-radius: 24px;
+  font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -139,6 +146,9 @@
   font-family: 'Mont', sans-serif;
   position: relative;
   z-index: 1;
+  text-align: center;
+  justify-content: center;
+  min-width: 160px;
 }
 
 .event-modal-status.opened {
@@ -155,24 +165,30 @@
 
 /* Основной контент */
 .event-modal-info {
-  padding: 32px;
-  padding-bottom: 24px;
+  padding: 40px 48px;
+  padding-bottom: 32px;
 }
 
 .info-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 24px;
 }
 
 .info-item {
   background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.6) 100%);
-  border-radius: 16px;
-  padding: 20px 24px;
+  border-radius: 20px;
+  padding: 32px 40px;
   border: 1px solid rgba(148, 163, 184, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .info-item:hover {
@@ -185,33 +201,45 @@
 .info-label {
   font-weight: 600;
   color: #475569;
-  font-size: 13px;
-  margin-bottom: 8px;
+  font-size: 16px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-family: 'Mont', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-align: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .info-value {
   color: #0f172a;
-  font-size: 16px;
+  font-size: 20px;
   line-height: 1.5;
   font-weight: 600;
   font-family: 'Mont', sans-serif;
+  text-align: center;
+  padding-left: 0 !important;
+  width: 100%;
+  min-height: 30px;
 }
 
 /* Описание */
 .event-modal-description {
-  margin: 0 32px 24px;
-  padding: 24px;
+  margin: 0 48px 32px;
+  padding: 40px;
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.04) 0%, rgba(147, 51, 234, 0.06) 100%);
-  border-radius: 16px;
+  border-radius: 20px;
   border: 1px solid rgba(59, 130, 246, 0.1);
   position: relative;
   overflow: hidden;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .event-modal-description::before {
@@ -226,55 +254,63 @@
 }
 
 .event-modal-description h3 {
-  margin: 0 0 16px 0;
+  margin: 0 0 24px 0;
   font-weight: 700;
   color: #0f172a;
-  font-size: 16px;
+  font-size: 20px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-family: 'Mont', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-align: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .event-modal-description p {
   margin: 0;
   color: #475569;
   line-height: 1.6;
-  font-size: 15px;
-  padding-left: 32px;
+  font-size: 18px;
+  padding-left: 0 !important;
   font-weight: 500;
+  text-align: center;
+  width: 100%;
 }
 
 /* Кнопки действий */
 .event-modal-actions {
   display: flex;
   justify-content: center;
-  gap: 16px;
-  padding: 24px 32px 32px;
+  gap: 24px;
+  padding: 32px 48px 40px;
   background: linear-gradient(180deg, rgba(248, 250, 252, 0.5) 0%, rgba(255, 255, 255, 0.8) 100%);
   border-top: 1px solid rgba(148, 163, 184, 0.1);
+  text-align: center;
 }
 
 .event-btn-primary {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 16px 32px;
+  gap: 14px;
+  padding: 20px 48px;
+  min-width: 240px;
+  min-height: 64px;
   
   background: #00B18F;
   box-shadow: 
     0 8px 16px rgba(0, 177, 143, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
+  border-radius: 18px;
   border: none;
   
   font-family: 'Mont', sans-serif;
   font-style: normal;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 17px;
   color: #FFFFFF;
   
   cursor: pointer;
@@ -283,6 +319,7 @@
   overflow: hidden;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-align: center;
 }
 
 .event-btn-primary::before {
@@ -315,11 +352,150 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
+/* Красивая кнопка для открытия/закрытия урока */
+.event-btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 20px 48px;
+  min-width: 240px;
+  min-height: 64px;
+  
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  box-shadow: 
+    0 8px 16px rgba(34, 197, 94, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+  border: none;
+  
+  font-family: 'Mont', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 17px;
+  color: #FFFFFF;
+  
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.event-btn-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.event-btn-secondary:hover {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 
+    0 12px 24px rgba(34, 197, 94, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.event-btn-secondary:hover::before {
+  left: 100%;
+}
+
+.event-btn-secondary:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 4px 12px rgba(34, 197, 94, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Стиль для кнопки закрытия урока (красный) */
+.event-btn-secondary.close-lesson {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 
+    0 8px 16px rgba(239, 68, 68, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.event-btn-secondary.close-lesson:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 
+    0 12px 24px rgba(239, 68, 68, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.event-btn-secondary.close-lesson:active {
+  box-shadow: 
+    0 4px 12px rgba(239, 68, 68, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Третья кнопка - провести урок (зелёная) */
+.event-btn-primary.conduct-lesson-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 
+    0 8px 16px rgba(16, 185, 129, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.event-btn-primary.conduct-lesson-btn:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 
+    0 12px 24px rgba(16, 185, 129, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.event-btn-primary.conduct-lesson-btn:active {
+  box-shadow: 
+    0 4px 12px rgba(16, 185, 129, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Третья кнопка - провести урок (зелёная) - старые стили */
+.event-btn-primary:nth-child(3) {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 
+    0 8px 16px rgba(16, 185, 129, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.event-btn-primary:nth-child(3):hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 
+    0 12px 24px rgba(16, 185, 129, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.event-btn-primary:nth-child(3):active {
+  box-shadow: 
+    0 4px 12px rgba(16, 185, 129, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Отключенное состояние для кнопок */
+.event-btn-secondary:disabled {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.event-btn-secondary:disabled:hover {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+  transform: none !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
 /* Адаптивность для планшетов */
 @media (max-width: 768px) {
   .event-modal {
     width: 96%;
-    max-height: 88vh;
+    max-height: 92vh;
     border-radius: 20px;
   }
   
@@ -345,44 +521,76 @@
   }
   
   .info-item {
-    padding: 16px 20px;
+    padding: 20px 24px;
     border-radius: 14px;
+    min-height: 70px;
   }
   
   .info-label {
-    font-size: 12px;
-    margin-bottom: 6px;
+    font-size: 13px;
+    margin-bottom: 10px;
   }
   
   .info-value {
-    font-size: 15px;
-    padding-left: 24px;
+    font-size: 16px;
   }
   
   .event-modal-description {
     margin: 0 24px 20px;
-    padding: 20px;
+    padding: 24px;
     border-radius: 14px;
+    min-height: 100px;
   }
   
   .event-modal-description h3 {
-    font-size: 15px;
-    margin-bottom: 12px;
+    font-size: 16px;
+    margin-bottom: 16px;
   }
   
   .event-modal-description p {
-    font-size: 14px;
-    padding-left: 28px;
+    font-size: 15px;
   }
   
   .event-modal-actions {
+    display: flex !important;
     padding: 20px 24px 28px;
+    flex-direction: column;
+    gap: 16px;
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.5) 0%, rgba(255, 255, 255, 0.8) 100%);
+    border-top: 1px solid rgba(148, 163, 184, 0.1);
+    text-align: center;
   }
   
-  .event-btn-primary {
-    padding: 14px 28px;
-    font-size: 14px;
+  .event-btn-primary,
+  .event-btn-secondary {
+    display: flex !important;
+    padding: 16px 32px;
+    font-size: 15px;
     border-radius: 14px;
+    min-height: 52px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  
+  /* Стили для третьей кнопки в планшетной версии */
+  .event-btn-primary.conduct-lesson-btn,
+  .event-btn-primary:nth-child(3) {
+    display: flex !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    padding: 16px 32px;
+    font-size: 15px;
+    border-radius: 14px;
+    min-height: 52px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    text-align: center;
+    box-sizing: border-box;
   }
 }
 
@@ -390,9 +598,9 @@
 @media (max-width: 480px) {
   .event-modal {
     width: 98%;
-    max-height: 92vh;
+    max-height: 95vh;
     border-radius: 16px;
-    margin: 16px 0;
+    margin: 8px 0;
   }
   
   .modal-close-btn {
@@ -432,50 +640,94 @@
   }
   
   .info-item {
-    padding: 14px 16px;
+    padding: 18px 20px;
     border-radius: 12px;
+    min-height: 65px;
   }
   
   .info-label {
-    font-size: 11px;
-    margin-bottom: 5px;
+    font-size: 12px;
+    margin-bottom: 8px;
     gap: 6px;
   }
   
   .info-value {
-    font-size: 14px;
-    padding-left: 20px;
+    font-size: 15px;
     font-weight: 600;
   }
   
   .event-modal-description {
     margin: 0 20px 16px;
-    padding: 16px;
+    padding: 20px;
     border-radius: 12px;
+    min-height: 80px;
   }
   
   .event-modal-description h3 {
-    font-size: 14px;
-    margin-bottom: 10px;
+    font-size: 15px;
+    margin-bottom: 12px;
     gap: 6px;
   }
   
   .event-modal-description p {
-    font-size: 13px;
-    padding-left: 24px;
+    font-size: 14px;
+    padding-left: 0 !important;
     line-height: 1.5;
+    text-align: center !important;
   }
   
   .event-modal-actions {
+    display: flex !important;
     padding: 16px 20px 24px;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.5) 0%, rgba(255, 255, 255, 0.8) 100%);
+    border-top: 1px solid rgba(148, 163, 184, 0.1);
+    text-align: center;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   
-  .event-btn-primary {
-    padding: 12px 24px;
-    font-size: 13px;
+  .event-btn-primary,
+  .event-btn-secondary {
+    display: flex !important;
+    padding: 14px 24px;
+    font-size: 14px;
     width: 100%;
     border-radius: 12px;
     gap: 8px;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-sizing: border-box;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Стили для третьей кнопки в мобильной версии */
+  .event-btn-primary.conduct-lesson-btn,
+  .event-btn-primary:nth-child(3) {
+    display: flex !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    padding: 14px 24px;
+    font-size: 14px;
+    width: 100%;
+    border-radius: 12px;
+    gap: 8px;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-sizing: border-box;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  .event-btn-primary.conduct-lesson-btn:hover,
+  .event-btn-primary:nth-child(3):hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
   }
 }
 
@@ -499,218 +751,6 @@
 
 .event-modal-content::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, rgba(0, 177, 143, 0.5) 0%, rgba(3, 105, 161, 0.7) 100%);
-}
-
-/* Адаптивность для планшетов */
-@media (max-width: 768px) {
-  .event-modal {
-    width: 95%;
-    max-height: 85vh;
-    border-radius: 16px;
-  }
-  
-  .event-modal-content {
-    padding: 24px;
-    padding-top: 60px;
-  }
-  
-  .event-modal-title {
-    font-size: 24px;
-  }
-  
-  .info-item {
-    padding: 16px;
-  }
-  
-  .info-label {
-    font-size: 13px;
-  }
-  
-  .info-value {
-    font-size: 15px;
-    padding-left: 20px;
-  }
-  
-  .event-modal-description {
-    padding: 20px;
-  }
-  
-  .event-modal-description h3 {
-    font-size: 16px;
-  }
-  
-  .event-modal-description p {
-    font-size: 14px;
-    padding-left: 28px;
-  }
-  
-  .event-btn-primary {
-    padding: 14px 28px;
-    font-size: 15px;
-  }
-}
-
-/* Адаптивность для мобильных */
-@media (max-width: 480px) {
-  .event-modal {
-    width: 98%;
-    max-height: 90vh;
-    border-radius: 12px;
-    margin: 20px 0;
-  }
-  
-  .event-modal-content {
-    padding: 20px;
-    padding-top: 56px;
-  }
-  
-  .modal-close-btn {
-    top: 12px;
-    right: 12px;
-    width: 36px;
-    height: 36px;
-    font-size: 20px;
-  }
-  
-  .event-modal-header {
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-  }
-  
-  .event-modal-title {
-    font-size: 20px;
-    margin-bottom: 12px;
-  }
-  
-  .event-modal-status {
-    padding: 10px 16px;
-    font-size: 12px;
-    gap: 6px;
-  }
-  
-  .info-item {
-    padding: 14px;
-    border-radius: 12px;
-  }
-  
-  .info-label {
-    font-size: 12px;
-    margin-bottom: 6px;
-  }
-  
-  .info-value {
-    font-size: 14px;
-    padding-left: 18px;
-  }
-  
-  .event-modal-description {
-    padding: 16px;
-    margin-bottom: 24px;
-  }
-  
-  .event-modal-description h3 {
-    font-size: 15px;
-    margin-bottom: 12px;
-  }
-  
-  .event-modal-description p {
-    font-size: 13px;
-    padding-left: 24px;
-  }
-  
-  .event-modal-actions {
-    margin-top: 24px;
-    padding-top: 20px;
-  }
-  
-  .event-btn-primary {
-    padding: 12px 24px;
-    font-size: 14px;
-    width: 100%;
-    border-radius: 10px;
-  }
-}
-
-/* Красивый скроллбар для модального окна */
-.event-modal::-webkit-scrollbar {
-  width: 8px;
-}
-
-.event-modal::-webkit-scrollbar-track {
-  background: rgba(0, 177, 143, 0.1);
-  border-radius: 12px;
-  margin: 8px 0;
-}
-
-.event-modal::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(0, 177, 143, 0.4) 0%, rgba(3, 131, 106, 0.6) 100%);
-  border-radius: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-}
-
-.event-modal::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, rgba(0, 177, 143, 0.6) 0%, rgba(3, 131, 106, 0.8) 100%);
-}
-
-/* Мобильная адаптация EventModal */
-@media (max-width: 768px) {
-  .event-modal {
-    width: 95%;
-    max-height: 85vh;
-    margin: 0 16px;
-    border-radius: 16px;
-  }
-
-  .modal-close-btn {
-    top: 16px;
-    right: 16px;
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
-  }
-
-  .event-modal-header {
-    padding: 24px 20px;
-    padding-top: 32px;
-  }
-
-  .event-title {
-    font-size: 22px !important;
-    line-height: 1.3 !important;
-  }
-
-  .event-subtitle {
-    font-size: 14px !important;
-    margin-top: 8px !important;
-  }
-
-  .event-modal-body {
-    padding: 20px !important;
-  }
-
-  .event-info-grid {
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
-  }
-
-  .event-info-item {
-    padding: 12px !important;
-  }
-
-  .event-description {
-    margin-top: 16px !important;
-  }
-
-  .lesson-controls {
-    padding: 16px 20px !important;
-    gap: 12px !important;
-  }
-
-  .lesson-control-btn {
-    padding: 12px 16px !important;
-    font-size: 14px !important;
-  }
 }
 
 /* Стили для модального окна проведения урока */
@@ -761,6 +801,7 @@
   font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.025em;
+  text-align: center;
 }
 
 .close-modal {
@@ -803,6 +844,7 @@
   color: #334155;
   font-size: 20px;
   font-weight: 600;
+  text-align: center;
 }
 
 .homework-form {
@@ -839,6 +881,7 @@
   color: #475569;
   font-size: 16px;
   font-weight: 600;
+  text-align: center;
 }
 
 .students-grades-section {
@@ -853,6 +896,7 @@
   color: #334155;
   font-size: 20px;
   font-weight: 600;
+  text-align: center;
 }
 
 .students-list {
@@ -880,6 +924,7 @@
   color: #1e293b;
   font-size: 18px;
   font-weight: 600;
+  text-align: center;
 }
 
 .grade-controls {
@@ -895,6 +940,8 @@
   gap: 4px;
   color: #374151;
   font-weight: 500;
+  text-align: center;
+  align-items: center;
 }
 
 .grade-controls input[type="checkbox"] {
@@ -940,6 +987,8 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  text-align: center;
+  justify-content: center;
 }
 
 .btn-primary {
@@ -969,6 +1018,7 @@
   justify-content: center;
   padding: 60px 20px;
   color: #64748b;
+  text-align: center;
 }
 
 .loader {
@@ -1010,5 +1060,188 @@
   
   .modal-actions {
     flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* Дополнительные стили для центрирования всех текстовых элементов в EventModal */
+.homework-form input::placeholder,
+.homework-form textarea::placeholder {
+  text-align: center;
+}
+
+.grade-controls input[type="number"] {
+  text-align: center;
+}
+
+.grade-controls textarea {
+  text-align: center;
+}
+
+.modal-actions p {
+  text-align: center !important;
+}
+
+/* Центрирование для всех параграфов в модальном окне */
+.event-modal p {
+  text-align: center !important;
+}
+
+/* Центрирование текста в мобильной версии */
+@media (max-width: 480px) {
+  .info-value {
+    padding-left: 0 !important;
+    text-align: center !important;
+  }
+  
+  .event-modal-description p {
+    padding-left: 0 !important;
+    text-align: center !important;
+  }
+  
+  .homework-form input,
+  .homework-form textarea {
+    text-align: center;
+  }
+  
+  .grade-controls input,
+  .grade-controls textarea {
+    text-align: center;
+  }
+}
+
+/* ДОПОЛНИТЕЛЬНЫЕ ПРИНУДИТЕЛЬНЫЕ СТИЛИ ДЛЯ МОБИЛЬНОЙ ВИДИМОСТИ */
+/* Обеспечиваем видимость кнопок в мобильной версии */
+
+@media (max-width: 768px) {
+  /* Принудительная видимость блока кнопок */
+  .event-modal-actions {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 100 !important;
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.5) 0%, rgba(255, 255, 255, 0.8) 100%) !important;
+    border-top: 1px solid rgba(148, 163, 184, 0.1) !important;
+    padding: 20px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+  }
+
+  /* Принудительная видимость всех кнопок */
+  .event-modal-actions .event-btn-primary,
+  .event-modal-actions .event-btn-secondary,
+  .event-modal-actions button {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 101 !important;
+    width: 100% !important;
+    min-height: 48px !important;
+    padding: 14px 20px !important;
+    font-size: 14px !important;
+    border-radius: 12px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    border: none !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+  }
+
+  /* Специально для кнопки "Провести урок" */
+  .event-modal-actions .conduct-lesson-btn,
+  .event-modal-actions .event-btn-primary:nth-child(3) {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Мобильная версия - еще более принудительные стили */
+  .event-modal-actions {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 100 !important;
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.9) 0%, rgba(255, 255, 255, 0.9) 100%) !important;
+    border-top: 2px solid rgba(148, 163, 184, 0.2) !important;
+    padding: 16px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+    min-height: 200px !important;
+  }
+
+  .event-modal-actions .event-btn-primary,
+  .event-modal-actions .event-btn-secondary,
+  .event-modal-actions button {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 101 !important;
+    width: 100% !important;
+    min-height: 50px !important;
+    padding: 16px 20px !important;
+    font-size: 14px !important;
+    border-radius: 12px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  /* Особые стили для кнопки провести урок в мобильной версии */
+  .event-modal-actions .conduct-lesson-btn,
+  .event-modal-actions .event-btn-primary:nth-child(3) {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+    border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  }
+
+  /* Стили для других кнопок */
+  .event-modal-actions .event-btn-primary:not(.conduct-lesson-btn):not(:nth-child(3)) {
+    background: #00B18F !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(0, 177, 143, 0.3) !important;
+  }
+
+  .event-modal-actions .event-btn-secondary {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3) !important;
+  }
+
+  .event-modal-actions .event-btn-secondary.close-lesson {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
   }
 }

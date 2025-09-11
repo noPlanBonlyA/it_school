@@ -188,9 +188,9 @@ export default function ShopPage() {
 
   if (loading && loadingCoins) {
     return (
-      <div className="app-layout">
+      <div className="app-layout" style={{ width: '100vw', minHeight: '100vh' }}>
         <Sidebar activeItem="shop" userRole={user?.role} />
-        <div className="main-content">
+        <div className="main-content" style={{ marginLeft: '250px', width: 'calc(100vw - 250px)', maxWidth: 'none' }}>
           <div className="loading-container">
             <div className="loader"></div>
             <p>Загрузка магазина...</p>
@@ -201,11 +201,11 @@ export default function ShopPage() {
   }
 
   return (
-    <div className="app-layout">
+    <div className="app-layout" style={{ width: '100vw', minHeight: '100vh' }}>
       <Sidebar activeItem="shop" userRole={user?.role} />
-      <div className="main-content">
+      <div className="main-content" style={{ marginLeft: '250px', width: 'calc(100vw - 250px)', maxWidth: 'none' }}>
         <SmartTopBar pageTitle="Магазин" />
-        <div className="shop-page">
+        <div className="shop-page" style={{ maxWidth: 'none', margin: '0', padding: '24px 40px', width: '100%' }}>
           {/* Заголовок */}
           <div className="page-header">
             <div className="header-info">
@@ -390,7 +390,7 @@ export default function ShopPage() {
                                       <span className="currency">монет</span>
                                     </div>
                                     <div className="coins-needed">
-                                      <span className="needed-icon">�</span>
+                                      <span className="needed-icon">🔒</span>
                                       <span className="needed-text">Нужно еще: </span>
                                       <span className="needed-amount">{progress.coinsNeeded}</span>
                                       <span className="needed-currency"> монет</span>

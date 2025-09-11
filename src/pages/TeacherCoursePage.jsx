@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
+import CourseImage from '../components/CourseImage';
 import { useAuth } from '../contexts/AuthContext';
 import { getCourse } from '../services/courseService';
 import { getCourseLessons } from '../services/lessonService';
 import '../styles/CourseDetailPage.css';
+import '../styles/CourseImageStyles.css';
+import '../styles/MobileImageFixes.css';
 import '../styles/TeacherCoursePage.css'; // Добавляем новые стили
 
 export default function TeacherCoursePage() {
@@ -127,71 +130,86 @@ export default function TeacherCoursePage() {
           </div>
         ) : (
           <>
-            <div className="teacher-course-header">
-              <div className="course-title-section">
-                <h1>{course ? course.name : 'Курс'}</h1>
-                {course?.description && (
-                  <p className="course-description">{course.description}</p>
-                )}
+            <div className="course-header">
+              <div className="course-header-top">
+                <button 
+                  className="btn-back"
+                  onClick={() => navigate('/teacher-courses')}
+                >
+                  ← Вернуться к моим курсам
+                </button>
               </div>
+              
+              {course && (
+                <div className="course-main-info">
+                  {course.photo?.url && (
+                    <CourseImage
+                      src={course.photo.url}
+                      alt={course.name}
+                      className="course-detail-image"
+                      placeholder="📚"
+                    />
+                  )}
+                  
+                  <div className="course-content">
+                    <h1 className="course-title">{course.name}</h1>
+                    <p className="course-description">{course.description}</p>
+                    <div className="course-meta">
+                      <span className="course-author">👩‍🏫 {course.author_name || 'Не указан'}</span>
+                      {course.age_category && (
+                        <span className="course-category">👥 {course.age_category}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="teacher-lessons-container">
-              <div className="section-header">
-                <h2 className="section-title">Уроки курса</h2>
-                <span className="lessons-count">{lessons.length} урок(ов)</span>
+            <div className="lessons-section">
+              <div className="lessons-header">
+                <h2>Уроки курса</h2>
+                {lessons.length > 0 && (
+                  <span className="lessons-count">{lessons.length} уроков</span>
+                )}
               </div>
 
               {lessons.length === 0 ? (
-                <div className="empty-lessons">
+                <div className="no-lessons">
                   <div className="empty-icon">📚</div>
                   <h3>В этом курсе пока нет уроков</h3>
-                  <p>В данном курсе уроки еще не созданы</p>
+                  <p>Уроки появятся после добавления их администратором</p>
                 </div>
               ) : (
-                <div className="lessons-grid">
-                  {Array.isArray(lessons) && lessons.map(lesson => {
+                <div className="lessons-list">
+                  {Array.isArray(lessons) && lessons.map((lesson, index) => {
                     const status = getStatusBadge(lesson);
                     
                     return (
                       <div
                         key={lesson.id}
-                        className="teacher-lesson-card"
+                        className="lesson-card"
+                        onClick={() => navigate(`/courses/${courseId}/teacher/lessons/${lesson.id}`)}
+                        style={{ cursor: 'pointer' }}
                       >
-                        <div className="lesson-card-header">
-                          <span className={`status-badge ${status.class}`}>
-                            {status.text}
-                          </span>
-                          <span className="lesson-number">Урок {lessons.indexOf(lesson) + 1}</span>
+                        <div className="lesson-number">
+                          {index + 1}
                         </div>
                         
-                        <div className="lesson-card-body">
-                          <h3 className="lesson-title">{lesson.name}</h3>
-                          {lesson.description && (
-                            <p className="lesson-desc">{lesson.description.length > 100 
-                              ? `${lesson.description.substring(0, 100)}...` 
-                              : lesson.description}
-                            </p>
-                          )}
-                        </div>
-                        
-                        <div className="lesson-card-footer">
+                        <div className="lesson-content">
+                          <div className="lesson-header">
+                            <h3 className="lesson-title">{lesson.name}</h3>
+                          </div>
+                          
                           <div className="lesson-meta">
+                            <span className={`lesson-status ${status.class}`}>
+                              {status.text}
+                            </span>
+                            
                             {lesson.holding_date && (
                               <span className="lesson-date">
-                                <i className="date-icon">📅</i> {formatDate(lesson.holding_date)}
+                                � {formatDate(lesson.holding_date)}
                               </span>
                             )}
-                            
-                            <div className="lesson-stats">
-                              <span className="materials-count" title="Материалы">
-                                <i className="materials-icon">📄</i> {lesson.materials_count || 0}
-                              </span>
-                              
-                              <span className="homework-count" title="Домашние работы">
-                                <i className="homework-icon">📝</i> {lesson.homework_count || 0}
-                              </span>
-                            </div>
                           </div>
                         </div>
                       </div>

@@ -34,17 +34,20 @@
 /* =================== ОСНОВНАЯ ОБЛАСТЬ =================== */
 .main-content {
   flex: 1;
-  padding: 32px;
+  padding: 32px 40px;
   background: transparent;
   min-height: 100vh;
   margin-left: 220px;
   overflow-x: hidden;
+  width: calc(100vw - 220px);
+  max-width: none;
 }
 
 .content-area {
-  max-width: 1400px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
   padding: 0;
+  width: 100%;
 }
 
 h1 {
@@ -247,8 +250,9 @@ h1 {
 
 .groups-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 24px;
+  width: 100%;
 }
 
 .group-card {
@@ -408,7 +412,7 @@ h1 {
 }
 
 .empty-state::before {
-  content: '📚';
+  content: '';
   font-size: 64px;
   display: block;
   margin-bottom: 20px;
@@ -472,8 +476,8 @@ h1 {
 }
 
 .modal-content.large {
-  width: 90vw;
-  max-width: 1400px;
+  width: 95vw;
+  max-width: none;
 }
 
 .modal-header {
@@ -1712,9 +1716,10 @@ mark {
 
 /* Адаптация для контента */
 .content-area {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
 h1 {
@@ -1885,8 +1890,8 @@ h1 {
 .modal-content {
   background: #ffffff;
   border-radius: 8px;
-  width: 800px;
-  max-width: 90%;
+  width: 95vw;
+  max-width: none;
   max-height: 90%;
   overflow-y: auto;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
@@ -2127,7 +2132,7 @@ mark { background:#ffecb5; border-radius:2px; padding:0 2px; }
 }
 
 /* широкая версия (управление группой) */
-.modal-content.large      { width: 90vw; max-width: 1200px; }   /* ← главное */
+.modal-content.large      { width: 95vw; max-width: none; }   /* ← главное */
 
 /* header / body */
 .modal-header {

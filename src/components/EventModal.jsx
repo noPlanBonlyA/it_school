@@ -611,18 +611,15 @@ export default function EventModal({ event, onClose, userRole }) {
               </button>
               
               <button 
-                className="event-btn-secondary"
+                className={`event-btn-secondary ${event.is_opened ? 'close-lesson' : ''}`}
                 onClick={handleToggleLessonAccess}
                 disabled={toggleLoading}
-                style={{ 
-                  backgroundColor: event.is_opened ? '#ef4444' : '#22c55e'
-                }}
               >
                 {toggleLoading ? '⏳' : event.is_opened ? '🔒 Закрыть урок' : '🔓 Открыть урок'}
               </button>
               
               <button 
-                className="event-btn-primary"
+                className="event-btn-primary conduct-lesson-btn"
                 onClick={() => handleConductLesson(event)}
               >
                 🎯 Провести урок

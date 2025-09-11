@@ -140,18 +140,19 @@ export default function ManageGroupPage() {
 
   /* ────────────── RENDER ───────────────────*/
   return (
-    <div className="groups-page app-layout manage-users manage-groups" style={{ width: '100%' }}>
+    <div className="groups-page app-layout manage-users manage-groups" style={{ width: '100vw', minHeight: '100vh' }}>
       <Sidebar activeItem="manage-groups" userRole={user.role}/>
-      <div className="main-content" style={{ marginLeft: '250px', width: 'calc(100% - 250px)', maxWidth: 'none' }}>
+      <div className="main-content" style={{ marginLeft: '250px', width: 'calc(100vw - 250px)', maxWidth: 'none' }}>
         <SmartTopBar pageTitle="Управление группами" />
 
-        <div className="content-area" style={{ maxWidth: 'none', padding: '20px' }}>
+        <div className="content-area" style={{ maxWidth: 'none', padding: '20px 40px', width: '100%' }}>
           {/* Статистика */}
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
             gap: '20px', 
-            marginBottom: '30px' 
+            marginBottom: '30px',
+            width: '100%'
           }}>
             <div style={{ 
               padding: '20px', 
@@ -202,11 +203,11 @@ export default function ManageGroupPage() {
           </div>
 
           {/*— create group —*/}
-          <div className="block create-group-block" style={{ marginBottom: '30px' }}>
+          <div className="block create-group-block" style={{ marginBottom: '30px', width: '100%' }}>
             <div className="create-group-header">
               <h2>Создать новую группу</h2>
             </div>
-            <div className="create-group-form" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', alignItems: 'start' }}>
+            <div className="create-group-form" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'start', width: '100%' }}>
               <div>
                 <div className="field">
                   <label>Название группы</label>
@@ -239,13 +240,13 @@ export default function ManageGroupPage() {
           </div>
 
           {/*— list of groups —*/}
-          <div className="block groups-list-block">
+          <div className="block groups-list-block" style={{ width: '100%' }}>
             <div className="groups-list-header">
               <h2>Управление группами</h2>
             </div>
-            <div className="groups-list">
+            <div className="groups-list" style={{ width: '100%' }}>
               {groups.length > 0 ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(450px, 1fr))', gap: '25px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '25px', width: '100%' }}>
                   {groups.map(g=>(
                     <div className="group-card" key={g.id} style={{ padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', border: '1px solid #e5e7eb' }}>
                       <div className="group-info" style={{ marginBottom: '20px' }}>

@@ -8,9 +8,11 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   border-radius: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 0; /* Убираем margin-bottom, используем gap в родителе */
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  width: 100%; /* Занимает всю ширину ячейки */
+  height: fit-content; /* Высота по содержимому */
 }
 .news-row:hover {
   background-color: #f8f9fa;
@@ -38,7 +40,7 @@
 .news-content {
   flex: 1;
   min-width: 0;
-  padding: 15px;
+  padding: 10px; /* Уменьшили отступы */
 }
 
 .news-title {
@@ -99,7 +101,7 @@
 .news-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 8px; /* Уменьшили gap между новостями */
   max-height: 70vh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -322,10 +324,11 @@
   .news-list {
     max-height: 60vh;
     padding: 0 5px 0 0;
+    gap: 12px; /* Уменьшаем gap для мобильных */
   }
   
   .news-row {
-    margin-bottom: 15px;
+    margin-bottom: 0; /* Убираем margin-bottom */
   }
   
   .news-row.no-image {
@@ -385,10 +388,11 @@
 @media (max-width: 480px) {
   .news-list {
     max-height: 50vh;
+    gap: 8px; /* Еще меньше gap для очень маленьких экранов */
   }
   
   .news-row {
-    margin-bottom: 12px;
+    margin-bottom: 0; /* Убираем margin-bottom */
   }
   
   .news-row.no-image {

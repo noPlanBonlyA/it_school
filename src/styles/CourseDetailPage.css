@@ -91,7 +91,8 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
+  padding-left: 0;
 }
 
 /* Показываем кнопку создания урока везде */
@@ -108,6 +109,12 @@
   gap: 24px;
   max-width: 800px;
   margin: 0 auto;
+  text-align: center;
+  padding: 0 40px;
+  width: 100%;
+  box-sizing: border-box;
+  /* Сдвигаем еще левее для компенсации сайдбара */
+  transform: translateX(-100px);
 }
 
 .course-image {
@@ -120,6 +127,7 @@
   position: relative;
   flex-shrink: 0;
   border: 2px solid #e2e8f0;
+  margin: 0 auto;
 }
 
 .course-image img {
@@ -168,6 +176,8 @@
 .course-content {
   text-align: center;
   width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .course-title {
@@ -176,6 +186,7 @@
   font-size: 2.2em;
   font-weight: 700;
   line-height: 1.2;
+  text-align: center;
 }
 
 .course-description {
@@ -183,9 +194,7 @@
   color: #666;
   line-height: 1.6;
   margin-bottom: 20px;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+  text-align: center;
   display: block;
 }
 
@@ -194,6 +203,7 @@
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
+  margin-top: 20px;
 }
 
 .course-meta span {
@@ -1159,18 +1169,19 @@
   .course-header-top {
     flex-direction: column !important;
     gap: 20px !important;
-    margin-bottom: 24px !important;
+    margin-bottom: 30px !important;
     align-items: center !important;
     text-align: center !important;
     justify-content: center !important;
     margin-top: 30px !important;
     width: 100% !important;
+    padding-left: 0 !important;
   }
 
   .course-header-top .btn-back {
     order: 1 !important;
     align-self: center !important;
-    margin: 0 auto 40px auto !important;
+    margin: 0 auto !important;
     display: block !important;
     width: auto !important;
     max-width: fit-content !important;
@@ -1185,6 +1196,9 @@
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
+    padding: 0 20px !important;
+    box-sizing: border-box !important;
+    transform: none !important;
   }
   
   .course-image {

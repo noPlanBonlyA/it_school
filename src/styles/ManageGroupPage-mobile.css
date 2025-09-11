@@ -6,18 +6,21 @@
 @media (max-width: 768px) {
   .groups-page {
     flex-direction: column;
+    width: 100vw;
   }
   
   .main-content {
     margin-left: 0 !important;
     padding: 8px !important;
-    width: 100% !important;
+    width: 100vw !important;
+    max-width: none !important;
   }
   
   .content-area {
     padding: 0 !important;
     gap: 16px;
     max-width: none !important;
+    width: 100% !important;
   }
   
   /* Статистические карточки */

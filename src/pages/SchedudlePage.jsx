@@ -101,35 +101,42 @@ export default function SchedulePage() {
       hour: '2-digit',
       minute: '2-digit'
     });
-    
-    return {
-      id: e.id,
-      title: `${startTime} ${e.course_name}`, // Показываем только время и название курса
-      start: e.start_datetime || e.start,
-      end: e.end_datetime || e.end,
-      // Обновленные прозрачные цвета для красивого отображения
-      backgroundColor: e.is_opened 
-        ? 'rgba(0, 177, 143, 0.85)' 
-        : new Date() < new Date(e.start_datetime || e.start) 
-          ? 'rgba(255, 193, 7, 0.85)' 
-          : 'rgba(239, 68, 68, 0.85)',
-      borderColor: e.is_opened 
-        ? 'rgba(3, 131, 106, 0.9)' 
-        : new Date() < new Date(e.start_datetime || e.start) 
-          ? 'rgba(211, 158, 0, 0.9)' 
-          : 'rgba(220, 38, 38, 0.9)',
-      extendedProps: {
-        originalEvent: e,
-        lesson_name: e.lesson_name,
-        course_name: e.course_name,
-        group_name: e.group_name,
-        teacher_name: e.teacher_name,
-        auditorium: e.auditorium,
-        is_opened: e.is_opened,
-        course_id: e.course_id,
-        lesson_id: e.lesson_id
-      }
-    };
+      // Форматируем время строго как HH:mm
+      // Берём название из первого непустого поля
+      let name = e.course_name || e.lesson_name || e.event_name || e.title || '';
+      // Получаем первую цифру, если есть
+      const firstNumberMatch = name.match(/^\d+/);
+      const firstNumber = firstNumberMatch ? firstNumberMatch[0] : '';
+      // Очищаем название от первой цифры и пробела
+      const cleanName = name.replace(/^\d+\s*/, '');
+      return {
+        id: e.id,
+        title: `${firstNumber} ${cleanName}`.trim(),
+        start: e.start_datetime || e.start,
+        end: e.end_datetime || e.end,
+        // ...existing code...
+        backgroundColor: e.is_opened 
+          ? 'rgba(0, 177, 143, 0.85)' 
+          : new Date() < new Date(e.start_datetime || e.start) 
+            ? 'rgba(255, 193, 7, 0.85)' 
+            : 'rgba(239, 68, 68, 0.85)',
+        borderColor: e.is_opened 
+          ? 'rgba(3, 131, 106, 0.9)' 
+          : new Date() < new Date(e.start_datetime || e.start) 
+            ? 'rgba(211, 158, 0, 0.9)' 
+            : 'rgba(220, 38, 38, 0.9)',
+        extendedProps: {
+          originalEvent: e,
+          lesson_name: e.lesson_name,
+          course_name: e.course_name,
+          group_name: e.group_name,
+          teacher_name: e.teacher_name,
+          auditorium: e.auditorium,
+          is_opened: e.is_opened,
+          course_id: e.course_id,
+          lesson_id: e.lesson_id
+        }
+      };
   }), [events]);
 
   // ───── ближайший день ─────

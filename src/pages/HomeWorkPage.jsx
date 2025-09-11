@@ -32,6 +32,10 @@ export default function HomeworkPage() {
   const [showArchive, setShowArchive] = useState(false);
   const [expandedArchiveStudent, setExpandedArchiveStudent] = useState(null);
   
+  // ===== НОВОЕ: Состояния для мобильной навигации =====
+  const [isMobile, setIsMobile] = useState(false);
+  const [activeColumn, setActiveColumn] = useState('groups'); // 'groups', 'lessons', 'submissions'
+  
   const [loading, setLoading] = useState(true);
   const [loadingLessons, setLoadingLessons] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
@@ -40,6 +44,21 @@ export default function HomeworkPage() {
   // ===== НОВОЕ: Разделение студентов на активных и архивных =====
   const ungraded = students.filter(student => !student.is_graded_homework && student.is_sent_homework);
   const archived = students.filter(student => student.is_graded_homework && student.is_sent_homework);
+
+  // ===== НОВОЕ: Обработка изменения размера экрана =====
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setActiveColumn('groups'); // Сброс на десктопе
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Загрузка данных при монтировании
   useEffect(() => {
@@ -77,6 +96,11 @@ export default function HomeworkPage() {
     setExpandedArchiveStudent(null);
     setStudents([]);
     
+    // ===== НОВОЕ: Переход на следующую колонку на мобильных =====
+    if (isMobile) {
+      setActiveColumn('lessons');
+    }
+    
     try {
       setLoadingLessons(true);
       setError(null);
@@ -101,6 +125,11 @@ export default function HomeworkPage() {
       setStudents([]);
       setExpandedSubmission(null);
       setExpandedArchiveStudent(null);
+
+      // ===== НОВОЕ: Переход на следующую колонку на мобильных =====
+      if (isMobile) {
+        setActiveColumn('submissions');
+      }
 
       console.log('[Homework] Loading students for lesson group:', lessonGroupId);
       
@@ -544,9 +573,34 @@ export default function HomeworkPage() {
           
           {error && <div className="error">{error}</div>}
           
-          <div className="homework-grid">
-            {/* Колонка 1: Список групп */}
-            <div className="column groups-col">
+          {/* ===== НОВОЕ: Мобильная навигация ===== */}
+          {isMobile && (
+            <div className="mobile-navigation">
+              <button 
+                className={`nav-btn ${activeColumn === 'groups' ? 'active' : ''}`}
+                onClick={() => setActiveColumn('groups')}
+              >
+                📚 Группы {groups.length > 0 && `(${groups.length})`}
+              </button>
+              <button 
+                className={`nav-btn ${activeColumn === 'lessons' ? 'active' : ''} ${!selectedGroupId ? 'disabled' : ''}`}
+                onClick={() => selectedGroupId && setActiveColumn('lessons')}
+                disabled={!selectedGroupId}
+              >
+                📖 Уроки {lessonGroups.length > 0 && `(${lessonGroups.length})`}
+              </button>
+              <button 
+                className={`nav-btn ${activeColumn === 'submissions' ? 'active' : ''} ${!selectedLessonGroupId ? 'disabled' : ''}`}
+                onClick={() => selectedLessonGroupId && setActiveColumn('submissions')}
+                disabled={!selectedLessonGroupId}
+              >
+                📝 Домашки {students.length > 0 && `(${ungraded.length}/${students.length})`}
+              </button>
+            </div>
+          )}
+          
+          <div className="homework-grid">{/* Колонка 1: Список групп */}
+            <div className={`column groups-col ${isMobile && activeColumn !== 'groups' ? 'mobile-hidden' : ''}`}>
               <h2>Группы ({groups.length})</h2>
               {groups.length === 0 ? (
                 <div className="placeholder">Нет доступных групп</div>
@@ -571,8 +625,18 @@ export default function HomeworkPage() {
             </div>
 
             {/* Колонка 2: Список уроков */}
-            <div className="column topics-col">
-              <h2>Уроки {selectedGroup && `(${lessonGroups.length})`}</h2>
+            <div className={`column topics-col ${isMobile && activeColumn !== 'lessons' ? 'mobile-hidden' : ''}`}>
+              <h2>
+                Уроки {selectedGroup && `(${lessonGroups.length})`}
+                {isMobile && selectedGroup && (
+                  <button 
+                    className="back-btn"
+                    onClick={() => setActiveColumn('groups')}
+                  >
+                    ← {selectedGroup.name}
+                  </button>
+                )}
+              </h2>
               {!selectedGroup ? (
                 <div className="placeholder">Выберите группу</div>
               ) : loadingLessons ? (
@@ -603,11 +667,19 @@ export default function HomeworkPage() {
             </div>
 
             {/* Колонка 3: Активные домашки + Архив */}
-            <div className="column submissions-col">
+            <div className={`column submissions-col ${isMobile && activeColumn !== 'submissions' ? 'mobile-hidden' : ''}`}>
               {/* ===== АКТИВНЫЕ ДОМАШКИ ===== */}
               <div className="submissions-section">
                 <h2>
                   На проверке {selectedLessonGroup && `(${ungraded.length})`}
+                  {isMobile && selectedLessonGroup && (
+                    <button 
+                      className="back-btn"
+                      onClick={() => setActiveColumn('lessons')}
+                    >
+                      ← {selectedLessonGroup.lesson?.name || 'Урок'}
+                    </button>
+                  )}
                   {archived.length > 0 && (
                     <button 
                       className="archive-toggle"

@@ -1,17 +1,19 @@
 /* src/styles/ImpersonatePage.css */
 
 .impersonate-page {
-  padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 24px;
+  width: 100%;
+  max-width: calc(100vw - 240px); /* Учитываем ширину сайдбара */
+  margin: 0;
   height: calc(100vh - 120px); /* Фиксированная высота */
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Запрещаем скролл самой страницы */
+  box-sizing: border-box;
 }
 
 .page-header {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   text-align: center;
   flex-shrink: 0; /* Не сжимаем заголовок */
 }
@@ -94,8 +96,8 @@
 /* Статистика */
 .users-stats {
   display: flex;
-  gap: 24px;
-  margin-bottom: 32px;
+  gap: 20px;
+  margin-bottom: 24px;
   justify-content: center;
   flex-shrink: 0; /* Не сжимаем статистику */
 }
@@ -125,12 +127,13 @@
 /* Сетка пользователей */
 .users-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
   overflow-y: auto; /* Включаем вертикальный скролл только для сетки */
-  padding-right: 8px; /* Отступ для красивого скроллбара */
-  margin-right: -8px;
+  padding: 0 4px 8px 4px; /* Отступ для красивого скроллбара */
+  margin-right: -4px;
   flex: 1; /* Занимаем всё доступное пространство */
+  justify-items: center; /* Центрируем карточки в ячейках */
 }
 
 /* Красивый скроллбар */
@@ -155,10 +158,12 @@
 .user-card {
   background: white;
   border-radius: 16px;
-  padding: 24px;
+  padding: 18px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   border: 1px solid #e5e7eb;
+  width: 100%;
+  max-width: 300px; /* Максимальная ширина карточки */
 }
 
 .user-card:hover {
@@ -167,12 +172,12 @@
 }
 
 .user-avatar {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  margin: 0 auto 16px;
+  margin: 0 auto 14px;
   overflow: hidden;
-  border: 4px solid #f3f4f6;
+  border: 3px solid #f3f4f6;
 }
 
 .user-avatar img {
@@ -189,17 +194,17 @@
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
 }
 
 .user-info {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .user-name {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: #1f2937;
   margin-bottom: 4px;
@@ -213,14 +218,14 @@
 
 .user-details {
   text-align: left;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .detail-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  padding: 6px 0;
   border-bottom: 1px solid #f3f4f6;
 }
 
@@ -245,7 +250,7 @@
 
 .user-role {
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .role-badge {
@@ -267,19 +272,19 @@
 
 .impersonate-btn {
   width: 100%;
-  padding: 12px 16px;
+  padding: 10px 14px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   border-radius: 12px;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .impersonate-btn:hover:not(:disabled) {
@@ -373,10 +378,35 @@
 }
 
 /* Адаптивность */
+@media (max-width: 1400px) {
+  .users-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  
+  .user-card {
+    max-width: 280px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .users-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+  }
+  
+  .user-card {
+    max-width: 260px;
+    padding: 14px;
+  }
+}
+
 @media (max-width: 768px) {
   .impersonate-page {
     padding: 16px;
     height: calc(100vh - 80px); /* Меньше отступ для мобильных */
+    max-width: 100%;
   }
   
   .controls {
@@ -390,6 +420,7 @@
   
   .users-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
     padding-right: 4px;
     margin-right: -4px;
   }

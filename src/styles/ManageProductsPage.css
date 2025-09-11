@@ -6,10 +6,11 @@
 }
 
 .manage-products-page {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 24px 40px;
+  max-width: none;
+  margin: 0;
   overflow-x: hidden;
+  width: 100%;
 }
 
 .page-header {
@@ -83,16 +84,17 @@
 /* Сетка товаров */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 24px;
   margin-top: 24px;
   padding: 16px 0;
+  width: 100%;
 }
 
 /* Для больших экранов - показываем больше товаров в ряд */
-@media (min-width: 1400px) {
+@media (min-width: 1600px) {
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 20px;
   }
 }
@@ -100,7 +102,7 @@
 /* Для средних экранов */
 @media (max-width: 1200px) and (min-width: 768px) {
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
   }
 }
@@ -200,6 +202,7 @@
 
 .product-actions {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-top: auto; /* Прижимаем кнопки к низу карточки */
   padding-top: 16px;
@@ -207,7 +210,8 @@
 }
 
 .product-actions button {
-  flex: 1;
+  flex: none;
+  width: 100%;
   padding: 10px 16px;
   border: none;
   border-radius: 8px;
@@ -615,8 +619,9 @@
 /* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
   .manage-products-page {
-    padding: 16px;
+    padding: 16px 20px;
     overflow-x: hidden;
+    width: 100%;
   }
   
   .page-header {
@@ -629,6 +634,7 @@
     grid-template-columns: 1fr;
     gap: 16px;
     padding: 8px 0;
+    width: 100%;
   }
   
   .product-card {
@@ -655,7 +661,7 @@
   }
   
   .product-actions {
-    flex-direction: row;
+    flex-direction: column;
     gap: 8px;
     padding-top: 12px;
   }
@@ -663,6 +669,7 @@
   .product-actions button {
     padding: 8px 12px;
     font-size: 13px;
+    width: 100%;
   }
   
   .pinned-badge {
@@ -744,7 +751,7 @@
 /* Маленькие экраны - упрощенные стили без !important */
 @media (max-width: 480px) {
   .manage-products-page {
-    padding: 12px;
+    padding: 12px 16px;
   }
 }
 
@@ -808,7 +815,7 @@
 /* Стили для экстра маленьких экранов */
 @media (max-width: 380px) {
   .manage-products-page {
-    padding: 8px;
+    padding: 8px 12px;
   }
   
   .page-header {
