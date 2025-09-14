@@ -14,6 +14,7 @@ import {
 } from '../services/userService';
 
 import '../styles/ManageUserPage.css';
+import '../styles/MobileFixes.css';
 
 export default function ManageAdminsPage() {
   const navigate = useNavigate();

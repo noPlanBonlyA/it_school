@@ -114,19 +114,20 @@ export default function HomePage() {
   }, []);
 
   // Вычисляем ближайший учебный день
-  const { labelNextDay, dayEvents } = useMemo(() => {
+  const { scheduleTitle, dayEvents } = useMemo(() => {
     if (!events.length) {
-      return { labelNextDay: 'Нет занятий', dayEvents: [] };
+      return { scheduleTitle: 'Тут будут пары', dayEvents: [] };
     }
     const days = [...new Set(events.map(e => 
       new Date(e.start).setHours(0,0,0,0)
     ))];
     const today = new Date().setHours(0,0,0,0);
     const nextDay = days.filter(d => d >= today).sort()[0];
+    const nextDayFormatted = new Date(nextDay).toLocaleDateString('ru-RU', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
     return {
-      labelNextDay: new Date(nextDay).toLocaleDateString('ru-RU', {
-        day: 'numeric', month: 'long', year: 'numeric'
-      }),
+      scheduleTitle: `Пары на ${nextDayFormatted}`,
       dayEvents: events.filter(e => 
         new Date(e.start).setHours(0,0,0,0) === nextDay
       )
@@ -176,7 +177,7 @@ export default function HomePage() {
           {/* Расписание - всегда первое */}
           <div className="card schedule">
             <div className="card-header">
-              <h3>Пары на {labelNextDay}</h3>
+              <h3>{scheduleTitle}</h3>
               <button 
                 className="btn-details"
                 onClick={() => navigate('/schedule')}

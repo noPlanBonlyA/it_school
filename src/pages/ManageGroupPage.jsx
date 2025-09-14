@@ -15,6 +15,7 @@ import api from '../api/axiosInstance';
 import '../styles/ManageUserPage.css';
 import '../styles/ManageGroupPage.css';
 import '../styles/ManageGroupPage-mobile.css';
+import '../styles/MobileFixes.css';
 
 /* ─────────────────── helpers ────────────────────────*/
 const normalizeGroup = g => ({

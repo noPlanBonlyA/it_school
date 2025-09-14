@@ -1,3 +1,6 @@
+/* Импорт мобильных исправлений для всего приложения */
+@import url('./styles/MobileFixes.css');
+
 body {
   margin: 0;
   padding: 0;

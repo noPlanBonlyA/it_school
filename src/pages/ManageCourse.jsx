@@ -16,6 +16,7 @@ import {
 import '../styles/ManageUserPage.css';   // старая сетка + модалки
 import '../styles/CourseGrid.css';       // сетка карточек
 import '../styles/CompactModal.css';     // компактные модальные окна
+import '../styles/MobileFixes.css';      // мобильные исправления
 
 /*
  * ИСПРАВЛЕНО: age_category теперь передается как массив в API

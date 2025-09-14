@@ -23,6 +23,7 @@ import {
 } from '../services/teacherService';
 
 import '../styles/ManageUserPage.css';
+import '../styles/MobileFixes.css';
 
 /* helper → teacher + user */
 const merge = (profile, map) => ({ teacher: profile, user: map.get(profile.user_id) || {} });

@@ -1,0 +1,323 @@
+/* src/styles/MobileFixes.css */
+/* Универсальные исправления для всех устройств */
+
+/* Убираем все фиксированные высоты на всех экранах */
+.app-layout,
+.main-content,
+.content-area,
+.block,
+.form-grid,
+.user-form {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+}
+
+/* Основные контейнеры должны расширяться по содержимому */
+.app-layout {
+  min-height: 100vh !important; /* Минимальная высота экрана */
+  height: auto !important; /* Автоматическая высота для расширения */
+  overflow: visible !important;
+  overflow-x: hidden !important; /* Только горизонтальная прокрутка запрещена */
+}
+
+.main-content {
+  min-height: 100vh !important; /* Минимальная высота экрана */
+  height: auto !important; /* Автоматическая высота для расширения */
+  overflow: visible !important;
+}
+
+.manage-users,
+.manage-groups,
+.manage-courses,
+.manage-teachers,
+.manage-admins {
+  min-height: 100vh !important; /* Минимальная высота экрана */
+  height: auto !important; /* Автоматическая высота для расширения */
+  overflow: visible !important;
+}
+
+/* Блоки адаптируются по содержимому */
+.block {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Формы адаптируются по содержимому */
+.form-grid,
+.user-form {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+}
+
+/* Исключения для модальных окон - оставляем max-height для предотвращения переполнения экрана */
+.modal-content {
+  max-height: 90vh !important;
+  height: auto !important;
+  overflow-y: auto !important;
+}
+
+/* Универсальные исправления для мобильных устройств */
+
+/* Убираем все фиксированные высоты на мобильных */
+@media (max-width: 768px) {
+  /* Основные контейнеры */
+  .app-layout,
+  .main-content,
+  .content-area,
+  .block,
+  .modal-content,
+  .form-grid,
+  .user-form {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+  }
+  
+  /* Исключения для модальных окон - оставляем max-height для предотвращения переполнения экрана */
+  .modal-content {
+    max-height: calc(100vh - 40px) !important;
+    height: auto !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Убираем overflow: hidden с основных контейнеров */
+  .app-layout {
+    overflow: visible !important;
+    overflow-x: hidden !important; /* Только горизонтальная прокрутка запрещена */
+  }
+  
+  .main-content {
+    overflow: visible !important;
+    padding-bottom: 40px !important; /* Добавляем отступ снизу */
+  }
+  
+  /* Формы на всю ширину на мобильных */
+  .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  /* Блоки адаптируются по содержимому */
+  .block {
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    border-radius: 12px !important;
+  }
+  
+  /* Поля ввода становятся полноразмерными */
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 12px 16px !important;
+    font-size: 16px !important; /* Предотвращает зум на iOS */
+  }
+  
+  /* Кнопки становятся полноразмерными */
+  .buttons {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  
+  .buttons button,
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 44px !important; /* Удобно для касания */
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+  }
+  
+  /* Suggestions списки */
+  .suggestions {
+    max-height: 50vh !important; /* Ограничиваем высоту suggestions на мобильных */
+    overflow-y: auto !important;
+  }
+  
+  /* Модальные окна */
+  .modal-overlay {
+    padding: 20px !important;
+    align-items: flex-start !important; /* Выравнивание сверху на мобильных */
+    padding-top: 40px !important;
+  }
+  
+  .modal-overlay .modal-content {
+    width: calc(100vw - 40px) !important;
+    max-width: none !important;
+    margin: 0 !important;
+    border-radius: 16px !important;
+  }
+  
+  /* Заголовки адаптируются */
+  h1 {
+    font-size: 24px !important;
+    margin-bottom: 16px !important;
+  }
+  
+  h2 {
+    font-size: 20px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  h3 {
+    font-size: 18px !important;
+    margin-bottom: 10px !important;
+  }
+  
+  /* Убираем лишние отступы */
+  .manage-users,
+  .manage-groups,
+  .manage-courses,
+  .manage-teachers {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Сайдбар скрывается или адаптируется */
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: -100% !important; /* По умолчанию скрыт */
+    z-index: 1001 !important;
+    transform: translateX(0) !important;
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    width: 300px !important;
+    max-width: 300px !important;
+    height: 100vh !important;
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .sidebar.mobile-open {
+    left: 0 !important; /* Показываем при открытии */
+  }
+  
+  /* Бургер-меню для мобильных */
+  .mobile-menu-button {
+    position: fixed !important;
+    top: 20px !important;
+    left: 20px !important;
+    z-index: 1001 !important;
+    background: #00B18F !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    color: white !important;
+    font-size: 18px !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 12px rgba(0, 177, 143, 0.3) !important;
+    display: block !important;
+  }
+  
+  /* Overlay для закрытия сайдбара */
+  .sidebar-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 999 !important;
+    display: block !important;
+  }
+  
+  /* Контент занимает всю ширину */
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding-top: 80px !important; /* Отступ сверху для бургер-меню */
+  }
+}
+
+/* Дополнительные исправления для очень маленьких экранов */
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 10px !important;
+    padding-top: 20px !important;
+  }
+  
+  .modal-overlay .modal-content {
+    width: calc(100vw - 20px) !important;
+    border-radius: 12px !important;
+  }
+  
+  .field input,
+  .field select,
+  .field textarea {
+    font-size: 16px !important; /* Предотвращает зум на мобильных */
+    padding: 10px 14px !important;
+  }
+  
+  .buttons button {
+    min-height: 48px !important; /* Еще больше для очень маленьких экранов */
+    font-size: 16px !important;
+  }
+  
+  h1 {
+    font-size: 22px !important;
+  }
+  
+  h2 {
+    font-size: 18px !important;
+  }
+  
+  .block {
+    padding: 12px !important;
+    margin-bottom: 12px !important;
+  }
+}
+
+/* Исправления для Safari на iOS */
+@supports (-webkit-appearance: none) {
+  @media (max-width: 768px) {
+    .field input,
+    .field select {
+      -webkit-appearance: none !important;
+      appearance: none !important;
+      border-radius: 12px !important;
+    }
+    
+    /* Предотвращаем зум при фокусе */
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      font-size: 16px !important;
+    }
+  }
+}
+
+/* Landscape режим на мобильных */
+@media (max-width: 768px) and (orientation: landscape) {
+  .modal-overlay {
+    padding-top: 20px !important;
+    align-items: center !important;
+  }
+  
+  .modal-overlay .modal-content {
+    max-height: calc(100vh - 40px) !important;
+  }
+}
+
+/* Исправления для планшетов */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+  }
+  
+  .buttons {
+    flex-direction: row !important;
+    justify-content: center !important;
+  }
+  
+  .buttons button {
+    width: auto !important;
+    min-width: 140px !important;
+  }
+}

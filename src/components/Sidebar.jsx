@@ -217,18 +217,16 @@ export default function Sidebar({ activeItem, userRole }) {
 
   return (
     <>
-      {/* Бургер-кнопка для мобильных */}
-      {isMobile && (
-        <button 
-          className={`mobile-menu-toggle ${isMobileMenuOpen ? 'open' : ''}`}
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-      )}
+      {/* Бургер-кнопка для мобильных - всегда отображается на экранах <= 768px */}
+      <button 
+        className={`mobile-menu-toggle ${isMobileMenuOpen ? 'open' : ''}`}
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        aria-label="Toggle menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
 
       <nav className={`sidebar ${isMobile ? 'mobile' : ''} ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="logo" onClick={() => handleItemClick('/home')}>

@@ -21,6 +21,7 @@ import {
 } from '../services/studentService';
 
 import '../styles/ManageUserPage.css';
+import '../styles/MobileFixes.css';
 
 export default function ManageStudentsPage() {
   const navigate = useNavigate();

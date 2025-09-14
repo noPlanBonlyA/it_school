@@ -27,30 +27,42 @@ button {
 /* Универсальный layout для всех страниц */
 .app-layout {
   display: flex;
-  height: 100vh;
+  min-height: 100vh; /* Минимальная высота экрана */
+  height: auto; /* Автоматическая высота для расширения контента */
   font-family: 'Mont', 'Nunito Sans', sans-serif;
   background: #FFFFFF;
   position: relative; /* Создаем контекст позиционирования */
-  overflow: hidden; /* Предотвращаем горизонтальную прокрутку */
+  overflow-x: hidden; /* Предотвращаем только горизонтальную прокрутку */
+  overflow-y: visible; /* Разрешаем вертикальную прокрутку */
 }
 
 /* Основной контент всех страниц */
 .main-content {
   margin-left: 240px; /* Отступ для фиксированного сайдбара */
   flex: 1;
-  min-height: 100vh;
+  min-height: 100vh; /* Минимальная высота экрана */
+  height: auto; /* Автоматическая высота для расширения контента */
   transition: margin-left 0.3s ease; /* Плавный переход */
   display: flex;
   flex-direction: column;
   background: #FFFFFF;
   position: relative; /* Убеждаемся в правильном позиционировании */
   z-index: 1; /* Контент ниже сайдбара */
+  padding-bottom: 20px; /* Добавляем отступ снизу */
+  overflow: visible; /* Разрешаем прокрутку при необходимости */
 }
 
 /* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column; /* На мобильных меняем направление */
+    min-height: 100vh; /* Убеждаемся что высота адаптивная */
+  }
+  
   .main-content {
     margin-left: 0; /* На мобильных убираем отступ */
+    width: 100%;
+    padding-bottom: 40px; /* Больше отступ на мобильных */
   }
 }
 
@@ -148,8 +160,8 @@ button {
   padding: 20px;
   max-width: 800px;
   width: 90%;
-  max-height: 90vh;
-  overflow: auto;
+  max-height: 90vh; /* Оставляем max-height для предотвращения переполнения */
+  overflow-y: auto; /* Изменено с auto на auto для вертикальной прокрутки */
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 

@@ -4,17 +4,20 @@
 /* Убираем padding у контейнера, чтобы Topbar прилегал к самому верху */
 .manage-users {
   display: flex;
-  min-height: 100vh;
+  min-height: 100vh; /* Минимальная высота экрана */
+  height: auto; /* Автоматическая высота для расширения контента */
   background: linear-gradient(135deg, #f8fffe 0%, #f0fdf9 50%, #ecfdf5 100%);
   font-family: 'Montserrat', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  overflow: visible; /* Разрешаем прокрутку */
 }
 
 /* Основная область справа от Sidebar */
 .main-content {
   flex: 1;
-  overflow: visible;
+  overflow: visible; /* Разрешаем прокрутку */
   padding: 0 24px 40px 24px;
-  min-height: 100vh;
+  min-height: 100vh; /* Минимальная высота экрана */
+  height: auto; /* Автоматическая высота для расширения контента */
   box-sizing: border-box;
 }
 
@@ -28,7 +31,8 @@
   flex: 1;
   padding: 16px 24px; /* Уменьшили с 24px до 16px сверху */
   background: transparent;
-  overflow-y: auto;
+  overflow: visible; /* Разрешаем прокрутку */
+  height: auto; /* Автоматическая высота */
 }
 
 /* Заголовок страницы */
@@ -116,6 +120,10 @@ h1 {
   box-shadow: 
     0 2px 8px rgba(0, 177, 143, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  min-height: 48px;
+  height: 48px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .field input:focus,
@@ -752,6 +760,58 @@ input[type="tel"]::placeholder {
   color: #9ca3af;
   font-weight: 400;
 }
+
+/* Стили для поля даты - обеспечиваем одинаковый размер */
+input[type="date"] {
+  min-height: 48px;
+  height: 48px;
+  padding: 12px 16px;
+  border: 2px solid rgba(0, 177, 143, 0.2);
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 2px 8px rgba(0, 177, 143, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  width: 100%;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+input[type="date"]:focus {
+  outline: none;
+  border-color: #00B18F;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 
+    0 0 0 4px rgba(0, 177, 143, 0.15),
+    0 4px 12px rgba(0, 177, 143, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+}
+
+input[type="date"]:hover {
+  border-color: rgba(0, 177, 143, 0.4);
+  box-shadow: 
+    0 4px 12px rgba(0, 177, 143, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1076,10 +1136,12 @@ div.manage-users div.modal-overlay div.modal-buttons button {
 @media (max-width: 768px) {
   .manage-users {
     flex-direction: column;
+    min-height: 100vh; /* Убеждаемся что используется min-height */
   }
   
   .main-content {
     padding: 0 16px 24px 16px;
+    min-height: auto; /* Убираем фиксированную высоту на мобильных */
   }
   
   .content-area {
@@ -1089,6 +1151,8 @@ div.manage-users div.modal-overlay div.modal-buttons button {
   .block {
     padding: 18px; /* Уменьшили с 20px до 18px */
     margin-bottom: 14px; /* Уменьшили с 16px до 14px */
+    min-height: auto; /* Убираем любую фиксированную высоту */
+    height: auto; /* Явно устанавливаем автоматическую высоту */
   }
   
   h1 {
@@ -1104,6 +1168,8 @@ div.manage-users div.modal-overlay div.modal-buttons button {
   .user-form.form-grid {
     grid-template-columns: 1fr;
     gap: 16px;
+    min-height: auto; /* Убираем фиксированную высоту */
+    height: auto; /* Явно устанавливаем автоматическую высоту */
   }
   
   .controls {
@@ -1160,6 +1226,8 @@ div.manage-users div.modal-overlay div.modal-buttons button {
     max-width: calc(100vw - 40px);
     min-width: 280px;
     border-radius: 12px;
+    max-height: calc(100vh - 40px); /* Адаптивная максимальная высота */
+    height: auto; /* Автоматическая высота */
   }
   
   .modal-content p {

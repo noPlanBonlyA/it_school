@@ -7,6 +7,10 @@
   display: flex;
   flex-direction: column;
   gap: 12px; /* Добавили отступы между элементами */
+  overflow-y: auto; /* Добавляем возможность скролла */
+  overflow-x: hidden; /* Убираем горизонтальный скролл */
+  flex: 1; /* Занимает все доступное место */
+  max-height: 100%; /* Не превышаем высоту контейнера */
 }
 .schedule-list li{
   display:flex;
@@ -659,24 +663,52 @@
 /* Мобильная адаптация для контейнера расписания */
 @media (max-width: 768px) {
   .schedule-container {
-    gap: 12px; /* Увеличили отступы */
-    max-height: 500px; /* Увеличили максимальную высоту */
-    min-height: 400px; /* Добавили минимальную высоту */
-    padding: 12px; /* Увеличили отступы */
-    background: linear-gradient(135deg, rgba(248, 250, 252, 0.6) 0%, rgba(255, 255, 255, 0.4) 100%);
-    border-radius: 16px;
-    border: 1px solid rgba(0, 177, 143, 0.1);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 16px rgba(0, 177, 143, 0.05);
+    gap: 8px; /* Отступы между элементами */
+    max-height: calc(70vh - 80px); /* Высота с учетом заголовка карточки */
+    min-height: 300px; /* Минимальная высота для мобильных */
+    padding: 8px; /* Отступы */
+    background: transparent; /* Убираем фон, так как он уже есть у карточки */
+    border-radius: 0;
+    border: none;
+    backdrop-filter: none;
+    box-shadow: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
+    flex: 1; /* Занимает оставшееся место в карточке */
   }
 }
 
 @media (max-width: 480px) {
   .schedule-container {
-    max-height: 300px;
+    max-height: calc(60vh - 60px); /* Уменьшенная высота для маленьких экранов */
     padding: 6px;
     gap: 6px;
-    border-radius: 12px;
+    border-radius: 0;
+    min-height: 250px;
+  }
+  
+  .schedule-list {
+    gap: 6px; /* Меньше отступы между элементами */
+    padding-right: 3px; /* Минимальный отступ для скроллбара */
+  }
+  
+  .schedule-container::-webkit-scrollbar,
+  .schedule-list::-webkit-scrollbar {
+    width: 3px; /* Очень тонкий скроллбар */
+  }
+  
+  .schedule-container::-webkit-scrollbar-track,
+  .schedule-list::-webkit-scrollbar-track {
+    border-radius: 3px;
+    background: rgba(0, 177, 143, 0.08);
+  }
+  
+  .schedule-container::-webkit-scrollbar-thumb,
+  .schedule-list::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.6) 0%, rgba(3, 131, 106, 0.8) 100%);
+    border: none;
   }
 }
 

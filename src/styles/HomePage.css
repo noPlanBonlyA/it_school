@@ -936,6 +936,11 @@ body, html, #root, .app-layout, .main-content {
     -webkit-overscroll-behavior: none; /* Для Safari */
   }
   
+  /* Улучшаем сенсорный скролл для всех scrollable элементов */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
   .app-layout {
     flex-direction: row !important; /* Возвращаем row для мобильных */
     min-height: 100vh;
@@ -1008,18 +1013,20 @@ body, html, #root, .app-layout, .main-content {
     order: 1;
     /* Увеличили размеры для мобильных */
     min-height: 400px; /* Увеличили минимальную высоту */
-    max-height: 75vh; /* Увеличили максимум до 75% высоты экрана */
+    max-height: 70vh; /* Ограничиваем высоту для лучшего скролла */
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   
   /* Улучшенные стили расписания для мобильных */
   .card.schedule .schedule-container {
     padding: 12px; /* Увеличили отступы */
-    gap: 12px; /* Увеличили отступы между элементами */
+    gap: 8px; /* Отступы между элементами */
     display: flex;
     flex-direction: column;
     height: 100%;
-    max-height: 550px; /* Увеличили максимальную высоту */
+    flex: 1;
     overflow: hidden;
   }
   
@@ -1029,11 +1036,13 @@ body, html, #root, .app-layout, .main-content {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 12px; /* Увеличили отступ между элементами */
+    gap: 8px; /* Отступ между элементами расписания */
     flex: 1;
     overflow-y: auto; /* Добавляем вертикальный скролл */
-    padding-right: 8px; /* Увеличили отступ для скроллбара */
-    max-height: 500px; /* Добавили максимальную высоту для скролла */
+    overflow-x: hidden; /* Убираем горизонтальный скролл */
+    padding-right: 6px; /* Отступ для скроллбара */
+    max-height: calc(70vh - 120px); /* Вычисляем максимальную высоту с учетом заголовка */
+    -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
   }
   
   .card.schedule .schedule-list li {
@@ -1129,26 +1138,27 @@ body, html, #root, .app-layout, .main-content {
     opacity: 0.8;
   }
   
-  /* Красивый скроллбар для виджета расписания */
+  /* Красивый скроллбар для виджета расписания на мобильных */
   .card.schedule .schedule-list::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
   }
   
   .card.schedule .schedule-list::-webkit-scrollbar-track {
     background: rgba(0, 177, 143, 0.1);
-    border-radius: 8px;
+    border-radius: 6px;
     margin: 4px 0;
   }
   
   .card.schedule .schedule-list::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, rgba(0, 177, 143, 0.4) 0%, rgba(3, 131, 106, 0.6) 100%);
-    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.5) 0%, rgba(3, 131, 106, 0.7) 100%);
+    border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
   }
   
   .card.schedule .schedule-list::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, rgba(0, 177, 143, 0.6) 0%, rgba(3, 131, 106, 0.8) 100%);
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.7) 0%, rgba(3, 131, 106, 0.9) 100%);
+    box-shadow: 0 2px 4px rgba(0, 177, 143, 0.2);
   }
   
   .card.schedule .schedule-list .meta {
@@ -1399,16 +1409,38 @@ body, html, #root, .app-layout, .main-content {
   }
   
   .card.schedule {
-    min-height: 200px !important; /* Компактнее на маленьких экранах */
-    max-height: 50vh !important; /* Еще меньше максимальной высоты */
+    min-height: 300px !important; /* Увеличили для лучшего пользовательского опыта */
+    max-height: 60vh !important; /* Оптимальная высота для скролла */
   }
   
   .card.schedule .schedule-container {
-    max-height: 180px !important; /* Ограничиваем высоту контейнера */
+    max-height: calc(60vh - 60px) !important; /* Вычисляем с учетом заголовка */
+    padding: 8px;
+    gap: 6px;
+  }
+  
+  .card.schedule .schedule-list {
+    gap: 6px; /* Меньше отступы между элементами */
+    max-height: calc(60vh - 100px); /* Максимальная высота для скролла */
+    padding-right: 4px; /* Отступ для скроллбара */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
   }
   
   .card.schedule .schedule-list::-webkit-scrollbar {
-    width: 4px; /* Еще более тонкий скроллбар */
+    width: 3px; /* Еще более тонкий скроллбар */
+  }
+  
+  .card.schedule .schedule-list::-webkit-scrollbar-track {
+    border-radius: 4px;
+    background: rgba(0, 177, 143, 0.08);
+  }
+  
+  .card.schedule .schedule-list::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    border: none; /* Убираем границу для экономии места */
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.6) 0%, rgba(3, 131, 106, 0.8) 100%);
   }
   
   .card.news {
