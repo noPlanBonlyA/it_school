@@ -70,22 +70,7 @@ h1 {
   overflow: hidden;
 }
 
-.create-group-block::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(0, 177, 143, 0.03) 0%, transparent 70%);
-  animation: subtleRotate 20s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes subtleRotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
+/* Убрана анимация с летающей линией */
 
 .create-group-header {
   display: flex;
@@ -1202,6 +1187,82 @@ mark {
   .btn-danger {
     width: 100% !important;
   }
+  
+  /* Дополнительная адаптация для планирования расписания на очень маленьких экранах */
+  .schedule-planning {
+    padding: 12px 8px !important;
+    margin-top: 8px !important;
+    border-radius: 8px !important;
+  }
+  
+  .schedule-planning h4 {
+    font-size: 14px !important;
+    margin-bottom: 8px !important;
+    padding: 0 4px !important;
+  }
+  
+  .schedule-lesson-card {
+    padding: 8px !important;
+    border-radius: 6px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .schedule-lesson-card h5 {
+    font-size: 12px !important;
+    padding: 4px 6px !important;
+    margin-bottom: 6px !important;
+  }
+  
+  .schedule-lesson-fields {
+    gap: 8px !important;
+  }
+  
+  .schedule-lesson-fields label {
+    font-size: 12px !important;
+    margin-bottom: 4px !important;
+    text-align: center !important;
+    display: block !important;
+  }
+  
+  .schedule-lesson-fields input {
+    padding: 8px 10px !important;
+    font-size: 14px !important;
+    border-radius: 6px !important;
+    min-height: 40px !important;
+    background: #ffffff !important;
+    color: #374151 !important;
+  }
+  
+  .schedule-lesson-fields input[type="text"]:focus {
+    border-color: #00B18F !important;
+    box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1) !important;
+    outline: none !important;
+  }
+  
+  .schedule-lesson-fields input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    font-size: 14px !important;
+    padding: 3px !important;
+    margin-left: 6px !important;
+  }
+  
+  .schedule-actions {
+    gap: 8px !important;
+    margin-top: 12px !important;
+    padding-top: 12px !important;
+  }
+  
+  .schedule-actions button {
+    padding: 10px 14px !important;
+    font-size: 14px !important;
+    min-height: 40px !important;
+    border-radius: 8px !important;
+  }
+  
+  .schedule-progress {
+    font-size: 12px !important;
+    padding: 8px 10px !important;
+    margin-top: 8px !important;
+  }
 }
 
 /* =================== СТИЛИ ДЛЯ ПЛАНИРОВАНИЯ РАСПИСАНИЯ =================== */
@@ -1266,24 +1327,71 @@ mark {
 }
 
 .schedule-lesson-fields .field {
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
 }
 
 .schedule-lesson-fields label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 6px;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #374151 !important;
+  margin-bottom: 6px !important;
+  text-align: center !important;
+  display: block !important;
 }
 
 .schedule-lesson-fields input {
   background: #ffffff !important;
-  border: 1px solid rgba(0, 177, 143, 0.2);
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 177, 143, 0.2) !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+  transition: all 0.3s ease !important;
   color: #374151 !important;
+  min-height: 40px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  font-family: 'Mont', sans-serif !important;
+}
+
+.schedule-lesson-fields input:focus {
+  background: #ffffff !important;
+  border-color: #00B18F !important;
+  box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1) !important;
+  outline: none !important;
+}
+
+.schedule-lesson-fields input[type="text"] {
+  cursor: text !important;
+  font-family: 'Mont', sans-serif !important;
+  line-height: 1.4 !important;
+}
+
+.schedule-lesson-fields input[type="datetime-local"] {
+  cursor: pointer !important;
+  font-family: 'Mont', sans-serif !important;
+  line-height: 1.4 !important;
+}
+
+.schedule-lesson-fields input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  background: transparent !important;
+  color: #00B18F !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  padding: 4px !important;
+  border-radius: 4px !important;
+}
+
+.schedule-lesson-fields input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+  background: rgba(0, 177, 143, 0.1) !important;
+}
+
+.schedule-lesson-fields input::placeholder {
+  color: #9ca3af !important;
+  font-style: italic !important;
+  font-size: 14px !important;
 }
 
 .schedule-lesson-fields input:focus {
@@ -1416,45 +1524,198 @@ mark {
 /* =================== АДАПТАЦИЯ ДЛЯ ПЛАНИРОВАНИЯ РАСПИСАНИЯ =================== */
 
 @media (max-width: 768px) {
-  .schedule-lesson-fields {
-    grid-template-columns: 1fr;
-    gap: 12px;
+  .schedule-planning {
+    padding: 20px 16px !important;
+    margin-top: 16px !important;
+    border-radius: 12px !important;
+  }
+  
+  .schedule-planning h4 {
+    font-size: 18px !important;
+    margin-bottom: 16px !important;
+    text-align: center;
+    line-height: 1.3;
+  }
+  
+  .schedule-lessons {
+    gap: 12px !important;
+    margin-bottom: 20px !important;
   }
   
   .schedule-lesson-card {
-    padding: 16px;
+    padding: 16px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 8px rgba(0, 177, 143, 0.1) !important;
+  }
+  
+  .schedule-lesson-card h5 {
+    font-size: 16px !important;
+    margin-bottom: 12px !important;
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
+    text-align: center;
+  }
+  
+  .schedule-lesson-fields {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+    grid-template-columns: none !important;
+  }
+  
+  .schedule-lesson-fields .field {
+    margin-bottom: 0 !important;
+  }
+  
+  .schedule-lesson-fields label {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    color: #374151 !important;
+    text-align: center !important;
+    display: block !important;
+  }
+  
+  .schedule-lesson-fields input {
+    padding: 12px 14px !important;
+    font-size: 16px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(0, 177, 143, 0.2) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-height: 48px !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    background: #ffffff !important;
+    color: #374151 !important;
+  }
+  
+  .schedule-lesson-fields input[type="text"] {
+    cursor: text !important;
+    font-family: 'Mont', sans-serif !important;
+    line-height: 1.4 !important;
+  }
+  
+  .schedule-lesson-fields input[type="text"]:focus {
+    border-color: #00B18F !important;
+    box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1) !important;
+    outline: none !important;
+  }
+  
+  .schedule-lesson-fields input[type="datetime-local"] {
+    cursor: pointer !important;
+    font-family: 'Mont', sans-serif !important;
+    line-height: 1.4 !important;
+  }
+  
+  .schedule-lesson-fields input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    background: transparent !important;
+    color: #00B18F !important;
+    cursor: pointer !important;
+    font-size: 18px !important;
+    padding: 6px !important;
+    border-radius: 4px !important;
+    margin-left: 8px !important;
+  }
+  
+  .schedule-lesson-fields input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+    background: rgba(0, 177, 143, 0.1) !important;
+  }
+  
+  .schedule-lesson-fields input:focus {
+    border-color: #00B18F !important;
+    box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1) !important;
   }
   
   .schedule-actions {
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+    margin-top: 20px !important;
+    padding-top: 16px !important;
   }
   
   .schedule-actions button {
-    width: 100%;
-    justify-content: center;
+    width: 100% !important;
+    padding: 14px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    justify-content: center !important;
+    min-height: 48px !important;
   }
   
   .schedule-progress {
-    font-size: 13px;
-    padding: 10px 12px;
+    font-size: 14px !important;
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    margin-top: 12px !important;
+    text-align: center !important;
   }
 }
 
 @media (max-width: 480px) {
   .schedule-planning {
-    padding: 16px;
+    padding: 16px 12px !important;
+    margin-top: 12px !important;
   }
   
-  .schedule-lesson-fields input {
-    padding: 8px 10px;
-    font-size: 13px;
+  .schedule-planning h4 {
+    font-size: 16px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .schedule-lesson-card {
+    padding: 12px !important;
+    border-radius: 8px !important;
   }
   
   .schedule-lesson-card h5 {
-    font-size: 14px;
-    padding: 6px 10px;
+    font-size: 14px !important;
+    padding: 6px 10px !important;
+    margin-bottom: 10px !important;
+  }
+  
+  .schedule-lesson-fields {
+    gap: 12px !important;
+  }
+  
+  .schedule-lesson-fields label {
+    font-size: 13px !important;
+    margin-bottom: 6px !important;
+    text-align: center !important;
+    display: block !important;
+  }
+  
+  .schedule-lesson-fields input {
+    padding: 10px 12px !important;
+    font-size: 16px !important;
+    min-height: 44px !important;
+    background: #ffffff !important;
+    color: #374151 !important;
+  }
+  
+  .schedule-lesson-fields input[type="text"]:focus {
+    border-color: #00B18F !important;
+    box-shadow: 0 0 0 3px rgba(0, 177, 143, 0.1) !important;
+    outline: none !important;
+  }
+  
+  .schedule-lesson-fields input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    font-size: 16px !important;
+    padding: 4px !important;
+  }
+  
+  .schedule-actions button {
+    padding: 12px 18px !important;
+    font-size: 15px !important;
+    min-height: 44px !important;
+  }
+  
+  .schedule-progress {
+    font-size: 13px !important;
+    padding: 10px 12px !important;
   }
 }
 

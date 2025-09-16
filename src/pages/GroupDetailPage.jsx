@@ -648,19 +648,21 @@ export default function GroupDetailPage() {
         <div className="content-area" style={{ maxWidth: 'none', padding: '20px' }}>
           {/* Панель действий */}
           <div className="block" style={{ marginBottom: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <button className="btn-secondary" onClick={goBack}>
                 ← Вернуться к списку групп
               </button>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                {hasChanges && (
-                  <button className="btn-primary" onClick={saveChanges}>
-                    Сохранить изменения
-                  </button>
-                )}
-              </div>
             </div>
           </div>
+
+          {/* Кнопка сохранения изменений */}
+          {hasChanges && (
+            <div className="block" style={{ marginBottom: '20px', textAlign: 'center' }}>
+              <button className="btn-primary" onClick={saveChanges} style={{ padding: '12px 24px', fontSize: '16px' }}>
+                💾 Сохранить изменения
+              </button>
+            </div>
+          )}
 
           <div className="modal-body grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', maxWidth: 'none' }}>
 

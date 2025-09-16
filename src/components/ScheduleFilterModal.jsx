@@ -116,10 +116,37 @@ export default function ScheduleFilterModal({
 
   return (
     <div className="schedule-filter-modal-overlay" onClick={onClose}>
+      {/* Крестик вне модального окна - сразу в правильной позиции */}
+      <button 
+        className="close-btn" 
+        onClick={onClose}
+        style={{
+          background: 'rgba(220, 38, 38, 0.9)',
+          border: 'none',
+          fontSize: '26px',
+          color: '#ffffff',
+          cursor: 'pointer',
+          padding: '8px',
+          borderRadius: '50%',
+          fontWeight: 'bold',
+          lineHeight: '1',
+          width: '44px',
+          height: '44px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          zIndex: '30000',
+          fontFamily: 'monospace',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+        }}
+      >×</button>
+      
       <div className="schedule-filter-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>🔍 Фильтрация расписания</h3>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <h3>Фильтрация расписания</h3>
         </div>
 
         <div className="modal-body">
@@ -217,7 +244,7 @@ export default function ScheduleFilterModal({
               {/* Информация об активных фильтрах */}
               {Object.values(filters).some(value => value !== '') && (
                 <div className="active-filters-info">
-                  <h4>🎯 Активные фильтры:</h4>
+                  <h4> Активные фильтры:</h4>
                   <ul>
                     {filters.group_id && <li>Группа: {getFilterLabel('groups', filters.group_id)}</li>}
                     {filters.course_id && <li>Курс: {getFilterLabel('courses', filters.course_id)}</li>}
@@ -232,7 +259,7 @@ export default function ScheduleFilterModal({
 
         <div className="modal-footer">
           <button className="btn btn-secondary" onClick={handleClear}>
-            🗑️ Очистить фильтры
+            ❌ Очистить фильтры
           </button>
           <button className="btn btn-secondary" onClick={onClose}>
             Отмена

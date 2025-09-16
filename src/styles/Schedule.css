@@ -444,7 +444,7 @@
 @media (max-width: 768px) {
   /* Компактный список расписания для главной страницы */
   .schedule-list li {
-    padding: 12px 16px;
+    padding: 14px 18px; /* Увеличили отступы для лучшего отображения текста */
     border-radius: 12px;
     margin-bottom: 8px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.8) 100%);
@@ -452,6 +452,71 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 8px rgba(0, 177, 143, 0.08);
     backdrop-filter: blur(10px);
+    min-height: 90px; /* Увеличили минимальную высоту для длинного текста */
+    align-items: flex-start; /* Выравнивание по верху для лучшего отображения */
+    display: flex;
+    flex-direction: column; /* Колонка для лучшего управления расположением */
+    gap: 6px; /* Отступы между элементами */
+  }
+  
+  /* Стили для мобильной структуры */
+  .schedule-list .schedule-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 4px;
+  }
+  
+  .schedule-list .schedule-main-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 100%; /* Используем всю ширину для текста */
+    flex: 1;
+  }
+  
+  .schedule-list .schedule-main-info .title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.4;
+    margin: 0;
+    word-wrap: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+    white-space: normal;
+    text-align: left;
+    width: 100%;
+  }
+  
+  .schedule-list .schedule-course-info {
+    color: #00B18F;
+    font-size: 14px;
+    font-weight: 600;
+    word-wrap: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+    line-height: 1.3;
+    white-space: normal;
+    width: 100%;
+  }
+  
+  .schedule-list .schedule-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    margin-top: 2px;
+  }
+  
+  .schedule-list .schedule-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
   }
   
   .schedule-list li:hover {
@@ -489,6 +554,71 @@
     font-weight: 500;
     word-wrap: break-word; /* Добавили перенос слов */
     overflow-wrap: break-word; /* Дополнительная поддержка переноса */
+  }
+
+  /* Стили для мобильной структуры */
+  .schedule-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .schedule-main-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .schedule-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    margin-top: 2px;
+  }
+
+  .schedule-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+  }
+
+  .schedule-detail-item .icon {
+    font-size: 12px;
+    opacity: 0.8;
+    flex-shrink: 0; /* Иконка не сжимается */
+  }
+
+  .schedule-status {
+    background: #e8f5e8;
+    color: #2d5a2d;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0; /* Статус не сжимается */
+  }
+
+  .schedule-course-info {
+    color: #00B18F;
+    font-size: 14px;
+    font-weight: 600;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.4;
+    white-space: normal;
   }
 
   .event-details {
@@ -1174,16 +1304,17 @@
     font-size: 15px;
     font-weight: 700;
     margin-bottom: 5px;
-    line-height: 1.4;
+    line-height: 1.4; /* Нормальный межстрочный интервал */
     white-space: normal;
     overflow: visible;
     text-overflow: unset;
-    max-height: 2.8em;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    /* Убираем принудительные переносы - оставляем только естественный перенос по пробелам */
+    word-wrap: normal; /* Убираем принудительный перенос слов */
+    overflow-wrap: normal; /* Убираем принудительный перенос */
+    hyphens: none; /* Отключаем автоматические переносы */
+    text-align: left;
+    display: block;
+    width: 100%; /* Используем всю доступную ширину */
   }
   
   .schedule-course-name {
@@ -1194,6 +1325,11 @@
     white-space: normal;
     overflow: visible;
     text-overflow: unset;
+    word-wrap: normal; /* Убираем принудительный перенос слов */
+    overflow-wrap: normal; /* Убираем принудительный перенос */
+    hyphens: none; /* Отключаем автоматические переносы */
+    line-height: 1.3; /* Нормальный межстрочный интервал */
+    width: 100%; /* Используем всю доступную ширину */
   }
   
   .schedule-group {

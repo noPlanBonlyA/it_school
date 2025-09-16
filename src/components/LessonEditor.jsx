@@ -8,6 +8,7 @@ import {
   createLessonWithMaterialsTextAndAutoSchedule
 } from '../services/lessonService';
 import '../styles/LessonEditor.css';
+import '../styles/LessonCreatorModal.css';
 import '../styles/ManageUserPage.css'; // Фирменные стили кнопок
 
 export default function LessonEditor({ courseId, lesson = null, onSave, onCancel }) {
@@ -289,7 +290,6 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
                     type="button"
                     onClick={() => handleDeleteMaterial('teacher_material')}
                     className="btn-danger btn-mini"
-                    style={{marginLeft: '10px'}}
                   >
                     🗑️ Удалить
                   </button>
@@ -326,7 +326,7 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
                   type="file"
                   id="teacher-additional-file"
                   onChange={(e) => handleFileChange('teacher_additional', e.target.files[0])}
-                  accept=".pdf,.doc,.docx,.ppt,.pptx,.html,.txt,.zip,.rar"
+                  accept=".pdf,.doc,.docx,.ppt,.pptx,.html,.txt,.zip,.rar,.mp4,.avi,.mov,.wmv,.flv,.webm,.mkv,.m4v,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.tif,.svg,.webp,.ico,.heic,.heif"
                   className="file-input"
                 />
                 <label htmlFor="teacher-additional-file" className="file-label">
@@ -351,7 +351,6 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
                     type="button"
                     onClick={() => handleDeleteMaterial('teacher_additional_material')}
                     className="btn-danger btn-mini"
-                    style={{marginLeft: '10px'}}
                   >
                     🗑️ Удалить
                   </button>
@@ -409,7 +408,6 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
                     type="button"
                     onClick={() => handleDeleteMaterial('student_material')}
                     className="btn-danger btn-mini"
-                    style={{marginLeft: '10px'}}
                   >
                     🗑️ Удалить
                   </button>
@@ -446,7 +444,7 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
                   type="file"
                   id="student-additional-file"
                   onChange={(e) => handleFileChange('student_additional', e.target.files[0])}
-                  accept=".pdf,.doc,.docx,.ppt,.pptx,.html,.txt,.zip,.rar"
+                  accept=".pdf,.doc,.docx,.ppt,.pptx,.html,.txt,.zip,.rar,.mp4,.avi,.mov,.wmv,.flv,.webm,.mkv,.m4v,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.tif,.svg,.webp,.ico,.heic,.heif"
                   className="file-input"
                 />
                 <label htmlFor="student-additional-file" className="file-label">
@@ -471,7 +469,6 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
                     type="button"
                     onClick={() => handleDeleteMaterial('student_additional_material')}
                     className="btn-danger btn-mini"
-                    style={{marginLeft: '10px'}}
                   >
                     🗑️ Удалить
                   </button>

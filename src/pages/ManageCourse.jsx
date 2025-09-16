@@ -17,6 +17,9 @@ import '../styles/ManageUserPage.css';   // старая сетка + модал
 import '../styles/CourseGrid.css';       // сетка карточек
 import '../styles/CompactModal.css';     // компактные модальные окна
 import '../styles/MobileFixes.css';      // мобильные исправления
+import '../styles/MobileKeyboardFix.css'; // исправления клавиатуры
+
+import { useMobileKeyboard } from '../hooks/useMobileKeyboard';
 
 /*
  * ИСПРАВЛЕНО: age_category теперь передается как массив в API
@@ -28,6 +31,9 @@ import '../styles/MobileFixes.css';      // мобильные исправле�
 export default function ManageCoursesPage() {
   const navigate = useNavigate();
   const { user }  = useAuth();
+
+  // Хук для обработки мобильной клавиатуры
+  useMobileKeyboard();
 
   /* ---------- state ---------- */
   const [courses, setCourses] = useState([]);
@@ -223,9 +229,9 @@ export default function ManageCoursesPage() {
     // Маппинг старых значений на новые
     let mappedAgeCategory = ageCategory;
     if (ageCategory === 'All' || ageCategory === 'Все возрасты') mappedAgeCategory = 'ALL';
-    else if (ageCategory === 'SixPlus') mappedAgeCategory = '5-7';
-    else if (ageCategory === 'TwelvePlus') mappedAgeCategory = '12-14';
-    else if (!['ALL', '5-7', '8-10', '12-14'].includes(ageCategory)) {
+    else if (ageCategory === 'SixPlus') mappedAgeCategory = '5-8';
+    else if (ageCategory === 'TwelvePlus') mappedAgeCategory = '12-15';
+    else if (!['ALL', '5-8', '9-11', '12-15'].includes(ageCategory)) {
       mappedAgeCategory = 'ALL'; // дефолт для неизвестных значений
     }
     
@@ -332,9 +338,9 @@ export default function ManageCoursesPage() {
                 className="age-category-select"
               >
                 <option value="ALL">ALL</option>
-                <option value="5-7">5-7</option>
-                <option value="8-10">8-10</option>
-                <option value="12-14">12-14</option>
+                <option value="5-8">5-8</option>
+                <option value="9-11">9-11</option>
+                <option value="12-15">12-15</option>
               </select>
             </div>
 
@@ -490,9 +496,9 @@ export default function ManageCoursesPage() {
                   className="age-category-select"
                 >
                   <option value="ALL">ALL</option>
-                  <option value="5-7">5-7</option>
-                  <option value="8-10">8-10</option>
-                  <option value="12-14">12-14</option>
+                  <option value="5-8">5-8</option>
+                  <option value="9-11">9-11</option>
+                  <option value="12-15">12-15</option>
                 </select>
               </div>
 

@@ -43,7 +43,6 @@ export default function EventModal({ event, onClose, userRole }) {
       response.data.forEach(student => {
         initialGrades[student.id] = {
           coins_for_visit: student.coins_for_visit || 0,
-          grade_for_visit: student.grade_for_visit || 0,
           is_visited: student.is_visited || false,
           is_excused_absence: student.is_excused_absence || false
         };
@@ -186,7 +185,7 @@ export default function EventModal({ event, onClose, userRole }) {
           is_excused_absence: Boolean(grades.is_excused_absence),
           is_compensated_skip: Boolean(student.is_compensated_skip || false),
           coins_for_visit: Number(grades.coins_for_visit) || 0,
-          grade_for_visit: Number(grades.grade_for_visit) || 0,
+          grade_for_visit: 0,
           is_sent_homework: Boolean(student.is_sent_homework),
           is_graded_homework: Boolean(student.is_graded_homework),
           coins_for_homework: Number(student.coins_for_homework) || 0,
@@ -253,13 +252,34 @@ export default function EventModal({ event, onClose, userRole }) {
 
   // Обработка изменения оценок
   const handleGradeChange = (studentId, field, value) => {
-    setStudentGrades(prev => ({
-      ...prev,
-      [studentId]: {
-        ...prev[studentId],
-        [field]: value
+    setStudentGrades(prev => {
+      const newGrades = { ...prev };
+      
+      // Если изменяется поле присутствия или уважительной причины
+      if (field === 'is_visited' && value) {
+        // Если отмечается "Присутствует", снимаем "Уважительная причина"
+        newGrades[studentId] = {
+          ...prev[studentId],
+          is_visited: true,
+          is_excused_absence: false
+        };
+      } else if (field === 'is_excused_absence' && value) {
+        // Если отмечается "Уважительная причина", снимаем "Присутствует"
+        newGrades[studentId] = {
+          ...prev[studentId],
+          is_visited: false,
+          is_excused_absence: true
+        };
+      } else {
+        // Для остальных полей обычная логика
+        newGrades[studentId] = {
+          ...prev[studentId],
+          [field]: value
+        };
       }
-    }));
+      
+      return newGrades;
+    });
   };
 
   // Обработка загрузки домашнего задания
@@ -470,17 +490,6 @@ export default function EventModal({ event, onClose, userRole }) {
                               max="10"
                               value={studentGrades[student.id]?.coins_for_visit || 0}
                               onChange={(e) => handleGradeChange(student.id, 'coins_for_visit', e.target.value)}
-                            />
-                          </label>
-                          
-                          <label>
-                            Оценка за урок:
-                            <input
-                              type="number"
-                              min="0"
-                              max="5"
-                              value={studentGrades[student.id]?.grade_for_visit || 0}
-                              onChange={(e) => handleGradeChange(student.id, 'grade_for_visit', e.target.value)}
                             />
                           </label>
                           

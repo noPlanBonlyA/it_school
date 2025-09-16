@@ -273,6 +273,17 @@ body, html, #root, .app-layout, .main-content {
   column-fill: balance; /* Равномерное заполнение столбцов */
 }
 
+/* Убираем колонки когда показывается сообщение о пустом списке */
+.news-scroll-container:has(.empty-text) {
+  column-count: 1; /* Один столбец для пустого состояния */
+}
+
+/* Fallback для браузеров без поддержки :has() */
+.news-scroll-container .empty-text {
+  column-span: all; /* Текст занимает всю ширину */
+  break-inside: avoid; /* Не разрывать текст между столбцами */
+}
+
 /* Красивый скроллбар для новостей */
 .news-scroll-container::-webkit-scrollbar {
   width: 8px;
@@ -589,6 +600,11 @@ body, html, #root, .app-layout, .main-content {
   font-style: italic;
   text-align: center;
   padding: 40px 0;
+  column-span: all; /* Текст занимает всю ширину */
+  break-inside: avoid; /* Не разрывать текст между столбцами */
+  white-space: nowrap; /* Предотвращаем перенос строк */
+  width: 100%; /* Занимаем всю ширину */
+  display: block; /* Блочный элемент */
 }
 
 /* Стили для выпадашки уведомлений, если понадобится */
@@ -1103,17 +1119,29 @@ body, html, #root, .app-layout, .main-content {
   }
   
   .card.schedule .schedule-list .title {
-    font-size: 15px;
+    font-size: 16px; /* Увеличили размер шрифта для лучшей читаемости */
     font-weight: 700;
     color: #1f2937;
-    line-height: 1.3;
+    line-height: 1.4; /* Нормальный межстрочный интервал */
     margin: 0;
+    word-wrap: normal; /* Убираем принудительный перенос слов */
+    overflow-wrap: normal; /* Убираем принудительный перенос */
+    hyphens: none; /* Отключаем автоматические переносы */
+    white-space: normal; /* Разрешаем перенос строк только по пробелам */
+    text-align: left; /* Выравнивание по левому краю */
+    width: 100%; /* Используем всю доступную ширину */
   }
   
   .card.schedule .schedule-course-info {
     color: #00B18F;
-    font-size: 13px;
+    font-size: 14px; /* Увеличили размер шрифта */
     font-weight: 600;
+    word-wrap: normal; /* Убираем принудительный перенос слов */
+    overflow-wrap: normal; /* Убираем принудительный перенос */
+    hyphens: none; /* Отключаем автоматические переносы */
+    line-height: 1.3; /* Нормальный межстрочный интервал */
+    white-space: normal; /* Разрешаем перенос строк только по пробелам */
+    width: 100%; /* Используем всю доступную ширину */
   }
   
   /* Дополнительная информация */
@@ -1128,9 +1156,12 @@ body, html, #root, .app-layout, .main-content {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 11px;
+    font-size: 12px; /* Увеличили размер шрифта */
     color: #6b7280;
     font-weight: 500;
+    word-wrap: break-word; /* Переносим длинные слова */
+    overflow-wrap: break-word; /* Дополнительная поддержка переноса */
+    white-space: normal; /* Разрешаем перенос строк */
   }
   
   .card.schedule .schedule-detail-item .icon {
@@ -1670,6 +1701,10 @@ body, html, #root, .app-layout, .main-content {
   transition: all 0.2s ease;
   white-space: nowrap;
   min-width: 80px;
+  text-align: center; /* Центрируем текст */
+  display: inline-flex; /* Используем inline-flex для лучшего контроля */
+  align-items: center; /* Центрируем по вертикали */
+  justify-content: center; /* Центрируем по горизонтали */
 }
 
 .btn-details:hover {

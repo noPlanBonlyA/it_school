@@ -16,6 +16,9 @@ import '../styles/ManageUserPage.css';
 import '../styles/ManageGroupPage.css';
 import '../styles/ManageGroupPage-mobile.css';
 import '../styles/MobileFixes.css';
+import '../styles/MobileKeyboardFix.css';
+
+import { useMobileKeyboard } from '../hooks/useMobileKeyboard';
 
 /* ─────────────────── helpers ────────────────────────*/
 const normalizeGroup = g => ({
@@ -40,6 +43,9 @@ const normalizeGroup = g => ({
 export default function ManageGroupPage() {
   const { user } = useAuth();
   const nav      = useNavigate();
+
+  // Хук для обработки мобильной клавиатуры
+  useMobileKeyboard();
 
   /* ------ state ---------- */
   const [groups,   setGroups]   = useState([]);
@@ -221,21 +227,29 @@ export default function ManageGroupPage() {
                   />
                   {errs.name && <div className="error-text">{errs.name}</div>}
                 </div>
+                <div className="field">
+                  <label>Описание группы</label>
+                  <textarea 
+                    value={newF.description}
+                    onChange={e=>setNewF(s=>({...s,description:e.target.value}))}
+                    placeholder="Введите описание группы (необязательно)"
+                    rows="5"
+                    style={{ width: '100%', padding: '12px', fontSize: '16px', resize: 'vertical' }}
+                  />
+                </div>
                 <div style={{ marginTop: '20px' }}>
                   <button className="create-group-btn" onClick={createGrp} style={{ padding: '12px 24px', fontSize: '16px' }}>
                     Создать группу
                   </button>
                 </div>
               </div>
-              <div className="field">
-                <label>Описание группы</label>
-                <textarea 
-                  value={newF.description}
-                  onChange={e=>setNewF(s=>({...s,description:e.target.value}))}
-                  placeholder="Введите описание группы (необязательно)"
-                  rows="5"
-                  style={{ width: '100%', padding: '12px', fontSize: '16px', resize: 'vertical' }}
-                />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, rgba(0, 177, 143, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)', borderRadius: '12px', padding: '20px', border: '1px solid rgba(0, 177, 143, 0.1)' }}>
+                <div style={{ textAlign: 'center', color: '#64748b' }}>
+                  <div style={{ fontSize: '48px', marginBottom: '12px' }}>📝</div>
+                  <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.4' }}>
+                    Заполните название группы и при желании добавьте описание, затем нажмите кнопку создания
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -91,7 +91,10 @@
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  min-height: 38px;
+  white-space: nowrap;
 }
 
 .btn-filter {
@@ -108,12 +111,23 @@
 .btn-clear {
   background: #ef4444;
   color: white;
+  position: relative;
 }
 
 .btn-clear:hover {
   background: #dc2626;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-clear .clear-icon {
+  font-size: 18px;
+  font-weight: bold;
+  color: #dc2626;
+  line-height: 1;
+  margin-right: 4px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 /* Основная страница расписания */
@@ -743,6 +757,14 @@
   .fc .fc-timegrid-slot {
     height: 25px !important;
   }
+
+  /* Стили для кнопки очистки фильтров на планшетах */
+  .btn-clear .clear-icon {
+    font-size: 16px;
+    margin-right: 5px;
+    font-weight: bold;
+    color: #dc2626;
+  }
 }
 
 @media (max-width: 768px) {
@@ -932,5 +954,22 @@
   .btn {
     font-size: 0.8rem;
     padding: 6px 12px;
+  }
+
+  .btn-clear .clear-icon {
+    font-size: 20px;
+    font-weight: bold;
+    margin-right: 6px;
+    color: #dc2626;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 0.8;
+  }
+
+  .btn-clear {
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }

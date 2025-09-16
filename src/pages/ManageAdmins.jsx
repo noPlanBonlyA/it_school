@@ -15,10 +15,16 @@ import {
 
 import '../styles/ManageUserPage.css';
 import '../styles/MobileFixes.css';
+import '../styles/MobileKeyboardFix.css';
+
+import { useMobileKeyboard } from '../hooks/useMobileKeyboard';
 
 export default function ManageAdminsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Хук для обработки мобильной клавиатуры
+  useMobileKeyboard();
 
   const [admins, setAdmins]  = useState([]);
   const [search, setSearch]  = useState('');

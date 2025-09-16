@@ -1,5 +1,30 @@
 /* src/styles/ScheduleFilterModal.css */
 
+/* Предотвращение горизонтального скролла */
+* {
+  box-sizing: border-box;
+}
+
+.schedule-filter-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+}
+  .filter-group label {
+  font-weight: 600 !important;
+  color: #1f2937 !important;
+  font-size: 0.85rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-bottom: 4px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  letter-spacing: -0.01em !important;
+}
+
 .schedule-filter-modal-overlay {
   position: fixed;
   top: 0;
@@ -9,20 +34,23 @@
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(5px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   z-index: 10000;
-  padding: 20px;
+  padding: 100px 20px 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .schedule-filter-modal {
   background: white;
   border-radius: 16px;
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
-  max-width: 600px;
+  max-width: 650px;
   width: 100%;
-  max-height: 90vh;
+  max-height: 75vh;
   overflow-y: auto;
+  overflow-x: hidden;
   animation: slideInUp 0.3s ease-out;
 }
 
@@ -39,40 +67,126 @@
 
 .modal-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 24px 24px 16px;
+  padding: 20px 30px 14px;
   border-bottom: 1px solid #e5e7eb;
+  position: relative;
 }
 
 .modal-header h3 {
-  margin: 0;
-  color: #1f2937;
-  font-size: 1.25rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin: 0 !important;
+  color: #1f2937 !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  letter-spacing: -0.01em !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  text-align: center !important;
+  width: 100% !important;
+  justify-content: center !important;
+}
+
+/* Убираем любые иконки/псевдоэлементы из заголовка */
+.modal-header h3::before {
+  display: none !important;
+}
+
+/* Дополнительные специфичные стили для центрирования заголовка */
+.schedule-filter-modal .modal-header,
+.schedule-filter-modal-overlay .modal-header {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+}
+
+.schedule-filter-modal .modal-header h3,
+.schedule-filter-modal-overlay .modal-header h3 {
+  margin: 0 auto !important;
+  text-align: center !important;
+  width: 100% !important;
+  justify-content: center !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.schedule-filter-modal .close-btn {
+  background: rgba(220, 38, 38, 0.9) !important;
+  border: none !important;
+  font-size: 26px !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+  font-weight: bold !important;
+  line-height: 1 !important;
+  width: 44px !important;
+  height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  z-index: 30000 !important;
+  font-family: monospace !important;
+  outline: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  text-decoration: none !important;
+  margin: 0 !important;
+}
+
+.schedule-filter-modal .close-btn:hover {
+  background: rgba(185, 28, 28, 0.95) !important;
+  color: #ffffff !important;
+  transform: scale(1.1) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  background: rgba(220, 38, 38, 0.9) !important;
+  border: none !important;
+  font-size: 26px !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+  font-weight: bold !important;
+  line-height: 1 !important;
+  width: 44px !important;
+  height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  z-index: 30000 !important;
+  font-family: monospace !important;
+  outline: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  text-decoration: none !important;
+  margin: 0 !important;
 }
 
 .close-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: rgba(185, 28, 28, 0.95) !important;
+  color: #ffffff !important;
+  transform: scale(1.1) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
 .modal-body {
-  padding: 24px;
+  padding: 20px 30px;
 }
 
 .loading-state {
@@ -102,70 +216,238 @@
 .filter-form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
+  position: relative;
+}
+
+/* Отступ для первой группы фильтров */
+.filter-group:first-child {
+  margin-top: 14px;
 }
 
 .filter-group label {
-  font-weight: 600;
-  color: #374151;
-  font-size: 0.875rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-weight: 600 !important;
+  color: #1f2937 !important;
+  font-size: 0.95rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 6px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  letter-spacing: -0.01em !important;
 }
 
-.filter-group select {
+/* Стили для выпадающих списков - более специфичные селекторы */
+.schedule-filter-modal .form-group select,
+.schedule-filter-modal .filter-group select,
+.schedule-filter-modal-overlay .form-group select,
+.schedule-filter-modal-overlay .filter-group select {
+  width: 100% !important;
+  padding: 12px 45px 12px 14px !important;
+  border: 2px solid #e5e7eb !important;
+  border-radius: 10px !important;
+  font-size: 0.9rem !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 500 !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  color: #374151 !important;
+  cursor: pointer !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  appearance: none !important;
+  position: relative !important;
+  letter-spacing: -0.01em !important;
+  backdrop-filter: blur(10px) !important;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  background-image: 
+    linear-gradient(135deg, #ffffff 0%, #f8fafc 100%),
+    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23374151' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+  background-position: right 14px center, right 14px center !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-size: 18px, 18px !important;
+}
+
+.schedule-filter-modal .form-group select:hover,
+.schedule-filter-modal .filter-group select:hover,
+.schedule-filter-modal-overlay .form-group select:hover,
+.schedule-filter-modal-overlay .filter-group select:hover {
+  border-color: #00B18F !important;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ecfdf5 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 
+    0 8px 25px rgba(0, 177, 143, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  background-image: 
+    linear-gradient(135deg, #f0fdfa 0%, #ecfdf5 100%),
+    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300B18F' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+}
+
+.schedule-filter-modal .form-group select:focus,
+.schedule-filter-modal .filter-group select:focus,
+.schedule-filter-modal-overlay .form-group select:focus,
+.schedule-filter-modal-overlay .filter-group select:focus {
+  outline: none !important;
+  border-color: #00B18F !important;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ecfdf5 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 
+    0 0 0 4px rgba(0, 177, 143, 0.1),
+    0 8px 25px rgba(0, 177, 143, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  background-image: 
+    linear-gradient(135deg, #f0fdfa 0%, #ecfdf5 100%),
+    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300B18F' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+}
+
+.schedule-filter-modal .form-group select:active,
+.schedule-filter-modal .filter-group select:active,
+.schedule-filter-modal-overlay .form-group select:active,
+.schedule-filter-modal-overlay .filter-group select:active {
+  transform: translateY(0) !important;
+  transition: all 0.1s ease !important;
+}
+
+/* Стили для option элементов */
+.filter-group select option {
   padding: 12px 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  background: white;
-  transition: all 0.2s ease;
-  cursor: pointer;
+  background: #ffffff;
+  color: #374151;
+  font-weight: 500;
 }
 
-.filter-group select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+.filter-group select option:hover {
+  background: #f0f9ff;
+  color: #0369a1;
 }
 
-.filter-group select:hover {
-  border-color: #d1d5db;
+.filter-group select option:checked {
+  background: #00B18F;
+  color: #ffffff;
 }
 
 .filter-preview {
-  padding: 8px 12px;
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  border: 2px solid #0ea5e9;
+  border-radius: 16px;
+  font-size: 0.95rem;
   color: #0369a1;
+  margin-top: 12px;
+  animation: slideInDown 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 8px 25px rgba(14, 165, 233, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.filter-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #0ea5e9, transparent);
+  animation: shimmer 2.5s infinite;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
 }
 
 .filter-preview strong {
   color: #0c4a6e;
+  font-weight: 600;
 }
 
 .active-filters-info {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 16px;
-  margin-top: 8px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  animation: fadeInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.active-filters-info::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #00B18F, #03836A, #00B18F);
+  background-size: 200% 100%;
+  animation: gradientMove 3s ease-in-out infinite;
 }
 
 .active-filters-info h4 {
-  margin: 0 0 12px 0;
-  color: #334155;
-  font-size: 0.875rem;
-  font-weight: 600;
+  margin: 0 0 18px 0;
+  color: #1e293b;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.active-filters-info h4::before {
+  content: '🎯';
+  font-size: 1.2rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes gradientMove {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
 }
 
 .active-filters-info ul {
@@ -174,97 +456,219 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .active-filters-info li {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   color: #475569;
-  padding: 4px 0;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.active-filters-info li:hover {
+  background: #f8fafc;
+  border-color: #00B18F;
+  transform: translateX(4px);
 }
 
 .active-filters-info li::before {
-  content: "•";
-  color: #3b82f6;
+  content: "✓";
+  color: #00B18F;
   font-weight: bold;
+  font-size: 0.9rem;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 177, 143, 0.1);
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .modal-footer {
   display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  padding: 16px 24px 24px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.btn {
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
+  gap: 10px;
+  justify-content: center;
   align-items: center;
-  gap: 6px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
 }
 
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* Переопределяем стили кнопок для модального окна */
+.schedule-filter-modal .btn,
+.schedule-filter-modal .modal-footer .btn,
+.schedule-filter-modal-overlay .btn {
+  padding: 12px 20px !important;
+  border-radius: 8px !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  height: 44px !important;
+  width: 160px !important;
+  flex: none !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  letter-spacing: -0.01em !important;
+  text-transform: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  box-sizing: border-box !important;
 }
 
-.btn-primary {
-  background: #3b82f6;
-  color: white;
+.schedule-filter-modal .btn:disabled,
+.schedule-filter-modal .modal-footer .btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+.schedule-filter-modal .btn-primary,
+.schedule-filter-modal .modal-footer .btn-primary {
+  background: linear-gradient(135deg, #00B18F 0%, #03836A 100%) !important;
+  color: white !important;
+  border: 1px solid transparent !important;
 }
 
-.btn-secondary {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+.schedule-filter-modal .btn-primary:hover:not(:disabled),
+.schedule-filter-modal .modal-footer .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #03836A 0%, #026B5A 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(0, 177, 143, 0.3) !important;
 }
 
-.btn-secondary:hover:not(:disabled) {
-  background: #e5e7eb;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.schedule-filter-modal .btn-secondary,
+.schedule-filter-modal .modal-footer .btn-secondary {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  color: #374151 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.schedule-filter-modal .btn-secondary:hover:not(:disabled),
+.schedule-filter-modal .modal-footer .btn-secondary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #f8fafc 0%, #e5e7eb 100%) !important;
+  border-color: #9ca3af !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Специальная кнопка очистки с корзинкой */
+.schedule-filter-modal .btn-secondary:first-child,
+.schedule-filter-modal .modal-footer .btn-secondary:first-child {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%) !important;
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+}
+
+.schedule-filter-modal .btn-secondary:first-child:hover:not(:disabled),
+.schedule-filter-modal .modal-footer .btn-secondary:first-child:hover:not(:disabled) {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important;
+  border-color: #f87171 !important;
+  color: #b91c1c !important;
 }
 
 /* Мобильная адаптация */
 @media (max-width: 768px) {
   .schedule-filter-modal-overlay {
-    padding: 10px;
+    padding: 80px 15px 15px;
+    overflow-x: hidden;
   }
 
   .schedule-filter-modal {
     max-width: 100%;
-    max-height: 95vh;
+    max-height: 80vh;
+    border-radius: 12px;
+    overflow-x: hidden;
   }
 
-  .modal-header, .modal-body, .modal-footer {
-    padding-left: 16px;
-    padding-right: 16px;
+  .modal-header {
+    padding: 14px 16px 10px;
+    position: relative;
+  }
+
+  .modal-header h3 {
+    padding-right: 0; /* Убираем отступ на мобильных */
+    font-size: 1rem;
+    gap: 6px;
+  }
+
+  .close-btn {
+    font-size: 28px !important;
+    width: 44px !important;
+    height: 44px !important;
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    border-radius: 50% !important;
+    background: rgba(220, 38, 38, 0.95) !important;
+    border: none !important;
+    outline: none !important;
+    z-index: 35000 !important;
+    font-family: monospace !important;
+    padding: 8px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .close-btn:hover {
+    background: rgba(185, 28, 28, 1) !important;
+    color: #ffffff !important;
+    transform: scale(1.15) !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .modal-body, .modal-footer {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .modal-body {
+    padding-top: 10px;
+    padding-bottom: 8px;
   }
 
   .modal-footer {
     flex-direction: column;
     gap: 8px;
+    padding: 12px 14px 16px;
   }
 
-  .btn {
-    width: 100%;
-    justify-content: center;
+  .schedule-filter-modal .btn,
+  .schedule-filter-modal .modal-footer .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    min-height: 44px !important;
+    font-size: 0.9rem !important;
+    padding: 12px 20px !important;
+    border-radius: 10px !important;
+    letter-spacing: 0 !important;
+    max-width: none !important;
+  }
+
+  .schedule-filter-modal .btn-primary,
+  .schedule-filter-modal .modal-footer .btn-primary {
+    order: 1 !important; /* Кнопка применить внизу */
+  }
+
+  .schedule-filter-modal .btn-secondary,
+  .schedule-filter-modal .modal-footer .btn-secondary {
+    order: 2 !important; /* Кнопки отмены и очистки сверху */
   }
 
   .active-filters-info ul {
@@ -273,6 +677,43 @@
 
   .active-filters-info li {
     font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+
+  /* Мобильные стили для выпадающих списков */
+  .schedule-filter-modal .filter-group select,
+  .schedule-filter-modal-overlay .filter-group select {
+    padding: 10px 35px 10px 12px !important;
+    font-size: 16px !important; /* Предотвращает зум на iOS */
+    border-radius: 8px !important;
+    background-size: 16px !important;
+    background-position: right 12px center !important;
+    min-height: 42px !important;
+  }
+
+  .schedule-filter-modal .filter-group label,
+  .schedule-filter-modal-overlay .filter-group label {
+    font-size: 0.8rem !important;
+    gap: 5px !important;
+    margin-bottom: 3px !important;
+  }
+
+  .filter-preview {
+    font-size: 0.9rem;
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-top: 12px;
+  }
+
+  .active-filters-info {
+    padding: 18px 16px;
+    border-radius: 14px;
+    margin-top: 16px;
+  }
+
+  .active-filters-info h4 {
+    font-size: 1rem;
+    margin-bottom: 14px;
   }
 }
 
@@ -306,4 +747,53 @@
 
 .schedule-filter-modal::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Адаптация для планшетов */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .close-btn {
+    font-size: 26px !important;
+    width: 44px !important;
+    height: 44px !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    border: none !important;
+    outline: none !important;
+    font-family: monospace !important;
+    padding: 8px !important;
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    z-index: 32000 !important;
+    background: rgba(220, 38, 38, 0.9) !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+  }
+
+  .close-btn:hover {
+    background: rgba(185, 28, 28, 0.95) !important;
+    color: #ffffff !important;
+    transform: scale(1.1) !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.45) !important;
+  }
+
+  /* Стили для планшетных выпадающих списков */
+  .filter-group select {
+    padding: 13px 16px;
+    font-size: 0.9rem;
+    background-size: 18px;
+    background-position: right 13px center;
+    padding-right: 46px;
+  }
+
+  .filter-group label {
+    font-size: 0.9rem;
+  }
+
+  .filter-preview {
+    font-size: 0.85rem;
+    padding: 9px 13px;
+  }
 }

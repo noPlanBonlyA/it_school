@@ -140,10 +140,18 @@ export default function CreateEventPage() {
       setSaving(true);
       
       // Подготавливаем данные события
+      // Добавляем +3 часа к выбранному времени
+      const add3Hours = (dateStr) => {
+        if (!dateStr) return null;
+        const date = new Date(dateStr);
+        date.setHours(date.getHours() + 3);
+        return date.toISOString();
+      };
+
       const eventData = {
         ...formData,
-        start_datetime: formData.start_datetime ? new Date(formData.start_datetime).toISOString() : null,
-        end_datetime: formData.end_datetime ? new Date(formData.end_datetime).toISOString() : null,
+        start_datetime: formData.start_datetime ? add3Hours(formData.start_datetime) : null,
+        end_datetime: formData.end_datetime ? add3Hours(formData.end_datetime) : null,
         name: formData.name.trim() || 'Мероприятие без названия',
         description: formData.description.trim() || 'Описание отсутствует',
         auditorium: formData.auditorium.trim() || ''
@@ -374,7 +382,7 @@ export default function CreateEventPage() {
                     checked={formData.is_opened}
                     onChange={(e) => setFormData({...formData, is_opened: e.target.checked})}
                   />
-                  <span className="checkbox-text">Открытое мероприятие (доступно всем)</span>
+                  <span className="checkbox-text" style={{ marginLeft: '10px', marginTop: '10px' }}>Открытое мероприятие (доступно всем)</span>
                 </label>
               </div>
             </div>

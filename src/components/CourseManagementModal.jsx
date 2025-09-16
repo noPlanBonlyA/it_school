@@ -608,12 +608,7 @@ ${result.message}
             >
               🗑️ Удалить курс
             </button>
-            <button 
-              className={`tab ${activeTab === 'diagnostics' ? 'active' : ''}`}
-              onClick={() => setActiveTab('diagnostics')}
-            >
-              🔧 Диагностика
-            </button>
+            
           </div>
 
           {loading && (

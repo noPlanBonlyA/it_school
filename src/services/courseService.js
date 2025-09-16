@@ -9,20 +9,20 @@ function normalizeAgeCategory(ageCategory) {
   if (Array.isArray(ageCategory)) {
     return ageCategory.map(category => {
       if (category === 'All' || category === 'Все возрасты') return 'All';
-      if (category === 'SixPlus') return '5-7';
-      if (category === 'TwelvePlus') return '12-14';
-      if (category === '5-7') return '5-7';  // уже в правильном формате
-      if (category === '8-10') return '8-10';  // уже в правильном формате
-      if (category === '12-14') return '12-14';  // уже в правильном формате
+      if (category === 'SixPlus') return '5-8';
+      if (category === 'TwelvePlus') return '12-15';
+      if (category === '5-7') return '5-8';  // уже в правильном формате
+      if (category === '8-10') return '9-1`';  // уже в правильном формате
+      if (category === '12-14') return '12-15';  // уже в правильном формате
       return category;
     });
   } else {
     if (ageCategory === 'All' || ageCategory === 'Все возрасты') return 'All';
-    if (ageCategory === 'SixPlus') return '5-7';
-    if (ageCategory === 'TwelvePlus') return '12-14';
-    if (ageCategory === '5-7') return '5-7';  // уже в правильном формате
-    if (ageCategory === '8-10') return '8-10';  // уже в правильном формате
-    if (ageCategory === '12-14') return '12-14';  // уже в правильном формате
+    if (ageCategory === 'SixPlus') return '5-8';
+    if (ageCategory === 'TwelvePlus') return '12-15';
+    if (ageCategory === '5-7') return '5-8';  // уже в правильном формате
+    if (ageCategory === '8-10') return '9-11';  // уже в правильном формате
+    if (ageCategory === '12-14') return '12-15';  // уже в правильном формате
     return ageCategory;
   }
 }

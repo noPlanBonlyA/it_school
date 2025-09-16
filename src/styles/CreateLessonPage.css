@@ -1,8 +1,12 @@
-/* Create Lesson Page Styles */
+/* Create Lesson Page Styles - Улучшенная мобильная адаптация */
+
+/* Основной контейнер страницы */
 .create-lesson-page {
   padding: 20px;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Мобильный заголовок */
@@ -10,46 +14,59 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   padding: 16px 20px;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 177, 143, 0.1);
+  border: 1px solid rgba(0, 177, 143, 0.1);
+  position: relative;
 }
 
 .mobile-header h1 {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1e293b;
+  font-size: 22px;
+  font-weight: 700;
+  color: #03836A;
   margin: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  white-space: nowrap;
 }
 
 .mobile-header .back-button {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background: linear-gradient(135deg, #10b981, #059669);
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #00B18F, #03836A);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 177, 143, 0.2);
+  flex-shrink: 0;
 }
 
 .mobile-header .back-button:hover {
-  background: linear-gradient(135deg, #059669, #047857);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #03836A, #007A67);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 177, 143, 0.3);
 }
 
 .back-icon {
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .back-text {
   font-size: 14px;
+  font-weight: 600;
 }
 
 /* Десктопный заголовок */
@@ -57,81 +74,124 @@
   display: none;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 24px;
-  padding: 24px;
+  margin-bottom: 32px;
+  padding: 32px;
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  box-shadow: 0 6px 30px rgba(0, 177, 143, 0.1);
+  border: 1px solid rgba(0, 177, 143, 0.1);
 }
 
 .header-info h1 {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 8px 0;
+  color: #03836A;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-info h1::before {
+  content: "✨";
+  font-size: 28px;
 }
 
 .header-info p {
   font-size: 16px;
-  color: #64748b;
+  color: #6b7280;
   margin: 0;
+  font-style: italic;
 }
 
 .back-to-course {
-  padding: 12px 20px;
-  background: #f8fafc;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
   color: #475569;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .back-to-course:hover {
-  background: #f1f5f9;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
   border-color: #cbd5e1;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Контент страницы */
 .create-lesson-content {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  box-shadow: 0 6px 30px rgba(0, 177, 143, 0.1);
+  border: 1px solid rgba(0, 177, 143, 0.1);
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .lesson-editor-container {
   padding: 32px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Переопределение стилей LessonEditor для страницы создания урока */
+.create-lesson-page .lesson-editor {
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+}
+
+.create-lesson-page .lesson-form {
+  gap: 28px;
+}
+
+.create-lesson-page .form-section,
+.create-lesson-page .materials-section,
+.create-lesson-page .form-actions {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 3px 15px rgba(0, 177, 143, 0.08);
+  border: 1px solid rgba(0, 177, 143, 0.1);
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Стили кнопок для единообразия */
 .btn-secondary {
-  padding: 12px 20px;
-  background: #f8fafc;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
   color: #475569;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .btn-secondary:hover {
-  background: #f1f5f9;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
   border-color: #cbd5e1;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Адаптация для планшетов */
@@ -145,23 +205,68 @@
   }
 }
 
-/* Адаптация для мобильных устройств */
-@media (max-width: 768px) {
+/* Адаптация для планшетов (средние экраны) */
+@media (max-width: 992px) {
   .create-lesson-page {
     padding: 16px;
   }
   
+  .desktop-header {
+    padding: 24px;
+    border-radius: 16px;
+  }
+  
+  .header-info h1 {
+    font-size: 28px;
+  }
+  
+  .lesson-editor-container {
+    padding: 24px;
+  }
+  
+  .create-lesson-page .form-section,
+  .create-lesson-page .materials-section,
+  .create-lesson-page .form-actions {
+    padding: 20px;
+  }
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 768px) {
+  .create-lesson-page {
+    padding: 12px;
+    max-width: 100%;
+  }
+  
   .mobile-header {
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    gap: 12px;
+    position: relative;
   }
   
   .mobile-header h1 {
     font-size: 18px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    white-space: nowrap;
   }
   
   .mobile-header .back-button {
-    padding: 6px 12px;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+  
+  .back-icon {
+    font-size: 16px;
+  }
+  
+  .back-text {
     font-size: 13px;
   }
   
@@ -170,25 +275,164 @@
   }
   
   .lesson-editor-container {
-    padding: 20px;
+    padding: 16px 12px;
+  }
+  
+  /* Переопределение стилей для мобильных */
+  .create-lesson-page .form-section,
+  .create-lesson-page .materials-section,
+  .create-lesson-page .form-actions {
+    padding: 16px 12px;
+    border-radius: 12px;
+    gap: 16px;
+  }
+  
+  .create-lesson-page .lesson-form {
+    gap: 20px;
+  }
+  
+  .create-lesson-page .section-title {
+    font-size: 18px;
+    text-align: center;
+    justify-content: center;
+  }
+  
+  .create-lesson-page .materials-section .section-title {
+    font-size: 20px;
+    color: #03836A;
+  }
+  
+  .create-lesson-page .material-category {
+    padding: 12px 8px;
+    border-radius: 10px;
+  }
+  
+  .create-lesson-page .category-title {
+    font-size: 16px;
+    text-align: center;
+    justify-content: center;
+  }
+  
+  .create-lesson-page .material-block {
+    padding: 12px 8px;
+    border-radius: 8px;
+  }
+  
+  .create-lesson-page .material-title {
+    font-size: 15px;
+    text-align: center;
+    justify-content: center;
+  }
+  
+  .create-lesson-page .material-subtitle {
+    text-align: center;
+    font-size: 12px;
+  }
+  
+  .create-lesson-page .checkbox-label {
+    padding: 12px 8px;
+    align-items: flex-start;
+  }
+  
+  .create-lesson-page .checkbox-text {
+    font-size: 14px;
+  }
+  
+  .create-lesson-page .form-hint {
+    margin-left: 0;
+    margin-top: 8px;
+    padding: 10px;
+    font-size: 12px;
+  }
+  
+  .create-lesson-page .btn-save {
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    font-size: 16px;
   }
 }
 
+/* Адаптация для очень маленьких экранов */
 @media (max-width: 480px) {
   .create-lesson-page {
-    padding: 12px;
+    padding: 8px;
   }
   
   .mobile-header {
     padding: 10px 12px;
-    gap: 12px;
+    gap: 10px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    position: relative;
   }
   
   .mobile-header h1 {
     font-size: 16px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    white-space: nowrap;
+  }
+  
+  .mobile-header .back-button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  .back-icon {
+    font-size: 14px;
+  }
+  
+  .back-text {
+    font-size: 12px;
+  }
+  
+  .create-lesson-content {
+    border-radius: 10px;
   }
   
   .lesson-editor-container {
-    padding: 16px;
+    padding: 12px 8px;
+  }
+  
+  .create-lesson-page .form-section,
+  .create-lesson-page .materials-section,
+  .create-lesson-page .form-actions {
+    padding: 12px 8px;
+    border-radius: 10px;
+  }
+  
+  .create-lesson-page .section-title {
+    font-size: 16px;
+  }
+  
+  .create-lesson-page .materials-section .section-title {
+    font-size: 18px;
+  }
+  
+  .create-lesson-page .category-title {
+    font-size: 15px;
+  }
+  
+  .create-lesson-page .material-title {
+    font-size: 14px;
+  }
+  
+  .create-lesson-page .checkbox-text {
+    font-size: 13px;
+  }
+  
+  .create-lesson-page .form-hint {
+    padding: 8px;
+    font-size: 11px;
+  }
+  
+  .create-lesson-page .btn-save {
+    padding: 14px 16px;
+    font-size: 15px;
   }
 }

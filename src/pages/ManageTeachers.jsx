@@ -24,6 +24,9 @@ import {
 
 import '../styles/ManageUserPage.css';
 import '../styles/MobileFixes.css';
+import '../styles/MobileKeyboardFix.css';
+
+import { useMobileKeyboard } from '../hooks/useMobileKeyboard';
 
 /* helper → teacher + user */
 const merge = (profile, map) => ({ teacher: profile, user: map.get(profile.user_id) || {} });
@@ -31,6 +34,9 @@ const merge = (profile, map) => ({ teacher: profile, user: map.get(profile.user_
 export default function ManageTeachersPage() {
   const { user } = useAuth();
   const nav      = useNavigate();
+
+  // Хук для обработки мобильной клавиатуры
+  useMobileKeyboard();
 
   const [teachers, setTeachers] = useState([]);
   const [search,   setSearch]   = useState('');

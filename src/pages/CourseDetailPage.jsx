@@ -344,7 +344,7 @@ export default function CourseDetailPage() {
                   className="btn-back"
                   onClick={() => navigate(getCoursesPath(user.role))}
                 >
-                  ← Вернуться к {getCoursesTitle(user.role)}
+                  ← Вернуться
                 </button>
               </div>
 

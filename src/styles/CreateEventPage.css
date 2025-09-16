@@ -649,7 +649,9 @@
 }
 
 .create-actions button {
-  min-width: 180px;
+  max-width: none;
+  flex: 1;
+  min-width: 0;
   padding: 16px 32px;
   border-radius: 12px;
   font-size: 16px;
@@ -657,13 +659,16 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 70px;
 }
 
 .create-btn {
   background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   color: white;
 }
-
+.btn-secondary{
+  margin-top: 10px;
+}
 .create-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #1d4ed8, #1e40af);
   transform: translateY(-2px);

@@ -33,6 +33,17 @@
   opacity: 0.6;
 }
 
+/* Стиль для выбранного значения */
+.searchable-select:not(.open) .searchable-input {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.searchable-select.open .searchable-input {
+  color: #374151;
+  font-weight: 400;
+}
+
 .searchable-icon {
   padding: 0 12px;
   font-size: 1.2rem;
@@ -49,10 +60,12 @@
   padding: 12px 8px;
   color: #1f2937;
   cursor: inherit;
+  font-weight: 500;
 }
 
 .searchable-input::placeholder {
   color: #9ca3af;
+  font-weight: 400;
 }
 
 .searchable-input:disabled {

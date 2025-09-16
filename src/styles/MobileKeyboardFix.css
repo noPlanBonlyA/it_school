@@ -1,0 +1,556 @@
+/* src/styles/MobileKeyboardFix.css */
+/* Исправления для мобильной клавиатуры и выпадающих списков */
+
+/* ======================== ОСНОВНЫЕ НАСТРОЙКИ ======================== */
+
+/* Переменные для управления поведением на мобильных */
+:root {
+  --keyboard-height: 0px; /* Высота клавиатуры (будет устанавливаться через JS) */
+  --suggestions-max-height: 200px; /* Максимальная высота списка предложений */
+  --mobile-suggestions-max-height: 150px; /* Уменьшенная высота для мобильных */
+}
+
+/* ======================== МОБИЛЬНЫЕ ИСПРАВЛЕНИЯ ======================== */
+
+@media (max-width: 768px) {
+  
+  /* Основные контейнеры адаптируются к клавиатуре */
+  .app-layout {
+    min-height: 100vh !important;
+    height: auto !important;
+    /* Используем переменную для учета высоты клавиатуры */
+    padding-bottom: calc(var(--keyboard-height) + 20px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+  
+  .main-content {
+    padding-bottom: calc(var(--keyboard-height) + 40px) !important;
+    min-height: calc(100vh - var(--keyboard-height)) !important;
+    transition: min-height 0.3s ease !important;
+  }
+  
+  /* ======================== SUGGESTIONS СПИСКИ ======================== */
+  
+  /* Базовые стили для всех suggestions */
+  .suggestions {
+    position: fixed !important; /* Фиксированное позиционирование на мобильных */
+    top: auto !important;
+    bottom: calc(var(--keyboard-height) + 10px) !important; /* Над клавиатурой */
+    left: 20px !important;
+    right: 20px !important;
+    width: auto !important;
+    max-width: calc(100vw - 40px) !important;
+    max-height: var(--mobile-suggestions-max-height) !important;
+    z-index: 10000 !important;
+    
+    /* Стили для мобильного дизайна */
+    background: rgba(255, 255, 255, 0.98) !important;
+    border: 2px solid rgba(0, 177, 143, 0.2) !important;
+    border-radius: 16px !important;
+    box-shadow: 
+      0 -8px 32px rgba(0, 177, 143, 0.2),
+      0 -4px 16px rgba(0, 0, 0, 0.1) !important;
+    backdrop-filter: blur(12px) !important;
+    
+    /* Плавная анимация появления */
+    transform: translateY(0) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    
+    /* Прокрутка с красивым скроллбаром */
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(0, 177, 143, 0.5) transparent !important;
+  }
+  
+  /* Кастомный скроллбар для мобильных suggestions */
+  .suggestions::-webkit-scrollbar {
+    width: 4px !important;
+  }
+  
+  .suggestions::-webkit-scrollbar-track {
+    background: rgba(0, 177, 143, 0.1) !important;
+    border-radius: 2px !important;
+  }
+  
+  .suggestions::-webkit-scrollbar-thumb {
+    background: rgba(0, 177, 143, 0.6) !important;
+    border-radius: 2px !important;
+  }
+  
+  .suggestions::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 177, 143, 0.8) !important;
+  }
+  
+  /* Стили элементов в suggestions */
+  .suggestions li,
+  .suggestion-item {
+    padding: 14px 20px !important;
+    font-size: 15px !important; /* Больше шрифт для удобства касания */
+    line-height: 1.4 !important;
+    border-bottom: 1px solid rgba(0, 177, 143, 0.1) !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    
+    /* Удобные зоны касания */
+    min-height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  
+  .suggestions li:last-child,
+  .suggestion-item:last-child {
+    border-bottom: none !important;
+    border-radius: 0 0 16px 16px !important;
+  }
+  
+  .suggestions li:first-child,
+  .suggestion-item:first-child {
+    border-radius: 16px 16px 0 0 !important;
+  }
+  
+  .suggestions li:hover,
+  .suggestion-item:hover {
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.1), rgba(3, 131, 106, 0.05)) !important;
+    color: #03836A !important;
+    font-weight: 500 !important;
+  }
+  
+  /* Активное состояние для касания */
+  .suggestions li:active,
+  .suggestion-item:active {
+    background: linear-gradient(135deg, rgba(0, 177, 143, 0.2), rgba(3, 131, 106, 0.1)) !important;
+    transform: scale(0.98) !important;
+  }
+  
+  /* ======================== КОГДА КЛАВИАТУРА ВИДНА ======================== */
+  
+  /* Класс, который добавляется когда клавиатура открыта */
+  .keyboard-visible .suggestions {
+    bottom: calc(var(--keyboard-height) + 10px) !important;
+    max-height: calc(100vh - var(--keyboard-height) - 120px) !important;
+    animation: slideUpFromBottom 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  
+  /* Анимация появления снизу */
+  @keyframes slideUpFromBottom {
+    from {
+      transform: translateY(100px) !important;
+      opacity: 0 !important;
+    }
+    to {
+      transform: translateY(0) !important;
+      opacity: 1 !important;
+    }
+  }
+  
+  /* Когда клавиатура скрыта - возвращаем обычное позиционирование */
+  .keyboard-hidden .suggestions {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    bottom: auto !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: auto !important;
+    max-height: var(--mobile-suggestions-max-height) !important;
+    animation: slideDownToNormal 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  
+  /* Анимация возврата к нормальному позиционированию */
+  @keyframes slideDownToNormal {
+    from {
+      transform: translateY(-20px) !important;
+      opacity: 0 !important;
+    }
+    to {
+      transform: translateY(0) !important;
+      opacity: 1 !important;
+    }
+  }
+  
+  /* ======================== ПОИСКОВЫЕ ПОЛЯ ======================== */
+  
+  /* Стили для поисковых полей при активной клавиатуре */
+  .search-block {
+    position: relative !important;
+  }
+  
+  .search-block input {
+    font-size: 16px !important; /* Предотвращаем зум на iOS */
+    padding: 14px 20px !important;
+    border-radius: 12px !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .search-block input:focus {
+    border-color: #00B18F !important;
+    box-shadow: 
+      0 0 0 4px rgba(0, 177, 143, 0.15),
+      0 4px 12px rgba(0, 177, 143, 0.2) !important;
+    transform: translateY(-2px) !important;
+  }
+  
+  /* Когда клавиатура активна - фиксируем поле поиска */
+  .keyboard-visible .search-block {
+    position: sticky !important;
+    top: 10px !important;
+    z-index: 999 !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(8px) !important;
+    border-radius: 12px !important;
+    padding: 8px !important;
+    margin-bottom: 10px !important;
+  }
+  
+  /* ======================== СПЕЦИАЛЬНЫЕ СЛУЧАИ ======================== */
+  
+  /* Для suggestion-item с кнопками просмотра */
+  .suggestion-item {
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+  
+  .suggestion-info {
+    flex: 1 !important;
+    padding-right: 12px !important;
+    min-height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  
+  .view-details-btn {
+    min-width: 44px !important;
+    height: 44px !important;
+    padding: 8px !important;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* ======================== УЛУЧШЕНИЯ UX ======================== */
+  
+  /* Добавляем индикатор прокрутки */
+  .suggestions::before {
+    content: '' !important;
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 2px !important;
+    background: linear-gradient(90deg, transparent, rgba(0, 177, 143, 0.3), transparent) !important;
+    z-index: 1 !important;
+  }
+  
+  /* Плавная подсветка при скролле */
+  .suggestions:hover::before {
+    background: linear-gradient(90deg, transparent, rgba(0, 177, 143, 0.6), transparent) !important;
+  }
+  
+  /* Затенение для понимания что есть еще элементы */
+  .suggestions::after {
+    content: '' !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 8px !important;
+    background: linear-gradient(to top, rgba(255, 255, 255, 1), transparent) !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+  }
+}
+
+/* ======================== ПЛАНШЕТЫ И БОЛЬШИЕ ТЕЛЕФОНЫ ======================== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .suggestions {
+    max-height: 250px !important;
+  }
+  
+  .suggestions li,
+  .suggestion-item {
+    padding: 12px 18px !important;
+    font-size: 14px !important;
+  }
+}
+
+/* ======================== ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ ======================== */
+
+@media (max-width: 480px) {
+  :root {
+    --mobile-suggestions-max-height: 120px !important;
+  }
+  
+  .suggestions {
+    left: 10px !important;
+    right: 10px !important;
+    border-radius: 12px !important;
+  }
+  
+  .suggestions li,
+  .suggestion-item {
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    min-height: 40px !important;
+  }
+  
+  .view-details-btn {
+    min-width: 36px !important;
+    height: 36px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* ======================== LANDSCAPE РЕЖИМ ======================== */
+
+@media (max-width: 768px) and (orientation: landscape) {
+  :root {
+    --mobile-suggestions-max-height: 100px !important;
+  }
+  
+  .keyboard-visible .suggestions {
+    max-height: calc(100vh - var(--keyboard-height) - 80px) !important;
+  }
+  
+  .suggestions li,
+  .suggestion-item {
+    padding: 10px 16px !important;
+    min-height: 36px !important;
+  }
+}
+
+/* ======================== ДОПОЛНИТЕЛЬНЫЕ ИСПРАВЛЕНИЯ ======================== */
+
+/* ======================== ДОПОЛНИТЕЛЬНЫЕ ИСПРАВЛЕНИЯ ======================== */
+
+/* Компонент MobileSearchBox */
+.mobile-search-container {
+  position: relative;
+  width: 100%;
+}
+
+.mobile-search-input {
+  width: 100%;
+  padding: 14px 20px;
+  border: 2px solid rgba(0, 177, 143, 0.2);
+  border-radius: 12px;
+  font-size: 16px; /* Предотвращаем зум на iOS */
+  font-family: 'Montserrat', sans-serif;
+  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 2px 8px rgba(0, 177, 143, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-sizing: border-box;
+}
+
+.mobile-search-input:focus {
+  outline: none;
+  border-color: #00B18F;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 
+    0 0 0 4px rgba(0, 177, 143, 0.15),
+    0 4px 12px rgba(0, 177, 143, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+}
+
+.mobile-search-input.keyboard-active {
+  position: sticky;
+  top: 10px;
+  z-index: 999;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.mobile-search-input::placeholder {
+  color: rgba(3, 131, 106, 0.6);
+  font-style: italic;
+}
+
+.mobile-suggestions {
+  background: rgba(255, 255, 255, 0.98);
+  border: 2px solid rgba(0, 177, 143, 0.15);
+  border-radius: 12px;
+  box-shadow: 
+    0 12px 32px rgba(0, 177, 143, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 177, 143, 0.5) transparent;
+}
+
+/* Обычный режим - под полем ввода */
+.mobile-suggestions.normal-mode {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  z-index: 100;
+}
+
+/* Режим клавиатуры - над клавиатурой */
+.mobile-suggestions.keyboard-mode {
+  position: fixed;
+  bottom: calc(var(--keyboard-height) + 10px);
+  left: 20px;
+  right: 20px;
+  max-height: calc(100vh - var(--keyboard-height) - 120px);
+  z-index: 10000;
+  animation: slideUpFromBottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-suggestion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  min-height: 44px;
+  border-bottom: 1px solid rgba(0, 177, 143, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  color: #2d3748;
+}
+
+.mobile-suggestion-item:last-child {
+  border-bottom: none;
+  border-radius: 0 0 12px 12px;
+}
+
+.mobile-suggestion-item:first-child {
+  border-radius: 12px 12px 0 0;
+}
+
+.mobile-suggestion-item:hover {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.1), rgba(3, 131, 106, 0.05));
+  color: #03836A;
+  font-weight: 500;
+}
+
+.mobile-suggestion-item:active {
+  background: linear-gradient(135deg, rgba(0, 177, 143, 0.2), rgba(3, 131, 106, 0.1));
+  transform: scale(0.98);
+}
+
+.suggestion-text {
+  flex: 1;
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.suggestion-details {
+  font-size: 13px;
+  color: #718096;
+  margin-left: 8px;
+}
+
+.suggestion-action {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #667eea;
+  margin-left: 12px;
+  min-width: 36px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.suggestion-action:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+  border-color: rgba(102, 126, 234, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+}
+
+@media (max-width: 768px) {
+  .mobile-search-input {
+    font-size: 16px; /* Важно для предотвращения зума на iOS */
+    padding: 12px 16px;
+  }
+  
+  .mobile-suggestion-item {
+    padding: 12px 16px;
+    font-size: 14px;
+    min-height: 40px;
+  }
+  
+  .suggestion-action {
+    min-width: 32px;
+    height: 28px;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+}
+
+/* Отключаем zoom на iOS при фокусе на input */
+@supports (-webkit-appearance: none) {
+  @media (max-width: 768px) {
+    .search-block input,
+    .field input {
+      font-size: 16px !important;
+      -webkit-appearance: none !important;
+      appearance: none !important;
+    }
+  }
+}
+
+/* Плавные переходы для всех анимаций */
+* {
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+}
+
+/* Улучшение производительности для анимаций */
+.suggestions,
+.search-block input,
+.suggestion-item,
+.suggestions li {
+  will-change: transform, opacity !important;
+}
+
+/* ======================== ACCESSIBILITY ======================== */
+
+/* Увеличиваем зоны касания на мобильных */
+@media (pointer: coarse) {
+  .suggestions li,
+  .suggestion-item,
+  .view-details-btn {
+    min-height: 44px !important; /* Рекомендуемый размер Apple/Google */
+  }
+}
+
+/* Высокий контраст для лучшей видимости */
+@media (prefers-contrast: high) {
+  .suggestions {
+    border-width: 3px !important;
+    background: white !important;
+  }
+  
+  .suggestions li:hover,
+  .suggestion-item:hover {
+    background: rgba(0, 177, 143, 0.3) !important;
+  }
+}
+
+/* Уменьшение анимаций для пользователей с чувствительностью к движению */
+@media (prefers-reduced-motion: reduce) {
+  .suggestions,
+  .search-block input,
+  .suggestion-item,
+  .suggestions li {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}

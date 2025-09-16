@@ -108,14 +108,14 @@ export default function SearchableSelect({
   const getDisplayText = () => {
     if (!selectedItem) return '';
     
-    if (renderItem) {
-      // Используем рендер функцию, но извлекаем только текст
-      const rendered = renderItem(selectedItem);
-      if (typeof rendered === 'string') return rendered;
-      return selectedItem[displayField];
+    // Для студентов показываем ФИО или username
+    if (selectedItem.user) {
+      const fio = [selectedItem.user.first_name, selectedItem.user.surname].filter(Boolean).join(' ');
+      return fio || selectedItem.user.username || 'Без имени';
     }
     
-    return selectedItem[displayField];
+    // Для остальных объектов используем displayField
+    return selectedItem[displayField] || '';
   };
 
   const defaultRenderItem = (item) => {
@@ -161,8 +161,8 @@ export default function SearchableSelect({
           ref={inputRef}
           type="text"
           className="searchable-input"
-          placeholder={selectedItem ? getDisplayText() : placeholder}
-          value={isOpen ? search : (selectedItem ? getDisplayText() : '')}
+          placeholder={!selectedItem ? placeholder : ''}
+          value={isOpen ? search : getDisplayText()}
           onChange={(e) => setSearch(e.target.value)}
           onFocus={() => !disabled && setIsOpen(true)}
           disabled={disabled}

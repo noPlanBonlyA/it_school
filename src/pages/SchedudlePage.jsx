@@ -231,7 +231,7 @@ export default function SchedulePage() {
                     className="btn btn-clear" 
                     onClick={handleClearFilters}
                   >
-                    ✖️ Очистить фильтры
+                    <span className="clear-icon">×</span> Очистить фильтры
                   </button>
                 )}
               </div>
