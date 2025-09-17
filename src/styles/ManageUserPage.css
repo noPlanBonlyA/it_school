@@ -1391,7 +1391,8 @@ div.manage-users div.modal-overlay div.modal-buttons button {
 /* Отключаем ультра-компактные стили для групп - возвращаем обычные размеры */
 .manage-groups.manage-users .modal-overlay .modal-content {
   width: auto !important;
-  max-width: 500px !important;
+  margin-left: 20% !important;
+  max-width: 800px !important;
   min-width: 300px !important;
   height: auto !important;
   max-height: 90vh !important;

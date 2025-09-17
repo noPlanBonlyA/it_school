@@ -224,17 +224,17 @@ export const updateStudentPoints = async (studentId, reason, changedPoints, desc
     console.log('[CoinHistoryService] Updating student points:', { studentId, reason, changedPoints, description });
 
     // Получаем текущего студента
-    const currentStudent = await getStudentById(studentId);
-    if (!currentStudent) {
-      throw new Error('Студент не найден');
-    }
+    // const currentStudent = await getStudentById(studentId);
+    // if (!currentStudent) {
+    //   throw new Error('Студент не найден');
+    // }
 
-    console.log('[CoinHistoryService] Current student:', currentStudent);
+    //console.log('[CoinHistoryService] Current student:', currentStudent);
 
     // Проверяем что у нас есть user_id
-    if (!currentStudent.user_id) {
-      throw new Error('У студента отсутствует user_id');
-    }
+    // if (!currentStudent.user_id) {
+    //   throw new Error('У студента отсутствует user_id');
+    // }
 
     // Создаем запись в истории (используем student_id)
     const historyRecord = await createPointsHistory({
@@ -247,14 +247,14 @@ export const updateStudentPoints = async (studentId, reason, changedPoints, desc
     console.log('[CoinHistoryService] History record created:', historyRecord);
 
     // Обновляем баланс студента
-    const newPoints = (currentStudent.points || 0) + changedPoints;
-    const updatedStudent = await updateStudent(studentId, {
-      user_id: currentStudent.user_id,
-      points: Math.max(0, newPoints), // Не даем балансу стать отрицательным
-      id: studentId
-    });
+    //const newPoints = (currentStudent.points || 0) + changedPoints;
+    // const updatedStudent = await updateStudent(studentId, {
+    //   user_id: currentStudent.user_id,
+    //   points: Math.max(0, newPoints), // Не даем балансу стать отрицательным
+    //   id: studentId
+    // });
 
-    console.log('[CoinHistoryService] Student updated:', updatedStudent);
+    //console.log('[CoinHistoryService] Student updated:', updatedStudent);
     
     // Отправляем уведомление если указан ID профиля студента
     if (studentProfileId && changedPoints !== 0) {
@@ -268,8 +268,8 @@ export const updateStudentPoints = async (studentId, reason, changedPoints, desc
     
     return {
       historyRecord,
-      updatedStudent,
-      newBalance: Math.max(0, newPoints)
+      //updatedStudent,
+      //newBalance: Math.max(0, newPoints)
     };
   } catch (error) {
     console.error('Ошибка при обновлении поинтов студента:', error);

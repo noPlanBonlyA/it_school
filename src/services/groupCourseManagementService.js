@@ -190,7 +190,7 @@ export const rescheduleGroupCourseLessons = async (groupId, courseId, timeSettin
       
       // Устанавливаем время начала
       const [hours, minutes] = startTime.split(':').map(Number);
-      lessonDate.setHours(hours, minutes, 0, 0);
+      lessonDate.setHours(hours+3, minutes, 0, 0);
       
       // Вычисляем время окончания
       const endDate = new Date(lessonDate);

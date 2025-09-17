@@ -381,7 +381,7 @@ export default function EventModal({ event, onClose, userRole }) {
 
   const handleGoToLesson = () => {
     if (event.lesson_id && event.course_id) {
-      navigate(`/courses/${event.course_id}/lessons/${event.lesson_id}`);
+      navigate(`/courses/${event.course_id}/lessons-with-materials/${event.lesson_id}`);
       onClose();
     } else {
       alert('Информация об уроке недоступна');
@@ -512,7 +512,8 @@ export default function EventModal({ event, onClose, userRole }) {
                   <button onClick={handleSaveGrades} className="btn-primary">
                     Сохранить результаты урока
                   </button>
-                  <button onClick={() => setConductingLesson(null)} className="btn-secondary">
+                  <button onClick={() => setConductingLesson(null)} className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}}>
                     Отмена
                   </button>
                 </div>

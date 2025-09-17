@@ -28,7 +28,7 @@
 
 .notification-header {
   text-align: left;
-  margin-bottom: 50px;
+  
   margin-left: 0; /* Убираем дополнительный отступ */
 }
 
@@ -480,7 +480,7 @@
   }
   
   .notification-header {
-    margin-bottom: 24px;
+    margin-bottom: 0px;
     margin-left: 0;
     text-align: center;
   }
@@ -613,7 +613,7 @@
   }
   
   .notification-header {
-    margin-bottom: 20px;
+    
   }
   
   .notification-title {

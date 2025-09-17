@@ -411,15 +411,15 @@
 }
 
 .btn-text.btn-edit {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  color: #1976d2;
-  border: 1px solid #90caf9;
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
 }
 
 .btn-text.btn-edit:hover {
   background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
-  color: #0d47a1;
-  border-color: #64b5f6;
+  color: #1b5e20;
+  border-color: #81c784;
 }
 
 .btn-text.btn-view-content {
@@ -434,22 +434,27 @@
   border-color: #81c784;
 }
 
-.btn-text.btn-danger {
+.btn-text.btn-danger1 {
   background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
   color: #d32f2f;
   border: 1px solid #ef9a9a;
 }
 
-.btn-text.btn-danger:hover {
+.btn-text.btn-danger1:hover {
   background: linear-gradient(135deg, #ffcdd2 0%, #ef9a9a 100%);
   color: #b71c1c;
   border-color: #e57373;
 }
 
-/* Специальный размер текста для кнопки удаления */
-.btn-text.btn-danger {
-  font-size: 11px;
-  min-width: 90px;
+
+/* Унифицированный размер для всех action-кнопок */
+.btn-text.btn-edit,
+.btn-text.btn-view-content,
+.btn-text.btn-danger1 {
+  font-size: 13px;
+  min-width: 80px;
+  height: 36px;
+  padding: 8px 16px;
 }
 
 .btn-icon {
@@ -473,7 +478,7 @@
 
 .btn-edit {
   background: #e3f2fd;
-  color: #1976d2;
+  color: #27ae60;;
 }
 
 .btn-view-content {
@@ -833,7 +838,7 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   animation: modalSlideIn 0.3s ease;
   position: relative;
-  margin: auto;
+  margin-left: 20%;
 }
 
 @keyframes modalSlideIn {
@@ -1156,6 +1161,11 @@
 }
 
 @media (max-width: 768px) {
+  .lesson-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
   .main-content {
     padding: 16px !important;
     text-align: center !important;
@@ -1469,17 +1479,14 @@
     justify-content: center;
   }
   
-  .btn-text {
-    font-size: 10px;
-    padding: 5px 10px;
-    min-width: 60px;
-    height: 28px;
-    letter-spacing: 0.2px;
-  }
-  
-  .btn-text.btn-danger {
-    font-size: 10px;
-    min-width: 75px;
+  .btn-text.btn-edit,
+  .btn-text.btn-view-content,
+  .btn-text.btn-danger1 {
+    font-size: 13px;
+    min-width: 80px;
+    height: 36px;
+    padding: 8px 16px;
+    letter-spacing: 0.5px;
   }
   
   .lesson-arrow {
@@ -1545,4 +1552,144 @@
   color: #495057;
   font-size: 18px;
   font-weight: 600;
+}
+
+
+/* ===== Desktop hero (две колонки) ===== */
+@media (min-width: 1024px) {
+  /* скрыть старую верхнюю полоску на десктопе, если она осталась */
+  .course-header-top { display: none !important; }
+
+  /* Контейнер шапки */
+  .course-main-info.two-col {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 460px; /* слева текст, справа картинка */
+    align-items: center;
+    gap: 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+    text-align: left;
+  }
+
+  .course-col--text { order: 1; }
+  .course-col--image { order: 2; }
+
+  /* Кнопка "Вернуться" сверху слева */
+  .btn-back {
+    margin: 0 0 16px 0;
+  }
+
+  /* Текст выравниваем влево */
+  .course-content,
+  .course-title,
+  .course-description { text-align: left !important; }
+
+  .course-title { margin: 0 0 12px 0; }
+  .course-description { margin-bottom: 16px; }
+
+  /* Метки под описанием слева */
+  .course-meta {
+    justify-content: flex-start !important;
+    margin-top: 8px;
+  }
+
+  /* Кнопка "Создать урок" под метками */
+  .btn-create-lesson-desktop {
+    display: inline-flex;
+    margin-top: 20px;
+  }
+
+  /* Мобильную кнопку прячем на десктопе, если она была */
+  .btn-create-lesson-mobile { display: none !important; }
+
+  /* Картинка справа — фиксированный красивый размер */
+  .course-detail-image,
+  .course-image {
+    width: 100% !important;
+    max-width: 460px !important;
+    height: 300px !important;
+    margin: 0 !important;
+  }
+}
+
+
+/* ===== Desktop hero (две колонки) ===== */
+@media (min-width: 1024px) {
+  /* прячем старую верхнюю полоску на десктопе */
+  .course-header-top { display: none !important; }
+
+  /* контейнер шапки в две колонки */
+  .course-main-info.two-col {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 520px; /* слева текст, справа фото */
+    align-items: center;
+    gap: 48px;
+    max-width: 1200px;
+    margin: 0 auto 24px auto;
+    padding: 0;
+    text-align: left;
+  }
+
+  .course-col--text { order: 1; }
+  .course-col--image { order: 2; }
+
+  /* выравниваем текстовые элементы */
+  .course-title,
+  .course-description,
+  .course-content { text-align: left !important; }
+
+  .course-title { margin: 0 0 12px 0; }
+  .course-description { margin: 0 0 16px 0; }
+
+  .course-meta {
+    justify-content: flex-start !important;
+    margin-top: 8px;
+  }
+
+  /* кнопка "Создать урок" под метками (только на десктопе) */
+  .btn-create-lesson-desktop {
+    display: inline-flex;
+    margin-top: 20px;
+  }
+  .btn-create-lesson-mobile { display: none !important; }
+
+  /* картинка справа — аккуратный размер */
+  .course-image,
+  .course-detail-image {
+    width: 100% !important;
+    max-width: 520px !important;
+    height: 320px !important;
+    margin: 0 !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .course-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+/* Мобилка: скрыть первую (десктопную) кнопку "Создать урок" */
+@media (max-width: 1023px) {
+  .btn-create-lesson-desktop {
+    display: none !important;
+  }
+}
+
+/* Десктоп: показать десктопную и скрыть мобильную */
+@media (min-width: 1024px) {
+  .btn-create-lesson-desktop {
+    display: inline-flex;
+  }
+  .btn-create-lesson-mobile {
+    display: none !important;
+  }
+}
+.material-name {
+  font-weight: 700;
+  margin: 8px 0 12px;
+  text-align: center;
 }

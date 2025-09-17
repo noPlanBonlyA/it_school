@@ -1716,3 +1716,31 @@ body, html, #root, .app-layout, .main-content {
 .btn-details:active {
   transform: translateY(0);
 }
+
+
+/* ===== Desktop-раскладка для admin/teacher/superadmin ===== */
+@media (min-width: 1024px) {
+  /* Только когда добавлен класс .cards--staff из HomePage.jsx */
+  .cards.cards--staff {
+    display: grid;                   /* не трогаем мобильную вёрстку */
+    grid-template-columns: 1fr 1fr;  /* две колонки: новости | расписание */
+    gap: 16px;                       /* подстрой под свой дизайн, если нужно */
+  }
+
+  /* Ставим "Новости" слева в ряду */
+  .cards.cards--staff .card.news {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  /* Ставим "Расписание" справа, на одной линии с новостями */
+  .cards.cards--staff .card.schedule {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  /* Прячем "Айтишки" для не-студентов (на всякий случай, если блок не обернули условием) */
+  .cards.cards--staff .card.coins {
+    display: none;
+  }
+}

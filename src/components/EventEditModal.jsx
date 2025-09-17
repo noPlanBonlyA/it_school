@@ -265,14 +265,16 @@ export default function EventEditModal({ event, onSave, onClose }) {
               </div>
 
               <div className="form-group">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_opened}
-                    onChange={(e) => setFormData({...formData, is_opened: e.target.checked})}
-                  />
-                  <span className="checkbox-text">Открытое мероприятие (доступно всем)</span>
-                </label>
+                <div className="form-group-open-event">
+                  <label className="checkbox-label open-event-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={formData.is_opened}
+                      onChange={(e) => setFormData({...formData, is_opened: e.target.checked})}
+                    />
+                    <span className="checkbox-text">Открытое мероприятие (доступно всем)</span>
+                  </label>
+                </div>
               </div>
             </div>
           )}
@@ -526,14 +528,16 @@ export default function EventEditModal({ event, onSave, onClose }) {
 
         <div className="modal-actions">
           <button 
-            className="btn-primary"
+            className="btn-secondary"
+            style={{ backgroundColor: '#10b981', color: 'white' }}
             onClick={handleSave}
             disabled={saving}
           >
             {saving ? 'Сохранение...' : 'Сохранить изменения'}
           </button>
           <button 
-            className="btn-secondary"
+            className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}}
             onClick={onClose}
           >
             Отмена

@@ -92,6 +92,20 @@
     display: flex;
     gap: 12px;
   }
+
+    /* Мобильная адаптация блока кнопок редактирования */
+    @media (max-width: 600px) {
+      .buttons-edit {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+      }
+      .buttons-edit button {
+        width: 100%;
+        font-size: 18px;
+        padding: 14px 0;
+      }
+    }
   .btn-primary {
     background: #4880FF;
     color: #FFF;
@@ -175,6 +189,87 @@
   .checkbox-field input[type="checkbox"]:checked + label::after {
     opacity: 1;
   }
+
+    /* Мобильная адаптация чекбокса "Закрепить" */
+    @media (max-width: 600px) {
+      .checkbox-field {
+        padding: 16px;
+        gap: 14px;
+    margin-right: 50%;
+      }
+      .checkbox-field input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        min-width: 18px;
+        min-height: 18px;
+        border-radius: 4px;
+        border: 2px solid #4880FF;
+        appearance: none;
+        -webkit-appearance: none;
+        background: #fff;
+        outline: none;
+        cursor: pointer;
+        position: relative;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+      }
+      .checkbox-field input[type="checkbox"]:checked {
+        background: #4880FF;
+        border-color: #4880FF;
+      }
+      .checkbox-field input[type="checkbox"]:checked::after {
+        content: '';
+        display: block;
+        width: 10px;
+        height: 10px;
+        background: #fff;
+        border-radius: 2px;
+        position: absolute;
+        top: 3px;
+        left: 3px;
+      }
+      .checkbox-field label {
+        font-size: 18px;
+        gap: 10px;
+      }
+      .checkbox-field label::after {
+        font-size: 20px;
+      }
+    }
+
+    /* Мобильная адаптация выпадающего списка поиска новостей */
+    @media (max-width: 600px) {
+      .search-block input {
+        max-width: 100vw;
+        font-size: 18px;
+        padding: 14px 12px;
+      }
+      .suggestions {
+        max-width: 100vw;
+        left: 0;
+        top: 48px;
+        border-radius: 0 0 12px 12px;
+        font-size: 18px;
+        z-index: 100;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      }
+      .suggestions li {
+        padding: 16px 14px;
+        font-size: 18px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .suggestions li img {
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 6px !important;
+      }
+      .suggestions li span {
+        font-size: 18px;
+      }
+    }
   
   /* Инлайн чекбокс для размещения рядом с заголовком */
   .checkbox-inline {

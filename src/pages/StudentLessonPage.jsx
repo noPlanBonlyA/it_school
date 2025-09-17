@@ -64,34 +64,59 @@ export default function StudentLessonPage() {
       
       if (lessonData) {
         const lessonObject = {
-          id: lessonId,
-          name: lessonData.name || lessonData.lesson_name || lessonData.title || 'Урок',
-          course_id: courseId,
-          // Различные возможные форматы URL-ов материалов
-          student_material_url: 
-            lessonData.student_material?.url || 
-            lessonData.student_material_url || 
-            lessonData.materials?.student_url ||
-            lessonData.student_materials ||
-            null,
-          student_additional_material_url: 
-            lessonData.student_additional_material?.url || 
-            lessonData.student_additional_material_url || 
-            lessonData.materials?.student_additional_url ||
-            null,
-          homework_material_url: 
-            lessonData.homework?.url || 
-            lessonData.homework_material_url || 
-            lessonData.homework?.file_url ||
-            lessonData.homework_url ||
-            lessonData.materials?.homework_url ||
-            null,
-          homework_additional_material_url: 
-            lessonData.homework_additional_material?.url || 
-            lessonData.homework_additional_material_url || 
-            lessonData.materials?.homework_additional_url ||
-            null
-        };
+  id: lessonId,
+  name: lessonData.name || lessonData.lesson_name || lessonData.title || 'Урок',
+  course_id: courseId,
+
+  // URL'ы
+  student_material_url:
+    lessonData.student_material?.url ||
+    lessonData.student_material_url ||
+    lessonData.materials?.student_url ||
+    lessonData.student_materials ||
+    null,
+  student_additional_material_url:
+    lessonData.student_additional_material?.url ||
+    lessonData.student_additional_material_url ||
+    lessonData.materials?.student_additional_url ||
+    null,
+  homework_material_url:
+    lessonData.homework?.url ||
+    lessonData.homework_material_url ||
+    lessonData.homework?.file_url ||
+    lessonData.homework_url ||
+    lessonData.materials?.homework_url ||
+    null,
+  homework_additional_material_url:
+    lessonData.homework_additional_material?.url ||
+    lessonData.homework_additional_material_url ||
+    lessonData.materials?.homework_additional_url ||
+    null,
+
+  // ИМЕНА (вот они)
+  student_material_name:
+    lessonData.student_material?.name ||
+    lessonData.student_material_name ||
+    lessonData.materials?.student_name ||
+    null,
+  student_additional_material_name:
+    lessonData.student_additional_material?.name ||
+    lessonData.student_additional_material_name ||
+    lessonData.materials?.student_additional_name ||
+    null,
+  // на всякий — для блока ДЗ (если захочешь показать):
+  homework_material_name:
+    lessonData.homework?.name ||
+    lessonData.homework_material_name ||
+    lessonData.materials?.homework_name ||
+    null,
+  homework_additional_material_name:
+    lessonData.homework_additional_material?.name ||
+    lessonData.homework_additional_material_name ||
+    lessonData.materials?.homework_additional_name ||
+    null,
+};
+
         
         console.log('[StudentLessonPage] Final lesson object:', lessonObject);
         console.log('[StudentLessonPage] Material URLs found:', {
@@ -349,16 +374,21 @@ export default function StudentLessonPage() {
               </div>
               
               {/* Основные материалы урока в одном айфрейме */}
-              {lesson?.student_material_url ? (
-                <div className="main-material-container">
-                  <div className="material-iframe-wrapper">
-                    <iframe 
-                      src={lesson.student_material_url} 
-                      title="Материалы урока"
-                      className="main-material-iframe"
-                    />
-                  </div>
-                </div>
+            {lesson?.student_material_url ? (
+  <div className="main-material-container">
+    {lesson?.student_material_name && (
+      <div className="material-name">
+        📄 {lesson.student_material_name}
+      </div>
+    )}
+    <div className="material-iframe-wrapper">
+      <iframe 
+        src={lesson.student_material_url} 
+        title="Материалы урока"
+        className="main-material-iframe"
+      />
+    </div>
+  </div>
               ) : (
                 <div className="no-materials-message">
                   <div className="no-materials-icon">📋</div>
@@ -369,17 +399,22 @@ export default function StudentLessonPage() {
               
               {/* Кнопка скачивания дополнительных материалов по центру */}
               {lesson?.student_additional_material_url && (
-                <div className="additional-materials-container">
-                  <a 
-                    href={lesson.student_additional_material_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="download-additional-btn"
-                  >
-                    📥 Скачать дополнительные материалы
-                  </a>
-                </div>
-              )}
+  <div className="additional-materials-container">
+    {lesson?.student_additional_material_name && (
+      <div className="material-name">
+        📎 {lesson.student_additional_material_name}
+      </div>
+    )}
+    <a 
+      href={lesson.student_additional_material_url} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="download-additional-btn"
+    >
+      📥 {lesson.student_additional_material_name || 'Скачать дополнительные материалы'}
+    </a>
+  </div>
+)}
             </div>
             
             {/* Блок домашнего задания - новый дизайн */}
@@ -390,41 +425,58 @@ export default function StudentLessonPage() {
               
               {/* Материалы домашнего задания в едином блоке */}
               {(lesson?.homework_material_url || lesson?.homework_additional_material_url) ? (
-                <div className="homework-material-container">
-                  {/* Основное задание */}
-                  {lesson?.homework_material_url && (
-                    <div className="homework-main-content">
-                      <div className="homework-iframe-wrapper">
-                        <iframe 
-                          src={lesson.homework_material_url} 
-                          title="Домашнее задание"
-                          className="homework-material-iframe"
-                        />
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Дополнительные материалы по центру */}
-                  {lesson?.homework_additional_material_url && (
-                    <div className="homework-additional-container">
-                      <a 
-                        href={lesson.homework_additional_material_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="download-homework-additional-btn"
-                      >
-                        📎 Скачать дополнительные материалы к заданию
-                      </a>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="no-homework-message">
-                  <div className="no-homework-icon">📝</div>
-                  <h3>Домашнее задание будет добавлено позже</h3>
-                  <p>Следите за обновлениями от преподавателя</p>
-                </div>
-              )}
+  <div className="homework-material-container">
+    {/* ОСНОВНОЙ МАТЕРИАЛ ДЗ */}
+    {lesson?.homework_material_url && (
+      <div className="homework-main-content">
+        {lesson?.homework_material_name && (
+          <div className="material-name">📝 {lesson.homework_material_name}</div>
+        )}
+        <div className="homework-iframe-wrapper">
+          <iframe
+            src={lesson.homework_material_url}
+            title="Домашнее задание"
+            className="homework-material-iframe"
+          />
+        </div>
+      </div>
+    )}
+
+    {/* ДОП. МАТЕРИАЛ ДЗ */}
+    {lesson?.homework_additional_material_url && (
+      <div className="homework-additional-container">
+        {lesson?.homework_additional_material_name && (
+          <div className="material-name">📎 {lesson.homework_additional_material_name}</div>
+        )}
+        <a
+          href={lesson.homework_additional_material_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="download-homework-additional-btn"
+        >
+          📎 {lesson.homework_additional_material_name || 'Скачать дополнительные материалы к заданию'}
+        </a>
+        {/* если хочешь именно встраивать, а не скачивать — замени <a> на iframe-обёртку как выше */}
+        {/* 
+        <div className="homework-iframe-wrapper">
+          <iframe
+            src={lesson.homework_additional_material_url}
+            title="Доп. материалы к ДЗ"
+            className="homework-material-iframe"
+          />
+        </div> 
+        */}
+      </div>
+    )}
+  </div>
+) : (
+  <div className="no-homework-message">
+    <div className="no-homework-icon">📝</div>
+    <h3>Домашнее задание будет добавлено позже</h3>
+    <p>Следите за обновлениями от преподавателя</p>
+  </div>
+)}
+
               
               {/* Раздел сдачи домашнего задания */}
               <div className="homework-submission-section">
@@ -468,7 +520,7 @@ export default function StudentLessonPage() {
                     >
                       📤 Отправить еще раз
                     </button>
-                    <p style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
+                    <p style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
                       Вы можете отправить новую версию домашнего задания
                     </p>
                   </div>

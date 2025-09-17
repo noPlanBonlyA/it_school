@@ -1,3 +1,32 @@
+/* Чекбокс "Открытое мероприятие (доступно всем)" — чуть выше и правее */
+.form-group-open-event {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  margin-bottom: -12px;
+  margin-top: -8px;
+}
+.open-event-checkbox {
+  font-weight: 500;
+  font-size: 1rem;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 6px 18px 6px 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.open-event-checkbox input[type="checkbox"] {
+  accent-color: #10b981;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+.open-event-checkbox .checkbox-text {
+  color: #111827;
+  font-size: 1rem;
+}
 /* Изолированные стили только для модалок управления мероприятиями */
 
 .events-modal-overlay {

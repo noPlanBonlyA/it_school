@@ -1414,3 +1414,109 @@ body {
   pointer-events: none;
   z-index: -1;
 }
+
+
+/* --- FIX: длинные имена не ломают строку --- */
+
+/* Делаем колонку "Студент" сжимаемой */
+.table-header,
+.table-row {
+  grid-template-columns: 100px minmax(0, 1fr) 140px;
+}
+
+/* ≤ 768px */
+@media (max-width: 768px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 70px minmax(0, 1fr) 90px;
+  }
+}
+
+/* ≤ 480px */
+@media (max-width: 480px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 50px minmax(0, 1fr) 70px;
+  }
+}
+
+/* ≤ 360px */
+@media (max-width: 360px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 45px minmax(0, 1fr) 60px;
+  }
+}
+
+/* Разрешаем flex-внутренностям сжиматься */
+.student-cell,
+.student-info,
+.student-details {
+  min-width: 0;
+}
+
+/* Обрезаем текст и не даём ему выталкивать строку */
+.student-name,
+.student-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  max-width: 100%;
+}
+
+/* На очень узких экранах имя можно показывать в 2 строки */
+@media (max-width: 480px) {
+  .student-name {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;      /* до 2 строк */
+    -webkit-box-orient: vertical;
+  }
+}
+
+/* Совсем узко — скрываем e-mail */
+@media (max-width: 360px) {
+  .student-email { display: none; }
+}
+
+
+/* --- Mobile scroll & no big white gap --- */
+
+/* Даем странице прокручиваться, а не внутренним контейнерам */
+@media (max-width: 768px) {
+  .table-body {
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* Контейнер не должен насильно занимать высоту экрана */
+  .rating-container {
+    min-height: 0;           /* вместо calc(100vh - 80px) */
+    padding-bottom: 16px;
+  }
+
+  /* Убираем “прокладку” снизу */
+  .rating-footer {
+    margin: 16px 0 0;
+    padding-bottom: 0;
+  }
+  .rating-footer::after {
+    display: none;
+  }
+}
+
+/* На всякий случай глобально разрешаем прокрутку страницы */
+html, body {
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto;
+}
+
+/* Если на странице есть textarea, чтобы она не тянула блок вниз */
+textarea { resize: none; }
+
+/* Безопасная зона iOS — небольшая подкладка вместо огромного “поля” */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  body { padding-bottom: env(safe-area-inset-bottom); }
+}

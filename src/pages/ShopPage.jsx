@@ -209,7 +209,7 @@ export default function ShopPage() {
           {/* Заголовок */}
           <div className="page-header">
             <div className="header-info">
-              <p>Добро пожаловать в магазин, {fullName}!</p>
+              <h2>Добро пожаловать в магазин, {fullName}!</h2>
             </div>
             <div className="coins-display">
               <BestCoins amount={studentData?.points || 0} loading={loadingCoins} />
@@ -252,7 +252,7 @@ export default function ShopPage() {
                     ) : (
                       <>
                         <div className="section-header">
-                          <h2>Товары, которые вы можете купить</h2>
+                          <h3>Товары, которые вы можете купить</h3>
                           <p>У вас достаточно монет для покупки этих товаров</p>
                         </div>
                         <div className="products-grid">
@@ -484,7 +484,8 @@ export default function ShopPage() {
                   Подтвердить покупку
                 </button>
                 <button 
-                  className="btn-secondary"
+                  className="btn-primary"
+                  style={{ backgroundColor: '#6c757d' }}
                   onClick={() => {
                     setShowPurchaseModal(false);
                     setSelectedProduct(null);

@@ -12,7 +12,7 @@ import {
   getEventWithUsers
 } from '../services/eventService';
 import '../styles/ManageEventsPage.css';
-import '../styles/EventModals.css'; // новый импорт
+//import '../styles/EventModals.css'; // новый импорт
 
 export default function ManageEventsPage() {
   const navigate = useNavigate();
@@ -315,7 +315,8 @@ export default function ManageEventsPage() {
                    Удалить
                  </button>
                  <button 
-                   className="btn-secondary"
+                   className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}}
                    onClick={() => {
                      setShowDeleteConfirm(false);
                      setEventToDelete(null);

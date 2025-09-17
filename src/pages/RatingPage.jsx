@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import SmartTopBar from '../components/SmartTopBar';
 import Topbar from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
 import { getTop10WithCurrentUser } from '../services/ratingService';
@@ -119,11 +120,8 @@ export default function RatingPage() {
         <div className="rating-page-background"></div>
         <Sidebar activeItem="rating" userRole={user.role} />
         <div className="main-content">
-          <Topbar
-            userName={fullName}
-            userRole={user.role}
-            onProfileClick={() => navigate('/profile')}
-          />
+          <SmartTopBar pageTitle="Главная" />
+
           <div className="loading-container">
             <div className="loader"></div>
             <p>Загрузка рейтинга...</p>
@@ -139,11 +137,8 @@ export default function RatingPage() {
         <div className="rating-page-background"></div>
         <Sidebar activeItem="rating" userRole={user.role} />
         <div className="main-content">
-          <Topbar
-            userName={fullName}
-            userRole={user.role}
-            onProfileClick={() => navigate('/profile')}
-          />
+          <SmartTopBar pageTitle="Главная" />
+
           <div className="error-container">
             <h2>Ошибка</h2>
             <p>{error}</p>
@@ -162,12 +157,8 @@ export default function RatingPage() {
       <Sidebar activeItem="rating" userRole={user.role} />
       
       <div className="main-content">
-        <Topbar
-          userName={fullName}
-          userRole={user.role}
-          pageTitle="Рейтинг"
-          onProfileClick={() => navigate('/profile')}
-        />
+        <SmartTopBar pageTitle="Главная" />
+
 
         <div className="rating-container">
           <div className="rating-header">

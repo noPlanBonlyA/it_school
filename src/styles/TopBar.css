@@ -806,3 +806,27 @@
     padding: 5px 8px;
   }
 }
+
+
+/* — убрать лишнюю высоту в шапке списка уведомлений — */
+.notification-header{
+  min-height: 0 !important;      /* не фиксируем высоту */
+  padding: 0 48px 0 0 !important;/* убираем вертикальные паддинги */
+}
+
+.notification-header-left{
+  padding: 6px 0 6px 16px !important; /* компактнее, только по 6px сверху/снизу */
+  align-items: center;                 /* ровняем кнопку по центру по высоте */
+}
+
+/* на мобильных ещё компактнее */
+@media (max-width: 480px){
+  .notification-header{ padding: 0 40px 0 0 !important; }
+  .notification-header-left{ padding: 6px 0 6px 12px !important; }
+}
+
+/* на всякий случай, чтобы список не добавлял отступ сверху */
+.notification-list{
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}

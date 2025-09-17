@@ -141,28 +141,49 @@ export default function TeacherCoursePage() {
               </div>
               
               {course && (
-                <div className="course-main-info">
-                  {course.photo?.url && (
-                    <CourseImage
-                      src={course.photo.url}
-                      alt={course.name}
-                      className="course-detail-image"
-                      placeholder="📚"
-                    />
-                  )}
-                  
-                  <div className="course-content">
-                    <h1 className="course-title">{course.name}</h1>
-                    <p className="course-description">{course.description}</p>
-                    <div className="course-meta">
-                      <span className="course-author">👩‍🏫 {course.author_name || 'Не указан'}</span>
-                      {course.age_category && (
-                        <span className="course-category">👥 {course.age_category}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
+  <div className="course-main-info">
+    {/* Левая колонка — текст */}
+    <div className="course-content">
+      <h1 className="course-title">{course.name}</h1>
+
+      {course.description && (
+        <p className="course-description">{course.description}</p>
+      )}
+
+      <div className="course-meta">
+        <span className="course-author">👩‍🏫 {course.author_name || 'Не указан'}</span>
+        {course.age_category && (
+          <span className="course-category">👥 {course.age_category}</span>
+        )}
+      </div>
+
+      {/* если нужна десктоп-кнопка под описанием — раскомментируй
+      {(user.role === 'admin' || user.role === 'superadmin') && (
+        <button
+          className="btn-create-lesson-desktop"
+          onClick={() => navigate(`/courses/${courseId}/lessons/create`)}
+        >
+          📝 Создать урок
+        </button>
+      )} */}
+    </div>
+
+    {/* Правая колонка — картинка */}
+    {course.photo?.url ? (
+      <CourseImage
+        src={course.photo.url}
+        alt={course.name}
+        className="course-image"      // ⇐ используем этот класс (в CSS он уже учтён)
+        placeholder="📚"
+      />
+    ) : (
+      <div className="course-image">
+        <div className="course-image-placeholder">📚</div>
+      </div>
+    )}
+  </div>
+)}
+
             </div>
 
             <div className="lessons-section">

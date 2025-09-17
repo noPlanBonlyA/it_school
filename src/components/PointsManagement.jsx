@@ -141,8 +141,7 @@ const PointsManagement = ({ onClose, selectedStudent = null }) => {
       console.log('[PointsManagement] Points update result:', result);
 
       setSuccessMessage(
-        `Успешно ${points > 0 ? 'начислено' : 'списано'} ${Math.abs(points)} монет студенту ${formData.student_name}. ` +
-        `Новый баланс: ${result.newBalance} монет.`
+        `Успешно ${points > 0 ? 'начислено' : 'списано'} ${Math.abs(points)} монет студенту ${formData.student_name}`
       );
       
       // Очищаем форму, если не было предварительно выбранного студента
@@ -322,7 +321,10 @@ const PointsManagement = ({ onClose, selectedStudent = null }) => {
 
         <div className="submit-section">
           {onClose && (
-            <button type="button" className="cancel-btn" onClick={onClose}>
+            <button type="button" 
+            className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}}
+            onClick={onClose}>
               Отмена
             </button>
           )}

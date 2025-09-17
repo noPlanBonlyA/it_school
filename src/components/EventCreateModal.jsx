@@ -778,7 +778,8 @@ export default function EventCreateModal({ onSave, onClose }) {
             {saving ? 'Создание мероприятия...' : 'Создать мероприятие'}
           </button>
           <button 
-            className="btn-secondary"
+            className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}}
             onClick={onClose}
           >
             Отмена

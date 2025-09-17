@@ -1,7 +1,7 @@
 /*  src/components/Schedule.jsx
     Виджет расписания с кнопками для преподавателя     */
 
-import React, { useState } from 'react';
+import React, { useRef,useState,useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Schedule.css';
@@ -10,10 +10,42 @@ import api from '../api/axiosInstance';
 import { getUserScheduleOptimized, updateLessonGroup } from '../services/scheduleService';
 import { createLessonCoinsHistory } from '../services/coinHistoryService';
 
+// === accent color (как в SchedulePage) ===
+const PALETTE = [
+  '#3B82F6', '#10B981', '#F59E0B', '#EF4444',
+  '#8B5CF6', '#06B6D4', '#A855F7', '#22C55E',
+  '#E11D48', '#14B8A6'
+];
+function hashCode(str=''){ let h=0; for (let i=0;i<String(str).length;i++){ h=(h<<5)-h+String(str).charCodeAt(i); h|=0;} return Math.abs(h); }
+function pickColorFromKey(key){ if(!key) return '#00B18F'; return PALETTE[ hashCode(String(key)) % PALETTE.length ]; }
+function hexToRGBA(hex, a=0.10){
+  const v=hex.replace('#','');
+  const r=parseInt(v.length===3?v[0]+v[0]:v.slice(0,2),16);
+  const g=parseInt(v.length===3?v[1]+v[1]:v.slice(2,4),16);
+  const b=parseInt(v.length===3?v[2]+v[2]:v.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function keyForAccent(ev){
+  return ev?.group_id || ev?.group_name || ev?.course_id || ev?.course_name || 'default';
+}
+
 export default function Schedule({ events, onSelect, selectedEvent, onClose, onCardClick }) {
+  
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+  const scrollerRef = useRef(null);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const update = () => {
+      const gutter = el.offsetWidth - el.clientWidth; // ширина скроллбара
+      el.style.setProperty('--sbw', `${gutter}px`);
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
   // Логируем структуру событий для отладки
   console.log('[Schedule] Component received events:', events);
   if (events && events.length > 0) {
@@ -51,6 +83,35 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
     auditorium: ''
   });
   const [savingTime, setSavingTime] = useState(false);
+  // Лочим скролл страницы, когда открыт виджет/модалка
+useEffect(() => {
+  const needLock = Boolean(selectedEvent || conductingLesson || editingTime);
+  const body = document.body;
+
+  if (!needLock) return;
+
+  const scrollY = window.scrollY;
+  const prev = {
+    position: body.style.position,
+    top: body.style.top,
+    width: body.style.width,
+    overflowY: body.style.overflowY
+  };
+
+  // Лочим фон без «дёрганья» страницы
+  body.style.position = 'fixed';
+  body.style.top = `-${scrollY}px`;
+  body.style.width = '100%';
+  body.style.overflowY = 'scroll';
+
+  return () => {
+    body.style.position = prev.position;
+    body.style.top = prev.top;
+    body.style.width = prev.width;
+    body.style.overflowY = prev.overflowY;
+    window.scrollTo(0, scrollY);
+  };
+}, [selectedEvent, conductingLesson, editingTime]);
 
   if (!events || events.length === 0) {
     return (
@@ -77,6 +138,26 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
       month: '2-digit'
     });
   };
+
+
+  const formatTimeRange = (ev) => {
+  const s = ev.start_datetime || ev.start;
+  const e = ev.end_datetime || ev.end;
+  const from = formatTime(s);
+  const to   = e ? formatTime(e) : '';
+  return to ? `${from} — ${to}` : from;
+};
+
+// NEW: бейдж типа занятия ("Практика" / "Мероприятие")
+const getLessonBadge = (ev) => {
+  const raw = (ev.lesson_type || ev.type || ev.type_name || '').toString().trim().toLowerCase();
+  const isEvent = getEventType(ev) === 'event' || raw === 'event';
+  return {
+    text: isEvent ? 'Мероприятие' : 'Урок',
+    isEvent
+  };
+};
+
 
   const getTimeUntil = (dateString) => {
     if (!dateString) return '';
@@ -108,7 +189,7 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
     const lessonTime = new Date(event.start_datetime || event.start);
     return `${now < lessonTime ? 'scheduled' : 'closed'} ${baseClass}`;
   };
-
+  
   const getStatusText = (event) => {
     if (event.is_opened) return 'Открыт';
     const now = new Date();
@@ -789,48 +870,41 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
   };
 
   // Рендеринг для мобильных устройств с улучшенной структурой
-  const renderMobileScheduleItem = (event, index) => (
-    <li 
-      key={event.id || index} 
+  const renderMobileScheduleItem = (event, index) => {
+  const badge = getLessonBadge(event);
+  const accent = pickColorFromKey(keyForAccent(event));
+  const styleVars = {
+    '--item-accent': accent,
+    '--item-accent-bg': hexToRGBA(accent, 0.10),
+    '--item-accent-border': hexToRGBA(accent, 0.5)
+  };
+
+  return (
+    <li
+      key={event.id || index}
+      style={styleVars}
       className={`schedule-item ${getStatusClass(event)} ${getEventType(event) === 'event' ? 'is-event' : 'is-lesson'}`}
-      onClick={(e) => {
-        if (onCardClick) {
-          onCardClick(e);
-        }
-        onSelect && onSelect(event);
-      }}
+      onClick={(e) => { onCardClick?.(e); onSelect?.(event); }}
     >
-      {/* Верхняя строка: время и статус */}
+      {/* верхняя строка: диапазон времени + бейдж */}
       <div className="schedule-top-row">
-        <div className="time">
-          {formatTime(event.start_datetime || event.start)}
-        </div>
-        <div className="schedule-status">
-          {getStatusText(event)}
-        </div>
+        <div className="time-range">{formatTimeRange(event)}</div>
+        <span className={`lesson-badge ${badge.isEvent ? 'badge--event' : 'badge--practice'}`}>
+          {badge.text}
+        </span>
       </div>
-      
-      {/* Основная информация о занятии */}
+
+      {/* название и курс */}
       <div className="schedule-main-info">
-        <div className="title">
-          {getEventDisplayName(event)}
-        </div>
-        <div className="schedule-course-info">
-          {getEventSubtitle(event)}
-        </div>
+        <div className="title">{getEventDisplayName(event)}</div>
+        <div className="schedule-course-info">{getEventSubtitle(event)}</div>
       </div>
-      
-      {/* Дополнительные детали */}
+
+      {/* детали */}
       <div className="schedule-details">
-        {event.group_name && (
-          <div className="schedule-detail-item">
-            <span className="icon">👥</span>
-            <span>{event.group_name}</span>
-          </div>
-        )}
         {event.teacher_name && (
           <div className="schedule-detail-item">
-            <span className="icon">👩‍🏫</span>
+            <span className="icon">👤</span>
             <span>{event.teacher_name}</span>
           </div>
         )}
@@ -843,68 +917,79 @@ export default function Schedule({ events, onSelect, selectedEvent, onClose, onC
       </div>
     </li>
   );
+};
 
   // Рендеринг для десктопных устройств (существующий)
-  const renderDesktopScheduleItem = (event, index) => (
-    <div 
-      key={event.id || index} 
-      className={`schedule-item ${getStatusClass(event)} ${getEventType(event) === 'event' ? 'is-event' : 'is-lesson'}`}
-      onClick={(e) => {
-        if (onCardClick) {
-          onCardClick(e);
-        }
-        onSelect && onSelect(event);
-      }}
+  // NEW: десктопная карточка без teacher-действий (ничего лишнего)
+const renderDesktopScheduleItem = (event, index) => {
+  const badge = getLessonBadge(event);
+  const accent = pickColorFromKey(keyForAccent(event));
+  const styleVars = {
+    '--item-accent': accent,
+    '--item-accent-bg': hexToRGBA(accent, 0.10),
+    '--item-accent-border': hexToRGBA(accent, 0.5)
+  };
+
+  return (
+    <div
+      key={event.id || index}
+      className={`schedule-desktop-item ${getStatusClass(event)} ${getEventType(event) === 'event' ? 'is-event' : 'is-lesson'}`}
+      onClick={(e) => { onCardClick?.(e); onSelect?.(event); }}
     >
-      <div className="schedule-time-block">
-        <div className="schedule-date">
-          {formatDate(event.start_datetime || event.start)}
+      <div className="schedule-card desktop" style={styleVars}>
+        {/* верхняя строка: диапазон времени + бейдж */}
+        <div className="schedule-top-row">
+          <div className="time-range">{formatTimeRange(event)}</div>
+          <span className={`lesson-badge ${badge.isEvent ? 'badge--event' : 'badge--practice'}`}>
+            {badge.text}
+          </span>
         </div>
-        <div className="schedule-time">
-          {formatTime(event.start_datetime || event.start)}
+
+        {/* название и курс */}
+        <div className="schedule-main-info">
+          <div className="title">{getEventDisplayName(event)}</div>
+          <div className="schedule-course-info">{getEventSubtitle(event)}</div>
         </div>
-        <div className="schedule-countdown">
-          {getTimeUntil(event.start_datetime || event.start)}
+
+        {/* детали */}
+        <div className="schedule-details">
+          {event.teacher_name && (
+            <div className="schedule-detail-item">
+              <span className="icon">👤</span>
+              <span>{event.teacher_name}</span>
+            </div>
+          )}
+          {event.auditorium && (
+            <div className="schedule-detail-item">
+              <span className="icon">📍</span>
+              <span>{event.auditorium}</span>
+            </div>
+          )}
         </div>
-      </div>
-      
-      <div className="schedule-content">
-        <div className="schedule-lesson-name">
-          {getEventDisplayName(event)}
-        </div>
-        <div className="schedule-course-name">
-          {getEventSubtitle(event)}
-        </div>
-        {event.group_name && (
-          <div className="schedule-group">
-            👥 {event.group_name}
-          </div>
-        )}
-        {event.teacher_name && (
-          <div className="schedule-teacher">
-            👩‍🏫 {event.teacher_name}
-          </div>
-        )}
-        {event.auditorium && (
-          <div className="schedule-auditorium">
-            📍 {event.auditorium}
-          </div>
-        )}
       </div>
     </div>
   );
+};
 
-  return (
-    <div className="schedule-container">
+
+ return (
+  <div className="schedule-container">
+    <div
+      ref={scrollerRef}
+      className="schedule-scroller"
+      role="region"
+      aria-label="Список занятий за день"
+    >
       {isMobile() ? (
-        // Мобильный вид с улучшенной структурой
         <ul className="schedule-list">
           {events.map((event, index) => renderMobileScheduleItem(event, index))}
         </ul>
       ) : (
-        // Десктопный вид (существующий)
-        events.map((event, index) => renderDesktopScheduleItem(event, index))
+        <div className="schedule-desktop-list">
+          {events.map((event, index) => renderDesktopScheduleItem(event, index))}
+        </div>
       )}
+    </div>
       
       {/* Виджет с подробностями выбранного события */}
       {selectedEvent && (

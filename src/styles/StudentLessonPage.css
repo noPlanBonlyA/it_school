@@ -757,6 +757,7 @@
 }
 
 .btn-secondary {
+  width: 100%;
   background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
   color: white;
   border: none;

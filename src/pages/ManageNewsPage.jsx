@@ -438,7 +438,8 @@ export default function ManageNewsPage() {
                   Удалить
                 </button>
                 <button 
-                  className="btn-secondary" 
+                  className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}}
                   onClick={() => { 
                     setEditItem(null); 
                     setImageFile(null); 

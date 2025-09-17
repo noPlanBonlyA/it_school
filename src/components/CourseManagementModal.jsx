@@ -823,14 +823,14 @@ ${result.message}
                     <div className="lessons-controls">
                       <div className="selection-controls">
                         <button 
-                          className="btn-secondary"
+                          className="btn-primary"
                           onClick={selectAllLessons}
                           disabled={selectedLessons.size === courseLessons.length}
                         >
                           Выбрать все
                         </button>
                         <button 
-                          className="btn-secondary"
+                          className="btn-primary"
                           onClick={clearLessonSelection}
                           disabled={selectedLessons.size === 0}
                         >
@@ -840,7 +840,8 @@ ${result.message}
                       
                       <div className="action-controls">
                         <button 
-                          className="btn-danger"
+                          className="btn-primary"
+                          style={{ backgroundColor: '#d9534f', borderColor: '#d43f3a' }}
                           onClick={handleRemoveSelectedLessons}
                           disabled={selectedLessons.size === 0 || loading}
                         >
@@ -1154,7 +1155,8 @@ ${result.message}
 
                 <div className="action-section">
                   <button 
-                    className="btn-danger remove-course-btn"
+                    className="btn-primary"
+                    style={{ backgroundColor: '#d9534f', borderColor: '#d43f3a' }}
                     onClick={handleRemoveCourse}
                     disabled={loading}
                   >

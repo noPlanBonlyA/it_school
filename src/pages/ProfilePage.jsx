@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
+import SmartTopBar from '../components/SmartTopBar';
 import AttendanceWidget from '../components/AttendanceWidget';
 import { useAuth } from '../contexts/AuthContext';
 import { getMe } from '../services/userService';
@@ -28,6 +29,8 @@ export default function ProfilePage() {
   }, [authUser]);
 
   // Обработка выбора файла
+  const [imgError, setImgError] = useState(false);
+
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -141,29 +144,24 @@ export default function ProfilePage() {
   };
 
   // Функция для получения URL аватара
-  const getAvatarUrl = () => {
-    if (previewUrl) return previewUrl;
-    
-    // По API документации фото пользователя находится в поле 'photo'
-    if (user?.photo?.url) {
-      // Если URL уже полный - используем как есть
-      if (user.photo.url.startsWith('http')) {
-        return user.photo.url;
-      }
-      // Если относительный путь - добавляем базовый URL
-      return `${window.location.protocol}//${window.location.hostname}:8080${user.photo.url}`;
-    }
-    
-    // Fallback к старым полям или дефолтной картинке
-    if (user?.avatar?.url) {
-      if (user.avatar.url.startsWith('http')) {
-        return user.avatar.url;
-      }
-      return `${window.location.protocol}//${window.location.hostname}:8080${user.avatar.url}`;
-    }
-    
-    return user?.avatar_url || '/img/default-avatar.svg';
-  };
+// Функция для получения URL аватара (возвращает null, если аватара нет)
+const getAvatarUrl = () => {
+  if (previewUrl) return previewUrl;
+
+  const buildUrl = (u) =>
+    u?.startsWith('http')
+      ? u
+      : `${window.location.protocol}//${window.location.hostname}:8080${u}`;
+
+  if (user?.photo?.url)  return buildUrl(user.photo.url);
+  if (user?.avatar?.url) return buildUrl(user.avatar.url);
+  if (user?.avatar_url)  return user.avatar_url;
+
+  return null; // нет аватара
+};
+const avatarUrl = getAvatarUrl();
+const showImage = !!avatarUrl && !imgError;
+
 
   if (!user) return <div>Загрузка...</div>;
 
@@ -179,62 +177,63 @@ export default function ProfilePage() {
       <Sidebar activeItem="settings" userRole={user.role} />
 
       <div className="main-content">
-        <Topbar
-          userName={fullName}
-          userRole={user.role}
-          pageTitle="Профиль"
-          onBellClick={() => {}}
-          onProfileClick={() => {}}
-        />
+        <SmartTopBar pageTitle="Главная" />
+
 
         <div className="profile-page">
           <div className="profile-form">
             {/* аватар + username */}
             <div className="avatar-block">
-              <div className="avatar-container">
-                <img
-                  className="avatar-img"
-                  src={getAvatarUrl()}
-                  alt="avatar"
-                  onError={(e) => {
-                    console.warn('Avatar image failed to load:', e.target.src);
-                    e.target.src = '/img/default-avatar.svg';
-                  }}
-                />
+             <div className="avatar-container">
+  {showImage ? (
+    <img
+      className="avatar-img"
+      src={avatarUrl}
+      alt="avatar"
+      onError={() => setImgError(true)}   // если картинка не загрузилась — переключаемся на фолбек
+    />
+  ) : (
+    <div
+      className="avatar-fallback"
+      aria-hidden="true"
+      title="Аватар отсутствует"
+    >
+      🙂  {/* можно заменить на любой эмодзи */}
+    </div>
+  )}
                 
                 {/* Кнопка для выбора файла */}
                 <div className="avatar-upload">
-                  <input
-                    type="file"
-                    id="avatar-input"
-                    accept="image/*"
-                    onChange={handleFileSelect}
-                    style={{ display: 'none' }}
-                  />
-                  <label htmlFor="avatar-input" className="upload-button">
-                    📷 Изменить фото
-                  </label>
-                </div>
+    <input
+      type="file"
+      id="avatar-input"
+      accept="image/*"
+      onChange={handleFileSelect}
+      style={{ display: 'none' }}
+    />
+    <label htmlFor="avatar-input" className="upload-button">
+      📷 Изменить фото
+    </label>
+  </div>
 
-                {/* Кнопки управления загрузкой */}
-                {selectedFile && (
-                  <div className="upload-controls">
-                    <button
-                      onClick={handleUploadAvatar}
-                      disabled={uploading}
-                      className="save-button"
-                    >
-                      {uploading ? 'Сохранение...' : 'Сохранить'}
-                    </button>
-                    <button
-                      onClick={handleCancelUpload}
-                      className="cancel-button"
-                    >
-                      Отмена
-                    </button>
-                  </div>
-                )}
-              </div>
+  {selectedFile && (
+    <div className="upload-controls">
+      <button
+        onClick={handleUploadAvatar}
+        disabled={uploading}
+        className="save-button"
+      >
+        {uploading ? 'Сохранение...' : 'Сохранить'}
+      </button>
+      <button
+        onClick={handleCancelUpload}
+        className="cancel-button"
+      >
+        Отмена
+      </button>
+    </div>
+  )}
+</div>
               
               <span className="username">{user.username || '—'}</span>
             </div>

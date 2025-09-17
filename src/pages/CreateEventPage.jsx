@@ -307,7 +307,7 @@ export default function CreateEventPage() {
               <p>Заполните информацию о новом мероприятии</p>
             </div>
             <button 
-              className="btn-secondary back-to-events"
+              className="btn-primary"
               onClick={() => navigate('/manage-events')}
             >
               ← К списку мероприятий
@@ -812,7 +812,8 @@ export default function CreateEventPage() {
                 {saving ? 'Создание мероприятия...' : 'Создать мероприятие'}
               </button>
               <button 
-                className="btn-secondary cancel-btn"
+                className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}}
                 onClick={() => navigate('/manage-events')}
                 disabled={saving}
               >

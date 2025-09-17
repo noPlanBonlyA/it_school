@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import Sidebar   from '../components/Sidebar';
 import Topbar    from '../components/TopBar';
+import SmartTopBar from '../components/SmartTopBar';
 import Schedule  from '../components/Schedule';
 import BestCoins from '../components/BestCoin';
 import NewsModal from '../components/NewsModal';
@@ -13,6 +14,7 @@ import userService          from '../services/userService';
 import { getUserScheduleOptimized } from '../services/scheduleService';
 import { findStudentByUser } from '../services/studentService';
 import api from '../api/axiosInstance';
+import '../styles/MobileImageFixes.css';
 
 import '../styles/HomePage.css';
 import '../styles/Schedule.css';
@@ -127,7 +129,7 @@ export default function HomePage() {
       day: 'numeric', month: 'long', year: 'numeric'
     });
     return {
-      scheduleTitle: `Пары на ${nextDayFormatted}`,
+      scheduleTitle: `${nextDayFormatted}`,
       dayEvents: events.filter(e => 
         new Date(e.start).setHours(0,0,0,0) === nextDay
       )
@@ -163,19 +165,15 @@ export default function HomePage() {
       <Sidebar activeItem="dashboard" userRole={fullUser.role} />
 
       <div className="main-content">
-        <Topbar
-          userName={fio}
-          userRole={fullUser.role}
-          pageTitle="Главная"
-          onBellClick={() => {}}
-          onProfileClick={() => navigate('/profile')}
-        />
+        <SmartTopBar pageTitle="Главная" />
+
 
 
 
         <section className="cards">
           {/* Расписание - всегда первое */}
-          <div className="card schedule">
+          <div className={`card schedule ${user?.role !== 'student' ? 'schedule--expanded' : ''}`}>
+
             <div className="card-header">
               <h3>{scheduleTitle}</h3>
               <button 
@@ -237,24 +235,27 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Айтишки - третье на мобильных */}
-          <div className="card coins">
-            <div className="card-header">
-              <h3>Айтишки</h3>
-              <button 
-                className="btn-details"
-                onClick={() => navigate('/rating')}
-                title="Перейти к рейтингу студентов"
-              >
-                Подробнее
-              </button>
-            </div>
+        {/* Айтишки — только для студентов */}
+{user?.role === 'student' && (
+  <div className="card coins">
+    <div className="card-header">
+      <h3>Айтишки</h3>
+      <button 
+        className="btn-details"
+        onClick={() => navigate('/rating')}
+        title="Перейти к рейтингу студентов"
+      >
+        Подробнее
+      </button>
+    </div>
 
-            <BestCoins 
-              amount={getCoinsAmount()} 
-              loading={user?.role === 'student' ? coinsLoading : false}
-            />
-          </div>
+    <BestCoins 
+      amount={getCoinsAmount()} 
+      loading={coinsLoading}
+    />
+  </div>
+)}
+
 
         </section>
 

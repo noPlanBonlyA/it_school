@@ -409,7 +409,8 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
           </button>
           <button 
             type="button" 
-            className="btn-secondary"
+            className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}}
             onClick={onCancel}
             disabled={loading}
           >

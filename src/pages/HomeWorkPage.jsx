@@ -184,8 +184,7 @@ export default function HomeworkPage() {
       
       setExpandedSubmission(studentId);
       
-      // Плавный скролл к кнопкам через небольшую задержку
-      scrollToButtons('.submission-details');
+      
     } catch (error) {
       console.error('[Homework] Error loading student details:', error);
       alert('Ошибка загрузки деталей студента');
@@ -211,8 +210,7 @@ export default function HomeworkPage() {
       
       setExpandedArchiveStudent(studentId);
       
-      // Плавный скролл к кнопкам архива через небольшую задержку
-      scrollToButtons('.archive-details');
+      
     } catch (error) {
       console.error('[Homework] Error loading archive student details:', error);
       alert('Ошибка загрузки деталей студента из архива');
@@ -523,29 +521,7 @@ export default function HomeworkPage() {
   }, [expandedSubmission, expandedArchiveStudent, students]);
 
   // ===== НОВОЕ: Функция плавного скролла к кнопкам =====
-  const scrollToButtons = (elementSelector) => {
-    setTimeout(() => {
-      const element = document.querySelector(elementSelector);
-      if (element) {
-        const buttons = element.querySelector('.details-buttons, .archive-buttons');
-        if (buttons) {
-          buttons.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'nearest',
-            inline: 'nearest'
-          });
-        }
-        
-        // Скрываем подсказку о скролле через 3 секунды
-        const scrollHint = element.querySelector('.scroll-hint');
-        if (scrollHint) {
-          setTimeout(() => {
-            scrollHint.classList.add('fade-out');
-          }, 3000);
-        }
-      }
-    }, 300); // Небольшая задержка для правильного рендеринга
-  };
+
 
   if (loading) {
     return (
@@ -729,7 +705,7 @@ export default function HomeworkPage() {
                         {expandedSubmission === student.id && (
                           <div className="submission-details">
                             {/* Подсказка о скролле */}
-                            <div className="scroll-hint">Прокрутите до кнопок</div>
+                            
                             
                             {/* Файлы домашки */}
                             {student.details?.passed_homeworks && student.details.passed_homeworks.length > 0 && (
@@ -793,9 +769,7 @@ export default function HomeworkPage() {
                                   />
                                   <span className="coins-icon">🪙</span>
                                 </div>
-                                <div className="coins-hint">
-                                  Максимум 10 бесткоинов за домашнее задание
-                                </div>
+                                
                               </div>
                             </div>
 

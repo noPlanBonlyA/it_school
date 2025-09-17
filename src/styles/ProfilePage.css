@@ -559,3 +559,29 @@
   transform: translateY(0) !important;
   box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3) !important;
 }
+/* Одинаковые размеры для картинки и фолбека */
+.avatar-img,
+.avatar-fallback {
+  width: 140px;     /* подгони под свой макет */
+  height: 140px;
+  border-radius: 50%;
+  border: 3px solid #e5e5e5;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* Картинка */
+.avatar-img {
+  object-fit: cover;
+  background: #fff;
+}
+
+/* Плашка с эмодзи — показывается, когда фото нет/сломалось */
+.avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;   /* размер эмодзи */
+  line-height: 1;
+  background: linear-gradient(135deg, #eafaf6 0%, #f5fffd 100%);
+  box-shadow: 0 8px 24px rgba(0, 177, 143, 0.15);
+}

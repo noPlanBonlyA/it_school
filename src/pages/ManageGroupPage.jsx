@@ -310,9 +310,9 @@ export default function ManageGroupPage() {
                           Управлять
                         </button>
                         <button 
-                          className="btn-danger" 
+                          className="btn-primary" 
                           onClick={() => delGrp(g.id)}
-                          style={{ padding: '10px 16px', fontSize: '14px' }}
+                          style={{ padding: '10px 16px', fontSize: '14px' , backgroundColor:'#e90b0bff'}}
                         >
                           Удалить
                         </button>

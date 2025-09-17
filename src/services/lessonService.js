@@ -153,6 +153,22 @@ export const getLessonWithMaterials = async (courseId, lessonId) => {
   }
 };
 
+
+
+export const getLessonWithMaterialsForAdmins = async (courseId, lessonId) => {
+  try {
+    console.log('[LessonService] Getting lesson with materials:', { courseId, lessonId });
+    
+    const response = await api.get(`/courses/${courseId}/lessons-with-materials/${lessonId}`);
+    
+    console.log('[LessonService] Lesson loaded:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('[LessonService] Error getting lesson:', error);
+    throw error;
+  }
+};
+
 /**
  * Удаление урока с материалами
  */

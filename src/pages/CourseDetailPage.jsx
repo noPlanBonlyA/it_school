@@ -250,6 +250,7 @@ export default function CourseDetailPage() {
         id: editingLesson.id,
         teacher_material_id: editingLesson.teacher_material_id,
         student_material_id: editingLesson.student_material_id
+        
       };
 
       // Применяем изменения материалов
@@ -338,81 +339,76 @@ export default function CourseDetailPage() {
         {course ? (
           <>
             <div className="course-header">
-              <div className="course-header-top">
-                {/* Кнопка вернуться слева */}
-                <button 
-                  className="btn-back"
-                  onClick={() => navigate(getCoursesPath(user.role))}
-                >
-                  ← Вернуться
-                </button>
-              </div>
+  {course && (
+    <div className="course-main-info two-col" style={{ marginLeft: '10px' }}>
+      {/* ЛЕВАЯ колонка: текст */}
+      <div className="course-col course-col--text">
+        <button
+          className="btn-back"
+          onClick={() => navigate(getCoursesPath(user.role))}
+        >
+          ← Вернуться 
+        </button>
 
-              <div className="course-main-info">
-                {course.photo?.url ? (
-                  <div className="course-image">
-                    <img 
-                      src={course.photo.url.startsWith('http') 
-                        ? course.photo.url 
-                        : `${window.location.protocol}//${window.location.hostname}:8080${course.photo.url}`
-                      } 
-                      alt={course.name}
-                      onLoad={() => console.log('[CourseDetailPage] Image loaded successfully:', course.photo.url)}
-                      onError={(e) => {
-                        console.error('[CourseDetailPage] Image failed to load:', course.photo.url);
-                        console.error('[CourseDetailPage] Image error event:', e);
-                        // Попробуем другие варианты URL
-                        const img = e.target;
-                        if (!img.dataset.retried) {
-                          img.dataset.retried = 'true';
-                          // Попробуем без протокола
-                          if (course.photo.url.startsWith('/')) {
-                            img.src = `http://localhost:8080${course.photo.url}`;
-                          }
-                        } else {
-                          // Если и второй раз не загрузилось, показываем placeholder
-                          img.style.display = 'none';
-                          const placeholder = document.createElement('div');
-                          placeholder.className = 'course-image-placeholder';
-                          placeholder.innerHTML = '📚 Изображение недоступно';
-                          img.parentElement.appendChild(placeholder);
-                        }
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="course-image">
-                    <div className="course-image-placeholder">📚</div>
-                  </div>
-                )}
+        <h1 className="course-title" style={{ marginTop: '5px' }}>{course.name}</h1>
 
-                <div className="course-content">
-                  <h1 className="course-title">{course.name}</h1>
-                  {course.description && (
-                    <p className="course-description">{course.description}</p>
-                  )}
-                  
-                  <div className="course-meta">
-                    {course.author_name && (
-                      <span className="course-author">👨‍🏫 {course.author_name}</span>
-                    )}
-                    {course.age_category && (
-                      <span className="course-category">🎯 {course.age_category}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Кнопка для мобильной версии */}
-              {(user.role === 'admin' || user.role === 'superadmin') && (
-                <button 
-                  className="btn-primary btn-create-lesson-mobile"
-                  onClick={handleOpenLessonEditor}
-                >
-                  📝 Создать урок с файлами
-                </button>
-              )}
-            </div>
+        {course.description && (
+          <p className="course-description">{course.description}</p>
+        )}
+
+        <div className="course-meta">
+          {course.author_name && (
+            <span className="course-author">👨‍🏫 {course.author_name}</span>
+          )}
+          {course.age_category && (
+            <span className="course-category">🎯 {course.age_category}</span>
+          )}
+        </div>
+
+        {(user.role === 'admin' || user.role === 'superadmin') && (
+          <button
+            className="btn-back"
+            style={{ marginTop: '32px' }}
+            onClick={handleOpenLessonEditor}
+          >
+            📝 Создать урок с файлами
+          </button>
+        )}
+      </div>
+
+      {/* ПРАВАЯ колонка: изображение */}
+      <div className="course-col course-col--image">
+        {course.photo?.url ? (
+          <div className="course-image">
+            <img
+              src={
+                course.photo.url.startsWith('http')
+                  ? course.photo.url
+                  : `${window.location.protocol}//${window.location.hostname}:8080${course.photo.url}`
+              }
+              alt={course.name}
+            />
+          </div>
+        ) : (
+          <div className="course-image">
+            <div className="course-image-placeholder">📚</div>
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+
+  {/* Мобильная кнопка — остаётся как была */}
+  {/* {(user.role === 'admin' || user.role === 'superadmin') && (
+    <button
+      className="btn-primary btn-create-lesson-mobile"
+      onClick={handleOpenLessonEditor}
+    >
+      📝 Создать урок с файлами
+    </button>
+  )} */}
+</div>
+
 
 
 
@@ -475,7 +471,8 @@ export default function CourseDetailPage() {
                   </div>
                   
                   <div className="modal-footer">
-                    <button className="btn-secondary" onClick={cancelEdit}>
+                    <button className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}} onClick={cancelEdit}>
                       Отмена
                     </button>
                     <button 
@@ -546,13 +543,7 @@ export default function CourseDetailPage() {
                           <div className="lesson-actions">
                             {(user.role === 'admin' || user.role === 'superadmin') && (
                               <>
-                                <button
-                                  className="btn-text btn-edit"
-                                  onClick={() => handleEditLesson(lesson)}
-                                  title="Редактировать урок"
-                                >
-                                  Редактировать
-                                </button>
+                                
                                 <button
                                   className="btn-text btn-view-content"
                                   onClick={() => viewLessonContent(lesson)}
@@ -561,7 +552,7 @@ export default function CourseDetailPage() {
                                   Содержимое
                                 </button>
                                 <button
-                                  className="btn-text btn-danger"
+                                  className="btn-text btn-danger1"
                                   onClick={() => handleDeleteLesson(lesson)}
                                   title="Удалить урок"
                                 >

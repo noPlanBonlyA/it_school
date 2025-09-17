@@ -40,6 +40,7 @@ import ImpersonatePage      from './pages/ImpersonatePage';
 
 import { useAuth }          from './contexts/AuthContext';
 import { NotificationsProvider } from './contexts/NotificationsContext';
+import AdminessonPage from './pages/AdminLessonPage';
 
 /**
  * Обёртка приватного маршрута:
@@ -82,6 +83,7 @@ export default function App() {
           <Route path="/courses" element={<PrivateRoute><StudentCoursesPage /></PrivateRoute>} />
           <Route path="/courses/:courseId/student" element={<PrivateRoute><StudentCoursePage /></PrivateRoute>} />
           <Route path="/courses/:courseId/lessons/:lessonId" element={<PrivateRoute><StudentLessonPage /></PrivateRoute>} />
+          <Route path="/courses/:courseId/lessons-with-materials/:lessonId" element={<PrivateRoute><AdminessonPage /></PrivateRoute>} />
           <Route path="/rating" element={<PrivateRoute><RatingPage /></PrivateRoute>} />
           <Route path="/shop" element={<PrivateRoute><ShopPage /></PrivateRoute>} />
 

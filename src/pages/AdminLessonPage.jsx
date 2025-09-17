@@ -4,10 +4,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
 import { useAuth } from '../contexts/AuthContext';
-import { getLessonInfoForTeacher } from '../services/lessonService';
+import { getLessonWithMaterialsForAdmins} from '../services/lessonService';
 import '../styles/StudentLessonPage.css';
 
-export default function TeacherLessonPage() {
+export default function AdminessonPage() {
   const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -27,58 +27,26 @@ export default function TeacherLessonPage() {
       
       console.log('[TeacherLessonPage] Loading lesson data for:', { courseId, lessonId });
       
-      const lessonData = await getLessonInfoForTeacher(courseId, lessonId);
+      const lessonData = await getLessonWithMaterialsForAdmins(courseId, lessonId);
       console.log('[TeacherLessonPage] Lesson data loaded:', lessonData);
       
       if (lessonData) {
-         const lessonObject = {
-  id: lessonId,
-  name: lessonData.name || lessonData.lesson_name || lessonData.title || 'Урок',
-  course_id: courseId,
-
-  // ---------- МАТЕРИАЛЫ ДЛЯ УЧИТЕЛЯ ----------
-  teacher_material_url:
-    lessonData.teacher_material?.url || null,
-  teacher_material_name:
-    lessonData.teacher_material?.name ||
-    lessonData.teacher_material_name ||
-    lessonData.materials?.teacher_name ||
-    null,
-
-  teacher_additional_material_url:
-    lessonData.teacher_additional_material?.url || null,
-  teacher_additional_material_name:
-    lessonData.teacher_additional_material?.name ||
-    lessonData.teacher_additional_material_name ||
-    lessonData.materials?.teacher_additional_name ||
-    null,
-
-  // ---------- ДЗ ----------
-  homework_material_url:
-    lessonData.homework?.url || null,
-  homework_material_name:
-    lessonData.homework?.name ||
-    lessonData.homework_material_name ||
-    lessonData.materials?.homework_name ||
-    null,
-
-  homework_additional_material_url:
-    lessonData.homework_additional_material?.url || null,
-  homework_additional_material_name:
-    lessonData.homework_additional_material?.name ||
-    lessonData.homework_additional_material_name ||
-    lessonData.materials?.homework_additional_name ||
-    null,
-
-  // (опционально можно добавить и студенческие, если когда-нибудь понадобятся на этой странице)
-  // student_material_url: lessonData.student_material?.url || null,
-  // student_material_name: lessonData.student_material?.name || null,
-  // student_additional_material_url: lessonData.student_additional_material?.url || null,
-  // student_additional_material_name: lessonData.student_additional_material?.name || null,
-
-  lesson_info: lessonData
-};
-
+        const lessonObject = {
+          id: lessonId,
+          name: lessonData.name || lessonData.lesson_name || lessonData.title || 'Урок',
+          course_id: courseId,
+          // Материалы для студентов
+          student_material_url: lessonData.student_material_url || null,
+          student_additional_material_url: lessonData.student_additional_material_url || null,
+          // Материалы домашнего задания
+          homework_material_url: lessonData.homework_material_url || null,
+          homework_additional_material_url: lessonData.homework_additional_material_url || null,
+          // Материалы для учителя
+          teacher_material_url: lessonData.teacher_material_url || null,
+          teacher_additional_material_url: lessonData.teacher_additional_material_url || null,
+          // Дополнительная информация
+          lesson_info: lessonData
+        };
         
         console.log('[TeacherLessonPage] Final lesson object:', lessonObject);
         setLesson(lessonObject);
@@ -138,7 +106,7 @@ export default function TeacherLessonPage() {
               <h2>Ошибка загрузки</h2>
               <p>{error}</p>
               <button 
-                onClick={() => navigate(`/courses/${courseId}/teacher`)}
+                onClick={() => navigate(`/shedule`)}
                 className="btn-primary"
               >
                 Вернуться к курсу
@@ -165,7 +133,7 @@ export default function TeacherLessonPage() {
           {/* Кнопка назад */}
           <div className="back-button-container">
             <button 
-              onClick={() => navigate(`/courses/${courseId}/teacher`)}
+              onClick={() => navigate(`/schedule`)}
               className="back-button"
             >
               ← Назад к курсу
@@ -177,7 +145,7 @@ export default function TeacherLessonPage() {
             <h1 className="lesson-title">{lesson?.name || 'Урок'} (Преподаватель)</h1>
           </div>
 
-          {/* Содержимое урока */}
+           {/* Содержимое урока */}
           <div className="lesson-content">
             
             {/* Материалы для учителя */}

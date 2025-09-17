@@ -494,3 +494,113 @@
     font-size: 12px;
   }
 }
+
+/* ====== Десктопная раскладка «текст слева — картинка справа» ====== */
+@media (min-width: 1024px) {
+  /* контейнер шапки курса уже есть */
+  .course-header {
+    margin-bottom: 40px;
+  }
+
+  /* делаем 2 колонки */
+  .course-main-info {
+    display: grid !important;
+    grid-template-columns: 1.25fr 1fr;
+    align-items: center;
+    gap: 32px;
+    max-width: 1180px;
+    margin: 0 auto;
+    text-align: left !important;
+  }
+
+  /* текстовая колонка слева */
+  .course-content {
+    order: 1;
+    text-align: left !important;
+    max-width: 720px;
+    margin: 0; /* убираем автоцентрирование с mobile-стилей */
+  }
+
+  .course-title {
+    font-size: 40px;
+    line-height: 1.15;
+    margin: 0 0 14px 0;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  .course-description {
+    font-size: 18px;
+    color: #4b5563;
+    margin-bottom: 16px;
+  }
+
+  .course-meta {
+    justify-content: flex-start !important;
+    gap: 10px 12px;
+  }
+
+  /* колонка с изображением справа */
+  .course-detail-image,
+  .course-image {
+    order: 2;
+    justify-self: end;
+    width: 560px !important;
+    height: 360px !important;
+    max-width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,.12);
+  }
+  .course-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* отступ перед блоком уроков */
+  .lessons-section {
+    margin-top: 28px;
+  }
+}
+
+/* планшет — чуть компактнее картинки */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .course-main-info {
+    gap: 24px;
+  }
+  .course-detail-image,
+  .course-image {
+    width: 440px !important;
+    height: 280px !important;
+  }
+}
+
+/* Мобилка — оставляем текущую колонку, ничего не ломаем */
+@media (max-width: 767px) {
+  .course-main-info { text-align: center; }
+}
+
+/* Если будет «десктопная» кнопка под описанием — показываем её ТОЛЬКО на десктопе */
+@media (min-width: 1024px) {
+  .btn-create-lesson-desktop { display: inline-flex; }
+  .btn-create-lesson-mobile  { display: none !important; }
+}
+@media (max-width: 1023px) {
+  .btn-create-lesson-desktop { display: none !important; }
+}
+/* небольшой стиль, если захочешь вставить кнопку под описанием */
+.btn-create-lesson-desktop {
+  margin-top: 18px;
+  background: #00B18F;
+  color: #fff;
+  border: 0;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0,177,143,.3);
+  cursor: pointer;
+}
+.btn-create-lesson-desktop:hover { background:#03836A; transform: translateY(-1px); }

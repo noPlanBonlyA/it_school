@@ -179,8 +179,9 @@ const CoinHistory = ({ studentId = null, compact = false }) => {
             {history.map((item) => (
               <li key={item.id} className="history-item">
                 <div className="item-left">
-                  <div className="reason-icon">
-                    {getReasonIcon(item.reason)}
+                   <div className={`points-change ${getPointsChangeClass(item.changed_points)}`}>
+                    <span className="points-icon">💻</span>
+                    {formatPointsChange(item.changed_points)}
                   </div>
                   <div className="item-info">
                     <h4 className="reason-label">
@@ -195,10 +196,7 @@ const CoinHistory = ({ studentId = null, compact = false }) => {
                   </div>
                 </div>
                 <div className="item-right">
-                  <div className={`points-change ${getPointsChangeClass(item.changed_points)}`}>
-                    <span className="points-icon">💻</span>
-                    {formatPointsChange(item.changed_points)}
-                  </div>
+                 
                 </div>
               </li>
             ))}

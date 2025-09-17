@@ -255,7 +255,8 @@ const AutoScheduleModal = ({
           </button>
           <button 
             onClick={onClose}
-            className="btn-secondary"
+            className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}}
             disabled={isLoading}
           >
             ❌ Отмена

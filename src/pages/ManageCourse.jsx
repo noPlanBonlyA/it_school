@@ -571,7 +571,8 @@ export default function ManageCoursesPage() {
                   Удалить
                 </button>
                 <button 
-                  className="btn-secondary" 
+                  className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}}
                   onClick={() => { 
                     setEdit(null); 
                     setEditImage(null); 
@@ -600,7 +601,8 @@ export default function ManageCoursesPage() {
                 <button className="btn-primary" onClick={handleCreate} disabled={uploading}>
                   {uploading ? 'Создание...' : '✨ Создать'}
                 </button>
-                <button className="btn-secondary" onClick={() => setShowConfirmCreate(false)}>
+                <button className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}} onClick={() => setShowConfirmCreate(false)}>
                   Отмена
                 </button>
               </div>
@@ -621,7 +623,8 @@ export default function ManageCoursesPage() {
                 <button className="btn-primary" onClick={handleUpdate} disabled={uploading}>
                   {uploading ? 'Сохранение...' : '💾 Сохранить'}
                 </button>
-                <button className="btn-secondary" onClick={() => setShowConfirmUpdate(false)}>
+                <button className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}} onClick={() => setShowConfirmUpdate(false)}>
                   Отмена
                 </button>
               </div>
@@ -642,7 +645,8 @@ export default function ManageCoursesPage() {
                 <button className="btn-danger" onClick={handleDelete}>
                   🗑️ Удалить
                 </button>
-                <button className="btn-secondary" onClick={() => setShowConfirmDelete(false)}>
+                <button className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}} onClick={() => setShowConfirmDelete(false)}>
                   Отмена
                 </button>
               </div>

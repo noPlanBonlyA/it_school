@@ -1,13 +1,15 @@
 /*  src/pages/SchedulePage.jsx  */
-import React, { useState, useEffect, useMemo } from 'react';
+
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-
+import listPlugin from '@fullcalendar/list'
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
+import SmartTopBar from '../components/SmartTopBar';
 import Schedule from '../components/Schedule';
 import EventModal from '../components/EventModal';
 import ScheduleFilterModal from '../components/ScheduleFilterModal';
@@ -16,6 +18,89 @@ import { getUserScheduleOptimized } from '../services/scheduleService';
 import { getFilteredSchedule, getFilterOptions, formatFiltersText } from '../services/scheduleFilterService';
 
 import '../styles/SchedulePage.css';
+// ▼ Вверху файла:
+// ---------- Цвет по курсу/группе (детерминированно) ----------
+const PALETTE = [
+  '#3B82F6', '#10B981', '#F59E0B', '#EF4444',
+  '#8B5CF6', '#06B6D4', '#A855F7', '#22C55E',
+  '#E11D48', '#14B8A6'
+];
+function hashCode(str='') {
+  let h = 0; for (let i = 0; i < String(str).length; i++) { h = (h<<5) - h + String(str).charCodeAt(i); h |= 0; }
+  return Math.abs(h);
+}
+function pickColorFromKey(key) {
+  if (!key) return '#00B18F';
+  return PALETTE[ hashCode(String(key)) % PALETTE.length ];
+}
+function hexToRGBA(hex, alpha=0.15) {
+  const v = hex.replace('#','');
+  const r = parseInt(v.length===3? v[0]+v[0]:v.slice(0,2),16);
+  const g = parseInt(v.length===3? v[1]+v[1]:v.slice(2,4),16);
+  const b = parseInt(v.length===3? v[2]+v[2]:v.slice(4,6),16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// ---------- утилита для безопасного HTML в шаблоне ----------
+function escapeHTML(s='') {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+}
+
+// ---------- единый шаблон карточки события ----------
+// если используете escapeHTML из вашего кода — оставляем его
+const renderEventContent = (arg) => {
+  const { event, timeText, view } = arg;
+  const tName = event.extendedProps.teacher_name || '';
+  const room  = event.extendedProps.auditorium || '';
+
+  // В мобильном list-виде — более плоский шаблон
+  if (view?.type?.startsWith?.('list')) {
+    return {
+      html: `
+        <div class="fc-listcard">
+          <div class="fc-listcard-title">${escapeHTML(event.title || '')}</div>
+          <div class="fc-listcard-meta">
+            ${timeText ? `<span class="fc-listcard-time">${escapeHTML(timeText)}</span>` : ``}
+            ${tName ? `<span class="fc-listcard-dot">•</span><span>${escapeHTML(tName)}</span>` : ``}
+            ${room  ? `<span class="fc-listcard-dot">•</span><span>${escapeHTML(room)}</span>` : ``}
+          </div>
+        </div>
+      `
+    };
+  }
+
+  // Месяц/неделя/день — прежняя карточка
+  return {
+    html: `
+      <div class="fc-card fc-card--stack">
+        <div class="fc-card-time">${escapeHTML(timeText || '')}</div>
+        <div class="fc-card-title">${escapeHTML(event.title || '')}</div>
+        ${tName ? `<div class="fc-card-sub"><span class="fc-i fc-i-teacher"></span>${escapeHTML(tName)}</div>` : ``}
+        ${room  ? `<div class="fc-card-sub"><span class="fc-i fc-i-room"></span>${escapeHTML(room)}</div>` : ``}
+      </div>
+    `
+  };
+};
+
+
+
+// ---------- классы на событие ----------
+const eventClassNames = () => ['fc-ev', 'fc-ev--card'];
+
+// ---------- покрасить карточку по курсу/группе ----------
+const eventDidMount = (info) => {
+  const ext = info.event.extendedProps || {};
+  const keyForColor = ext.group_id || ext.group_name || ext.course_id || ext.course_name || 'default';
+  const accent      = pickColorFromKey(keyForColor);
+  info.el.style.setProperty('--ev-accent', accent);
+  info.el.style.setProperty('--ev-accent-bg', hexToRGBA(accent, 0.12));
+  info.el.style.setProperty('--ev-accent-border', hexToRGBA(accent, 0.9));
+};
+
+
 
 export default function SchedulePage() {
   const navigate = useNavigate();
@@ -23,6 +108,30 @@ export default function SchedulePage() {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+// ——— мобильный брейкпоинт + ref календаря ———
+const calendarRef = useRef(null);
+const [isMobile, setIsMobile] = useState(
+  typeof window !== 'undefined' &&
+  window.matchMedia('(max-width: 768px)').matches
+);
+
+useEffect(() => {
+  const mq = window.matchMedia('(max-width: 768px)');
+  const onChange = (e) => setIsMobile(e.matches);
+  mq.addEventListener?.('change', onChange);
+  mq.addListener?.(onChange); // для старых браузеров
+  return () => {
+    mq.removeEventListener?.('change', onChange);
+    mq.removeListener?.(onChange);
+  };
+}, []);
+
+// При смене брейкпоинта — меняем представление
+useEffect(() => {
+  const api = calendarRef.current?.getApi?.();
+  if (!api) return;
+  api.changeView(isMobile ? 'listWeek' : 'dayGridMonth');
+}, [isMobile]);
 
   // Состояния для фильтрации (только для админов)
   const [showFilterModal, setShowFilterModal] = useState(false);
@@ -187,7 +296,8 @@ export default function SchedulePage() {
       <div className="app-layout">
         <Sidebar activeItem="schedule" userRole={user.role} />
         <div className="main-content">
-          <Topbar userName={fio} userRole={user.role} onProfileClick={() => navigate('/profile')} />
+         <SmartTopBar pageTitle="Главная" />
+
           <div className="loading-container">
             <div className="loader"></div>
             <p>Загрузка расписания...</p>
@@ -202,7 +312,8 @@ export default function SchedulePage() {
       <Sidebar activeItem="schedule" userRole={user.role} />
       
       <div className="main-content">
-        <Topbar userName={fio} userRole={user.role} pageTitle="Расписание" onProfileClick={() => navigate('/profile')} />
+        <SmartTopBar pageTitle="Главная" />
+
         
         {/* Панель фильтрации для админов */}
         {isAdmin && (
@@ -243,42 +354,54 @@ export default function SchedulePage() {
           <div className="schedule-layout">
             {/* Календарь - теперь на всю ширину */}
             <div className="calendar-widget full-width">
-              <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
-                headerToolbar={{
-                  left: 'prev,next today',
-                  center: 'title',
-                  right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                }}
-                locale="ru"
-                height="calc(100vh - 250px)" /* Фиксированная высота для лучшего отображения */
-                events={calendarEvents}
-                eventClick={handleEventClick}
-                eventDisplay="block"
-                dayMaxEvents={3}
-                moreLinkText="ещё"
-                slotMinTime="08:00:00"
-                slotMaxTime="22:00:00"
-                scrollTime="08:00:00"
-                businessHours={{
-                  daysOfWeek: [1, 2, 3, 4, 5, 6], // Пн-Сб
-                  startTime: '08:00',
-                  endTime: '20:00'
-                }}
-                allDaySlot={false}
-                slotDuration="00:30:00"
-                slotLabelInterval="01:00:00"
-                expandRows={true}
-                nowIndicator={true}
-                
-                /* Настройки формата времени */
-                slotLabelFormat={{
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  hour12: false
-                }}
-              />
+            <FullCalendar
+  ref={calendarRef}
+  plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+  initialView={isMobile ? 'listWeek' : 'dayGridMonth'}
+  headerToolbar={{
+    left: 'prev,next',
+    center: 'title',
+    right: isMobile ? 'listWeek,timeGridDay,today' : 'dayGridMonth,timeGridWeek,timeGridDay,today'
+  }}
+  buttonText={{ today: 'Сегодня', month: 'Месяц', week: 'Неделя', day: 'День', list: 'Список' }}
+  locale="ru"
+  height={isMobile ? 'auto' : 'calc(100vh - 250px)'}
+  events={calendarEvents}
+  eventClick={handleEventClick}
+  eventDisplay="block"
+  dayMaxEvents={3}
+  moreLinkText="ещё"
+  slotMinTime="08:00:00"
+  slotMaxTime="22:00:00"
+  scrollTime="08:00:00"
+  businessHours={{ daysOfWeek: [1,2,3,4,5,6], startTime: '08:00', endTime: '20:00' }}
+  allDaySlot={false}
+  slotDuration="00:30:00"
+  slotLabelInterval="01:00:00"
+  expandRows={true}
+  nowIndicator={true}
+  
+  /* формат времени (09:50), а в dayGrid дефолтное не рисуем — у нас свой шаблон */
+  eventTimeFormat={{ hour: '2-digit', minute: '2-digit', hour12: false }}
+
+  /* наш шаблон и стили */
+  eventContent={renderEventContent}
+  eventClassNames={eventClassNames}
+  eventDidMount={eventDidMount}
+  
+  /* без визуального наложения */
+  eventOverlap={false}
+  slotEventOverlap={false}   // <— важно для week/day
+  eventMaxStack={1}  
+  views={{
+    listWeek: {
+      listDayFormat: { weekday: 'long', day: 'numeric', month: 'long' },
+      listDaySideFormat: false
+    }
+  }}
+/>
+
+
             </div>
           </div>
         </div>

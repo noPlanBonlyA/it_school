@@ -60,7 +60,7 @@ export default function CreateLessonPage() {
               <p>Заполните информацию о новом уроке для курса</p>
             </div>
             <button 
-              className="btn-secondary back-to-course"
+              className="btn-primary"
               onClick={handleCancel}
             >
               ← К курсу

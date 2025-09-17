@@ -142,7 +142,8 @@ const MaterialUploader = ({
 
           <div className="editor-actions">
             <button 
-              className="btn-cancel"
+              className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}}
               onClick={handleCancel}
             >
               Отмена

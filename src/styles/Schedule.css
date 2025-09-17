@@ -1075,13 +1075,12 @@
 }
 
 .schedule-item.is-event::before {
-  content: '🎉';
+  
   position: absolute;
   top: 8px;
   right: 8px;
   font-size: 20px;
   opacity: 0.8;
-  animation: bounce 2s infinite;
 }
 
 @keyframes bounce {
@@ -1888,7 +1887,7 @@
   transition: all 0.2s ease;
   font-size: 12px; /* Уменьшен размер шрифта */
   white-space: nowrap; /* Предотвращает перенос текста */
-  width: 100%; /* На всю ширину */
+  width: 20%; /* На всю ширину */
   text-align: center; /* Центрируем текст */
 }
 
@@ -2807,5 +2806,515 @@
   .modal-overlay.conduct-lesson-modal .modal-actions {
     padding: 16px !important;
     gap: 10px !important;
+  }
+}
+
+
+/* === Новые элементы под референс === */
+.time-range{
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: #111827;
+}
+
+.lesson-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:14px;
+  font-weight:700;
+  line-height:1;
+  border:1px solid rgba(0,0,0,.05);
+}
+
+.lesson-badge.badge--practice{
+  background:#fde68a;  /* amber-200 */
+  color:#92400e;       /* amber-800 */
+}
+
+.lesson-badge.badge--event{
+  background:#ede9fe;  /* violet-100 */
+  color:#6d28d9;       /* violet-700 */
+  border-color: rgba(109,40,217,.25);
+}
+
+/* слегка усилим верхнюю строку */
+.schedule-top-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+/* чуть жирнее заголовок и зелёный курс — как в макете */
+.schedule-list .title{
+  font-size:18px;
+  font-weight:800;
+  color:#111827;
+  margin:2px 0 0;
+}
+
+.schedule-course-info{
+  color:#00B18F;
+  font-size:15px;
+  font-weight:700;
+}
+
+.schedule-details{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:6px;
+}
+
+.schedule-detail-item{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:14px;
+  color:#6b7280;
+}
+.schedule-detail-item .icon{ font-size:14px; opacity:.9; }
+
+
+/* ====== Десктоп: тот же «карточный» вид, что и на мобайле ====== */
+@media (min-width: 1025px) {
+  .schedule-desktop-item {
+    width: 100%;
+  }
+
+  .schedule-desktop-item .schedule-card.desktop {
+    background: #fff;
+    border: 1px solid rgba(17,24,39,.06);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 8px rgba(17,24,39,.04);
+    display: grid;
+    grid-template-rows: auto auto auto auto;
+    row-gap: 8px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+
+  .schedule-desktop-item .schedule-card.desktop:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(17,24,39,.07);
+  }
+
+  .schedule-desktop-item .schedule-top-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+  }
+
+  .schedule-desktop-item .time-range{
+    font-size: 15px;     /* чуть крупнее, чем на мобайле */
+    line-height: 1;
+    font-weight: 800;
+    color:#111827;
+  }
+
+  .schedule-desktop-item .lesson-badge{
+    display:inline-flex;
+    align-items:center;
+    padding:6px 10px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:700;
+    line-height:1;
+    border:1px solid rgba(0,0,0,.05);
+  }
+  .schedule-desktop-item .lesson-badge.badge--practice{
+    background:#fde68a;  /* amber-200 */
+    color:#92400e;       /* amber-800 */
+  }
+  .schedule-desktop-item .lesson-badge.badge--event{
+    background:#ede9fe;  /* violet-100 */
+    color:#6d28d9;       /* violet-700 */
+    border-color: rgba(109,40,217,.25);
+  }
+
+  .schedule-desktop-item .title{
+    font-size: 20px;
+    font-weight: 800;
+    color:#111827;
+    margin-top: 2px;
+  }
+
+  .schedule-desktop-item .schedule-course-info{
+    color:#00B18F;
+    font-size: 15px;
+    font-weight:700;
+  }
+
+  .schedule-desktop-item .schedule-details{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top: 4px;
+  }
+  .schedule-desktop-item .schedule-detail-item{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    color:#6b7280;
+  }
+  .schedule-desktop-item .schedule-detail-item .icon{
+    font-size:14px; opacity:.9;
+  }
+
+  /* кнопки действий — аккуратная сетка снизу */
+  .schedule-desktop-item .lesson-actions{
+    display:flex;
+    gap:8px;
+    margin-top: 6px;
+  }
+}
+
+
+/* === Uni-карточка урока/мероприятия (мобайл + десктоп) === */
+.schedule-item,
+.schedule-desktop-item .schedule-card.desktop {
+  --item-accent: #00B18F;
+  --item-accent-bg: rgba(0, 177, 143, .08);
+  --item-accent-border: rgba(0, 177, 143, .55);
+  background: var(--item-accent-bg) !important;
+  border-left: 6px solid var(--item-accent) !important;
+  border-right: 1px solid var(--item-accent-border) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,.06) !important;
+}
+
+/* убираем «старые» спец-раскраски, оставляем только акцент */
+.schedule-item.is-event,
+.schedule-item.is-lesson {
+  border: 1px solid rgba(17,24,39,.06) !important;
+  background: var(--item-accent-bg) !important;
+}
+
+/* time – приглушённый серый, как на календаре */
+.time-range{
+  color:#6b7280 !important;
+  font-weight:700 !important;
+}
+
+/* заголовок жирнее, курс зелёный — без изменений, но на всякий */
+.schedule-list .title,
+.schedule-desktop-item .title { color:#111827; font-weight:800; }
+.schedule-course-info { color:#00B18F; font-weight:700; }
+
+/* при hover слегка подсвечиваем рамку акцентом */
+.schedule-item:hover,
+.schedule-desktop-item .schedule-card.desktop:hover {
+  box-shadow: 0 10px 26px rgba(0,0,0,.10) !important;
+  border-right-color: var(--item-accent) !important;
+}
+
+/* статусные (opened/scheduled/closed) — не ломаем фон, только неприметные нюансы */
+.schedule-item.opened,
+.schedule-desktop-item.opened .schedule-card.desktop { filter: none; }
+.schedule-item.scheduled,
+.schedule-desktop-item.scheduled .schedule-card.desktop { filter: saturate(1.02); }
+.schedule-item.closed,
+.schedule-desktop-item.closed .schedule-card.desktop { opacity:.9; }
+/* === ВНУТРЕННЕЕ ОКНО СО СКРОЛЛОМ ДЛЯ ДЛИННЫХ ДНЕЙ === */
+.schedule-scroller{
+  /* окно внутри карточки: крутится ТОЛЬКО список */
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: clamp(380px, 62vh, 740px);  /* на десктопах — красиво и не «ломает» верстку */
+  padding-right: 8px;                     /* место под скроллбар */
+  overscroll-behavior: contain;           /* без «прокрутки страницы» когда упёрлись в край */
+  -webkit-overflow-scrolling: touch;      /* плавный скролл на iOS */
+  scroll-padding-top: 6px;
+}
+
+/* чтобы элементы «прилипали» при скролле (приятнее листать длинный день) */
+.schedule-list > li{ scroll-snap-align: start; }
+.schedule-list{ scroll-snap-type: y proximity; }
+
+/* десктопный поток, когда рендерим не UL, а дивы */
+.schedule-desktop-list{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* --- Мобилки и планшеты --- */
+@media (max-width: 1024px){
+  .schedule-scroller{
+    max-height: clamp(320px, 66vh, 680px);
+  }
+}
+
+@media (max-width: 768px){
+  .schedule-scroller{
+    /* на телефонах учитываем шапки/паддинги и безопасную зону */
+    max-height: calc(72vh - 8px);
+    min-height: 45vh;
+    padding-right: 6px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+@media (max-width: 480px){
+  .schedule-scroller{
+    max-height: calc(68vh - 6px);
+    min-height: 40vh;
+    padding-right: 4px;
+  }
+}
+/* === Мобайл-адаптация для длинных дней (внутренний скролл) === */
+@media (max-width: 768px){
+  .schedule-scroller{
+    /* используем динамический вьюпорт и safe-area */
+    max-height: calc(100dvh - 160px);
+    min-height: calc(100dvh - 320px);
+    padding-right: 6px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; /* плавно на iOS */
+    overscroll-behavior: contain;      /* не прокручиваем страницу */
+    touch-action: pan-y;
+  }
+
+  /* тонкий скролл под мобайл */
+  .schedule-scroller::-webkit-scrollbar{ width: 4px; }
+  .schedule-scroller::-webkit-scrollbar-track{
+    background: rgba(0,177,143,.08);
+    border-radius: 4px;
+    margin: 6px 0;
+  }
+  .schedule-scroller::-webkit-scrollbar-thumb{
+    background: linear-gradient(135deg, rgba(0,177,143,.55), rgba(3,131,106,.8));
+    border-radius: 4px;
+  }
+
+  /* приятная фиксация элементов при прокрутке */
+  .schedule-list{ scroll-snap-type: y proximity; }
+  .schedule-list > li{ scroll-snap-align: start; }
+}
+
+/* чуть компактнее на очень маленьких экранах */
+@media (max-width: 480px){
+  .schedule-scroller{
+    max-height: calc(100dvh - 140px);
+    min-height: calc(100dvh - 360px);
+    padding-right: 4px;
+  }
+}
+
+
+/* список занятий прокручиваем внутри */
+.schedule-scroller {
+  max-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* сайдбар с деталями — фикс и свой скролл */
+.event-details {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  /* подбери ширину под свой дизайн */
+  width: min(420px, 100vw);
+  background: #fff;
+  box-shadow: -8px 0 24px rgba(0,0,0,.08);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* модалка «Провести урок» — контент тоже должен скроллиться */
+.conduct-lesson-modal .modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* на всякий случай — фон модалки растягиваем на весь экран */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  overflow: hidden; /* фон не должен скроллиться */
+}
+
+.schedule-scroller{
+  max-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-inline-end: var(--sbw, 12px); /* если скроллбар 0px — оставим 12px */
+}
+
+.schedule-list::after{
+  right: calc(var(--sbw, 12px));
+}
+.schedule-scroller{
+  max-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* резерв под полосу прокрутки */
+  scrollbar-gutter: stable both-edges;
+  padding-inline-end: 12px; /* небольшой запас на macOS с оверлеем */
+  box-sizing: border-box;
+}
+
+/* если есть вертикальная «линия таймлайна» у списка — сместим её,
+   чтобы не совпадала со скроллбаром */
+.schedule-list::after{
+  right: 12px;
+}
+
+.schedule-card.desktop,
+.schedule-item{
+  width: 100%;
+  box-sizing: border-box;
+}/* было: padding-inline-end: 12px/var(--sbw) */
+.schedule-scroller{
+  max-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable both-edges; /* резерв под полосу */
+  padding-inline-end: 0;               /* не сужаем контент */
+  box-sizing: border-box;
+}
+/* компенсируем «канавку» скроллбара, чтобы карточки не сужались */
+.schedule-desktop-list,
+.schedule-list{
+  padding-inline-end: var(--sbw, 12px);          /* внутренний запас */
+  margin-inline-end: calc(var(--sbw, 12px) * -1);/* визуально растягиваем */
+}
+
+.schedule-card.desktop,
+.schedule-item{
+  width: 100%;
+  box-sizing: border-box;
+}
+/* --- FIX: скролл только внутри .schedule-scroller --- */
+.schedule-container{
+  overflow: visible !important;          /* убрали свой скролл */
+  padding-right: 0 !important;           /* не сужаем контент */
+  max-height: none !important;           /* высоту ограничит scroller */
+}
+
+/* если хочешь лимит высоты — ставь его на скроллер */
+.schedule-scroller{
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  max-height: clamp(380px, 62vh, 740px) !important;
+  padding-right: 0 !important;           /* без внутреннего запаса */
+  scrollbar-gutter: stable !important;   /* чтобы не прыгала вёрстка */
+}
+
+/* список — на всю ширину, без "компенсаций" и запасов */
+.schedule-desktop-list,
+.schedule-list{
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* если где-то рисуешь вертикальную линию у списка — отключи, чтобы не путать со скроллом */
+.schedule-list::after{ display: none !important; }
+.schedule-card.desktop,
+.schedule-item { width: 100%; box-sizing: border-box; }
+/* 1) Родителю скролл не нужен — скроллим только .schedule-scroller */
+.schedule-container{
+  overflow: visible !important;
+  max-height: none !important;
+  padding-right: 0 !important;
+}
+
+/* 2) Сам скроллер — флекс-дитя, ему нужно min-height:0 и flex:1 */
+.schedule-scroller{
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+  touch-action: pan-y !important;
+  padding-right: 0 !important; /* не сужаем карточки */
+}
+
+/* 3) Мобилка: задаём реальную высоту через динамический вьюпорт */
+@media (max-width: 768px){
+  .schedule-scroller{
+    height: calc(100dvh - 200px) !important; /* подгони отступ под свою шапку */
+    max-height: none !important;             /* Safari любит явный height */
+  }
+}
+
+/* список на всю ширину, без «компенсаций» */
+.schedule-list,
+.schedule-desktop-list{
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* чтобы визуальная линия списка (если есть) не мешала справа */
+.schedule-list::after{ display:none !important; }
+/* --- исключение только для карточки расписания --- */
+.card.schedule{
+  /* даём детям нормальную высоту и убираем обрезание */
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: auto !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* тело карточки со списком (если есть отдельный блок) */
+.card.schedule > *{
+  min-height: 0 !important; /* критично для iOS/Safari */
+}
+
+/* скроллим ТОЛЬКО список внутри */
+.card.schedule .schedule-scroller{
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* мобильная высота — без фиксированных max-height */
+@media (max-width: 768px){
+  .card.schedule .schedule-scroller{
+    height: calc(100dvh - 220px) !important; /* подгони под свою шапку/кнопки */
+    max-height: none !important;
+  }
+}
+/* 1) список не должен иметь фиксированный «запас» 12px */
+.schedule-desktop-list,
+.schedule-list{
+  padding-inline-end: var(--sbw, 0px) !important;          /* 0 по умолчанию */
+  margin-inline-end: calc(var(--sbw, 0px) * -1) !important;/* компенсация, если есть реальный gutter */
+}
+
+/* 2) если рисуешь правую вертикальную линию — сдвигай её на ширину скролл-гуттера */
+.schedule-list::after{
+  right: var(--sbw, 0px) !important;
+}
+
+/* 3) сам скроллер ничего не «съедает» справа, резерв делает scrollbar-gutter */
+.schedule-scroller{
+  padding-inline-end: 0 !important;
+  scrollbar-gutter: stable both-edges;   /* оставляет место под системный скроллбар */
+  overflow-y: auto !important;
+}
+
+/* 4) на iOS/Android со «оверлейным» скроллбаром никаких запасов не нужно вообще */
+@supports (-webkit-touch-callout: none) {
+  .schedule-desktop-list,
+  .schedule-list{
+    padding-inline-end: 0 !important;
+    margin-inline-end: 0 !important;
   }
 }

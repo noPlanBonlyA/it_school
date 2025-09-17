@@ -824,7 +824,9 @@
 }
 
 .modal-header h2 {
-  margin: 0;
+ 
+  width: 100%;
+  padding-left: 10%;
   font-size: 1.5rem;
   font-weight: 600;
   color: #1f2937;
@@ -916,7 +918,17 @@
   padding: 0 24px 24px;
 }
 
+@media (max-width: 768px) {
+    .close-modal {
+        position: absolute;
+        top: 0px;
+
+    }
+       
+    }
+
 .btn-primary {
+  width: 100%;
   background: #10b981;
   color: white;
   border: none;
@@ -971,7 +983,7 @@
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
-  flex: 1;
+  
   transition: all 0.2s ease;
   /* Улучшение для touch устройств */
   min-height: 44px;
@@ -1862,7 +1874,7 @@
   
   .price-info {
     background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
-    padding: 16px;
+    padding: 37px;
     border-radius: 12px;
     border: 2px solid #10b981;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
@@ -1977,7 +1989,7 @@
   }
   
   .price-info {
-    padding: 12px;
+    padding: 37px;
   }
   
   .purchase-price,
@@ -2053,7 +2065,7 @@
   }
   
   .price-info {
-    padding: 8px;
+    padding: 37px;
   }
   
   .purchase-price,

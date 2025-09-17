@@ -177,39 +177,54 @@ export default function StudentCoursePage() {
         />
 
         <div className="course-header">
-          <div className="course-header-top">
-            <button 
-              className="btn-back"
-              onClick={() => navigate(getCoursesPath(user.role))}
-            >
-              ← Вернуться к {getCoursesTitle(user.role)}
-            </button>
-          </div>
-          
           {course && (
-            <div className="course-main-info">
-              {course.photo?.url && (
-                <CourseImage
-                  src={course.photo.url}
-                  alt={course.name}
-                  className="course-detail-image"
-                  placeholder="📚"
-                />
-              )}
-              
-              <div className="course-content">
-                <h1 className="course-title">{course.name}</h1>
-                <p className="course-description">{course.description}</p>
-                <div className="course-meta">
-                  <span className="course-author">👩‍🏫 {course.author_name || 'Не указан'}</span>
-                  {course.age_category && (
-                    <span className="course-category">👥 {course.age_category}</span>
-                  )}
-                </div>
-              </div>
-            </div>
+          <div className="course-main-info two-col"
+          style={{ marginLeft: '10px' }}>
+          {/* Левая колонка: текст */}
+          <div className="course-col course-col--text">
+         <button
+          className="btn-back"
+          onClick={() => navigate(getCoursesPath(user.role))}
+         >
+          ← Вернуться к {getCoursesTitle(user.role)}
+          </button>
+
+        <h1 className="course-title"
+        style={{ marginTop: '5px' }}>{course.name}</h1>
+        <p className="course-description">{course.description}</p>
+
+        <div className="course-meta">
+          <span className="course-author">👩‍🏫 {course.author_name || 'Не указан'}</span>
+          {course.age_category && (
+            <span className="course-category">👥 {course.age_category}</span>
           )}
         </div>
+
+        {(user.role === 'teacher' || user.role === 'admin' || user.role === 'superadmin') && (
+          <button
+            className="btn-primary btn-create-lesson-desktop"
+            onClick={() => navigate(`/courses/${courseId}/lessons/new`)}
+          >
+            + Создать урок
+          </button>
+        )}
+      </div>
+
+      {/* Правая колонка: изображение */}
+      <div className="course-col course-col--image">
+        {course.photo?.url && (
+          <CourseImage
+            src={course.photo.url}
+            alt={course.name}
+            className="course-detail-image"
+            placeholder="📚"
+          />
+        )}
+      </div>
+    </div>
+  )}
+</div>
+
 
         <div className="lessons-section">
           <div className="lessons-header">

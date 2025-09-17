@@ -973,3 +973,278 @@
     justify-content: center;
   }
 }
+
+
+/* ======== “Журнальный” вид, как на 4–5 скринах ======== */
+
+/* Скрываем дефолтные внутренности, используем свой шаблон */
+.fc-event .fc-event-main,
+.fc-daygrid-event .fc-event-main {
+  padding: 0 !important;
+}
+
+/* Карточка события (week/day) */
+.fc-timegrid-event,
+.fc-daygrid-event {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 10px !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* ЛЕВАЯ цветная полоса статуса */
+.fc-timegrid-event::after,
+.fc-daygrid-event::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 4px;
+  background: var(--ev-color, #00B18F);
+}
+
+/* Цвета статусов (похоже на примеры: зелёные/жёлтые/серые) */
+.fc-ev-opened  { --ev-color:#00B18F; }
+.fc-ev-upcoming{ --ev-color:#FFC107; }
+.fc-ev-closed  { --ev-color:#9CA3AF; }
+
+/* Внутренний контент карточки из eventContent */
+.fc-card { padding: 8px 10px 10px 12px; }
+.fc-card-time {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+.fc-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.25;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fc-card-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.2;
+}
+
+/* Иконки (teacher/room) маленькие, как на примере) */
+.fc-i { display:inline-block; width:12px; height:12px; opacity:.7; }
+.fc-i-teacher { background: radial-gradient(#6b7280 40%, transparent 41%) center/100% 100% no-repeat; border-radius:50%; }
+.fc-i-room {
+  position: relative;
+}
+.fc-i-room::before, .fc-i-room::after {
+  content:""; position:absolute; left:4px; background:#6b7280;
+}
+.fc-i-room::before { top:2px; width:4px; height:8px; border-radius:2px; }
+.fc-i-room::after  { bottom:0; width:8px; height:2px; border-radius:2px; left:2px; }
+
+/* Списочные события в MONTH — компактные “пилюли” */
+.fc-daygrid-event {
+  padding: 0 !important;
+  min-height: 26px;
+}
+.fc-daygrid-day .fc-daygrid-event-harness {
+  margin: 2px 4px !important;
+}
+.fc-daygrid-event .fc-card {
+  padding: 6px 8px 6px 10px;
+}
+.fc-daygrid-event .fc-card-time {
+  display: inline-block;
+  margin-right: 6px;
+  font-size: 12px;
+  color: #0f172a;
+}
+.fc-daygrid-event .fc-card-title {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* Убираем “точку” у daygrid и дефолтные стили */
+.fc-daygrid-event-dot { display: none !important; }
+
+/* Заголовки колонок недели: имя дня + дата визуально ближе к примеру */
+.fc-col-header-cell-cushion {
+  font-weight: 700 !important;
+  color: #111827 !important;
+}
+
+/* Подсветка текущего дня (мягкая) */
+.fc .fc-day-today {
+  background-color: rgba(0, 177, 143, 0.06) !important;
+}
+
+/* Сетка таймгрида — тонкие линии, как в примерах */
+.fc .fc-timegrid-slot { height: 36px !important; }
+.fc .fc-timegrid-slot-minor { border-top: 1px solid #f3f4f6 !important; }
+.fc .fc-timegrid-slot-major { border-top: 1px solid #e5e7eb !important; }
+
+/* Кнопки режима — уже стилизованы, чуть скруглим сильнее */
+.fc .fc-button { border-radius: 10px !important; }
+
+/* Чуть меньше отступов у календаря */
+.calendar-widget.full-width { padding: 18px; }
+
+/* “ещё +n” — как лаконичная ссылка */
+.fc-daygrid-more-link { font-weight: 600; color:#0369a1 !important; }
+/* Внутри карточки события: строка "время + название" */
+.fc-ev__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fc-ev__time {
+  font-weight: 800;
+  font-size: 11px;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);
+}
+
+.fc-ev__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Чуть плотнее в месячном виде */
+.fc-daygrid-event .fc-ev__time {
+  margin-right: 2px;
+}
+
+/* В недельном/дневном — оставляем так же, чтобы стиль был единым */
+/* Карточка события: вертикальная компоновка */
+.fc-card--stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Время — приглушённое */
+.fc-card-time {
+  color: #6b7280;          /* серый */
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* Название — жирнее и темнее */
+.fc-card-title {
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Подписи (преподаватель/аудитория) */
+.fc-card-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Иконки слева (если используете) */
+.fc-i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.fc-i-teacher { background: #9CA3AF; }
+.fc-i-room    { background: #CBD5E1; }
+
+/* Чуть крупнее в month-виде (читабельнее) */
+.fc-daygrid-event .fc-card-time { font-size: 13px; }
+.fc-daygrid-event .fc-card-title { font-size: 13px; }
+/* Карточка события с акцентным цветом от JS (CSS-переменные) */
+.fc-event {
+  --ev-accent: #00B18F;
+  --ev-accent-bg: rgba(0,177,143,0.10);
+  --ev-accent-border: rgba(0,177,143,0.85);
+  border: none !important;
+  overflow: hidden !important;
+}
+
+.fc-card {
+  position: relative;
+  border-radius: 12px;
+  padding: 10px 12px 10px 14px;
+  background: var(--ev-accent-bg);
+  border-left: 6px solid var(--ev-accent);
+  border-right: 1px solid var(--ev-accent-border);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.fc-card-time {
+  color: #6B7280;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.fc-card-title {
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.25;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.fc-card-sub {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: #6B7280; margin-top: 2px;
+}
+
+.fc-i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.fc-i-teacher { background: #9CA3AF; }
+.fc-i-room    { background: #CBD5E1; }
+
+/* компактнее в месячном виде */
+.fc-daygrid-event .fc-card-time,
+.fc-daygrid-event .fc-card-title { font-size: 13px; }
+/* УБРАТЬ внешнюю зеленую полоску у контейнера события */
+.fc-timegrid-event::after,
+.fc-daygrid-event::after {
+  content: none !important;
+  display: none !important;
+}
+/* ===== Mobile listWeek (FullCalendar) ===== */
+@media (max-width: 768px) {
+  .fc-header-toolbar { gap: 8px !important; margin-bottom: 12px !important; }
+  .fc-toolbar-title { font-size: 18px !important; }
+
+  .fc .fc-list { border-radius: 14px; overflow: hidden; }
+  .fc .fc-list-day-cushion {
+    background: rgba(0,177,143,0.08) !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
+  }
+  .fc .fc-list-table { font-size: 14px; }
+  .fc-list-event td { padding: 10px 12px !important; }
+  .fc-list-event:hover { background: rgba(0,0,0,0.02); }
+
+  /* Внутри строки события — аккуратная «карточка» */
+  .fc-listcard { display: grid; gap: 4px; }
+  .fc-listcard-title { font-weight: 800; color:#111827; line-height: 1.25; }
+  .fc-listcard-meta { display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:12px; color:#6b7280; }
+  .fc-listcard-time { font-weight:700; }
+  .fc-listcard-dot { opacity:.6; }
+}

@@ -568,7 +568,8 @@ export default function EventCreateModal({ onSave, onClose }) {
         <div className="modal-footer">
           <button
             type="button"
-            className="btn-secondary"
+            className="btn-primary"
+            style={{ backgroundColor: '#e40b0bff'}}
             onClick={onClose}
           >
             Отмена
