@@ -163,6 +163,7 @@ export default function ManageTeachersPage() {
     const u=o.user, t=o.teacher;
     setEdit({ ...u, teacherId:t.id, birth_date:u.birth_date||'' });
     setSearch('');
+    setShowSug(false); // закрываем список после выбора
   };
 
   /* ───────── СОХРАНЕНИЕ ───────── */
@@ -266,8 +267,7 @@ export default function ManageTeachersPage() {
           <div style={{position:'relative'}}>
             <input placeholder="Поиск по логину или ФИО"
                    value={search} onChange={e=>setSearch(e.target.value)}
-                   onFocus={()=>setShowSug(true)}
-                   onBlur ={()=>setTimeout(()=>setShowSug(false),200)}/>
+                   onFocus={()=>setShowSug(true)}/>
             {showSug&&list.length>0&&(
               <ul className="suggestions">
                 {list.map(o=>{

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar      from '../components/Sidebar';
 import SmartTopBar  from '../components/SmartTopBar';
 import CourseCard   from '../components/CourseCard';
+import SuccessModal from '../components/SuccessModal';
 import { useAuth }  from '../contexts/AuthContext';
 
 import {
@@ -64,6 +65,10 @@ export default function ManageCoursesPage() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showConfirmUpdate, setShowConfirmUpdate] = useState(false);
   const [uploading, setUploading] = useState(false);
+  
+  /* модальное окно успеха */
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   /* ---------- effects ---------- */
   useEffect(() => { load(); }, []);
@@ -144,6 +149,14 @@ export default function ManageCoursesPage() {
 
   /* ---------- handlers ---------- */
   const handleCreate = async () => {
+    if (!form.name.trim()) {
+      alert('Название курса обязательно');
+      return;
+    }
+    if (form.name.trim().length > 20) {
+      alert('Название курса не должно превышать 20 символов');
+      return;
+    }
     setUploading(true);
     try {
       // Определяем имя автора из текущего пользователя
@@ -201,7 +214,9 @@ export default function ManageCoursesPage() {
       setFormPreviewUrl(null);
       setShowConfirmCreate(false);
       await load();
-      alert('Курс создан успешно');
+      
+      setSuccessMessage('Новый курс успешно добавлен в систему');
+      setShowSuccessModal(true);
     } catch (e) {
       console.error('[ManageCourse] Error creating course:', e);
       
@@ -245,9 +260,18 @@ export default function ManageCoursesPage() {
     setEditImage(null);
     setEditPreviewUrl(null);
     setSearch('');
+    setShowSug(false); // закрываем список после выбора
   };
 
   const handleUpdate = async () => {
+    if (!edit.name.trim()) {
+      alert('Название курса обязательно');
+      return;
+    }
+    if (edit.name.trim().length > 20) {
+      alert('Название курса не должно превышать 20 символов');
+      return;
+    }
     setUploading(true);
     try {
       const fd = new FormData();
@@ -280,7 +304,9 @@ export default function ManageCoursesPage() {
       setEditPreviewUrl(null);
       setShowConfirmUpdate(false);
       await load();
-      alert('Курс обновлен успешно');
+      
+      setSuccessMessage('Курс успешно обновлен в системе');
+      setShowSuccessModal(true);
     } catch (e) {
       console.error('[ManageCourse] Error updating course:', e);
       alert('Ошибка обновления курса');
@@ -296,7 +322,9 @@ export default function ManageCoursesPage() {
       setEdit(null);
       setShowConfirmDelete(false);
       await load();
-      alert('Курс удален успешно');
+      
+      setSuccessMessage('Курс успешно удален из системы');
+      setShowSuccessModal(true);
     } catch {
       alert('Ошибка удаления курса');
       setShowConfirmDelete(false);
@@ -327,7 +355,11 @@ export default function ManageCoursesPage() {
                 value={form.name}
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="Введите название курса"
+                maxLength={20}
               />
+              <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                {form.name.length}/20 символов
+              </div>
             </div>
 
             <div className="field">
@@ -351,7 +383,11 @@ export default function ManageCoursesPage() {
                 onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                 placeholder="Описание курса"
                 rows={4}
+                maxLength={40}
               />
+              <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                {form.description.length}/40 символов
+              </div>
             </div>
 
             <div className="field">
@@ -454,22 +490,12 @@ export default function ManageCoursesPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               onFocus={() => setShowSug(true)}
-              onBlur={() => setTimeout(() => setShowSug(false), 200)}
             />
             {showSug && filtered.length > 0 && (
               <ul className="suggestions">
                 {filtered.map(c => (
                   <li key={c.id} onClick={() => handleSelect(c)}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      {getImageUrl(c) && (
-                        <img 
-                          src={getImageUrl(c)} 
-                          alt="" 
-                          style={{ width: '30px', height: '30px', objectFit: 'cover', borderRadius: '4px' }}
-                        />
-                      )}
-                      <span>{c.name} ({c.author_name})</span>
-                    </div>
+                    <span>{c.name} ({c.author_name})</span>
                   </li>
                 ))}
               </ul>
@@ -485,7 +511,11 @@ export default function ManageCoursesPage() {
                   type="text"
                   value={edit.name}
                   onChange={e => setEdit(p => ({ ...p, name: e.target.value }))}
+                  maxLength={20}
                 />
+                <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                  {edit.name.length}/20 символов
+                </div>
               </div>
 
               <div className="field">
@@ -508,7 +538,11 @@ export default function ManageCoursesPage() {
                   value={edit.description}
                   onChange={e => setEdit(p => ({ ...p, description: e.target.value }))}
                   rows={4}
+                  maxLength={40}
                 />
+                <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                  {edit.description.length}/40 символов
+                </div>
               </div>
 
               <div className="field">
@@ -653,6 +687,14 @@ export default function ManageCoursesPage() {
             </div>
           </div>
         )}
+        
+        {/* Модальное окно успеха */}
+        <SuccessModal
+          isOpen={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          title="Успешно!"
+          message={successMessage}
+        />
       </div>
     </div>
   );

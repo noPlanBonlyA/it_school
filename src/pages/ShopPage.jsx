@@ -209,7 +209,7 @@ export default function ShopPage() {
           {/* Заголовок */}
           <div className="page-header">
             <div className="header-info">
-              <h2>Добро пожаловать в магазин, {fullName}!</h2>
+              <h2>Добро пожаловать в магазин!</h2>
             </div>
             <div className="coins-display">
               <BestCoins amount={studentData?.points || 0} loading={loadingCoins} />
@@ -281,7 +281,7 @@ export default function ShopPage() {
                                   </>
                                 ) : (
                                   <div className="image-placeholder no-photo">
-                                    <div className="placeholder-icon">�</div>
+                                    <div className="placeholder-icon"></div>
                                     <div className="placeholder-text">Фото не загружено</div>
                                     <div className="placeholder-subtext">Администратор еще не добавил изображение</div>
                                   </div>
@@ -463,13 +463,13 @@ export default function ShopPage() {
                     <p>{selectedProduct.description}</p>
                     <div className="price-info">
                       <div className="purchase-price">
-                        Цена: <strong>{selectedProduct.price} монет</strong>
+                        Цена: <strong>{selectedProduct.price}  монет</strong>
                       </div>
                       <div className="balance-info">
-                        Ваш баланс: <strong>{studentData?.points || 0} монет</strong>
+                        Ваш баланс: <strong>{studentData?.points || 0}  монет</strong>
                       </div>
                       <div className="after-purchase">
-                        После покупки: <strong>{(studentData?.points || 0) - selectedProduct.price} монет</strong>
+                        После покупки:&nbsp;<strong>{(studentData?.points || 0) - selectedProduct.price}&nbsp;монет</strong>
                       </div>
                     </div>
                   </div>

@@ -176,6 +176,7 @@ export default function ManageStudentsPage() {
       points: o.student.points
     });
     setSearch('');
+    setShowSug(false); // закрываем список после выбора
   };
 
   /* ---------- просмотр деталей ---------- */
@@ -183,6 +184,7 @@ export default function ManageStudentsPage() {
     console.log('viewDetails called with:', student);
     setSelectedStudent(student);
     setShowDetail(true);
+    setShowSug(false); // закрываем список после просмотра деталей
   };
 
   /* ---------- СОХРАНЕНИЕ ---------- */
@@ -306,8 +308,7 @@ export default function ManageStudentsPage() {
             <div style={{position:'relative'}}>
               <input placeholder="Поиск по логину или ФИО"
                      value={search} onChange={e=>setSearch(e.target.value)}
-                     onFocus={()=>setShowSug(true)}
-                     onBlur={()=>setTimeout(()=>setShowSug(false),300)}/>
+                     onFocus={()=>setShowSug(true)}/>
               {showSug && filtered.length>0 && (
                 <ul className="suggestions">
                   {filtered.map(o=>{
@@ -320,13 +321,10 @@ export default function ManageStudentsPage() {
                         </div>
                         <button 
                           className="view-details-btn"
-                          onMouseDown={(e) => {
+                          onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             viewDetails(o);
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
                           }}
                           title="Подробная информация"
                         >

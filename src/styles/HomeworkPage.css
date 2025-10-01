@@ -1,14 +1,48 @@
 /* src/styles/HomeworkPage.css */
 
+/* Специфичные стили для Homework Page - полная высота экрана */
+.homework-page-wrapper.app-layout {
+  display: flex;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+.homework-page-wrapper .main-content {
+  margin-left: 240px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+  padding-bottom: 0 !important;
+}
+
+.homework-page-wrapper .content-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100% !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
 /* Общий layout: Sidebar + Main */
 .homework-page {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
   
   /* ===== НОВОЕ: Мобильная навигация ===== */
   .mobile-navigation {
@@ -68,8 +102,8 @@
   /* Кнопка "Назад" */
   .back-btn {
     background: rgba(0, 177, 143, 0.1);
-    color: #00B18F;
-    border: 1px solid rgba(0, 177, 143, 0.3);
+    color: #d90bf5;
+    border: 1px solid rgba(215, 9, 219, 0.3);
     padding: 4px 8px;
     border-radius: 6px;
     font-size: 11px;
@@ -102,8 +136,9 @@
     display: grid;
     grid-template-columns: 250px 300px 1fr;
     gap: 20px;
-    height: calc(100vh - 200px);
-    min-height: 600px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
   
   /* Колонка общие стили */
@@ -114,6 +149,8 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    min-height: 0;
+    height: 100%;
   }
   
   .column h2 {
@@ -144,6 +181,36 @@
     padding: 0;
     flex: 1;
     overflow-y: auto;
+    min-height: 0;
+  }
+  
+  /* Кастомный скроллбар для списков */
+  .groups-list::-webkit-scrollbar,
+  .topics-list::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .groups-list::-webkit-scrollbar-track,
+  .topics-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  .groups-list::-webkit-scrollbar-thumb,
+  .topics-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
+    border-radius: 4px;
+  }
+  
+  .groups-list::-webkit-scrollbar-thumb:hover,
+  .topics-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #03836A 0%, #025f4a 100%);
+  }
+  
+  .groups-list,
+  .topics-list {
+    scrollbar-width: thin;
+    scrollbar-color: #00B18F #f1f1f1;
   }
   .groups-list li {
     padding: 15px 20px;
@@ -198,6 +265,7 @@
     padding: 0;
     flex: 1;
     overflow-y: auto;
+    min-height: 0;
   }
   .topics-list li {
     padding: 15px 20px;
@@ -239,6 +307,10 @@
   .submissions-col {
     flex: 3;
     min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
   }
   .submissions-col h2 {
     margin-top: 0;
@@ -251,6 +323,31 @@
     flex: 1;
     overflow-y: auto;
     padding: 0;
+    min-height: 0;
+  }
+  
+  /* Кастомный скроллбар для submissions */
+  .submissions-content::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .submissions-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  .submissions-content::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
+    border-radius: 4px;
+  }
+  
+  .submissions-content::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #03836A 0%, #025f4a 100%);
+  }
+  
+  .submissions-content {
+    scrollbar-width: thin;
+    scrollbar-color: #00B18F #f1f1f1;
   }
 
   /* Мобильная адаптация списка домашек */
@@ -788,31 +885,85 @@
   
   /* Адаптивность для мобильных */
   @media (max-width: 768px) {
-    .homework-page {
-      padding: 8px;
+    .homework-page-wrapper.app-layout {
+      height: 100vh !important;
+      max-height: 100vh !important;
+      overflow: hidden !important;
     }
     
+    .homework-page-wrapper .main-content {
+      margin-left: 0 !important;
+      height: 100vh !important;
+      max-height: 100vh !important;
+      overflow: hidden !important;
+    }
+    
+    .homework-page-wrapper .content-area {
+      flex: 1 !important;
+      height: 100% !important;
+      overflow: hidden !important;
+    }
+    
+    .homework-page {
+      padding: 8px;
+      flex: 1 !important;
+      height: 100% !important;
+      overflow: hidden !important;
+    }
+  }
+  
+  /* Дополнительно для планшетов */
+  @media (max-width: 1024px) and (min-width: 769px) {
+    .homework-page-wrapper.app-layout {
+      height: 100vh !important;
+      max-height: 100vh !important;
+    }
+    
+    .homework-page-wrapper .main-content {
+      height: 100vh !important;
+      max-height: 100vh !important;
+    }
+  }
+  
+  /* Для очень маленьких экранов */
+  @media (max-width: 480px) {
+    .homework-page-wrapper.app-layout {
+      height: 100vh !important;
+      height: calc(var(--vh, 1vh) * 100) !important;
+    }
+    
+    .homework-page-wrapper .main-content {
+      height: 100vh !important;
+      height: calc(var(--vh, 1vh) * 100) !important;
+    }
+  }
+  
+  /* Старые мобильные стили для остальных элементов */
+  @media (max-width: 768px) {
     .homework-grid {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      height: auto;
-      min-height: auto;
+      flex: 1;
+      height: 100%;
+      min-height: 0;
     }
     
     .column {
       min-width: auto;
       height: auto;
-      min-height: 200px;
-      max-height: 50vh;
+      min-height: 300px;
+      max-height: 60vh;
       overflow: hidden;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      flex: 1;
     }
     
     /* Увеличиваем высоту для колонки с домашками */
     .submissions-col {
-      max-height: 75vh;
-      min-height: 300px;
+      max-height: 70vh;
+      min-height: 400px;
+      flex: 1;
     }
     
     .column h2 {
@@ -826,6 +977,7 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 6px;
+      flex-shrink: 0;
     }
     
     /* Заголовки колонок на мобильных */
@@ -861,7 +1013,8 @@
     
     .groups-list,
     .topics-list {
-      max-height: 240px;
+      flex: 1;
+      min-height: 0;
       overflow-y: auto;
       scrollbar-width: thin;
       scrollbar-color: rgba(0, 177, 143, 0.6) rgba(0, 177, 143, 0.1);
@@ -869,7 +1022,9 @@
     
     /* Submissions колонка на мобильных занимает больше места */
     .submissions-content {
-      max-height: 65vh;
+      flex: 1;
+      min-height: 0;
+      max-height: none;
       overflow-y: auto;
     }
     
@@ -1175,17 +1330,21 @@
     
     .column {
       border-radius: 8px;
-      max-height: 550px;
+      max-height: 100%;
+      flex: 1;
     }
     
     /* Еще больше увеличиваем высоту для колонки с домашками на маленьких экранах */
     .submissions-col {
-      max-height: 80vh !important;
-      min-height: 350px;
+      max-height: 70vh !important;
+      min-height: 400px;
+      flex: 1;
     }
     
     .submissions-content {
-      max-height: 70vh !important;
+      flex: 1;
+      min-height: 0;
+      max-height: none !important;
     }
     
     .column h2 {
@@ -1195,7 +1354,9 @@
     
     .groups-list,
     .topics-list {
-      max-height: 550px;
+      flex: 1;
+      min-height: 0;
+      max-height: none;
     }
     
     .groups-list li,
@@ -1407,17 +1568,21 @@
     }
     
     .column {
-      max-height: 300px;
+      max-height: 60vh;
+      flex: 1;
     }
     
     /* Максимальное увеличение высоты для очень узких экранов */
     .submissions-col {
-      max-height: 85vh !important;
-      min-height: 400px;
+      max-height: 75vh !important;
+      min-height: 450px;
+      flex: 1;
     }
     
     .submissions-content {
-      max-height: 75vh !important;
+      flex: 1;
+      min-height: 0;
+      max-height: none !important;
     }
     
     .column h2 {
@@ -1427,7 +1592,9 @@
     
     .groups-list,
     .topics-list {
-      max-height: 200px;
+      flex: 1;
+      min-height: 0;
+      max-height: none;
     }
     
     .submission-details,
@@ -1509,6 +1676,11 @@
 
 .submissions-section {
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .archive-section {

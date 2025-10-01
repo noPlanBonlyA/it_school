@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import SmartTopBar from '../components/SmartTopBar';
 import EventEditModal from '../components/EventEditModal';
+import SuccessModal from '../components/SuccessModal';
 import {
   getAllEvents,
   updateEvent,
@@ -30,6 +31,10 @@ export default function ManageEventsPage() {
   const [editingEvent, setEditingEvent] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
+  
+  // Модальное окно успеха
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Проверка прав доступа
   useEffect(() => {
@@ -97,7 +102,8 @@ export default function ManageEventsPage() {
   const handleUpdate = async (eventData) => {
     try {
       await updateEvent(editingEvent.id, eventData);
-      alert('Мероприятие успешно обновлено!');
+      setSuccessMessage('Мероприятие успешно обновлено в системе');
+      setShowSuccessModal(true);
       setShowEditModal(false);
       setEditingEvent(null);
       await loadEvents();
@@ -117,7 +123,8 @@ export default function ManageEventsPage() {
     
     try {
       await deleteEvent(eventToDelete.id);
-      alert('Мероприятие успешно удалено!');
+      setSuccessMessage('Мероприятие успешно удалено из системы');
+      setShowSuccessModal(true);
       await loadEvents();
     } catch (error) {
       console.error('Error deleting event:', error);
@@ -328,6 +335,14 @@ export default function ManageEventsPage() {
              </div>
            </div>
         )}
+        
+        {/* Модальное окно успеха */}
+        <SuccessModal
+          isOpen={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          title="Успешно!"
+          message={successMessage}
+        />
       </div>
     </div>
   );

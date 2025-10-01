@@ -37,7 +37,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 4px;
 }
 
 .coins-icon {
@@ -124,21 +124,29 @@
     padding: 16px 20px;
     max-width: 100%;
     border-radius: 16px;
+    display: flex;
+    justify-content: center;
   }
   
   .bestcoins-display {
     flex-direction: row;
-    gap: 14px;
-    text-align: left;
+    gap: 8px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    width: auto;
   }
   
   .coins-icon {
     font-size: 32px;
+    margin: 0;
+    flex-shrink: 0;
   }
   
   .coins-amount {
-    flex: 1;
-    align-items: flex-start;
+    align-items: center;
+    margin: 0;
+    flex-shrink: 0;
   }
   
   .coins-number {
@@ -148,6 +156,9 @@
   .coins-label {
     font-size: 12px;
     letter-spacing: 1px;
+    margin: 0;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 }
 

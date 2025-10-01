@@ -135,8 +135,8 @@ const ProductModal = ({
             </button>
             <button 
               type="button" 
-              className="btn-primary"
-            style={{ backgroundColor: '#e40b0bff'}}
+              className="product-btn product-btn-primary"
+            style={{ background: '#e40b0bff'}}
               onClick={onClose}
             >
               Отмена

@@ -883,7 +883,7 @@ mark {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 0px;
 }
 
 .schedule-day {

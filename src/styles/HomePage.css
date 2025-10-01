@@ -1133,6 +1133,7 @@ body, html, #root, .app-layout, .main-content {
   }
   
   .card.schedule .schedule-course-info {
+    display: flex;
     color: #00B18F;
     font-size: 14px; /* Увеличили размер шрифта */
     font-weight: 600;

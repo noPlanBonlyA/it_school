@@ -153,7 +153,7 @@ const getLessonBadge = (ev) => {
   const raw = (ev.lesson_type || ev.type || ev.type_name || '').toString().trim().toLowerCase();
   const isEvent = getEventType(ev) === 'event' || raw === 'event';
   return {
-    text: isEvent ? 'Мероприятие' : 'Урок',
+    text: isEvent ? 'Меро' : 'Урок',
     isEvent
   };
 };

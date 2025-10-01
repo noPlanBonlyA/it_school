@@ -369,6 +369,7 @@
   }
   
   .mobile-header h1 {
+    margin-left: 16px;
     font-size: 16px;
     position: absolute;
     left: 50%;

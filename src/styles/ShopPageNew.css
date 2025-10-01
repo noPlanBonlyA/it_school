@@ -1508,9 +1508,11 @@
   margin: 16px 0;
   color: #065f46;
   font-size: 16px;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
   line-height: 1.4;
+}
+
+.purchased-item strong {
+  white-space: nowrap;
 }
 
 .instruction {
@@ -1977,7 +1979,7 @@
   }
   
   .purchase-details {
-    padding: 16px;
+    padding: 30px;
   }
   
   .purchase-details h3 {

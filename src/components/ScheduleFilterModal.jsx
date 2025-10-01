@@ -261,9 +261,7 @@ export default function ScheduleFilterModal({
           <button className="btn btn-secondary" onClick={handleClear}>
             ❌ Очистить фильтры
           </button>
-          <button className="btn btn-secondary" onClick={onClose}>
-            Отмена
-          </button>
+          
           <button className="btn btn-primary" onClick={handleApply} disabled={loading}>
             ✅ Применить фильтры
           </button>

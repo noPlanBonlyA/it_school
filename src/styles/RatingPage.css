@@ -239,6 +239,15 @@
   opacity: 0.9;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
   color: white;
+  flex-shrink: 0;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
 }
 
 .stat-number {
@@ -247,6 +256,10 @@
   margin-bottom: 4px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   color: white;
+  line-height: 1;
+  display: block;
+  width: 100%;
+  text-align: left;
 }
 
 .stat-label {
@@ -255,6 +268,10 @@
   font-weight: 500;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   color: white;
+  line-height: 1.2;
+  display: block;
+  width: 100%;
+  text-align: left;
 }
 
 /* Таблица рейтинга */
@@ -937,7 +954,7 @@
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 20px 32px;
   display: grid;
-  grid-template-columns: 100px 1fr 140px;
+  grid-template-columns: 80px 1fr 120px;
   gap: 24px;
   font-weight: 700;
   font-size: 0.875rem;
@@ -953,7 +970,7 @@
 
 .table-row {
   display: grid;
-  grid-template-columns: 100px 1fr 140px;
+  grid-template-columns: 80px 1fr 120px;
   gap: 24px;
   padding: 24px 32px;
   border-bottom: 1px solid rgba(0, 177, 143, 0.05);
@@ -1027,12 +1044,14 @@
 .student-info {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 0;
   width: 100%;
 }
 
 .student-avatar {
   width: 48px;
+  min-width: 48px;
+  max-width: 48px;
   height: 48px;
   border-radius: 50%;
   background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
@@ -1040,6 +1059,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-right: 16px;
 }
 
 .avatar-text {
@@ -1133,13 +1153,16 @@
   }
   
   .student-info {
-    gap: 10px;
+    gap: 0;
   }
   
   .student-avatar {
     width: 36px;
+    min-width: 36px;
+    max-width: 36px;
     height: 36px;
     font-size: 1rem;
+    margin-right: 10px;
   }
   
   .student-name {
@@ -1217,8 +1240,11 @@
   
   .student-avatar {
     width: 32px;
+    min-width: 32px;
+    max-width: 32px;
     height: 32px;
     font-size: 0.9rem;
+    margin-right: 8px;
   }
   
   .rank-number {
@@ -1283,8 +1309,11 @@
   
   .student-avatar {
     width: 28px;
+    min-width: 28px;
+    max-width: 28px;
     height: 28px;
     font-size: 0.8rem;
+    margin-right: 8px;
   }
   
   .rank-number {
@@ -1421,7 +1450,7 @@ body {
 /* Делаем колонку "Студент" сжимаемой */
 .table-header,
 .table-row {
-  grid-template-columns: 100px minmax(0, 1fr) 140px;
+  grid-template-columns: 80px minmax(0, 1fr) 120px;
 }
 
 /* ≤ 768px */
@@ -1460,18 +1489,28 @@ body {
 .student-email {
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
   display: block;
   max-width: 100%;
 }
 
-/* На очень узких экранах имя можно показывать в 2 строки */
+.student-name {
+  
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+
+.student-email {
+  white-space: nowrap;
+}
+
+/* На очень узких экранах имя по-прежнему в 3 строки */
 @media (max-width: 480px) {
   .student-name {
-    white-space: normal;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;      /* до 2 строк */
-    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
   }
 }
 

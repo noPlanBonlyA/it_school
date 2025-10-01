@@ -79,6 +79,7 @@ export default function ManageGroupPage() {
   /* ────────── CREATE GROUP ────────────────*/
   const createGrp = async () => {
     if (!newF.name.trim()) { setErrs({ name:'Название обязательно' }); return; }
+    if (newF.name.trim().length > 20) { setErrs({ name:'Название не должно превышать 20 символов' }); return; }
     try {
       // Добавляем обязательные поля start_date и end_date со значениями по умолчанию
       const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -223,9 +224,13 @@ export default function ManageGroupPage() {
                     value={newF.name}
                     onChange={e=>setNewF(s=>({...s,name:e.target.value}))}
                     placeholder="Введите название группы"
+                    maxLength={20}
                     style={{ width: '100%', padding: '12px', fontSize: '16px' }}
                   />
                   {errs.name && <div className="error-text">{errs.name}</div>}
+                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                    {newF.name.length}/20 символов
+                  </div>
                 </div>
                 <div className="field">
                   <label>Описание группы</label>

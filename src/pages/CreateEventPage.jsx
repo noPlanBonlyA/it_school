@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import SmartTopBar from '../components/SmartTopBar';
+import SuccessModal from '../components/SuccessModal';
 import { getAllUsers } from '../services/userService';
 import { getAllGroups } from '../services/groupService';
 import { createEvent, addEventForGroup, addEventForUsers } from '../services/eventService';
@@ -26,6 +27,10 @@ export default function CreateEventPage() {
 
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  
+  // Состояние для модального окна успеха
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Данные для выбора участников
   const [users, setUsers] = useState([]);
@@ -192,8 +197,13 @@ export default function CreateEventPage() {
         alert('Функция добавления участников курсов будет реализована в следующем обновлении');
       }
 
-      alert('Мероприятие и участники успешно добавлены!');
-      navigate('/manage-events');
+      setSuccessMessage('Мероприятие и участники успешно добавлены в систему');
+      setShowSuccessModal(true);
+      
+      // Перенаправляем после закрытия модального окна
+      setTimeout(() => {
+        navigate('/manage-events');
+      }, 3000);
     } catch (error) {
       console.error('Error creating event:', error);
       const errorMessage = error.response?.data?.detail?.[0]?.msg || error.response?.data?.detail || error.message;
@@ -376,13 +386,13 @@ export default function CreateEventPage() {
               </div>
 
               <div className="form-group">
-                <label className="checkbox-label">
+                <label className="checkbox-label" style={{ display: 'flex'}}>
                   <input
                     type="checkbox"
                     checked={formData.is_opened}
                     onChange={(e) => setFormData({...formData, is_opened: e.target.checked})}
                   />
-                  <span className="checkbox-text" style={{ marginLeft: '10px', marginTop: '10px' }}>Открытое мероприятие (доступно всем)</span>
+                  <span className="checkbox-text">Открытое мероприятие (доступно всем)</span>
                 </label>
               </div>
             </div>
@@ -520,7 +530,8 @@ export default function CreateEventPage() {
                       </button>
                     )}
                     <button 
-                      className="btn-select-all"
+                      className="btn-clear"
+                      style={{ color: 'black', borderColor: 'black' }}
                       onClick={() => {
                         const students = getFilteredUsers('student');
                         if (selectedUsers.length === students.length) {
@@ -822,6 +833,17 @@ export default function CreateEventPage() {
             </div>
           </div>
         </div>
+        
+        {/* Модальное окно успеха */}
+        <SuccessModal
+          isOpen={showSuccessModal}
+          onClose={() => {
+            setShowSuccessModal(false);
+            navigate('/manage-events');
+          }}
+          title="Мероприятие создано!"
+          message={successMessage}
+        />
       </div>
     </div>
   );

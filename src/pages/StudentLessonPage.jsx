@@ -400,18 +400,13 @@ export default function StudentLessonPage() {
               {/* Кнопка скачивания дополнительных материалов по центру */}
               {lesson?.student_additional_material_url && (
   <div className="additional-materials-container">
-    {lesson?.student_additional_material_name && (
-      <div className="material-name">
-        📎 {lesson.student_additional_material_name}
-      </div>
-    )}
     <a 
       href={lesson.student_additional_material_url} 
       target="_blank" 
       rel="noopener noreferrer"
       className="download-additional-btn"
     >
-      📥 {lesson.student_additional_material_name || 'Скачать дополнительные материалы'}
+      📥 Скачать дополнительные материалы
     </a>
   </div>
 )}
@@ -445,16 +440,13 @@ export default function StudentLessonPage() {
     {/* ДОП. МАТЕРИАЛ ДЗ */}
     {lesson?.homework_additional_material_url && (
       <div className="homework-additional-container">
-        {lesson?.homework_additional_material_name && (
-          <div className="material-name">📎 {lesson.homework_additional_material_name}</div>
-        )}
         <a
           href={lesson.homework_additional_material_url}
           target="_blank"
           rel="noopener noreferrer"
           className="download-homework-additional-btn"
         >
-          📎 {lesson.homework_additional_material_name || 'Скачать дополнительные материалы к заданию'}
+          � Скачать дополнительные материалы
         </a>
         {/* если хочешь именно встраивать, а не скачивать — замени <a> на iframe-обёртку как выше */}
         {/* 

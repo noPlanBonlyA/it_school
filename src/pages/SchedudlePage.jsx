@@ -64,8 +64,8 @@ const renderEventContent = (arg) => {
           <div class="fc-listcard-title">${escapeHTML(event.title || '')}</div>
           <div class="fc-listcard-meta">
             ${timeText ? `<span class="fc-listcard-time">${escapeHTML(timeText)}</span>` : ``}
-            ${tName ? `<span class="fc-listcard-dot">•</span><span>${escapeHTML(tName)}</span>` : ``}
-            ${room  ? `<span class="fc-listcard-dot">•</span><span>${escapeHTML(room)}</span>` : ``}
+            ${tName ? `<span>${escapeHTML(tName)}</span>` : ``}
+            ${room  ? `<span>${escapeHTML(room)}</span>` : ``}
           </div>
         </div>
       `
@@ -279,7 +279,18 @@ useEffect(() => {
     : 'Нет занятий';
 
   // ───── при клике на событие открываем мини-виджет ─────
-  const handleEventClick = ({ event }) => {
+  const handleEventClick = ({ event, jsEvent }) => {
+    // Закрываем popover с дополнительными событиями, если он открыт
+    const calendarApi = calendarRef.current?.getApi?.();
+    if (calendarApi) {
+      // Закрываем любые открытые popovers FullCalendar
+      const popovers = document.querySelectorAll('.fc-popover');
+      popovers.forEach(popover => {
+        popover.style.display = 'none';
+        popover.remove();
+      });
+    }
+    
     console.log('[SchedulePage] Event clicked:', event.extendedProps.originalEvent);
     console.log('[SchedulePage] Event course_id:', event.extendedProps.originalEvent.course_id);
     console.log('[SchedulePage] Event lesson_id:', event.extendedProps.originalEvent.lesson_id);

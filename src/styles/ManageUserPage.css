@@ -265,6 +265,8 @@ h1 {
   border-bottom: 1px solid rgba(0, 177, 143, 0.1);
   font-family: 'Montserrat', sans-serif;
   transition: all 0.2s ease;
+  text-align: left;
+  display: block;
 }
 
 .suggestions li:last-child {
@@ -283,13 +285,14 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 12px 20px;
   cursor: default;
   border-bottom: 1px solid rgba(0, 177, 143, 0.1);
   font-family: 'Montserrat', sans-serif;
   font-size: 14px;
   color: #2d3748;
   transition: all 0.2s ease;
+  list-style: none;
 }
 
 .suggestion-item:hover {
@@ -309,6 +312,7 @@ h1 {
   font-size: 14px;
   font-weight: 500;
   transition: color 0.2s ease;
+  text-align: left;
 }
 
 .suggestion-info:hover {
@@ -1391,13 +1395,20 @@ div.manage-users div.modal-overlay div.modal-buttons button {
 /* Отключаем ультра-компактные стили для групп - возвращаем обычные размеры */
 .manage-groups.manage-users .modal-overlay .modal-content {
   width: auto !important;
-  margin-left: 20% !important;
+  margin-left: 0 !important;
   max-width: 800px !important;
   min-width: 300px !important;
   height: auto !important;
   max-height: 90vh !important;
   min-height: auto !important;
   border-radius: 12px !important;
+}
+
+/* Десктопная версия - отступ 20% слева */
+@media (min-width: 769px) {
+  .manage-groups.manage-users .modal-overlay .modal-content {
+    margin-left: 20% !important;
+  }
 }
 
 /* Специальные стили для больших модальных окон управления группами */

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { refreshGroupSchedule } from '../services/groupScheduleService';
+import ScheduleUpdateResultModal from './ScheduleUpdateResultModal';
 import '../styles/RefreshScheduleButton.css';
 
 export default function RefreshScheduleButton({ 
@@ -13,6 +14,8 @@ export default function RefreshScheduleButton({
   onRefresh 
 }) {
   const [loading, setLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState(null);
 
   const handleRefresh = async () => {
     if (!groupId) {
@@ -74,50 +77,25 @@ export default function RefreshScheduleButton({
       const successCount = allResults.filter(r => r.success).length;
       const failCount = allResults.filter(r => !r.success).length;
       
-      let message = `📅 Обновление расписания группы завершено\n\n`;
+      // Подготавливаем данные для модального окна
+      const resultData = {
+        success: successCount > 0,
+        totalCourses: coursesToUpdate.length,
+        successCount,
+        failCount,
+        totalAdded,
+        totalExisting,
+        totalLessons,
+        results: allResults
+      };
       
-      if (coursesToUpdate.length === 1) {
-        const result = allResults[0];
-        if (result.success) {
-          message += `${result.message}\n\n`;
-          message += `📊 Статистика:\n`;
-          message += `• Всего уроков в курсе: ${result.total}\n`;
-          message += `• Уже было в расписании: ${result.existing}\n`;
-          message += `• Добавлено новых: ${result.added}`;
-        } else {
-          message += `❌ Ошибка: ${result.error}`;
-        }
-      } else {
-        message += `Обработано курсов: ${coursesToUpdate.length}\n`;
-        message += `✅ Успешно: ${successCount}\n`;
-        message += `❌ С ошибками: ${failCount}\n\n`;
-        message += `📊 Общая статистика:\n`;
-        message += `• Всего уроков: ${totalLessons}\n`;
-        message += `• Уже было в расписании: ${totalExisting}\n`;
-        message += `• Добавлено новых: ${totalAdded}\n\n`;
-        
-        if (failCount > 0) {
-          message += `❌ Курсы с ошибками:\n`;
-          allResults.filter(r => !r.success).forEach(r => {
-            message += `• ${r.course}: ${r.error}\n`;
-          });
-        }
-      }
-      
-      alert(message);
+      // Открываем модальное окно с результатами
+      setModalData(resultData);
+      setModalOpen(true);
       
       // Уведомляем родительский компонент об обновлении
       if (onRefresh) {
-        onRefresh({
-          success: successCount > 0,
-          totalCourses: coursesToUpdate.length,
-          successCount,
-          failCount,
-          totalAdded,
-          totalExisting,
-          totalLessons,
-          results: allResults
-        });
+        onRefresh(resultData);
       }
       
     } catch (error) {
@@ -160,21 +138,29 @@ export default function RefreshScheduleButton({
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleRefresh}
-      disabled={loading}
-      className={`refresh-schedule-btn ${variant === "small" ? "compact" : ""}`}
-      title={getDisplayText()}
-    >
-      {loading ? (
-        <>
-          <span className="refresh-icon spinning">🔄</span>
+    <>
+      <button
+        type="button"
+        onClick={handleRefresh}
+        disabled={loading}
+        className={`refresh-schedule-btn ${variant === "small" ? "compact" : ""}`}
+        title={getDisplayText()}
+      >
+        {loading ? (
+          <>
+            <span className="refresh-icon spinning">🔄</span>
+            <span>{getButtonText()}</span>
+          </>
+        ) : (
           <span>{getButtonText()}</span>
-        </>
-      ) : (
-        <span>{getButtonText()}</span>
-      )}
-    </button>
+        )}
+      </button>
+
+      <ScheduleUpdateResultModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        data={modalData}
+      />
+    </>
   );
 }

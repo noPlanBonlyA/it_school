@@ -301,7 +301,7 @@ export default function RatingPage() {
                                     {[student.user?.first_name, student.user?.surname]
                                       .filter(Boolean).join(' ') || student.user?.username || 'Неизвестный студент'}
                                   </div>
-                                  <div className="student-email">
+                                  <div className="student-email" style={{ display: 'flex'}}>
                                     {student.user?.email || 'Почта не указана'}
                                   </div>
                                 </div>
@@ -314,7 +314,7 @@ export default function RatingPage() {
                             <div className="points-cell">
                               <div className="points-content">
                                 <span className="points-number">{student.points || 0}</span>
-                                <span className="points-icon">🪙</span>
+                                <span className="points-icon">💻</span>
                               </div>
                             </div>
                           </div>
@@ -361,7 +361,7 @@ export default function RatingPage() {
                           <div className="points-cell">
                             <div className="points-content">
                               <span className="points-number">{ratingData.currentUser.data.points || 0}</span>
-                              <span className="points-icon">🪙</span>
+                              <span className="points-icon">💻</span>
                             </div>
                           </div>
                         </div>
@@ -394,7 +394,7 @@ export default function RatingPage() {
           <div className="rating-footer">
             <div className="info-card">
               <div className="info-card-header">
-                <h3>� Как заработать бесткоины?</h3>
+                <h3>Как заработать бесткоины?</h3>
                 <p className="info-card-subtitle">Выполняйте задания и получайте награды за активность</p>
               </div>
               <div className="info-card-body">
@@ -405,25 +405,25 @@ export default function RatingPage() {
                       <span className="task-icon">📚</span>
                       <div className="task-title">Посещение занятий</div>
                       <div className="task-description">Приходите на занятия вовремя и не пропускайте уроки</div>
-                      <div className="task-reward">+10 🪙 за урок</div>
+                      <div className="task-reward">+10 💻 за урок</div>
                     </div>
                     <div className="task-card">
                       <span className="task-icon">✍️</span>
                       <div className="task-title">Домашние задания</div>
                       <div className="task-description">Выполняйте домашние задания качественно и в срок</div>
-                      <div className="task-reward">+15 🪙 за задание</div>
+                      <div className="task-reward">+15 💻 за задание</div>
                     </div>
                     <div className="task-card">
                       <span className="task-icon">🙋</span>
                       <div className="task-title">Активность на уроках</div>
                       <div className="task-description">Участвуйте в обсуждениях и отвечайте на вопросы</div>
-                      <div className="task-reward">+5 🪙 за активность</div>
+                      <div className="task-reward">+5 💻 за активность</div>
                     </div>
                     <div className="task-card">
                       <span className="task-icon">💯</span>
                       <div className="task-title">Контрольные работы</div>
                       <div className="task-description">Успешно сдавайте тесты и экзамены</div>
-                      <div className="task-reward">+25 🪙 за тест</div>
+                      <div className="task-reward">+25 💻 за тест</div>
                     </div>
                   </div>
                 </div>
@@ -435,25 +435,25 @@ export default function RatingPage() {
                       <span className="task-icon">🤝</span>
                       <div className="task-title">Помощь одногруппникам</div>
                       <div className="task-description">Помогайте другим студентам с заданиями и вопросами</div>
-                      <div className="task-reward">+20 🪙 за помощь</div>
+                      <div className="task-reward">+20 💻 за помощь</div>
                     </div>
                     <div className="task-card">
                       <span className="task-icon">🎨</span>
                       <div className="task-title">Творческие проекты</div>
                       <div className="task-description">Создавайте собственные проекты и презентуйте их</div>
-                      <div className="task-reward">+50 🪙 за проект</div>
+                      <div className="task-reward">+50 💻 за проект</div>
                     </div>
                     <div className="task-card">
                       <span className="task-icon">📖</span>
                       <div className="task-title">Дополнительное обучение</div>
                       <div className="task-description">Изучайте материалы сверх программы</div>
-                      <div className="task-reward">+30 🪙 за курс</div>
+                      <div className="task-reward">+30 💻 за курс</div>
                     </div>
                     <div className="task-card">
                       <span className="task-icon">🏆</span>
                       <div className="task-title">Участие в конкурсах</div>
                       <div className="task-description">Принимайте участие в олимпиадах и хакатонах</div>
-                      <div className="task-reward">+100 🪙 за участие</div>
+                      <div className="task-reward">+100 💻 за участие</div>
                     </div>
                   </div>
                 </div>

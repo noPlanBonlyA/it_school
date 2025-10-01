@@ -206,16 +206,13 @@ export default function TeacherLessonPage() {
     {/* Доп. материал преподавателя */}
     {lesson?.teacher_additional_material_url && (
       <div className="additional-materials-container">
-        {lesson?.teacher_additional_material_name && (
-          <div className="material-name"></div>
-        )}
         <a
           href={lesson.teacher_additional_material_url}
           target="_blank"
           rel="noopener noreferrer"
           className="download-additional-btn"
         >
-          📥 {lesson.teacher_additional_material_name || 'Скачать дополнительные материалы для преподавателя'}
+          📥 Скачать дополнительные материалы
         </a>
       </div>
     )}
@@ -251,16 +248,13 @@ export default function TeacherLessonPage() {
       {/* Доп. материал ДЗ */}
       {lesson?.homework_additional_material_url && (
         <div className="homework-additional-container">
-          {lesson?.homework_additional_material_name && (
-            <div className="material-name">📎 {lesson.homework_additional_material_name}</div>
-          )}
           <a
             href={lesson.homework_additional_material_url}
             target="_blank"
             rel="noopener noreferrer"
             className="download-homework-additional-btn"
           >
-            📎 {lesson.homework_additional_material_name || 'Скачать дополнительные материалы к заданию'}
+            � Скачать дополнительные материалы
           </a>
           {/*
           Если хочешь встраивать доп-материал как iframe:

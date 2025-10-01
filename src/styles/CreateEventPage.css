@@ -203,11 +203,15 @@
   height: 20px;
   margin: 0;
   accent-color: #3b82f6;
+  flex-shrink: 0;
+  align-self: center;
 }
 
 .checkbox-text {
   font-weight: 500;
   color: #374151;
+  line-height: 1;
+  align-self: center;
 }
 
 /* =================== ВЫБОР УЧАСТНИКОВ =================== */
@@ -512,6 +516,7 @@
 
 .card-checkbox {
   flex-shrink: 0;
+  width: 18px;
 }
 
 .card-checkbox input[type="checkbox"] {
@@ -519,6 +524,7 @@
   height: 18px;
   cursor: pointer;
   accent-color: #3b82f6;
+  margin: 0;
 }
 
 .card-content {
@@ -553,11 +559,15 @@
   font-weight: 600;
   font-size: 18px;
   flex-shrink: 0;
+  min-width: 48px;
 }
 
 .card-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .card-info h4 {
@@ -568,6 +578,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
+  text-align: left;
 }
 
 .card-info p {

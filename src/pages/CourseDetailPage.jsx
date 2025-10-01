@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/TopBar';
+import SuccessModal from '../components/SuccessModal';
 import { useAuth } from '../contexts/AuthContext';
 import { getCoursesPath, getCoursesTitle } from '../utils/navigationUtils';
 import '../styles/CourseDetailPage.css';
@@ -35,6 +36,10 @@ export default function CourseDetailPage() {
   
   // ───── изменения материалов ───── */
   const [materialChanges, setMaterialChanges] = useState({});
+  
+  // ───── модальное окно успеха ───── */
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const fullName = `${user.first_name || ''} ${user.surname || ''}`.trim() || user.username || 'Пользователь';
 
@@ -277,7 +282,9 @@ export default function CourseDetailPage() {
       setMaterialChanges({});
       
       await reloadLessons();
-      alert('✅ Урок успешно обновлен!');
+      
+      setSuccessMessage('Урок успешно обновлен в системе');
+      setShowSuccessModal(true);
     } catch (e) {
       console.error(e);
       alert('❌ Не удалось обновить урок: ' + (e.message || 'Неизвестная ошибка'));
@@ -303,7 +310,9 @@ export default function CourseDetailPage() {
         student_material_id: lessonToDelete.student_material_id
       });
       await reloadLessons();
-      alert('✅ Урок успешно удален!');
+      
+      setSuccessMessage('Урок успешно удален из системы');
+      setShowSuccessModal(true);
     } catch (e) {
       console.error(e);
       alert('❌ Не удалось удалить урок');
@@ -609,6 +618,14 @@ export default function CourseDetailPage() {
         ) : (
           <p>Загрузка курса...</p>
         )}
+        
+        {/* Модальное окно успеха */}
+        <SuccessModal
+          isOpen={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          title="Успешно!"
+          message={successMessage}
+        />
       </div>
     </div>
   );

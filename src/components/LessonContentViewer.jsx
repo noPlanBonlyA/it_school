@@ -162,16 +162,7 @@ const LessonContentViewer = ({ courseId, lessonId, lessonName, onClose }) => {
         </div>
 
         {/* Дополнительная информация о уроке */}
-        <div className="lesson-info">
-          <div className="info-item">
-            <span className="info-label">ID урока:</span>
-            <span className="info-value">{lessonInfo?.id}</span>
-          </div>
-          <div className="info-item">
-            <span className="info-label">ID курса:</span>
-            <span className="info-value">{lessonInfo?.course_id}</span>
-          </div>
-        </div>
+        
       </div>
     </div>
   );

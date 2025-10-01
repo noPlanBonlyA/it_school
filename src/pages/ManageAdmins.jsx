@@ -139,7 +139,7 @@ export default function ManageAdminsPage() {
   };
 
   /* ---------- выбор / save / delete ---------- */
-  const handleSelect=u=>{setEdit({...u,birth_date:u.birth_date||''}); setSearch('');};
+  const handleSelect=u=>{setEdit({...u,birth_date:u.birth_date||''}); setSearch(''); setShowSug(false);};
 
   /* ───────── СОХРАНЕНИЕ ───────── */
   const save = async () => {
@@ -237,8 +237,7 @@ export default function ManageAdminsPage() {
               <input placeholder="Поиск по логину или ФИО"
                      value={search}
                      onChange={e=>setSearch(e.target.value)}
-                     onFocus={()=>setShowSug(true)}
-                     onBlur={()=>setTimeout(()=>setShowSug(false),200)}/>
+                     onFocus={()=>setShowSug(true)}/>
               {showSug&&filtered.length>0&&(
                 <ul className="suggestions">
                   {filtered.map(u=>{

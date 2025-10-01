@@ -53,11 +53,20 @@ export default function HomeworkPage() {
       if (!mobile) {
         setActiveColumn('groups'); // Сброс на десктопе
       }
+      
+      // Фикс для мобильных браузеров (правильный vh с учетом адресной строки)
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
   }, []);
 
   // Загрузка данных при монтировании
@@ -525,7 +534,7 @@ export default function HomeworkPage() {
 
   if (loading) {
     return (
-      <div className="app-layout">
+      <div className="app-layout homework-page-wrapper">
         <Sidebar activeItem="homework" userRole="teacher" />
         <div className="main-content">
           <SmartTopBar pageTitle="Домашние задания" />
@@ -538,7 +547,7 @@ export default function HomeworkPage() {
   }
 
   return (
-    <div className="app-layout">
+    <div className="app-layout homework-page-wrapper">
       <Sidebar activeItem="homework" userRole="teacher" />
 
       <div className="main-content">
@@ -865,7 +874,7 @@ export default function HomeworkPage() {
                         {expandedArchiveStudent === student.id && (
                           <div className="archive-details">
                             {/* Подсказка о скролле */}
-                            <div className="scroll-hint">Прокрутите до кнопок</div>
+                           
                             
                             {/* Информация об оценке */}
                             <div className="grade-info">

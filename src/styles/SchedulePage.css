@@ -25,6 +25,7 @@
     padding-top: 20px !important; /* Меньший отступ на мобильных */
     overflow-y: auto;
     height: 100vh;
+    -webkit-overflow-scrolling: touch; /* Нативный скролл iOS */
   }
 }
 
@@ -256,7 +257,7 @@
   flex: 1;
   /* Убираем ограничения высоты */
   height: auto;
-  min-height: 400px;
+  min-height: 0px;
 }
 
 /* Виджеты боковой панели */
@@ -440,10 +441,7 @@
   font-weight: 600 !important;
   padding: 6px 10px !important;
   cursor: pointer !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   font-family: 'Mont', sans-serif !important;
-  /* Добавляем прозрачность и красивые стили */
-  backdrop-filter: blur(10px) !important;
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.08),
     0 2px 8px rgba(0, 0, 0, 0.04),
@@ -453,28 +451,35 @@
   overflow: hidden !important;
 }
 
-/* Добавляем эффект стекла для событий */
-.fc-event::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.15) 0%, 
-    transparent 50%, 
-    rgba(0, 0, 0, 0.05) 100%) !important;
-  pointer-events: none !important;
-}
+/* Десктопные эффекты */
+@media (min-width: 769px) {
+  .fc-event {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+  
+  .fc-event::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.15) 0%, 
+      transparent 50%, 
+      rgba(0, 0, 0, 0.05) 100%) !important;
+    pointer-events: none !important;
+  }
 
-.fc-event:hover {
-  transform: translateY(-2px) scale(1.02) !important;
-  box-shadow: 
-    0 8px 32px rgba(0, 177, 143, 0.2),
-    0 4px 16px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
-  border-color: rgba(255, 255, 255, 0.4) !important;
+  .fc-event:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 
+      0 8px 32px rgba(0, 177, 143, 0.2),
+      0 4px 16px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+  }
 }
 
 .fc .fc-timegrid-slot-label {
@@ -773,6 +778,7 @@
     padding-bottom: 60px !important;
     padding-left: 16px !important;
     padding-right: 16px !important;
+    -webkit-overflow-scrolling: touch; /* Нативный скролл iOS */
   }
   
   .schedule-page {
@@ -800,6 +806,8 @@
   .calendar-widget {
     margin-bottom: 60px !important;
     padding: 16px !important;
+    /* Убираем backdrop-filter на мобильных для лучшей производительности */
+    backdrop-filter: none !important;
   }
   
   .widget.nearest-lessons {
@@ -830,12 +838,25 @@
   .fc-button {
     padding: 8px 12px !important;
     font-size: 13px !important;
+    /* Убираем трансформации на мобильных */
+    transform: none !important;
+  }
+  
+  .fc-button:hover {
+    transform: none !important;
   }
 
   .fc-event {
     font-size: 12px !important;
     padding: 2px 4px !important;
     border-radius: 6px !important;
+    /* Убираем анимации и эффекты */
+    transition: none !important;
+    backdrop-filter: none !important;
+  }
+  
+  .fc-event::before {
+    display: none !important;
   }
 
   .fc-event-title {
@@ -992,6 +1013,14 @@
   box-shadow: 0 6px 18px rgba(0,0,0,0.06) !important;
   position: relative !important;
   overflow: hidden !important;
+}
+
+/* Мобильные события без анимаций */
+@media (max-width: 768px) {
+  .fc-timegrid-event,
+  .fc-daygrid-event {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+  }
 }
 
 /* ЛЕВАЯ цветная полоса статуса */
@@ -1228,6 +1257,16 @@
 }
 /* ===== Mobile listWeek (FullCalendar) ===== */
 @media (max-width: 768px) {
+  /* Оптимизация скролла для мобильных */
+  .fc,
+  .fc-scroller,
+  .fc-list {
+    -webkit-overflow-scrolling: touch !important;
+    transform: translateZ(0) !important; /* GPU ускорение */
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
+  }
+
   .fc-header-toolbar { gap: 8px !important; margin-bottom: 12px !important; }
   .fc-toolbar-title { font-size: 18px !important; }
 

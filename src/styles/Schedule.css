@@ -3272,6 +3272,7 @@
 
 /* тело карточки со списком (если есть отдельный блок) */
 .card.schedule > *{
+  margin-top: 5px;
   min-height: 0 !important; /* критично для iOS/Safari */
 }
 

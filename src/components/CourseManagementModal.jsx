@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import * as groupCourseManagementService from '../services/groupCourseManagementService';
+import RescheduleResultModal from './RescheduleResultModal';
+import ConfirmRescheduleModal from './ConfirmRescheduleModal';
 import './CourseManagementModal.css';
 
 /**
@@ -24,6 +26,14 @@ const CourseManagementModal = ({
   const [courseLessons, setCourseLessons] = useState([]);
   const [selectedLessons, setSelectedLessons] = useState(new Set());
   
+  // Состояние для модального окна результатов
+  const [resultModalOpen, setResultModalOpen] = useState(false);
+  const [resultModalData, setResultModalData] = useState(null);
+  
+  // Состояние для модального окна подтверждения
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [confirmModalData, setConfirmModalData] = useState(null);
+  
   // Состояние для формы изменения расписания
   const [scheduleForm, setScheduleForm] = useState({
     dayOfWeek: 1, // Понедельник по умолчанию
@@ -34,8 +44,8 @@ const CourseManagementModal = ({
   });
 
   const dayNames = [
-    'Воскресенье', 'Понедельник', 'Вторник', 'Среда', 
-    'Четверг', 'Пятница', 'Суббота'
+     'Понедельник', 'Вторник', 'Среда', 
+    'Четверг', 'Пятница', 'Суббота','Воскресенье'
   ];
 
   // Функция загрузки информации о расписании
@@ -524,37 +534,51 @@ ${result.message}
       return;
     }
 
-    if (!window.confirm(
-      `Изменить расписание всех занятий курса "${course.name}"?\n\n` +
-      `Новое расписание:\n` +
-      `• День недели: ${dayNames[scheduleForm.dayOfWeek]}\n` +
-      `• Время: ${scheduleForm.startTime}\n` +
-      `• Продолжительность: ${scheduleForm.durationMinutes} минут\n` +
-      `• Начать с: ${new Date(scheduleForm.startDate).toLocaleDateString('ru-RU')}\n` +
-      `• Аудитория: ${scheduleForm.auditorium || 'Не указана'}\n\n` +
-      `Будет изменено ${scheduleInfo.totalLessons} занятий.`
-    )) {
-      return;
-    }
+    // Подготавливаем данные для модального окна подтверждения
+    const confirmData = {
+      courseName: course.name,
+      dayOfWeek: dayNames[scheduleForm.dayOfWeek],
+      startTime: scheduleForm.startTime,
+      durationMinutes: scheduleForm.durationMinutes,
+      startDate: new Date(scheduleForm.startDate).toLocaleDateString('ru-RU'),
+      auditorium: scheduleForm.auditorium || 'Не указана',
+      totalLessons: scheduleInfo.totalLessons
+    };
+    
+    setConfirmModalData(confirmData);
+    setConfirmModalOpen(true);
+  };
+
+  // Функция, которая выполняется после подтверждения
+  const handleConfirmedReschedule = async () => {
 
     try {
       setLoading(true);
       
       const result = await groupCourseManagementService.rescheduleGroupCourseLessons(groupId, course.id, scheduleForm);
       
-      if (result.success) {
-        alert(
-          `Расписание курса "${course.name}" успешно изменено!\n\n` +
-          `Обновлено занятий: ${result.updated} из ${result.totalLessons}`
-        );
-        onCourseUpdated();
-        loadScheduleInfo(); // Обновляем информацию
-      } else {
-        alert(
-          `Изменение расписания завершено с ошибками.\n` +
-          `Обновлено: ${result.updated}\nОшибок: ${result.failed}`
-        );
-      }
+      // Подготавливаем данные для модального окна
+      const modalData = {
+        courseName: course.name,
+        success: result.success || result.updated > 0,
+        updated: result.updated || 0,
+        failed: result.failed || 0,
+        totalLessons: result.totalLessons || scheduleInfo.totalLessons,
+        newSchedule: {
+          dayOfWeek: dayNames[scheduleForm.dayOfWeek],
+          startTime: scheduleForm.startTime,
+          durationMinutes: scheduleForm.durationMinutes,
+          startDate: new Date(scheduleForm.startDate).toLocaleDateString('ru-RU'),
+          auditorium: scheduleForm.auditorium || 'Не указана'
+        }
+      };
+      
+      // Показываем красивое модальное окно
+      setResultModalData(modalData);
+      setResultModalOpen(true);
+      
+      onCourseUpdated();
+      loadScheduleInfo(); // Обновляем информацию
       
     } catch (error) {
       console.error('Error rescheduling course:', error);
@@ -931,7 +955,7 @@ ${result.message}
                           <span className="info-icon">🆕</span>
                           <div className="info-text">
                             <strong>Новый API метод</strong>
-                            <p>Использует эндпоинт DELETE /courses/lessons/{"{lesson_id}"}/groups/{"{group_id}"}</p>
+                            <p>Использует эндпоинт DELETE </p>
                           </div>
                         </div>
                         <div className="info-item">
@@ -1310,6 +1334,21 @@ ${result.message}
           )}
         </div>
       </div>
+      
+      {/* Модальное окно подтверждения изменения расписания */}
+      <ConfirmRescheduleModal
+        isOpen={confirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        onConfirm={handleConfirmedReschedule}
+        data={confirmModalData}
+      />
+      
+      {/* Модальное окно результатов изменения расписания */}
+      <RescheduleResultModal
+        isOpen={resultModalOpen}
+        onClose={() => setResultModalOpen(false)}
+        data={resultModalData}
+      />
     </div>
   );
 };

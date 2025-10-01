@@ -83,9 +83,9 @@ export default function TeacherCoursePage() {
     const today = new Date();
     const lessonDate = lesson.holding_date ? new Date(lesson.holding_date) : null;
     
-    if (!lessonDate) return { text: 'Не назначен', class: 'not-scheduled' };
+    
     if (lessonDate > today) return { text: 'Предстоит', class: 'upcoming' };
-    return { text: 'Проведен', class: 'completed' };
+    return { text: '', class: '' };
   };
 
   /* ───── Создание урока ───── */

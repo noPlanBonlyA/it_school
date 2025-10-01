@@ -288,15 +288,16 @@
   transition: all 0.1s ease;
 }
 
-.close-btn {
+/* УСТАРЕЛО: заменено на .notification-close-btn */
+/* .close-btn {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 24px;
   cursor: pointer;
   color: #999;
   padding: 0;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -306,17 +307,16 @@
   font-weight: 300;
   line-height: 1;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 8px;
+  right: 8px;
   z-index: 10;
-  border-top-right-radius: 16px;
 }
 
 .close-btn:hover {
   background-color: rgba(255, 71, 87, 0.1);
   color: #ff4757;
   transform: scale(1.1);
-}
+} */
 
 .notification-list {
   max-height: calc(400px - 48px);
@@ -410,7 +410,8 @@
   font-size: 11px;
 }
 
-.delete-btn {
+/* УСТАРЕЛО: заменено на .notification-delete-btn */
+/* .delete-btn {
   background: none;
   border: none;
   color: #999;
@@ -440,7 +441,7 @@
   color: #ff4757;
   background-color: rgba(255, 71, 87, 0.1);
   transform: translateY(-50%) scale(1.1);
-}
+} */
 
 .no-notifications {
   padding: 40px 20px;
@@ -664,14 +665,14 @@
     padding: 10px 0 10px 12px;
   }
   
-  .close-btn {
+  /* УСТАРЕЛО: используйте .notification-close-btn */
+  /* .close-btn {
     width: 36px;
     height: 36px;
-    font-size: 18px;
-    top: 0;
-    right: 0;
-    border-top-right-radius: 20px;
-  }
+    font-size: 22px;
+    top: 6px;
+    right: 6px;
+  } */
   
   .notification-list {
     max-height: calc(100vh - 120px);
@@ -792,14 +793,14 @@
     padding: 8px 0 8px 10px;
   }
   
-  .close-btn {
+  /* УСТАРЕЛО: используйте .notification-close-btn */
+  /* .close-btn {
     width: 32px;
     height: 32px;
-    font-size: 16px;
-    top: 0;
-    right: 0;
-    border-top-right-radius: 16px;
-  }
+    font-size: 20px;
+    top: 6px;
+    right: 6px;
+  } */
   
   .clear-all-btn {
     font-size: 9px;
@@ -829,4 +830,117 @@
 .notification-list{
   margin-top: 0 !important;
   padding-top: 0 !important;
+}
+
+/* ============================================
+   СТИЛИ ДЛЯ КНОПОК В УВЕДОМЛЕНИЯХ
+   ============================================ */
+
+/* Кнопка закрытия панели уведомлений */
+.notification-close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-weight: 300;
+  line-height: 1;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
+.notification-close-btn:hover {
+  background-color: rgba(255, 71, 87, 0.1);
+  color: #ff4757;
+  transform: scale(1.1);
+}
+
+.notification-close-btn:active {
+  transform: scale(0.95);
+}
+
+/* Кнопка удаления отдельного уведомления */
+.notification-delete-btn {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  z-index: 5;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.notification-item:hover .notification-delete-btn {
+  opacity: 1;
+}
+
+.notification-delete-btn:hover {
+  color: #ff4757;
+  background-color: rgba(255, 71, 87, 0.1);
+  transform: translateY(-50%) scale(1.15);
+}
+
+.notification-delete-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 480px) {
+  .notification-close-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 26px;
+    top: 0px;
+    right: 6px;
+  }
+  
+  .notification-delete-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 18px;
+    right: 14px;
+    opacity: 1; /* На мобильных всегда показываем */
+  }
+}
+
+@media (max-width: 400px) {
+  .notification-close-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 24px;
+    top: 0px;
+    right: 6px;
+  }
+  
+  .notification-delete-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    right: 12px;
+  }
 }

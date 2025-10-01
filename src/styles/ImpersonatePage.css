@@ -405,7 +405,7 @@
 @media (max-width: 768px) {
   .impersonate-page {
     padding: 16px;
-    height: calc(100vh - 80px); /* Меньше отступ для мобильных */
+    height: calc(100vh - 0px); /* Меньше отступ для мобильных */
     max-width: 100%;
   }
   

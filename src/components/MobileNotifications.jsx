@@ -210,9 +210,10 @@ export default function MobileNotifications() {
                   )}
                 </div>
                 <button 
-                  className="close-btn"
+                  className="notification-close-btn"
                   onClick={() => setShowNotifications(false)}
                   type="button"
+                  aria-label="Закрыть уведомления"
                 >
                   ×
                 </button>
@@ -249,9 +250,10 @@ export default function MobileNotifications() {
                         </small>
                       </div>
                       <button 
-                        className="delete-btn"
+                        className="notification-delete-btn"
                         onClick={(e) => handleDeleteNotification(notification.id, e)}
                         type="button"
+                        aria-label="Удалить уведомление"
                       >
                         ×
                       </button>

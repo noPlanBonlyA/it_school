@@ -1,0 +1,123 @@
+/* src/styles/SuccessModal.css */
+
+.success-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.success-modal-content {
+  background: white;
+  border-radius: 20px;
+  padding: 0;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+  overflow: hidden;
+}
+
+.success-modal-header {
+  background: linear-gradient(135deg, #2d9a8c 0%, #34b3a3 100%);
+  padding: 30px 30px 20px;
+  text-align: center;
+}
+
+.success-modal-header h2 {
+  color: white;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.success-modal-body {
+  background: #d4f4dd;
+  padding: 30px;
+  text-align: center;
+}
+
+.success-message {
+  color: #2d9a8c;
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 0;
+  font-weight: 500;
+}
+
+.success-modal-actions {
+  padding: 25px 30px 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-success-ok {
+  background: linear-gradient(135deg, #2d9a8c 0%, #34b3a3 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 60px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(45, 154, 140, 0.3);
+}
+
+.btn-success-ok:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(45, 154, 140, 0.4);
+}
+
+.btn-success-ok:active {
+  transform: translateY(0);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .success-modal-content {
+    width: 95%;
+    margin: 20px;
+  }
+
+  .success-modal-header h2 {
+    font-size: 20px;
+  }
+
+  .success-message {
+    font-size: 16px;
+  }
+
+  .btn-success-ok {
+    padding: 12px 50px;
+    font-size: 15px;
+  }
+}

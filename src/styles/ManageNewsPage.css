@@ -192,48 +192,75 @@
 
     /* Мобильная адаптация чекбокса "Закрепить" */
     @media (max-width: 600px) {
-      .checkbox-field {
-        padding: 16px;
-        gap: 14px;
-    margin-right: 50%;
+      /* Ограничиваем ширину поля с чекбоксом */
+      .field:has(.checkbox-field) {
+        width: fit-content;
+        max-width: 100%;
+        grid-column: 1 / -1;
       }
+      
+      .checkbox-field {
+        padding: 10px 12px;
+        gap: 10px;
+        display: inline-flex;
+        flex-direction: row;
+        align-items: center;
+        width: auto;
+      }
+      
       .checkbox-field input[type="checkbox"] {
         width: 18px;
-        height: 18px;
+        height: 32px;
         min-width: 18px;
+        max-width: 18px;
         min-height: 18px;
-        border-radius: 4px;
+        max-height: 32px;
+        border-radius: 9px;
         border: 2px solid #4880FF;
         appearance: none;
         -webkit-appearance: none;
+        -moz-appearance: none;
         background: #fff;
         outline: none;
         cursor: pointer;
         position: relative;
-        transition: border-color 0.2s;
+        transition: all 0.2s;
         box-sizing: border-box;
+        flex-shrink: 0;
+        margin: 0;
+        padding: 0;
       }
+      
       .checkbox-field input[type="checkbox"]:checked {
         background: #4880FF;
         border-color: #4880FF;
       }
+      
       .checkbox-field input[type="checkbox"]:checked::after {
         content: '';
         display: block;
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
         background: #fff;
-        border-radius: 2px;
+        border-radius: 4px;
         position: absolute;
         top: 3px;
         left: 3px;
       }
+      
       .checkbox-field label {
-        font-size: 18px;
-        gap: 10px;
+        font-size: 15px;
+        line-height: 1.2;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+        margin: 0;
+        padding: 0;
       }
+      
       .checkbox-field label::after {
-        font-size: 20px;
+        font-size: 16px;
       }
     }
 
