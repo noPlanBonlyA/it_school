@@ -247,13 +247,13 @@ export default function ShopPage() {
                       <div className="empty-state">
                         <div className="empty-icon">🛍️</div>
                         <h3>Нет доступных товаров</h3>
-                        <p>К сожалению, сейчас нет товаров, которые вы можете купить за ваши монеты.</p>
+                        <p>К сожалению, сейчас нет товаров, которые вы можете купить за ваши айтишки.</p>
                       </div>
                     ) : (
                       <>
                         <div className="section-header">
                           <h3>Товары, которые вы можете купить</h3>
-                          <p>У вас достаточно монет для покупки этих товаров</p>
+                          <p>У вас достаточно айтишек для покупки этих товаров</p>
                         </div>
                         <div className="products-grid">
                           {availableProducts.map(product => (
@@ -293,7 +293,7 @@ export default function ShopPage() {
                                 <div className="product-footer">
                                   <div className="product-price">
                                     <span className="price">{product.price}</span>
-                                    <span className="currency">монет</span>
+                                    <span className="currency">айтишек</span>
                                   </div>
                                   <button 
                                     className="btn-purchase"
@@ -317,13 +317,13 @@ export default function ShopPage() {
                       <div className="empty-state">
                         <div className="empty-icon">✨</div>
                         <h3>Отлично!</h3>
-                        <p>У вас достаточно монет для покупки всех доступных товаров!</p>
+                        <p>У вас достаточно айтишек для покупки всех доступных товаров!</p>
                       </div>
                     ) : (
                       <>
                         <div className="section-header">
                           <h2>Товары для будущих покупок</h2>
-                          <p>Накопите больше монет, чтобы купить эти товары</p>
+                          <p>Накопите больше айтишек, чтобы купить эти товары</p>
                         </div>
                         <div className="products-grid">
                           {notAvailableProducts.map(product => {
@@ -387,13 +387,13 @@ export default function ShopPage() {
                                   <div className="product-footer">
                                     <div className="product-price">
                                       <span className="price">{product.price}</span>
-                                      <span className="currency">монет</span>
+                                      <span className="currency">айтишек</span>
                                     </div>
                                     <div className="coins-needed">
                                       <span className="needed-icon">🔒</span>
                                       <span className="needed-text">Нужно еще: </span>
                                       <span className="needed-amount">{progress.coinsNeeded}</span>
-                                      <span className="needed-currency"> монет</span>
+                                      <span className="needed-currency"> айтишек</span>
                                     </div>
                                   </div>
                                 </div>
@@ -463,13 +463,13 @@ export default function ShopPage() {
                     <p>{selectedProduct.description}</p>
                     <div className="price-info">
                       <div className="purchase-price">
-                        Цена: <strong>{selectedProduct.price}  монет</strong>
+                        Цена: <strong>{selectedProduct.price}  айтишек</strong>
                       </div>
                       <div className="balance-info">
-                        Ваш баланс: <strong>{studentData?.points || 0}  монет</strong>
+                        Ваш баланс: <strong>{studentData?.points || 0}  айтишек</strong>
                       </div>
                       <div className="after-purchase">
-                        После покупки:&nbsp;<strong>{(studentData?.points || 0) - selectedProduct.price}&nbsp;монет</strong>
+                        После покупки:&nbsp;<strong>{(studentData?.points || 0) - selectedProduct.price}&nbsp;айтишек</strong>
                       </div>
                     </div>
                   </div>
@@ -514,9 +514,6 @@ export default function ShopPage() {
               
               <div className="success-body">
                 <div className="success-message">
-                  <div className="purchased-item">
-                    <strong>"{selectedProduct.name}"</strong>
-                  </div>
                   <p className="instruction">
                     Обратитесь к&nbsp;администратору для&nbsp;покупки.
                   </p>

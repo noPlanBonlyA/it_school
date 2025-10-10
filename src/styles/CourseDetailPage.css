@@ -988,7 +988,6 @@
   white-space: pre-wrap;
   max-height: 150px;
   overflow-y: auto;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
 .no-materials {

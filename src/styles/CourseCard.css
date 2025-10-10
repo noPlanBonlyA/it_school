@@ -92,6 +92,8 @@
   transition: transform 0.3s ease;
   display: block;
   background: #f8fafc;
+  position: relative;
+  z-index: 2;
 }
 
 .course-card:hover .course-image {
@@ -108,6 +110,8 @@
   border-radius: 16px;
   border: 2px dashed #cbd5e1;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .course-placeholder span {

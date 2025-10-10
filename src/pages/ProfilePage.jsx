@@ -177,7 +177,7 @@ const showImage = !!avatarUrl && !imgError;
       <Sidebar activeItem="settings" userRole={user.role} />
 
       <div className="main-content">
-        <SmartTopBar pageTitle="Главная" />
+        <SmartTopBar pageTitle="Профиль" />
 
 
         <div className="profile-page">

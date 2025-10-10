@@ -288,7 +288,7 @@ export default function ManageAdminsPage() {
               </div>
               <div className="buttons" style={{gridColumn:'1 / -1'}}>
                 <button className="btn-primary" onClick={save}>Сохранить</button>
-                <button className="btn-danger"  onClick={()=>setShowDeleteConfirm(true)}>Удалить</button>
+                <button className="btn-primary" style={{ backgroundColor: 'red' }} onClick={()=>setShowDeleteConfirm(true)}>Удалить</button>
               </div>
             </div>
           )}

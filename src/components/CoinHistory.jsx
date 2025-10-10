@@ -144,7 +144,7 @@ const CoinHistory = ({ studentId = null, compact = false }) => {
     <div className="coin-history">
       <div className="coin-history-header">
         <h3 className="coin-history-title">
-          <span className="coin-icon">🪙</span>
+          <span className="coin-icon"></span>
           История монет
         </h3>
         <div className="history-controls">

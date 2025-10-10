@@ -750,7 +750,6 @@ h1 {
 
 /* Стили для поля телефона */
 input[type="tel"] {
-  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
   letter-spacing: 0.5px;
   font-weight: 500;
 }

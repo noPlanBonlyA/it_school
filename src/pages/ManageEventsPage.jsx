@@ -180,7 +180,7 @@ export default function ManageEventsPage() {
     <div className="app-layout">
       <Sidebar activeItem="manage-events" userRole={user?.role} />
       <div className="main-content">
-        <SmartTopBar />
+         <SmartTopBar pageTitle="Мероприятия" />
         <div className="manage-events-page">
           <div className="page-header">
             <div className="header-info">

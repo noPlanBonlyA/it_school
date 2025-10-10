@@ -144,8 +144,16 @@ useEffect(() => {
   const s = ev.start_datetime || ev.start;
   const e = ev.end_datetime || ev.end;
   const from = formatTime(s);
-  const to   = e ? formatTime(e) : '';
-  return to ? `${from} — ${to}` : from;
+  const to = formatTime(e);
+  
+  // Всегда показываем и начало, и конец времени с тире
+  if (from !== '—' && to !== '—') {
+    return `${from} — ${to}`;
+  } else if (from !== '—') {
+    return `${from} — ...`; // Показываем тире даже если конец неизвестен
+  } else {
+    return '—';
+  }
 };
 
 // NEW: бейдж типа занятия ("Практика" / "Мероприятие")

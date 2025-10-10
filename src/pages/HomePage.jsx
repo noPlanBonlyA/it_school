@@ -128,11 +128,22 @@ export default function HomePage() {
     const nextDayFormatted = new Date(nextDay).toLocaleDateString('ru-RU', {
       day: 'numeric', month: 'long', year: 'numeric'
     });
+    
+    // Фильтруем события по дню и сортируем по времени начала
+    const filteredEvents = events.filter(e => 
+      new Date(e.start).setHours(0,0,0,0) === nextDay
+    );
+    
+    // Сортируем по времени начала (по возрастанию)
+    filteredEvents.sort((a, b) => {
+      const timeA = new Date(a.start || a.start_datetime).getTime();
+      const timeB = new Date(b.start || b.start_datetime).getTime();
+      return timeA - timeB;
+    });
+    
     return {
       scheduleTitle: `${nextDayFormatted}`,
-      dayEvents: events.filter(e => 
-        new Date(e.start).setHours(0,0,0,0) === nextDay
-      )
+      dayEvents: filteredEvents
     };
   }, [events]);
 
@@ -170,7 +181,7 @@ export default function HomePage() {
 
 
 
-        <section className="cards">
+        <section className={`cards ${user?.role !== 'student' ? 'cards--staff' : ''}`}>
           {/* Расписание - всегда первое */}
           <div className={`card schedule ${user?.role !== 'student' ? 'schedule--expanded' : ''}`}>
 

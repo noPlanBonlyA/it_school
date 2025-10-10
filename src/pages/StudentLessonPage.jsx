@@ -361,7 +361,7 @@ export default function StudentLessonPage() {
 
           {/* Заголовок урока с новым дизайном */}
           <div className="lesson-title-section">
-            <h1 className="lesson-title">{lesson?.name || 'Урок'}</h1>
+            <h1 className="lesson-title" style={{ fontSize: '36px' }}>{lesson?.name || 'Урок'}</h1>
           </div>
 
           {/* Содержимое урока */}
@@ -370,22 +370,59 @@ export default function StudentLessonPage() {
             {/* Материалы урока - новый дизайн */}
             <div className="materials-section">
               <div className="materials-header">
-                <h2 className="materials-title">📚 Материалы урока</h2>
+                <h2 className="materials-title" style={{ fontSize: '28px' }}>📚 Материалы урока</h2>
               </div>
               
               {/* Основные материалы урока в одном айфрейме */}
             {lesson?.student_material_url ? (
   <div className="main-material-container">
     {lesson?.student_material_name && (
-      <div className="material-name">
+      <div className="material-name" style={{fontSize:'28px'}}>
         📄 {lesson.student_material_name}
       </div>
     )}
     <div className="material-iframe-wrapper">
+      <div style={{ 
+        position: 'absolute', 
+        top: '10px', 
+        right: '10px', 
+        zIndex: 10 
+      }}>
+        <button
+          onClick={() => window.open(lesson.student_material_url, '_blank')}
+          style={{
+            background: 'rgba(0, 177, 143, 0.9)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '8px 16px',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = 'rgba(3, 131, 106, 1)';
+            e.target.style.transform = 'scale(1.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'rgba(0, 177, 143, 0.9)';
+            e.target.style.transform = 'scale(1)';
+          }}
+        >
+          🔗 Открыть в новом окне
+        </button>
+      </div>
       <iframe 
         src={lesson.student_material_url} 
         title="Материалы урока"
         className="main-material-iframe"
+        style={{ userSelect: 'none', pointerEvents: 'auto' }}
+        onContextMenu={(e) => e.preventDefault()}
       />
     </div>
   </div>
@@ -400,6 +437,11 @@ export default function StudentLessonPage() {
               {/* Кнопка скачивания дополнительных материалов по центру */}
               {lesson?.student_additional_material_url && (
   <div className="additional-materials-container">
+    {lesson?.student_additional_material_name && (
+      <div className="material-name" style={{ marginBottom: '10px', fontSize: '22px', fontWeight: '500' }}>
+        📎 {lesson.student_additional_material_name}
+      </div>
+    )}
     <a 
       href={lesson.student_additional_material_url} 
       target="_blank" 
@@ -415,7 +457,7 @@ export default function StudentLessonPage() {
             {/* Блок домашнего задания - новый дизайн */}
             <div className="homework-section">
               <div className="homework-header">
-                <h2 className="homework-title">📋 Домашнее задание</h2>
+                <h2 className="homework-title" style={{ fontSize: '28px' }}>📋 Домашнее задание</h2>
               </div>
               
               {/* Материалы домашнего задания в едином блоке */}
@@ -425,13 +467,50 @@ export default function StudentLessonPage() {
     {lesson?.homework_material_url && (
       <div className="homework-main-content">
         {lesson?.homework_material_name && (
-          <div className="material-name">📝 {lesson.homework_material_name}</div>
+          <div className="material-name" style={{fontSize:'28px'}}>📝 {lesson.homework_material_name}</div>
         )}
         <div className="homework-iframe-wrapper">
+          <div style={{ 
+            position: 'absolute', 
+            top: '10px', 
+            right: '10px', 
+            zIndex: 10 
+          }}>
+            <button
+              onClick={() => window.open(lesson.homework_material_url, '_blank')}
+              style={{
+                background: 'rgba(255, 193, 7, 0.9)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '8px 16px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'rgba(255, 149, 0, 1)';
+                e.target.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'rgba(255, 193, 7, 0.9)';
+                e.target.style.transform = 'scale(1)';
+              }}
+            >
+              🔗 Открыть в новом окне
+            </button>
+          </div>
           <iframe
             src={lesson.homework_material_url}
             title="Домашнее задание"
             className="homework-material-iframe"
+            style={{ userSelect: 'none', pointerEvents: 'auto' }}
+            onContextMenu={(e) => e.preventDefault()}
           />
         </div>
       </div>
@@ -440,13 +519,18 @@ export default function StudentLessonPage() {
     {/* ДОП. МАТЕРИАЛ ДЗ */}
     {lesson?.homework_additional_material_url && (
       <div className="homework-additional-container">
+        {lesson?.homework_additional_material_name && (
+          <div className="material-name" style={{ marginBottom: '10px', fontSize: '22px', fontWeight: '500' }}>
+            📎 {lesson.homework_additional_material_name}
+          </div>
+        )}
         <a
           href={lesson.homework_additional_material_url}
           target="_blank"
           rel="noopener noreferrer"
           className="download-homework-additional-btn"
         >
-          � Скачать дополнительные материалы
+          📥 Скачать дополнительные материалы
         </a>
         {/* если хочешь именно встраивать, а не скачивать — замени <a> на iframe-обёртку как выше */}
         {/* 
@@ -618,8 +702,11 @@ export default function StudentLessonPage() {
                     disabled={!file || submitting}
                     style={{
                       marginTop: '20px',
-                      width: '100%',
-                      padding: '12px'
+                      width: 'auto',
+                      padding: '12px 32px',
+                      display: 'block',
+                      marginLeft: 'auto',
+                      marginRight: 'auto'
                     }}
                   >
                     {submitting 

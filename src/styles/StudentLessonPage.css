@@ -95,7 +95,7 @@
 
 .materials-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
 }
 
 .materials-title {
@@ -127,12 +127,21 @@
   margin-bottom: 30px;
 }
 
+.main-material-container .material-name {
+  margin-bottom: 8px;
+}
+
 .material-iframe-wrapper {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 25px rgba(0, 177, 143, 0.15);
   border: 2px solid #e2e8f0;
   transition: all 0.3s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  position: relative;
 }
 
 .material-iframe-wrapper:hover {
@@ -147,6 +156,11 @@
   border: none;
   display: block;
   background: white;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  pointer-events: auto;
 }
 
 /* Сообщение об отсутствии материалов */
@@ -485,6 +499,11 @@
   box-shadow: 0 8px 25px rgba(0, 177, 143, 0.15);
   border: 2px solid #e2e8f0;
   transition: all 0.3s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  position: relative;
 }
 
 .homework-iframe-wrapper:hover {
@@ -499,6 +518,11 @@
   border: none;
   display: block;
   background: white;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  pointer-events: auto;
 }
 
 /* Сообщение об отсутствии домашнего задания */
@@ -903,7 +927,6 @@
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 24px;
-  font-family: 'Courier New', monospace;
   font-size: 12px;
 }
 

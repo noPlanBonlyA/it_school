@@ -158,7 +158,6 @@
   background: #FFFFFF;
   color: #2D3748;
   transition: all 0.3s ease;
-  font-family: 'Mont', sans-serif;
   box-sizing: border-box;
 }
 
@@ -177,7 +176,6 @@
   line-height: 1.6;
   resize: vertical;
   min-height: 120px;
-  font-family: 'Mont', sans-serif;
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
@@ -298,7 +296,6 @@
 }
 
 .result-title {
-  font-family: 'Mont', sans-serif;
   font-weight: 700;
   font-size: 20px;
   color: #2D3748;
@@ -387,7 +384,6 @@
 }
 
 .stat-value {
-  font-family: 'Mont', sans-serif !important;
   font-weight: 700 !important;
   font-size: 18px !important;
   color: #00B18F !important;

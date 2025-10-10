@@ -101,10 +101,7 @@ const StudentDetailView = ({ student, onClose }) => {
               <label>Очки (BestCoin):</label>
               <span className="points-badge">{studentData.points || 0}</span>
             </div>
-            <div className="info-item">
-              <label>ID студента:</label>
-              <span>{basicInfo.id || studentData.id || 'Не определен'}</span>
-            </div>
+            
           </div>
         </div>
       </div>

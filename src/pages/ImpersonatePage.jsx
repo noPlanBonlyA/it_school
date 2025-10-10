@@ -174,7 +174,7 @@ export default function ImpersonatePage() {
         
         <div className="impersonate-page">
           <div className="page-header">
-            <h1>🪄 Магия</h1>
+            <h1>Магия</h1>
             <p>Вход под другими пользователями</p>
           </div>
 

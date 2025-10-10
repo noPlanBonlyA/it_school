@@ -40,7 +40,7 @@ body, html, #root, .app-layout, .main-content {
   overflow: hidden;
   width: 100%;
   max-width: 100%;
-  margin-top: 40px !important;
+  margin-top: -10px !important;
 }
 
 /* Расписание - первая карточка в левой колонке (теперь выше) */
@@ -52,7 +52,7 @@ body, html, #root, .app-layout, .main-content {
   position: relative;
   overflow: hidden;
   min-height: 500px; /* Значительно увеличили минимальную высоту */
-  max-height: 700px; /* Значительно увеличили максимальную высоту */
+  max-height: none; /* Убираем ограничение высоты - пусть расписание растягивается по содержимому */
 }
 
 /* Контейнер расписания с прокруткой для десктопа */
@@ -60,15 +60,13 @@ body, html, #root, .app-layout, .main-content {
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
-  max-height: 650px; /* Добавляем максимальную высоту */
+  overflow-y: auto; /* Включаем скролл для всего контейнера */
+  max-height: 650px; /* Ограничиваем высоту для появления скролла */
 }
 
 .card.schedule .schedule-container > div:not(.schedule-list) {
   flex: 1;
-  overflow-y: auto;
   padding-right: 12px; /* Увеличиваем отступ для скроллбара */
-  max-height: 600px; /* Добавляем максимальную высоту для скролла */
 }
 
 /* Красивый скроллбар для расписания на десктопе */
@@ -395,7 +393,6 @@ body, html, #root, .app-layout, .main-content {
 }
 
 .news-row:hover {
-  transform: translateY(-6px) scale(1.02);
   box-shadow: 
     0 16px 48px rgba(0, 0, 0, 0.12),
     0 4px 16px rgba(0, 177, 143, 0.2);
@@ -439,11 +436,6 @@ body, html, #root, .app-layout, .main-content {
   flex-shrink: 0;
   position: relative;
   z-index: 2;
-  transition: transform 0.4s ease;
-}
-
-.news-row:hover .news-thumb {
-  transform: scale(1.05);
 }
 
 .news-content {
@@ -549,7 +541,6 @@ body, html, #root, .app-layout, .main-content {
 .news-expand-btn:hover {
   background: linear-gradient(135deg, rgba(0, 177, 143, 0.1) 0%, rgba(3, 131, 106, 0.15) 100%);
   color: #03836A;
-  transform: translateY(-1px);
 }
 
 .news-expand-btn:hover::before {
@@ -1029,8 +1020,8 @@ body, html, #root, .app-layout, .main-content {
     order: 1;
     /* Увеличили размеры для мобильных */
     min-height: 400px; /* Увеличили минимальную высоту */
-    max-height: 70vh; /* Ограничиваем высоту для лучшего скролла */
-    overflow: hidden;
+    max-height: none; /* Убираем ограничение - пусть расписание занимает столько места, сколько нужно */
+    overflow: visible; /* Разрешаем содержимому быть видимым */
     display: flex;
     flex-direction: column;
   }
@@ -1041,9 +1032,9 @@ body, html, #root, .app-layout, .main-content {
     gap: 8px; /* Отступы между элементами */
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: auto; /* Автоматическая высота */
     flex: 1;
-    overflow: hidden;
+    overflow: visible; /* Убираем ограничение скролла */
   }
   
   .card.schedule .schedule-list {
@@ -1054,11 +1045,9 @@ body, html, #root, .app-layout, .main-content {
     flex-direction: column;
     gap: 8px; /* Отступ между элементами расписания */
     flex: 1;
-    overflow-y: auto; /* Добавляем вертикальный скролл */
-    overflow-x: hidden; /* Убираем горизонтальный скролл */
-    padding-right: 6px; /* Отступ для скроллбара */
-    max-height: calc(70vh - 120px); /* Вычисляем максимальную высоту с учетом заголовка */
-    -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
+    overflow: visible; /* Убираем скролл - пусть все элементы видны */
+    padding-right: 0; /* Убираем отступ для скроллбара */
+    max-height: none; /* Убираем ограничение высоты */
   }
   
   .card.schedule .schedule-list li {
@@ -1441,38 +1430,22 @@ body, html, #root, .app-layout, .main-content {
   }
   
   .card.schedule {
-    min-height: 300px !important; /* Увеличили для лучшего пользовательского опыта */
-    max-height: 60vh !important; /* Оптимальная высота для скролла */
+    min-height: auto !important; /* Автоматическая минимальная высота */
+    max-height: none !important; /* Убираем ограничение высоты */
   }
   
   .card.schedule .schedule-container {
-    max-height: calc(60vh - 60px) !important; /* Вычисляем с учетом заголовка */
+    max-height: none !important; /* Убираем ограничение высоты */
     padding: 8px;
     gap: 6px;
+    overflow: visible; /* Показываем все элементы */
   }
   
   .card.schedule .schedule-list {
     gap: 6px; /* Меньше отступы между элементами */
-    max-height: calc(60vh - 100px); /* Максимальная высота для скролла */
-    padding-right: 4px; /* Отступ для скроллбара */
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
-  }
-  
-  .card.schedule .schedule-list::-webkit-scrollbar {
-    width: 3px; /* Еще более тонкий скроллбар */
-  }
-  
-  .card.schedule .schedule-list::-webkit-scrollbar-track {
-    border-radius: 4px;
-    background: rgba(0, 177, 143, 0.08);
-  }
-  
-  .card.schedule .schedule-list::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    border: none; /* Убираем границу для экономии места */
-    background: linear-gradient(135deg, rgba(0, 177, 143, 0.6) 0%, rgba(3, 131, 106, 0.8) 100%);
+    max-height: none; /* Убираем ограничение высоты */
+    padding-right: 0; /* Убираем отступ для скроллбара */
+    overflow: visible; /* Показываем все элементы */
   }
   
   .card.news {
@@ -1723,21 +1696,48 @@ body, html, #root, .app-layout, .main-content {
 @media (min-width: 1024px) {
   /* Только когда добавлен класс .cards--staff из HomePage.jsx */
   .cards.cards--staff {
-    display: grid;                   /* не трогаем мобильную вёрстку */
-    grid-template-columns: 1fr 1fr;  /* две колонки: новости | расписание */
-    gap: 16px;                       /* подстрой под свой дизайн, если нужно */
+    display: grid;
+    grid-template-columns: 1fr 2fr;  /* Расписание слева (1fr), Новости справа (2fr - шире) */
+    grid-template-rows: minmax(600px, auto); /* Минимальная высота 600px, но может быть больше */
+    gap: 24px;
+    align-items: stretch; /* Растягиваем элементы на всю высоту */
   }
 
-  /* Ставим "Новости" слева в ряду */
-  .cards.cards--staff .card.news {
+  /* Ставим "Расписание" слева в ряду */
+  .cards.cards--staff .card.schedule {
     grid-column: 1;
     grid-row: 1;
+    min-height: 600px; /* Минимальная высота */
+    max-height: none; /* Убираем ограничение */
+    display: flex;
+    flex-direction: column;
   }
 
-  /* Ставим "Расписание" справа, на одной линии с новостями */
-  .cards.cards--staff .card.schedule {
+  /* Контейнер расписания растягиваем на всю высоту */
+  .cards.cards--staff .card.schedule .schedule-container {
+    min-height: 550px !important;
+    max-height: none !important;
+    height: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Внутренний скролл расписания */
+  .cards.cards--staff .card.schedule .schedule-container > div:not(.schedule-list) {
+    max-height: none;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  /* Ставим "Новости" справа в ряду */
+  .cards.cards--staff .card.news {
     grid-column: 2;
     grid-row: 1;
+    min-height: 600px; /* Такая же минимальная высота */
+    max-height: none;
+    display: flex;
+    flex-direction: column;
   }
 
   /* Прячем "Айтишки" для не-студентов (на всякий случай, если блок не обернули условием) */

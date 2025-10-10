@@ -140,6 +140,7 @@
 }
 
 .product-form-group textarea {
+  font-family: 'Mont', 'Inter', 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   resize: vertical;
   min-height: 80px;
 }

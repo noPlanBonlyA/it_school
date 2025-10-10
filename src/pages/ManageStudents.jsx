@@ -381,10 +381,10 @@ export default function ManageStudentsPage() {
               </div>
               <div className="buttons" style={{gridColumn:'1 / -1'}}>
                 <button className="btn-primary" onClick={save}>Сохранить</button>
-                <button className="btn-info" onClick={() => viewDetails({user: edit, student: {id: edit.studentId, points: edit.points}})}>
+                <button className="btn-primary" onClick={() => viewDetails({user: edit, student: {id: edit.studentId, points: edit.points}})}>
                   Подробная информация
                 </button>
-                <button className="btn-danger"  onClick={()=>setShowDelete(true)}>Удалить</button>
+                <button className="btn-primary" style={{ backgroundColor: 'red' }}  onClick={()=>setShowDelete(true)}>Удалить</button>
               </div>
             </div>
           )}

@@ -74,7 +74,6 @@
 
 /* Текстовые области */
 .form-textarea {
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   resize: vertical;
   min-height: 120px;
 }

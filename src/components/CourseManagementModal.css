@@ -430,7 +430,6 @@
   padding: 12px;
   border-radius: 6px;
   margin: 0;
-  font-family: 'Courier New', monospace;
   font-size: 12px;
   color: #742a2a;
   white-space: pre-wrap;
@@ -737,7 +736,6 @@
   color: #2d3748;
   font-size: 14px;
   word-break: break-word;
-  font-family: 'Courier New', monospace;
   background: #f7fafc;
   padding: 4px 8px;
   border-radius: 4px;

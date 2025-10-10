@@ -81,7 +81,7 @@ export const createPointsHistory = async (historyData) => {
 const sendCoinsNotification = async (studentProfileId, coins, reason) => {
   try {
     await api.post('/notifications/', 
-      { content: `Вам начислено ${coins} монет за ${reason}! 🪙` },
+      { content: `Вам начислено ${coins} монет за ${reason}! ` },
       { 
         params: { 
           recipient_type: 'student', 

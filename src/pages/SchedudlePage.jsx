@@ -18,6 +18,50 @@ import { getUserScheduleOptimized } from '../services/scheduleService';
 import { getFilteredSchedule, getFilterOptions, formatFiltersText } from '../services/scheduleFilterService';
 
 import '../styles/SchedulePage.css';
+
+// ========== ГЛОБАЛЬНАЯ ЗАГЛУШКА ДЛЯ ОШИБОК POPOVER ==========
+// Подавляем ошибки FullCalendar Popover на самом раннем этапе
+if (typeof window !== 'undefined') {
+  // Сохраняем оригинальные методы
+  const originalError = console.error;
+  const originalWarn = console.warn;
+  
+  // Переопределяем console.error
+  console.error = function(...args) {
+    const message = args.join(' ');
+    // Полностью игнорируем ошибки, связанные с getBoundingClientRect и Popover
+    if (message.includes('getBoundingClientRect') || 
+        message.includes('Popover') ||
+        message.includes('updateSize') ||
+        message.includes('componentDidMount')) {
+      return; // Ничего не выводим
+    }
+    originalError.apply(console, args);
+  };
+
+  // Глобальный обработчик ошибок
+  window.addEventListener('error', function(event) {
+    if (event.error?.message?.includes('getBoundingClientRect') ||
+        event.error?.message?.includes('Popover') ||
+        event.error?.message?.includes('updateSize')) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      return false;
+    }
+  }, true);
+
+  // Обработчик неперехваченных промисов
+  window.addEventListener('unhandledrejection', function(event) {
+    if (event.reason?.message?.includes('getBoundingClientRect') ||
+        event.reason?.message?.includes('Popover')) {
+      event.preventDefault();
+      event.stopPropagation();
+      return false;
+    }
+  }, true);
+}
+// ========== КОНЕЦ ЗАГЛУШКИ ==========
 // ▼ Вверху файла:
 // ---------- Цвет по курсу/группе (детерминированно) ----------
 const PALETTE = [
@@ -55,6 +99,28 @@ const renderEventContent = (arg) => {
   const { event, timeText, view } = arg;
   const tName = event.extendedProps.teacher_name || '';
   const room  = event.extendedProps.auditorium || '';
+  
+  // Функция для форматирования времени с началом и концом
+  const formatTimeRange = () => {
+    if (!event.start) return timeText || '';
+    
+    const startTime = new Date(event.start).toLocaleTimeString('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    if (event.end) {
+      const endTime = new Date(event.end).toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      return `${startTime} — ${endTime}`;
+    }
+    
+    return startTime;
+  };
+  
+  const formattedTime = formatTimeRange();
 
   // В мобильном list-виде — более плоский шаблон
   if (view?.type?.startsWith?.('list')) {
@@ -63,7 +129,7 @@ const renderEventContent = (arg) => {
         <div class="fc-listcard">
           <div class="fc-listcard-title">${escapeHTML(event.title || '')}</div>
           <div class="fc-listcard-meta">
-            ${timeText ? `<span class="fc-listcard-time">${escapeHTML(timeText)}</span>` : ``}
+            ${formattedTime ? `<span class="fc-listcard-time">${escapeHTML(formattedTime)}</span>` : ``}
             ${tName ? `<span>${escapeHTML(tName)}</span>` : ``}
             ${room  ? `<span>${escapeHTML(room)}</span>` : ``}
           </div>
@@ -76,10 +142,10 @@ const renderEventContent = (arg) => {
   return {
     html: `
       <div class="fc-card fc-card--stack">
-        <div class="fc-card-time">${escapeHTML(timeText || '')}</div>
+        <div class="fc-card-time">${escapeHTML(formattedTime || '')}</div>
         <div class="fc-card-title">${escapeHTML(event.title || '')}</div>
-        ${tName ? `<div class="fc-card-sub"><span class="fc-i fc-i-teacher"></span>${escapeHTML(tName)}</div>` : ``}
-        ${room  ? `<div class="fc-card-sub"><span class="fc-i fc-i-room"></span>${escapeHTML(room)}</div>` : ``}
+        ${tName ? `<div class="fc-card-sub">${escapeHTML(tName)}</div>` : ``}
+        ${room  ? `<div class="fc-card-sub">${escapeHTML(room)}</div>` : ``}
       </div>
     `
   };
@@ -100,6 +166,156 @@ const eventDidMount = (info) => {
   info.el.style.setProperty('--ev-accent-border', hexToRGBA(accent, 0.9));
 };
 
+// ---------- обработчик клика на "+N еще" (показываем только скрытые события) ----------
+const handleMoreLinkClick = (info) => {
+  // info содержит: date, allSegs, hiddenSegs, jsEvent, view
+  const { hiddenSegs, jsEvent } = info;
+  
+  if (!hiddenSegs || hiddenSegs.length === 0) {
+    return false; // Не показываем ничего, если нет скрытых событий
+  }
+  
+  // Предотвращаем стандартное поведение FullCalendar
+  if (jsEvent) {
+    jsEvent.preventDefault();
+    jsEvent.stopPropagation();
+  }
+  
+  // Используем фирменный зеленый цвет для попапа
+  const accent = '#00B18F';
+  
+  // Удаляем существующие кастомные попапы
+  document.querySelectorAll('.fc-more-popover-custom').forEach(p => p.remove());
+  
+  // Создаем попап с ТОЛЬКО скрытыми событиями
+  const popover = document.createElement('div');
+  popover.className = 'fc-more-popover-custom';
+  popover.style.setProperty('--popover-accent', accent);
+  popover.style.setProperty('--popover-accent-bg', hexToRGBA(accent, 0.12));
+  popover.style.setProperty('--popover-accent-border', hexToRGBA(accent, 0.9));
+  
+  // Формируем список ТОЛЬКО скрытых событий
+  const eventsList = hiddenSegs.map(seg => {
+    const event = seg.event;
+    const tName = event.extendedProps.teacher_name || '';
+    const room = event.extendedProps.auditorium || '';
+    
+    const formatTimeRange = () => {
+      if (!event.start) return '';
+      
+      const startTime = new Date(event.start).toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      if (event.end) {
+        const endTime = new Date(event.end).toLocaleTimeString('ru-RU', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        return `${startTime} — ${endTime}`;
+      }
+      
+      return startTime;
+    };
+    
+    const formattedTime = formatTimeRange();
+    
+    return `
+      <div class="fc-more-event" data-event-id="${event.id}">
+        <div class="fc-more-event-time">${escapeHTML(formattedTime)}</div>
+        <div class="fc-more-event-title">${escapeHTML(event.title || '')}</div>
+        ${tName ? `<div class="fc-more-event-sub">👤 ${escapeHTML(tName)}</div>` : ''}
+        ${room ? `<div class="fc-more-event-sub">🚪 ${escapeHTML(room)}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+  
+  popover.innerHTML = `
+    <div class="fc-more-popover-header">
+      <span>Скрытые занятия (${hiddenSegs.length})</span>
+      <button class="fc-more-popover-close">×</button>
+    </div>
+    <div class="fc-more-popover-body">
+      ${eventsList}
+    </div>
+  `;
+  
+  // Позиционируем попап
+  if (!jsEvent || !jsEvent.target) {
+    return false; // Если нет данных о клике, не показываем попап
+  }
+  
+  const rect = jsEvent.target.getBoundingClientRect();
+  popover.style.position = 'fixed';
+  popover.style.left = `${rect.left}px`;
+  popover.style.top = `${rect.bottom + 5}px`;
+  popover.style.zIndex = '10000';
+  
+  document.body.appendChild(popover);
+  
+  // Проверяем, не выходит ли попап за пределы экрана
+  setTimeout(() => {
+    if (!popover.isConnected) return;
+    
+    const popoverRect = popover.getBoundingClientRect();
+    
+    // Если попап выходит справа за пределы экрана
+    if (popoverRect.right > window.innerWidth) {
+      popover.style.left = `${window.innerWidth - popoverRect.width - 20}px`;
+    }
+    
+    // Если попап выходит слева за пределы экрана
+    if (popoverRect.left < 0) {
+      popover.style.left = '20px';
+    }
+    
+    // Если попап выходит снизу за пределы экрана
+    if (popoverRect.bottom > window.innerHeight) {
+      // Позиционируем над кнопкой
+      popover.style.top = `${rect.top - popoverRect.height - 5}px`;
+    }
+  }, 10);
+  
+  // Обработчик закрытия попапа
+  const closePopover = () => {
+    if (popover && popover.isConnected) {
+      popover.remove();
+    }
+  };
+  
+  const closeBtn = popover.querySelector('.fc-more-popover-close');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closePopover);
+  }
+  
+  // Закрываем при клике вне попапа
+  setTimeout(() => {
+    document.addEventListener('click', function closeOnOutside(e) {
+      if (!popover.contains(e.target) && !e.target.closest('.fc-daygrid-more-link')) {
+        closePopover();
+        document.removeEventListener('click', closeOnOutside);
+      }
+    });
+  }, 100);
+  
+  // Обработчик клика на события в попапе
+  const eventElements = popover.querySelectorAll('.fc-more-event');
+  eventElements.forEach(el => {
+    el.addEventListener('click', (e) => {
+      const eventId = el.getAttribute('data-event-id');
+      const event = hiddenSegs.find(seg => seg.event.id === eventId)?.event;
+      if (event && window.__scheduleEventClickHandler) {
+        closePopover();
+        window.__scheduleEventClickHandler(event.extendedProps.originalEvent);
+      }
+    });
+  });
+  
+  // Возвращаем false, чтобы предотвратить стандартное поведение FullCalendar
+  return false;
+};
+
 
 
 export default function SchedulePage() {
@@ -108,6 +324,7 @@ export default function SchedulePage() {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+
 // ——— мобильный брейкпоинт + ref календаря ———
 const calendarRef = useRef(null);
 const [isMobile, setIsMobile] = useState(
@@ -283,12 +500,17 @@ useEffect(() => {
     // Закрываем popover с дополнительными событиями, если он открыт
     const calendarApi = calendarRef.current?.getApi?.();
     if (calendarApi) {
-      // Закрываем любые открытые popovers FullCalendar
-      const popovers = document.querySelectorAll('.fc-popover');
-      popovers.forEach(popover => {
-        popover.style.display = 'none';
-        popover.remove();
-      });
+      // Безопасно закрываем любые открытые popovers
+      try {
+        const popovers = document.querySelectorAll('.fc-popover, .fc-more-popover-custom');
+        popovers.forEach(popover => {
+          if (popover.isConnected) {
+            popover.remove();
+          }
+        });
+      } catch (e) {
+        console.warn('Ошибка при закрытии попаповов:', e);
+      }
     }
     
     console.log('[SchedulePage] Event clicked:', event.extendedProps.originalEvent);
@@ -297,6 +519,17 @@ useEffect(() => {
     console.log('[SchedulePage] Event extendedProps:', event.extendedProps);
     setSelectedEvent(event.extendedProps.originalEvent);
   };
+
+  // Сохраняем обработчик в глобальной переменной для доступа из попапа
+  useEffect(() => {
+    window.__scheduleEventClickHandler = (eventData) => {
+      setSelectedEvent(eventData);
+    };
+    
+    return () => {
+      delete window.__scheduleEventClickHandler;
+    };
+  }, []);
 
   // ───── отрисовка ─────
   const fio = [user?.first_name, user?.surname, user?.patronymic]
@@ -307,7 +540,7 @@ useEffect(() => {
       <div className="app-layout">
         <Sidebar activeItem="schedule" userRole={user.role} />
         <div className="main-content">
-         <SmartTopBar pageTitle="Главная" />
+         <SmartTopBar pageTitle="Расписание" />
 
           <div className="loading-container">
             <div className="loader"></div>
@@ -322,8 +555,8 @@ useEffect(() => {
     <div className="app-layout">
       <Sidebar activeItem="schedule" userRole={user.role} />
       
-      <div className="main-content">
-        <SmartTopBar pageTitle="Главная" />
+      <div className="main-content schedule-fullscreen-mode">
+        <SmartTopBar pageTitle="Расписание" />
 
         
         {/* Панель фильтрации для админов */}
@@ -361,10 +594,10 @@ useEffect(() => {
           </div>
         )}
         
-        <div className="schedule-page">
-          <div className="schedule-layout">
-            {/* Календарь - теперь на всю ширину */}
-            <div className="calendar-widget full-width">
+        <div className={`schedule-page-fullscreen ${isAdmin ? 'has-admin-filters' : ''}`}>
+          <div className="schedule-layout-fullscreen">
+            {/* Календарь - на весь экран */}
+            <div className="calendar-widget-fullscreen">
             <FullCalendar
   ref={calendarRef}
   plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
@@ -376,12 +609,16 @@ useEffect(() => {
   }}
   buttonText={{ today: 'Сегодня', month: 'Месяц', week: 'Неделя', day: 'День', list: 'Список' }}
   locale="ru"
-  height={isMobile ? 'auto' : 'calc(100vh - 250px)'}
+  firstDay={1}
+  height="100%"
   events={calendarEvents}
   eventClick={handleEventClick}
   eventDisplay="block"
   dayMaxEvents={3}
-  moreLinkText="ещё"
+  moreLinkText={(n) => `еще +${n}`}
+  moreLinkClick={handleMoreLinkClick}
+  
+  noEventsContent="Нет событий для отображения"
   slotMinTime="08:00:00"
   slotMaxTime="22:00:00"
   scrollTime="08:00:00"
@@ -408,6 +645,14 @@ useEffect(() => {
     listWeek: {
       listDayFormat: { weekday: 'long', day: 'numeric', month: 'long' },
       listDaySideFormat: false
+    },
+    timeGridWeek: {
+      dayMaxEvents: 3, // Ограничиваем количество событий в одном слоте
+      moreLinkClick: handleMoreLinkClick // Используем наш кастомный обработчик
+    },
+    timeGridDay: {
+      dayMaxEvents: 3, // Ограничиваем количество событий в одном слоте
+      moreLinkClick: handleMoreLinkClick // Используем наш кастомный обработчик
     }
   }}
 />

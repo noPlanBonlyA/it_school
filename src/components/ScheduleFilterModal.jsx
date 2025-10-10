@@ -139,14 +139,13 @@ export default function ScheduleFilterModal({
           top: '20px',
           right: '20px',
           zIndex: '30000',
-          fontFamily: 'monospace',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
         }}
       >×</button>
       
       <div className="schedule-filter-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>Фильтрация расписания</h3>
+          <h3 >Фильтрация расписания</h3>
         </div>
 
         <div className="modal-body">
@@ -258,7 +257,7 @@ export default function ScheduleFilterModal({
         </div>
 
         <div className="modal-footer">
-          <button className="btn btn-secondary" onClick={handleClear}>
+          <button className="btn btn-secondary" onClick={handleClear} style={{ marginTop: '0px' }}>
             ❌ Очистить фильтры
           </button>
           

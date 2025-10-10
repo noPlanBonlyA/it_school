@@ -427,10 +427,6 @@ export default function AttendanceWidget({ userId }) {
           <span className="stat-label">посещено</span>
         </div>
         <div className="stat-item">
-          <span className="stat-number">{stats.excusedLessons || 0}</span>
-          <span className="stat-label">уважительно</span>
-        </div>
-        <div className="stat-item">
           <span className="stat-number">{percentage}%</span>
           <span className="stat-label">процент посещения</span>
         </div>
@@ -519,7 +515,7 @@ export default function AttendanceWidget({ userId }) {
 
         {/* Легенда */}
         <div className="calendar-legend">
-          <span className="legend-label">Меньше</span>
+          
           <div className="legend-colors">
             <div className="legend-item">
               <div className="day-cell empty"></div>
@@ -530,10 +526,6 @@ export default function AttendanceWidget({ userId }) {
               <span>Запланировано</span>
             </div>
             <div className="legend-item">
-              <div className="day-cell excused intensity-1"></div>
-              <span>Уважительная</span>
-            </div>
-            <div className="legend-item">
               <div className="day-cell attended intensity-1"></div>
               <span>Присутствовал</span>
             </div>
@@ -542,7 +534,7 @@ export default function AttendanceWidget({ userId }) {
               <span>Пропустил</span>
             </div>
           </div>
-          <span className="legend-label">Больше</span>
+          
         </div>
       </div>
     </div>

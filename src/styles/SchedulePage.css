@@ -1,5 +1,31 @@
 /* src/styles/SchedulePage.css */
 
+/* ========== ПЕРЕОПРЕДЕЛЕНИЕ CSS ПЕРЕМЕННЫХ FULLCALENDAR ========== */
+:root {
+  --fc-more-link-bg-color: linear-gradient(135deg, #00B18F 0%, #03836A 100%) !important;
+  --fc-more-link-text-color: white !important;
+}
+
+.fc {
+  --fc-more-link-bg-color: #00B18F !important;
+  --fc-more-link-text-color: white !important;
+}
+/* ========== КОНЕЦ ПЕРЕОПРЕДЕЛЕНИЯ ========== */
+
+/* ========== КРИТИЧЕСКАЯ ЗАГЛУШКА: Скрываем стандартные попапы FullCalendar ========== */
+/* Скрываем стандартный popover FullCalendar чтобы избежать ошибок getBoundingClientRect */
+.fc-popover,
+.fc-more-popover {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+}
+/* ========== КОНЕЦ ЗАГЛУШКИ ========== */
+
 /* ---------- Общий layout (как на главной) ---------- */
 .app-layout {
   display: flex;
@@ -18,6 +44,17 @@
   box-sizing: border-box;
 }
 
+/* Для полноэкранного режима расписания */
+.main-content.schedule-fullscreen-mode {
+  padding: 0 !important;
+  padding-top: 80px !important;
+  min-height: auto !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
 /* Скролл только на мобильных */
 @media (max-width: 768px) {
   .main-content {
@@ -32,17 +69,18 @@
 /* ---------- Панель управления фильтрами для админов ---------- */
 .admin-schedule-controls {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .filter-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  padding: 10px 20px;
   gap: 16px;
 }
 
@@ -135,6 +173,73 @@
 .schedule-page {
   padding-top: 20px !important; /* Дополнительный отступ сверху */
   padding-bottom: 40px !important; /* Дополнительный отступ снизу */
+}
+
+/* ===== ПОЛНОЭКРАННЫЙ РЕЖИМ ===== */
+.schedule-page-fullscreen {
+  padding: 0 20px !important;
+  margin: 0 !important;
+  height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* Для админов с панелью фильтрации */
+.schedule-page-fullscreen.has-admin-filters {
+  height: calc(100vh - 130px);
+}
+
+.schedule-layout-fullscreen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.calendar-widget-fullscreen {
+  flex: 1;
+  background: white;
+  border-radius: 16px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(0, 177, 143, 0.1) !important;
+  padding: 20px 20px 20px 20px !important;
+  margin: 0 !important;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-widget-fullscreen .fc {
+  flex: 1;
+  min-height: 0;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding-bottom: 0;
+}
+
+.calendar-widget-fullscreen .fc .fc-view-harness {
+  flex: 1 !important;
+  height: 100% !important;
+}
+
+.calendar-widget-fullscreen .fc .fc-scroller {
+  height: 100% !important;
+  overflow-y: auto !important;
+}
+
+.calendar-widget-fullscreen .fc .fc-scroller-liquid-absolute {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
 }
 
 /* ---------- Loading ---------- */
@@ -378,7 +483,7 @@
   border: 1px solid rgba(0, 177, 143, 0.1);
   /* УБИРАЕМ фиксированную высоту, позволяем контенту определять размер */
   min-height: 400px;
-  max-height: none; /* убираем ограничение высоты */
+  max-height: 450px; /* убираем ограничение высоты */
   overflow: visible; /* делаем прокрутку видимой */
 }
 
@@ -498,7 +603,7 @@
 /* Прокрутка календаря в режимах Week/Day */
 .fc .fc-scroller {
   overflow-y: auto !important;
-  max-height: calc(100vh - 300px) !important; /* Ограничиваем высоту для прокрутки */
+ 
 }
 
 /* Убираем лишние отступы в timeGrid режимах */
@@ -833,6 +938,8 @@
 
   .fc-button-group {
     margin: 0 !important;
+    gap: 8px !important;
+    display: flex !important;
   }
 
   .fc-button {
@@ -909,7 +1016,7 @@
 /* ДОБАВЛЕНО: стили для лучшего отображения в расширенное время */
 @media (min-width: 1400px) {
   .calendar-container {
-    height: calc(100vh - 160px);
+    height: calc(60vh - 160px);
   }
   
   .fc .fc-timegrid-slot {
@@ -1045,6 +1152,8 @@
   font-weight: 700;
   color: #0f172a;
   margin-bottom: 2px;
+  white-space: nowrap; /* Не переносим время на новую строку */
+  overflow: visible; /* Показываем всё время */
 }
 .fc-card-title {
   font-size: 13px;
@@ -1126,7 +1235,6 @@
 .calendar-widget.full-width { padding: 18px; }
 
 /* “ещё +n” — как лаконичная ссылка */
-.fc-daygrid-more-link { font-weight: 600; color:#0369a1 !important; }
 /* Внутри карточки события: строка "время + название" */
 .fc-ev__row {
   display: flex;
@@ -1169,6 +1277,8 @@
   font-weight: 700;
   font-size: 12px;
   line-height: 1;
+  white-space: nowrap;     /* Не переносим время на новую строку */
+  overflow: visible;       /* Показываем всё время полностью */
 }
 
 /* Название — жирнее и темнее */
@@ -1228,6 +1338,8 @@
   font-size: 12px;
   line-height: 1;
   margin-bottom: 2px;
+  white-space: nowrap; /* Не переносим время на новую строку */
+  overflow: visible;   /* Показываем всё время полностью */
 }
 
 .fc-card-title {
@@ -1277,13 +1389,402 @@
     font-weight: 700 !important;
   }
   .fc .fc-list-table { font-size: 14px; }
-  .fc-list-event td { padding: 10px 12px !important; }
-  .fc-list-event:hover { background: rgba(0,0,0,0.02); }
+  
+  /* Полный фон для каждого события в списке */
+  .fc-list-event {
+    background: white !important;
+    border-bottom: 1px solid rgba(0, 177, 143, 0.1) !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .fc-list-event td { 
+    padding: 12px 14px !important; 
+    background: white !important;
+  }
+  
+  .fc-list-event:hover { 
+    background: rgba(0, 177, 143, 0.05) !important;
+  }
+  
+  .fc-list-event .fc-list-event-time {
+    background: rgba(0, 177, 143, 0.1) !important;
+    color: #00B18F !important;
+    padding: 4px 8px !important;
+    border-radius: 6px !important;
+    font-weight: 700 !important;
+  }
 
-  /* Внутри строки события — аккуратная «карточка» */
-  .fc-listcard { display: grid; gap: 4px; }
-  .fc-listcard-title { font-weight: 800; color:#111827; line-height: 1.25; }
-  .fc-listcard-meta { display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:12px; color:#6b7280; }
-  .fc-listcard-time { font-weight:700; }
-  .fc-listcard-dot { opacity:.6; }
+  /* Внутри строки события — аккуратная «карточка» с фоном */
+  .fc-listcard { 
+    display: grid; 
+    gap: 6px;
+    background: white !important;
+    padding: 8px !important;
+    border-radius: 10px !important;
+    border-left: 4px solid var(--ev-accent, #00B18F) !important;
+    box-shadow: 0 2px 8px rgba(0, 177, 143, 0.08) !important;
+  }
+  
+  .fc-listcard-title { 
+    font-weight: 800; 
+    color: #111827; 
+    line-height: 1.25; 
+    font-size: 14px !important;
+  }
+  
+  .fc-listcard-meta { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 8px; 
+    align-items: center; 
+    font-size: 12px; 
+    color: #6b7280; 
+  }
+  
+  .fc-listcard-time { 
+    font-weight: 700; 
+    white-space: nowrap;
+    background: rgba(0, 177, 143, 0.15) !important;
+    color: #00B18F !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    font-size: 11px !important;
+  }
+  
+  .fc-listcard-dot { opacity: .6; }
+}
+
+/* ===== Стилизация "еще N" и popover для накладывающихся событий ===== */
+
+/* Позиционирование кнопки "+N еще" внизу ячейки дня */
+.fc-daygrid-day-bottom {
+  margin-top: 4px !important;
+  display: flex !important;
+  justify-content: center !important;
+  padding: 4px 0 !important;
+}
+
+/* Переопределяем стиль кнопки "+N" - делаем зеленой */
+.fc-daygrid-more-link,
+.fc-timegrid-more-link,
+a.fc-daygrid-more-link,
+a.fc-timegrid-more-link { 
+  font-weight: 600 !important; 
+  color: white !important;
+  font-size: 13px !important;
+  padding: 8px 16px !important;
+  border-radius: 20px !important;
+  background: #00B18F !important;
+  background-color: #00B18F !important;
+  transition: all 0.2s ease !important;
+  font-family: 'Mont', sans-serif !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+  line-height: 1.2 !important;
+  border: none !important;
+  min-width: 90px !important;
+  height: 32px !important;
+  box-shadow: 0 2px 4px rgba(0, 177, 143, 0.2) !important;
+  cursor: pointer !important;
+  position: relative !important;
+  margin: 4px auto !important;
+  /* Переопределяем переменные */
+  --fc-more-link-bg-color: #00B18F !important;
+  --fc-more-link-text-color: white !important;
+}
+
+/* Добавляем слово "еще" перед числом в timegrid видах */
+.fc-timegrid-more-link::before,
+a.fc-timegrid-more-link::before {
+  content: "еще " !important;
+  font-weight: 600 !important;
+}
+
+/* Корректируем позицию кнопки по вертикали в timegrid */
+.fc-timegrid-more-link,
+a.fc-timegrid-more-link {
+  top: 600px !important; /* Фиксированная позиция сверху */
+}
+
+.fc-daygrid-more-link:hover,
+.fc-timegrid-more-link:hover,
+a.fc-daygrid-more-link:hover,
+a.fc-timegrid-more-link:hover {
+  background: #03836A !important; /* Тёмно-зелёный при наведении */
+  background-color: #03836A !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(0, 177, 143, 0.3) !important;
+}
+
+.fc-daygrid-more-link:active,
+.fc-timegrid-more-link:active,
+a.fc-daygrid-more-link:active,
+a.fc-timegrid-more-link:active {
+  transform: translateY(0px) !important;
+  box-shadow: 0 1px 2px rgba(0, 177, 143, 0.2) !important;
+}
+
+/* Полностью скрываем стандартный popover FullCalendar (используем кастомный) */
+.fc-popover {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Заголовок popover */
+.fc-popover-header {
+  background: linear-gradient(135deg, #00B18F 0%, #03836A 100%) !important;
+  color: white !important;
+  padding: 12px 16px !important;
+  font-weight: 700 !important;
+  font-family: 'Mont', sans-serif !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+/* Убираем дату из заголовка popover */
+.fc-popover-title {
+  display: none !important;
+}
+
+/* Добавляем свой текст в заголовок */
+.fc-popover-header::before {
+  content: "Занятия" !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+/* Кнопка закрытия popover */
+.fc-popover-close {
+  color: white !important;
+  opacity: 0.9 !important;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  font-size: 18px !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-left: auto !important;
+}
+
+.fc-popover-close:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  opacity: 1 !important;
+}
+
+/* Тело popover с событиями */
+.fc-popover-body {
+  padding: 8px !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+}
+
+/* События внутри popover - убираем дату */
+.fc-popover .fc-daygrid-event {
+  margin-bottom: 4px !important;
+  border-radius: 8px !important;
+}
+
+.fc-popover .fc-event-time {
+  display: none !important;
+}
+
+/* Стрелка popover в наших цветах */
+.fc-popover .fc-popover-arrow {
+  border-bottom-color: #00B18F !important;
+}
+
+.fc-popover .fc-popover-arrow::after {
+  border-bottom-color: #00B18F !important;
+}
+
+/* Мобильная адаптация popover */
+@media (max-width: 768px) {
+  .fc-popover {
+    max-width: calc(100vw - 40px) !important;
+    transform: translateX(-10px) !important;
+  }
+  
+  .fc-popover-body {
+    max-height: 250px !important;
+  }
+  
+  /* Адаптация кнопки "+N" для мобильных */
+  .fc-daygrid-more-link,
+  .fc-timegrid-more-link,
+  a.fc-daygrid-more-link,
+  a.fc-timegrid-more-link {
+    font-size: 12px !important;
+    padding: 6px 12px !important;
+    margin: 3px !important;
+    min-width: 60px !important;
+    height: 28px !important;
+  }
+}
+
+/* ===== КАСТОМНЫЙ ПОПАП ДЛЯ СКРЫТЫХ ЗАНЯТИЙ ===== */
+
+/* Кастомный попап для показа ТОЛЬКО скрытых событий */
+.fc-more-popover-custom {
+  position: fixed;
+  background: white;
+  border: 2px solid var(--popover-accent-border, rgba(0, 177, 143, 0.4));
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15), 
+              0 4px 16px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  min-width: 280px;
+  max-width: 400px;
+  z-index: 10000;
+  animation: popoverFadeIn 0.2s ease;
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Заголовок попапа */
+.fc-more-popover-header {
+  background: linear-gradient(135deg, 
+    var(--popover-accent, #00B18F) 0%, 
+    color-mix(in srgb, var(--popover-accent, #00B18F) 80%, black) 100%);
+  color: white;
+  padding: 12px 16px;
+  font-weight: 700;
+  font-family: 'Mont', sans-serif;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+/* Кнопка закрытия */
+.fc-more-popover-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.fc-more-popover-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* Тело попапа */
+.fc-more-popover-body {
+  padding: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.fc-more-popover-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.fc-more-popover-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.fc-more-popover-body::-webkit-scrollbar-thumb {
+  background: var(--popover-accent, #00B18F);
+  border-radius: 3px;
+  opacity: 0.5;
+}
+
+.fc-more-popover-body::-webkit-scrollbar-thumb:hover {
+  opacity: 0.7;
+}
+
+/* События в попапе */
+.fc-more-event {
+  background: var(--popover-accent-bg, rgba(0, 177, 143, 0.08));
+  border: 1px solid var(--popover-accent-border, rgba(0, 177, 143, 0.2));
+  border-left: 4px solid var(--popover-accent, #00B18F);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fc-more-event:hover {
+  background: var(--popover-accent-bg, rgba(0, 177, 143, 0.15));
+  border-color: var(--popover-accent, #00B18F);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.fc-more-event:last-child {
+  margin-bottom: 0;
+}
+
+/* Время события */
+.fc-more-event-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--popover-accent, #00B18F);
+  margin-bottom: 4px;
+  font-family: 'Mont', sans-serif;
+}
+
+/* Название события */
+.fc-more-event-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+  font-family: 'Mont', sans-serif;
+}
+
+/* Дополнительная информация */
+.fc-more-event-sub {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Мобильная адаптация кастомного попапа */
+@media (max-width: 768px) {
+  .fc-more-popover-custom {
+    max-width: calc(100vw - 40px);
+    min-width: 260px;
+  }
+  
+  .fc-more-popover-body {
+    max-height: 250px;
+  }
 }

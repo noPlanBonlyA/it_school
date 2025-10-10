@@ -1,8 +1,8 @@
 .rating-container {
-  padding: 24px;
+  padding: 24px 0 0 0;
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
   background: #ffffff;
   min-height: calc(100vh - 80px);
   position: relative;
@@ -30,14 +30,18 @@
 .rating-header {
   text-align: center;
   margin-bottom: 32px;
+  margin-left: 0;
+  margin-right: 0;
   background: linear-gradient(135deg, #ffffff 0%, #f0fdf9 100%);
   padding: 32px;
-  border-radius: 24px;
+  border-radius: 0;
   box-shadow: 
     0 8px 32px rgba(0, 177, 143, 0.12),
     0 4px 16px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(0, 177, 143, 0.1);
+  border-left: none;
+  border-right: none;
   position: relative;
   overflow: hidden;
 }
@@ -183,23 +187,30 @@
 .rating-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
+  gap: 0;
   margin-bottom: 32px;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .stat-card {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20px;
+  border-radius: 0;
   padding: 28px;
   color: white;
   display: flex;
   align-items: center;
   gap: 20px;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  box-shadow: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   animation: fadeInUp 0.6s ease-out;
+}
+
+.stat-card:last-child {
+  border-right: none;
 }
 
 .stat-card::before {
@@ -238,7 +249,7 @@
   font-size: 3rem;
   opacity: 0.9;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-  color: white;
+  color: #ffffff !important;
   flex-shrink: 0;
 }
 
@@ -250,41 +261,43 @@
   width: 100%;
 }
 
-.stat-number {
-  font-size: 2.2rem;
-  font-weight: 800;
-  margin-bottom: 4px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  color: white;
-  line-height: 1;
-  display: block;
-  width: 100%;
-  text-align: left;
+.rating-container .rating-stats .stat-number,
+.rating-container .stat-card .stat-number {
+  font-size: 2.2rem !important;
+  font-weight: 800 !important;
+  margin-bottom: 4px !important;
+  color: #ffffff !important;
+  line-height: 1 !important;
+  display: block !important;
+  width: 100% !important;
+  text-align: left !important;
 }
 
-.stat-label {
-  font-size: 1rem;
-  opacity: 0.9;
-  font-weight: 500;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  color: white;
-  line-height: 1.2;
-  display: block;
-  width: 100%;
-  text-align: left;
+.rating-container .rating-stats .stat-label,
+.rating-container .stat-card .stat-label {
+  font-size: 1rem !important;
+  opacity: 1 !important;
+  font-weight: 500 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  color: #ffffff !important;
+  line-height: 1.2 !important;
+  display: block !important;
+  width: 100% !important;
+  text-align: left !important;
 }
 
 /* Таблица рейтинга */
 .rating-table-container {
   background: #ffffff;
-  border-radius: 24px;
-  box-shadow: 
-    0 8px 32px rgba(0, 177, 143, 0.12),
-    0 4px 16px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border-radius: 0;
+  box-shadow: none;
   overflow: hidden;
-  margin-bottom: 32px;
-  border: 1px solid rgba(0, 177, 143, 0.1);
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
+  border: none;
+  border-top: 1px solid rgba(0, 177, 143, 0.1);
+  border-bottom: 1px solid rgba(0, 177, 143, 0.1);
   position: relative;
 }
 
@@ -553,13 +566,12 @@
   padding: 80px 20px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-radius: 24px;
-  margin: 24px;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 4px 16px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0;
+  margin: 0;
+  box-shadow: none;
+  border: none;
+  border-top: 1px solid rgba(0, 177, 143, 0.1);
+  border-bottom: 1px solid rgba(0, 177, 143, 0.1);
 }
 
 .empty-icon {
@@ -584,28 +596,26 @@
 /* Подвал */
 .rating-footer {
   margin-top: 32px;
-  margin-bottom: 40px;
-  padding-bottom: 60px;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .rating-footer::after {
   content: '';
   display: block;
-  height: 40px;
+  height: 0;
   background: #ffffff;
-  margin-top: 40px;
+  margin-top: 0;
   border-radius: 20px;
 }
 
 .info-card {
   background: #ffffff;
-  border-radius: 20px;
+  border-radius: 0;
   padding: 0;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 4px 16px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+  border: none;
+  border-top: 1px solid rgba(0, 177, 143, 0.1);
   position: relative;
   overflow: hidden;
 }
@@ -626,8 +636,8 @@
   color: white;
   padding: 24px 32px;
   text-align: center;
-  border-radius: 20px 20px 0 0;
-  margin-top: 4px;
+  border-radius: 0;
+  margin-top: 0;
 }
 
 .info-card-body {
@@ -664,6 +674,9 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
 }
 
 .task-card::before {
@@ -701,6 +714,7 @@
   font-size: 0.95rem;
   line-height: 1.5;
   margin-bottom: 16px;
+  flex: 1;
 }
 
 .task-reward {
@@ -715,6 +729,8 @@
   gap: 6px;
   box-shadow: 0 4px 12px rgba(0, 177, 143, 0.3);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  align-self: flex-start;
+  margin-top: auto;
 }
 
 .basic-tasks {
@@ -769,13 +785,10 @@
   text-align: center;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  margin: 24px;
-  border-radius: 24px;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 4px 16px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
 }
 
 .loader {
@@ -845,13 +858,11 @@
 .rating-section {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-radius: 24px;
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-radius: 0;
+  box-shadow: none;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: none;
+  border-top: 1px solid rgba(0, 177, 143, 0.1);
   position: relative;
   animation: slideInRight 0.8s ease-out;
 }
@@ -952,10 +963,10 @@
 
 .table-header {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  padding: 20px 32px;
+  padding: 20px 12px;
   display: grid;
-  grid-template-columns: 80px 1fr 120px;
-  gap: 24px;
+  grid-template-columns: 90px 1fr 130px;
+  gap: 10px;
   font-weight: 700;
   font-size: 0.875rem;
   text-transform: uppercase;
@@ -970,9 +981,9 @@
 
 .table-row {
   display: grid;
-  grid-template-columns: 80px 1fr 120px;
-  gap: 24px;
-  padding: 24px 32px;
+  grid-template-columns: 90px 1fr 130px;
+  gap: 10px;
+  padding: 16px 12px;
   border-bottom: 1px solid rgba(0, 177, 143, 0.05);
   transition: all 0.3s ease;
   align-items: center;
@@ -991,26 +1002,30 @@
   border-bottom: none;
 }
 
-/* Топ позиции */
+/* Топ позиции - единый стиль для всех */
 .table-row.top-1 {
   background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);
   border-left: 4px solid #ffd700;
+  padding-left: 8px; /* Компенсация бордера: 12px - 4px = 8px */
 }
 
 .table-row.top-2 {
   background: linear-gradient(135deg, rgba(192, 192, 192, 0.1) 0%, rgba(169, 169, 169, 0.05) 100%);
   border-left: 4px solid #c0c0c0;
+  padding-left: 8px; /* Компенсация бордера: 12px - 4px = 8px */
 }
 
 .table-row.top-3 {
   background: linear-gradient(135deg, rgba(205, 127, 50, 0.1) 0%, rgba(184, 115, 51, 0.05) 100%);
   border-left: 4px solid #cd7f32;
+  padding-left: 8px; /* Компенсация бордера: 12px - 4px = 8px */
 }
 
 /* Текущий пользователь */
 .table-row.current-user {
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
   border-left: 4px solid #10b981;
+  padding-left: 8px; /* Компенсация бордера: 12px - 4px = 8px */
 }
 
 /* Ячейки */
@@ -1039,45 +1054,60 @@
 .student-cell {
   display: flex;
   align-items: center;
+  min-width: 0; /* Важно для flex-элементов */
+  overflow: hidden; /* Предотвращаем выход за границы */
 }
 
 .student-info {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 12px;
   width: 100%;
+  min-width: 0; /* Важно для flex-элементов */
+  overflow: visible; /* Позволяем badge быть видимым */
 }
 
 .student-avatar {
-  width: 48px;
-  min-width: 48px;
-  max-width: 48px;
-  height: 48px;
+  width: 42px;
+  min-width: 42px;
+  max-width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-right: 16px;
 }
 
 .avatar-text {
   color: white;
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .student-details {
   flex: 1;
-  min-width: 0;
+  min-width: 0; /* Критически важно для обрезки текста */
+  overflow: hidden; /* Предотвращаем выход за границы */
 }
 
 .student-name {
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: #1e293b;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* На десктопе ограничиваем ширину для длинных имён */
+@media (min-width: 769px) {
+  .student-name {
+    max-width: 200px; /* Максимальная ширина для полного имени */
+  }
 }
 
 .student-email {
@@ -1086,6 +1116,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;
 }
 
 .current-user-badge {
@@ -1096,27 +1127,31 @@
   font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
+  flex-shrink: 0; /* Не сжимать бейдж */
+  margin-left: auto; /* Сдвигаем вправо */
 }
 
 .points-cell {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* Не сжимать колонку с монетами */
 }
 
 .points-content {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
-  padding: 12px 16px;
+  padding: 8px 10px;
   border-radius: 16px;
   border: 2px solid rgba(251, 191, 36, 0.2);
+  min-width: 90px; /* Минимальная ширина для красивого отображения */
 }
 
 .points-number {
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   color: #92400e;
 }
 
@@ -1133,11 +1168,11 @@
 /* Адаптивность */
 @media (max-width: 768px) {
   .rating-container {
-    padding: 16px;
+    padding: 16px 0 0 0;
   }
   
   .rating-section {
-    border-radius: 16px;
+    border-radius: 0;
   }
   
   .section-title {
@@ -1147,43 +1182,36 @@
   
   .table-header,
   .table-row {
-    grid-template-columns: 70px 1fr 90px;
+    grid-template-columns: 80px minmax(0, 1fr) 120px;
     gap: 12px;
-    padding: 14px 16px;
+    padding: 16px 16px;
   }
   
-  .student-info {
-    gap: 0;
+  .table-row.top-1,
+  .table-row.top-2,
+  .table-row.top-3,
+  .table-row.current-user {
+    padding-left: 12px;
   }
   
   .student-avatar {
-    width: 36px;
-    min-width: 36px;
-    max-width: 36px;
-    height: 36px;
-    font-size: 1rem;
-    margin-right: 10px;
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    height: 40px;
   }
   
   .student-name {
-    font-size: 0.9rem;
-    line-height: 1.2;
-  }
-  
-  .student-email {
-    font-size: 0.75rem;
-  }
-  
-  .rank-number {
-    font-size: 0.9rem;
-  }
-  
-  .points-number {
     font-size: 0.95rem;
   }
   
+  .student-email {
+    font-size: 0.8rem;
+  }
+  
   .points-content {
-    padding: 8px 12px;
+    min-width: 100px;
+    padding: 10px 12px;
   }
   
   .medal {
@@ -1215,57 +1243,44 @@
 @media (max-width: 480px) {
   .table-header,
   .table-row {
-    grid-template-columns: 50px 1fr 70px;
-    gap: 6px;
-    padding: 12px 14px;
+    grid-template-columns: 70px minmax(0, 1fr) 110px;
+    gap: 10px;
+    padding: 14px 12px;
   }
   
-  .student-details {
-    min-width: 0;
-  }
-  
-  .student-name {
-    font-size: 0.85rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  .student-email {
-    font-size: 0.7rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .table-row.top-1,
+  .table-row.top-2,
+  .table-row.top-3,
+  .table-row.current-user {
+    padding-left: 8px;
   }
   
   .student-avatar {
-    width: 32px;
-    min-width: 32px;
-    max-width: 32px;
-    height: 32px;
+    width: 36px;
+    min-width: 36px;
+    max-width: 36px;
+    height: 36px;
+  }
+  
+  .student-name {
     font-size: 0.9rem;
-    margin-right: 8px;
   }
   
-  .rank-number {
-    font-size: 0.8rem;
-  }
-  
-  .points-number {
-    font-size: 0.85rem;
+  .student-email {
+    font-size: 0.75rem;
   }
   
   .points-content {
-    padding: 6px 10px;
-    gap: 4px;
+    min-width: 90px;
+    padding: 8px 10px;
   }
   
-  .medal {
-    font-size: 0.9rem;
+  .rank-number {
+    font-size: 1rem;
   }
   
-  .current-user-badge {
-    display: none;
+  .points-number {
+    font-size: 1.1rem;
   }
   
   .section-title {
@@ -1288,48 +1303,64 @@
   .task-description {
     font-size: 0.9rem;
   }
+  
+  .current-user-badge {
+    font-size: 0.7rem;
+    padding: 5px 10px;
+  }
 }
 
-/* Дополнительная адаптивность для очень маленьких экранов */
-@media (max-width: 360px) {
+@media (max-width: 375px) {
   .table-header,
   .table-row {
-    grid-template-columns: 45px 1fr 60px;
-    gap: 4px;
-    padding: 10px 12px;
+    grid-template-columns: 60px minmax(0, 1fr) 100px;
+    gap: 8px;
+    padding: 12px 10px;
   }
   
-  .student-name {
-    font-size: 0.8rem;
-  }
-  
-  .student-email {
-    font-size: 0.65rem;
+  .table-row.top-1,
+  .table-row.top-2,
+  .table-row.top-3,
+  .table-row.current-user {
+    padding-left: 6px;
   }
   
   .student-avatar {
-    width: 28px;
-    min-width: 28px;
-    max-width: 28px;
-    height: 28px;
-    font-size: 0.8rem;
-    margin-right: 8px;
+    width: 32px;
+    min-width: 32px;
+    max-width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+  
+  .student-name {
+    font-size: 0.85rem;
+  }
+  
+  .student-email {
+    display: none;
+  }
+  
+  .points-content {
+    min-width: 80px;
+    padding: 6px 8px;
   }
   
   .rank-number {
-    font-size: 0.75rem;
+    font-size: 0.9rem;
   }
   
   .points-number {
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
   
-  .medal {
-    font-size: 0.8rem;
+  .current-user-badge {
+    font-size: 0.65rem;
+    padding: 4px 8px;
   }
   
   .section-title {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     padding: 14px 10px;
   }
   
@@ -1450,31 +1481,7 @@ body {
 /* Делаем колонку "Студент" сжимаемой */
 .table-header,
 .table-row {
-  grid-template-columns: 80px minmax(0, 1fr) 120px;
-}
-
-/* ≤ 768px */
-@media (max-width: 768px) {
-  .table-header,
-  .table-row {
-    grid-template-columns: 70px minmax(0, 1fr) 90px;
-  }
-}
-
-/* ≤ 480px */
-@media (max-width: 480px) {
-  .table-header,
-  .table-row {
-    grid-template-columns: 50px minmax(0, 1fr) 70px;
-  }
-}
-
-/* ≤ 360px */
-@media (max-width: 360px) {
-  .table-header,
-  .table-row {
-    grid-template-columns: 45px minmax(0, 1fr) 60px;
-  }
+  grid-template-columns: 90px minmax(0, 1fr) 130px;
 }
 
 /* Разрешаем flex-внутренностям сжиматься */
@@ -1482,6 +1489,10 @@ body {
 .student-info,
 .student-details {
   min-width: 0;
+}
+
+.student-cell {
+  overflow: visible; /* Позволяем badge выходить за границы если нужно */
 }
 
 /* Обрезаем текст и не даём ему выталкивать строку */
@@ -1494,31 +1505,12 @@ body {
 }
 
 .student-name {
-  
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  word-break: break-word;
+  white-space: nowrap;
 }
 
 .student-email {
   white-space: nowrap;
 }
-
-/* На очень узких экранах имя по-прежнему в 3 строки */
-@media (max-width: 480px) {
-  .student-name {
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-  }
-}
-
-/* Совсем узко — скрываем e-mail */
-@media (max-width: 360px) {
-  .student-email { display: none; }
-}
-
 
 /* --- Mobile scroll & no big white gap --- */
 
@@ -1532,7 +1524,7 @@ body {
   /* Контейнер не должен насильно занимать высоту экрана */
   .rating-container {
     min-height: 0;           /* вместо calc(100vh - 80px) */
-    padding-bottom: 16px;
+    padding-bottom: 0;
   }
 
   /* Убираем “прокладку” снизу */

@@ -897,7 +897,6 @@ mark {
 }
 
 .schedule-time {
-  font-family: 'Monaco', 'Menlo', monospace;
   color: #28a745;
   font-weight: 600;
   background: rgba(40, 167, 69, 0.15);
@@ -2585,7 +2584,6 @@ mark { background:#ffecb5; border-radius:2px; padding:0 2px; }
 }
 
 .schedule-time {
-  font-family: 'Monaco', 'Menlo', monospace;
   color: #28a745;
   font-weight: 500;
   background: rgba(40, 167, 69, 0.1);

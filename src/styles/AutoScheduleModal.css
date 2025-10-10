@@ -113,7 +113,6 @@
 }
 
 .preview-time {
-  font-family: 'Monaco', 'Menlo', monospace;
   font-size: 12px;
   color: #007bff;
   font-weight: 500;
@@ -192,7 +191,6 @@
 
 /* Кастомные стили для времени */
 input[type="time"].form-control {
-  font-family: 'Monaco', 'Menlo', monospace;
   letter-spacing: 0.5px;
 }
 

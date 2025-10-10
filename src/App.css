@@ -3,7 +3,6 @@ body, html, #root {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: 'Nunito Sans', sans-serif;
   background-color: #FFFFFF;
   overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
 }
@@ -29,7 +28,7 @@ button {
   display: flex;
   min-height: 100vh; /* Минимальная высота экрана */
   height: auto; /* Автоматическая высота для расширения контента */
-  font-family: 'Mont', 'Nunito Sans', sans-serif;
+  
   background: #FFFFFF;
   position: relative; /* Создаем контекст позиционирования */
   overflow-x: hidden; /* Предотвращаем только горизонтальную прокрутку */

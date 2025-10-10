@@ -234,7 +234,7 @@ const AutoScheduleModal = ({
                   {lessonCount > 3 && (
                     <div className="preview-item more">
                       <div className="preview-lesson">...</div>
-                      <div className="preview-date">и еще {lessonCount - 3} уроков</div>
+                      <div className="preview-date">еще {lessonCount - 3} уроков</div>
                       <div className="preview-time">по расписанию</div>
                     </div>
                   )}
@@ -251,7 +251,7 @@ const AutoScheduleModal = ({
             className="btn-primary"
             disabled={isLoading}
           >
-            {isLoading ? '⏳ Создание расписания...' : '✅ Создать автоматическое расписание'}
+            {isLoading ? '⏳ Создание расписания...' : '✅ Создать '}
           </button>
           <button 
             onClick={onClose}

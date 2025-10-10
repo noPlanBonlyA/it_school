@@ -783,9 +783,9 @@
   display: flex;
   flex-direction: column;
   gap: 16px; /* Увеличили отступы между элементами */
-  max-height: 600px; /* Значительно увеличили максимальную высоту */
-  min-height: 450px; /* Добавили минимальную высоту */
-  overflow-y: auto;
+  max-height: none; /* Убираем ограничение - пусть контейнер растягивается */
+  min-height: auto; /* Автоматическая минимальная высота */
+  overflow-y: auto; /* Добавляем скролл при необходимости */
   padding: 12px; /* Добавили внутренние отступы */
   padding-right: 8px; /* Отступ для скроллбара */
 }
@@ -794,16 +794,15 @@
 @media (max-width: 768px) {
   .schedule-container {
     gap: 8px; /* Отступы между элементами */
-    max-height: calc(70vh - 80px); /* Высота с учетом заголовка карточки */
-    min-height: 300px; /* Минимальная высота для мобильных */
+    max-height: none; /* Убираем ограничение высоты */
+    min-height: auto; /* Автоматическая минимальная высота */
     padding: 8px; /* Отступы */
     background: transparent; /* Убираем фон, так как он уже есть у карточки */
     border-radius: 0;
     border: none;
     backdrop-filter: none;
     box-shadow: none;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: visible; /* Показываем все элементы */
     -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
     flex: 1; /* Занимает оставшееся место в карточке */
   }
@@ -2817,6 +2816,8 @@
   font-weight: 800;
   letter-spacing: .2px;
   color: #111827;
+  white-space: nowrap; /* Предотвращаем перенос времени на новую строку */
+  flex-shrink: 0; /* Не сжимаем время при недостатке места */
 }
 
 .lesson-badge{
@@ -2915,6 +2916,8 @@
     line-height: 1;
     font-weight: 800;
     color:#111827;
+    white-space: nowrap; /* Не переносим время на новую строку */
+    flex-shrink: 0;      /* Не сжимаем время при недостатке места */
   }
 
   .schedule-desktop-item .lesson-badge{
@@ -3098,6 +3101,13 @@
   /* приятная фиксация элементов при прокрутке */
   .schedule-list{ scroll-snap-type: y proximity; }
   .schedule-list > li{ scroll-snap-align: start; }
+  
+  /* Время урока на мобильных - всегда видимо */
+  .time-range {
+    font-size: 14px; /* Чуть меньше для мобильных */
+    white-space: nowrap; /* Не переносим время */
+    flex-shrink: 0; /* Не сжимаем */
+  }
 }
 
 /* чуть компактнее на очень маленьких экранах */
@@ -3106,6 +3116,13 @@
     max-height: calc(100dvh - 140px);
     min-height: calc(100dvh - 360px);
     padding-right: 4px;
+  }
+  
+  /* Время урока на очень маленьких экранах */
+  .time-range {
+    font-size: 13px; /* Еще меньше для очень маленьких экранов */
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 }
 

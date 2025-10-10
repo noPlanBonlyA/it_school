@@ -320,7 +320,7 @@ export default function ManageTeachersPage() {
             </div>
             <div className="buttons" style={{gridColumn:'1 / -1'}}>
               <button className="btn-primary" onClick={save}>Сохранить</button>
-              <button className="btn-danger"  onClick={()=>setModDelete(true)}>Удалить</button>
+              <button className="btn-primary" style={{ backgroundColor: 'red' }} onClick={()=>setModDelete(true)}>Удалить</button>
             </div>
           </div>
         )}

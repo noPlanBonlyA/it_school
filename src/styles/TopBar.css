@@ -171,6 +171,9 @@
   transform: translateX(0);
   will-change: auto;
   animation: fadeInFast 0.05s ease-out;
+  /* Запрещаем горизонтальную прокрутку */
+  overflow-x: hidden;
+  word-wrap: break-word;
 }
 
 /* Адаптация для узких экранов на десктопе */
@@ -179,6 +182,8 @@
     right: 0;
     width: calc(100vw - 40px);
     max-width: 380px;
+    overflow-x: hidden;
+    word-wrap: break-word;
   }
 }
 
@@ -321,10 +326,12 @@
 .notification-list {
   max-height: calc(400px - 48px);
   overflow-y: auto;
+  overflow-x: hidden; /* Запрещаем горизонтальную прокрутку */
   scrollbar-width: thin;
   scrollbar-color: #00B18F #f0f0f0;
   margin: 0;
   padding: 0;
+  word-wrap: break-word; /* Переносим длинные слова */
 }
 
 .notification-list::-webkit-scrollbar {
@@ -346,7 +353,7 @@
 }
 
 .notification-item {
-  padding: 14px 56px 14px 16px;
+  padding: 16px 56px 16px 16px; /* Увеличили паддинги для больше расстояния */
   border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
   display: flex;
@@ -354,7 +361,10 @@
   align-items: flex-start;
   transition: background-color 0.2s ease;
   position: relative;
-  min-height: 60px;
+  min-height: 65px; /* Увеличили минимальную высоту */
+  margin-bottom: 4px; /* Добавили отступ между уведомлениями */
+  word-wrap: break-word; /* Переносим длинные слова */
+  overflow-wrap: break-word; /* Современный стандарт для переноса */
 }
 
 .notification-item:hover {
@@ -387,6 +397,9 @@
   flex: 1;
   margin-right: 8px;
   margin-left: 0;
+  word-wrap: break-word; /* Переносим длинные слова */
+  overflow-wrap: break-word; /* Современный стандарт */
+  max-width: calc(100% - 40px); /* Ограничиваем ширину, оставляя место для кнопки удаления */
 }
 
 .notification-content p {
@@ -396,6 +409,10 @@
   line-height: 1.5;
   font-family: 'Mont', sans-serif;
   font-weight: 500;
+  word-wrap: break-word; /* Переносим длинные слова */
+  overflow-wrap: break-word; /* Современный стандарт */
+  white-space: normal; /* Разрешаем перенос строк */
+  max-width: 100%; /* Ограничиваем ширину */
 }
 
 .notification-content .notification-time {
@@ -503,7 +520,6 @@
   color: #00B18F;
   line-height: 1.2;
   margin: 0;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-weight: 600;
   background: rgba(0, 177, 143, 0.1);
   padding: 2px 6px;
@@ -577,6 +593,8 @@
     max-height: calc(100vh - 80px);
     border-radius: 20px;
     animation: mobileDropdownShow 0.1s ease-out;
+    overflow-x: hidden; /* Запрещаем горизонтальную прокрутку */
+    word-wrap: break-word;
   }
   
   .notification-list {
@@ -679,17 +697,26 @@
   }
   
   .notification-item {
-    padding: 16px 48px 16px 16px;
-    min-height: 70px;
+    padding: 18px 48px 18px 16px; /* Увеличили отступы для мобильных */
+    min-height: 75px; /* Больше места для многострочного текста */
+    margin-bottom: 6px; /* Больше расстояния между уведомлениями на мобильных */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   
   .notification-content {
     margin-left: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: calc(100% - 35px); /* Оставляем место для кнопки удаления */
   }
   
   .notification-content p {
     font-size: 14px;
     line-height: 1.6;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
   }
   
   .notification-content .notification-time {
@@ -705,22 +732,35 @@
     right: 0;
     width: 350px;
     max-height: calc(100vh - 120px);
+    overflow-x: hidden;
+    word-wrap: break-word;
   }
   
   .notification-list {
     max-height: calc(350px - 48px);
+    overflow-x: hidden;
+    word-wrap: break-word;
   }
   
   .notification-item {
-    padding: 14px 52px 14px 16px;
+    padding: 16px 52px 16px 16px;
+    margin-bottom: 4px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   
   .notification-content {
     margin-left: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: calc(100% - 40px);
   }
   
   .notification-content p {
     font-size: 14px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
   }
 }
 
@@ -830,6 +870,35 @@
 .notification-list{
   margin-top: 0 !important;
   padding-top: 0 !important;
+}
+
+/* ============================================
+   ОБЩИЕ СТИЛИ ДЛЯ ПЕРЕНОСА ТЕКСТА В УВЕДОМЛЕНИЯХ
+   ============================================ */
+
+/* Гарантируем правильный перенос текста во всех уведомлениях */
+.notification-dropdown,
+.notification-list,
+.notification-item,
+.notification-content,
+.notification-content p {
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  hyphens: auto !important;
+  -webkit-hyphens: auto !important;
+  -ms-hyphens: auto !important;
+}
+
+/* Исключаем горизонтальную прокрутку */
+.notification-dropdown,
+.notification-list {
+  overflow-x: hidden !important;
+}
+
+/* Нормальный перенос строк */
+.notification-content p {
+  white-space: normal !important;
 }
 
 /* ============================================
