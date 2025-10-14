@@ -350,6 +350,20 @@ useEffect(() => {
   api.changeView(isMobile ? 'listWeek' : 'dayGridMonth');
 }, [isMobile]);
 
+// Программно кликаем на кнопку "Месяц" после загрузки
+useEffect(() => {
+  if (!loading && !isMobile) {
+    setTimeout(() => {
+      // Ищем кнопку месяца в календаре
+      const monthButton = document.querySelector('.fc-dayGridMonth-button');
+      if (monthButton) {
+        monthButton.click();
+        console.log('[SchedulePage] Программно нажата кнопка "Месяц"');
+      }
+    },300);
+  }
+}, [loading, isMobile]);
+
   // Состояния для фильтрации (только для админов)
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState({});

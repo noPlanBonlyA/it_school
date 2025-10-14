@@ -421,8 +421,19 @@ export default function StudentLessonPage() {
         src={lesson.student_material_url} 
         title="Материалы урока"
         className="main-material-iframe"
-        style={{ userSelect: 'none', pointerEvents: 'auto' }}
+        style={{ 
+          userSelect: 'none', 
+          pointerEvents: 'auto',
+          WebkitUserSelect: 'none',
+          MozUserSelect: 'none',
+          msUserSelect: 'none'
+        }}
         onContextMenu={(e) => e.preventDefault()}
+        onCopy={(e) => e.preventDefault()}
+        onCut={(e) => e.preventDefault()}
+        onPaste={(e) => e.preventDefault()}
+        onDragStart={(e) => e.preventDefault()}
+        onSelectStart={(e) => e.preventDefault()}
       />
     </div>
   </div>
@@ -432,6 +443,30 @@ export default function StudentLessonPage() {
                   <h3>Материалы урока пока не добавлены</h3>
                   <p>Обратитесь к преподавателю за дополнительной информацией</p>
                 </div>
+              )}
+              
+              {/* Overlay для блокировки копирования из основных материалов */}
+              {lesson?.student_material_url && (
+                <div 
+                  className="iframe-protection-overlay"
+                  onContextMenu={(e) => e.preventDefault()}
+                  onMouseDown={(e) => {
+                    if (e.button === 2) { // Правый клик
+                      e.preventDefault();
+                      e.stopPropagation();
+                      return false;
+                    }
+                  }}
+                  style={{
+                    position: 'absolute',
+                    top: lesson?.student_material_name ? '90px' : '50px',
+                    left: '0',
+                    right: '0',
+                    bottom: '0',
+                    zIndex: 5,
+                    cursor: 'default'
+                  }}
+                />
               )}
               
               {/* Кнопка скачивания дополнительных материалов по центру */}
@@ -452,6 +487,30 @@ export default function StudentLessonPage() {
     </a>
   </div>
 )}
+              
+              {/* Overlay для блокировки копирования из ДЗ iframe */}
+              {lesson?.homework_material_url && (
+                <div 
+                  className="iframe-protection-overlay"
+                  onContextMenu={(e) => e.preventDefault()}
+                  onMouseDown={(e) => {
+                    if (e.button === 2) { // Правый клик
+                      e.preventDefault();
+                      e.stopPropagation();
+                      return false;
+                    }
+                  }}
+                  style={{
+                    position: 'absolute',
+                    top: lesson?.homework_material_name ? '90px' : '50px',
+                    left: '0',
+                    right: '0',
+                    bottom: lesson?.homework_additional_material_url ? '80px' : '0',
+                    zIndex: 5,
+                    cursor: 'default'
+                  }}
+                />
+              )}
             </div>
             
             {/* Блок домашнего задания - новый дизайн */}
@@ -509,8 +568,19 @@ export default function StudentLessonPage() {
             src={lesson.homework_material_url}
             title="Домашнее задание"
             className="homework-material-iframe"
-            style={{ userSelect: 'none', pointerEvents: 'auto' }}
+            style={{ 
+              userSelect: 'none', 
+              pointerEvents: 'auto',
+              WebkitUserSelect: 'none',
+              MozUserSelect: 'none',
+              msUserSelect: 'none'
+            }}
             onContextMenu={(e) => e.preventDefault()}
+            onCopy={(e) => e.preventDefault()}
+            onCut={(e) => e.preventDefault()}
+            onPaste={(e) => e.preventDefault()}
+            onDragStart={(e) => e.preventDefault()}
+            onSelectStart={(e) => e.preventDefault()}
           />
         </div>
       </div>

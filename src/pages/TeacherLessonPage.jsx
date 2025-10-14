@@ -233,8 +233,19 @@ export default function TeacherLessonPage() {
             src={lesson.teacher_material_url}
             title="Материалы для преподавателя"
             className="main-material-iframe"
-            style={{ userSelect: 'none', pointerEvents: 'auto' }}
+            style={{ 
+              userSelect: 'none', 
+              pointerEvents: 'auto',
+              WebkitUserSelect: 'none',
+              MozUserSelect: 'none',
+              msUserSelect: 'none'
+            }}
             onContextMenu={(e) => e.preventDefault()}
+            onCopy={(e) => e.preventDefault()}
+            onCut={(e) => e.preventDefault()}
+            onPaste={(e) => e.preventDefault()}
+            onDragStart={(e) => e.preventDefault()}
+            onSelectStart={(e) => e.preventDefault()}
           />
         </div>
       </div>
@@ -260,6 +271,30 @@ export default function TeacherLessonPage() {
     )}
   </div>
 )}
+
+            {/* Overlay для блокировки копирования из материалов преподавателя */}
+            {lesson?.teacher_material_url && (
+              <div 
+                className="iframe-protection-overlay"
+                onContextMenu={(e) => e.preventDefault()}
+                onMouseDown={(e) => {
+                  if (e.button === 2) { // Правый клик
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                  }
+                }}
+                style={{
+                  position: 'absolute',
+                  top: lesson?.teacher_material_name ? '90px' : '50px',
+                  left: '0',
+                  right: '0',
+                  bottom: lesson?.teacher_additional_material_url ? '80px' : '0',
+                  zIndex: 5,
+                  cursor: 'default'
+                }}
+              />
+            )}
 
 
             
@@ -317,8 +352,19 @@ export default function TeacherLessonPage() {
               src={lesson.homework_material_url}
               title="Домашнее задание"
               className="homework-material-iframe"
-              style={{ userSelect: 'none', pointerEvents: 'auto' }}
+              style={{ 
+                userSelect: 'none', 
+                pointerEvents: 'auto',
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
+                msUserSelect: 'none'
+              }}
               onContextMenu={(e) => e.preventDefault()}
+              onCopy={(e) => e.preventDefault()}
+              onCut={(e) => e.preventDefault()}
+              onPaste={(e) => e.preventDefault()}
+              onDragStart={(e) => e.preventDefault()}
+              onSelectStart={(e) => e.preventDefault()}
             />
           </div>
         </div>
@@ -359,6 +405,30 @@ export default function TeacherLessonPage() {
       <h3>Домашнее задание будет добавлено позже</h3>
       <p>Добавьте задание через панель управления курсом</p>
     </div>
+  )}
+  
+  {/* Overlay для блокировки копирования из ДЗ */}
+  {lesson?.homework_material_url && (
+    <div 
+      className="iframe-protection-overlay"
+      onContextMenu={(e) => e.preventDefault()}
+      onMouseDown={(e) => {
+        if (e.button === 2) { // Правый клик
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      }}
+      style={{
+        position: 'absolute',
+        top: lesson?.homework_material_name ? '90px' : '50px',
+        left: '0',
+        right: '0',
+        bottom: lesson?.homework_additional_material_url ? '80px' : '0',
+        zIndex: 5,
+        cursor: 'default'
+      }}
+    />
   )}
 </div>
 

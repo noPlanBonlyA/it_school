@@ -524,6 +524,7 @@
   transition: all 0.2s ease !important;
   font-family: 'Mont', sans-serif !important;
   box-shadow: 2px 2px 0.3px #03836A !important;
+  margin: 0 4px !important; /* Отступы между кнопками */
 }
 
 .fc .fc-button:hover {
@@ -537,6 +538,17 @@
   cursor: not-allowed !important;
   transform: none !important;
   box-shadow: none !important;
+}
+
+/* Отступы между группами кнопок в навигации */
+.fc .fc-button-group {
+  margin: 0 8px !important;
+}
+
+/* Специальные отступы для кнопок навигации (стрелочки) */
+.fc .fc-prev-button,
+.fc .fc-next-button {
+  margin: 0 6px !important;
 }
 
 .fc-event {
@@ -937,7 +949,7 @@
   }
 
   .fc-button-group {
-    margin: 0 !important;
+    margin: 0 6px !important; /* Небольшие отступы между группами на мобильных */
     gap: 8px !important;
     display: flex !important;
   }
@@ -945,6 +957,7 @@
   .fc-button {
     padding: 8px 12px !important;
     font-size: 13px !important;
+    margin: 0 3px !important; /* Меньшие отступы между кнопками на мобильных */
     /* Убираем трансформации на мобильных */
     transform: none !important;
   }

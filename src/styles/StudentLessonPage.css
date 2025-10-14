@@ -125,9 +125,11 @@
 /* Основной контейнер материалов */
 .main-material-container {
   margin-bottom: 30px;
+  position: relative;
 }
 
 .main-material-container .material-name {
+  margin-right: 3%;
   margin-bottom: 8px;
 }
 
@@ -487,6 +489,7 @@
 /* Контейнер материалов домашнего задания */
 .homework-material-container {
   margin-bottom: 30px;
+  position: relative;
 }
 
 .homework-main-content {
@@ -601,6 +604,26 @@
 .download-homework-additional-btn:active {
   transform: translateY(-1px);
   transition: transform 0.1s ease;
+}
+
+/* Overlay для защиты от копирования в iframe */
+.iframe-protection-overlay {
+  position: absolute;
+  background: transparent;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.iframe-protection-overlay::selection {
+  background: transparent;
+}
+
+.iframe-protection-overlay::-moz-selection {
+  background: transparent;
 }
 
 /* Раздел сдачи домашнего задания */

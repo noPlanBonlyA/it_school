@@ -188,23 +188,6 @@ export default function RatingPage() {
           <div className="rating-header">
             <div className="header-top">
               <h1>🏆 Рейтинг студентов</h1>
-              <div className="header-controls">
-                <button 
-                  onClick={loadRating} 
-                  className="btn-refresh"
-                  disabled={loading}
-                  title="Обновить рейтинг"
-                >
-                  {loading ? '🔄' : '🔄'}
-                </button>
-                <button 
-                  onClick={() => setAutoUpdate(!autoUpdate)}
-                  className={`btn-auto-update ${autoUpdate ? 'active' : ''}`}
-                  title={autoUpdate ? 'Отключить автообновление' : 'Включить автообновление'}
-                >
-                  {autoUpdate ? '⏸️' : '▶️'}
-                </button>
-              </div>
             </div>
             <p className="rating-description">
               Топ студентов по количеству заработанных бесткоинов
