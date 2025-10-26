@@ -1,5 +1,5 @@
 // src/components/AutoScheduleModal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   WEEKDAYS, 
   WEEKDAY_NAMES, 
@@ -22,6 +22,8 @@ const AutoScheduleModal = ({
   const [settings, setSettings] = useState(new GroupScheduleSettings());
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const dateInputRef = useRef(null);
+  const [isDatePickerLocked, setIsDatePickerLocked] = useState(false);
 
   // Загружаем сохраненные настройки при открытии модала
   useEffect(() => {
@@ -34,10 +36,16 @@ const AutoScheduleModal = ({
     }
   }, [isOpen, groupId]);
 
-  const handleChange = (field, value) => {
+  const handleChange = (field, value, event) => {
+    // Приводим dayOfWeek к числу если это необходимо
+    let processedValue = value;
+    if (field === 'dayOfWeek' && value !== '' && value !== null) {
+      processedValue = parseInt(value);
+    }
+    
     setSettings(prev => ({
       ...prev,
-      [field]: value
+      [field]: processedValue
     }));
     
     // Убираем ошибку для поля при изменении
@@ -46,6 +54,44 @@ const AutoScheduleModal = ({
         ...prev,
         [field]: undefined
       }));
+    }
+
+    // Убираем фокус с поля даты после изменения и блокируем его
+    if (field === 'startDate' && dateInputRef.current) {
+      setIsDatePickerLocked(true);
+      dateInputRef.current.blur();
+      
+      // Разблокируем через 500мс
+      setTimeout(() => {
+        setIsDatePickerLocked(false);
+      }, 500);
+    }
+  };
+
+  // Обработчик клика по полю даты - открываем календарь вручную
+  const handleDateClick = (e) => {
+    e.stopPropagation(); // Останавливаем всплытие
+    
+    if (isDatePickerLocked) {
+      e.preventDefault();
+      return;
+    }
+  };
+
+  // Глобальный обработчик кликов - закрываем календарь если клик не по полю даты
+  const handleModalClick = (e) => {
+    // Проверяем, был ли клик по полю даты или его label
+    const isDateInput = e.target === dateInputRef.current;
+    const isDateLabel = e.target.htmlFor === 'startDate';
+    const isInsideDateGroup = e.target.closest('.form-group')?.querySelector('#startDate') === dateInputRef.current;
+    
+    if (!isDateInput && !isDateLabel && !isInsideDateGroup && dateInputRef.current) {
+      // Клик был вне поля даты - закрываем календарь
+      dateInputRef.current.blur();
+      setIsDatePickerLocked(true);
+      setTimeout(() => {
+        setIsDatePickerLocked(false);
+      }, 100);
     }
   };
 
@@ -118,8 +164,8 @@ const AutoScheduleModal = ({
   const preview = generatePreview();
 
   return (
-    <div className="modal-overlay auto-schedule-modal">
-      <div className="modal-content large">
+    <div className="modal-overlay auto-schedule-modal" onClick={handleModalClick}>
+      <div className="modal-content large" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>🗓️ Автоматическое расписание</h2>
           <div style={{ fontSize: '14px', color: '#666', marginTop: '4px' }}>
@@ -128,7 +174,7 @@ const AutoScheduleModal = ({
           <button className="close-modal" onClick={onClose}>×</button>
         </div>
         
-        <div className="modal-body">
+        <div className="modal-body" onClick={handleModalClick}>
           <div className="schedule-settings">
             
             {/* День недели */}
@@ -136,8 +182,8 @@ const AutoScheduleModal = ({
               <label htmlFor="dayOfWeek">День недели занятий</label>
               <select
                 id="dayOfWeek"
-                value={settings.dayOfWeek}
-                onChange={(e) => handleChange('dayOfWeek', parseInt(e.target.value))}
+                value={settings.dayOfWeek !== null && settings.dayOfWeek !== '' ? settings.dayOfWeek : ''}
+                onChange={(e) => handleChange('dayOfWeek', parseInt(e.target.value), e)}
                 className={`form-control ${errors.dayOfWeek ? 'error' : ''}`}
               >
                 <option value="">Выберите день недели</option>
@@ -156,7 +202,7 @@ const AutoScheduleModal = ({
                   type="time"
                   id="startTime"
                   value={settings.startTime}
-                  onChange={(e) => handleChange('startTime', e.target.value)}
+                  onChange={(e) => handleChange('startTime', e.target.value, e)}
                   className={`form-control ${errors.startTime ? 'error' : ''}`}
                 />
                 {errors.startTime && <span className="error-text">{errors.startTime}</span>}
@@ -168,7 +214,7 @@ const AutoScheduleModal = ({
                   type="time"
                   id="endTime"
                   value={settings.endTime}
-                  onChange={(e) => handleChange('endTime', e.target.value)}
+                  onChange={(e) => handleChange('endTime', e.target.value, e)}
                   className={`form-control ${errors.endTime ? 'error' : ''}`}
                 />
                 {errors.endTime && <span className="error-text">{errors.endTime}</span>}
@@ -181,7 +227,7 @@ const AutoScheduleModal = ({
               <select
                 id="interval"
                 value={settings.interval}
-                onChange={(e) => handleChange('interval', e.target.value)}
+                onChange={(e) => handleChange('interval', e.target.value, e)}
                 className={`form-control ${errors.interval ? 'error' : ''}`}
               >
                 <option value="">Выберите периодичность</option>
@@ -193,15 +239,36 @@ const AutoScheduleModal = ({
             </div>
 
             {/* Дата начала */}
-            <div className="form-group">
+            <div className="form-group" style={{ position: 'relative', isolation: 'isolate' }}>
               <label htmlFor="startDate">Дата начала занятий</label>
               <input
+                ref={dateInputRef}
                 type="date"
                 id="startDate"
                 value={settings.startDate}
-                onChange={(e) => handleChange('startDate', e.target.value)}
+                onChange={(e) => handleChange('startDate', e.target.value, e)}
+                onClick={handleDateClick}
+                onFocus={(e) => {
+                  // Блокируем стандартное открытие календаря
+                  if (isDatePickerLocked) {
+                    e.preventDefault();
+                    e.target.blur();
+                  }
+                }}
+                onKeyDown={(e) => {
+                  // Блокируем открытие календаря через клавиатуру
+                  if (isDatePickerLocked) {
+                    e.preventDefault();
+                  }
+                }}
+                readOnly={isDatePickerLocked}
                 className={`form-control ${errors.startDate ? 'error' : ''}`}
                 min={new Date().toISOString().split('T')[0]}
+                style={{ 
+                  cursor: isDatePickerLocked ? 'not-allowed' : 'pointer',
+                  position: 'relative',
+                  zIndex: 1
+                }}
               />
               {errors.startDate && <span className="error-text">{errors.startDate}</span>}
             </div>
@@ -213,7 +280,7 @@ const AutoScheduleModal = ({
                 type="text"
                 id="auditorium"
                 value={settings.auditorium}
-                onChange={(e) => handleChange('auditorium', e.target.value)}
+                onChange={(e) => handleChange('auditorium', e.target.value, e)}
                 placeholder="Например: 101, Актовый зал"
                 className="form-control"
               />

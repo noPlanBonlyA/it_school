@@ -89,7 +89,7 @@ h1 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 20px;
-  align-items: end;
+  align-items: start;
 }
 
 /* Поля формы */
@@ -683,7 +683,7 @@ h1 {
   display: flex;
   justify-content: center;
   gap: 20px;
-  margin-top: 32px;
+  margin-top: 0px;
   padding-top: 24px;
   border-top: 2px solid rgba(0, 177, 143, 0.1);
 }
@@ -1549,6 +1549,15 @@ div.manage-users div.modal-overlay div.modal-buttons button {
   cursor: pointer;
   transition: all 0.2s ease;
   color: #333;
+  display: block;
+  list-style: none;
+}
+
+.manage-courses .suggestions li span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .manage-courses .suggestions li:last-child {

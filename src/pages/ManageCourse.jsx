@@ -390,20 +390,7 @@ export default function ManageCoursesPage() {
               </div>
             </div>
 
-            <div className="field">
-              <label>Автор курса</label>
-              <input
-                type="text"
-                value={[user.first_name, user.surname].filter(Boolean).join(' ') || user.username || 'Неизвестный автор'}
-                disabled
-                className="disabled-field"
-              />
-              <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                Автор определяется автоматически
-              </small>
-            </div>
-
-            <div className="field">
+            <div className="field" style={{ gridColumn: '1 / -1' }}>
               <label>Изображение (опционально)</label>
               <input
                 type="file"
@@ -411,7 +398,7 @@ export default function ManageCoursesPage() {
                 onChange={e => handleFileSelect(e.target.files[0], false)}
               />
               {formPreviewUrl && (
-                <div style={{ marginTop: '10px' }}>
+                <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <img 
                     src={formPreviewUrl} 
                     alt="Превью" 
@@ -420,7 +407,7 @@ export default function ManageCoursesPage() {
                   <button 
                     type="button" 
                     onClick={() => { setFormImage(null); setFormPreviewUrl(null); }}
-                    style={{ marginLeft: '10px', padding: '5px 10px' }}
+                    style={{ marginTop: '10px', padding: '5px 10px' }}
                   >
                     Удалить
                   </button>
@@ -545,25 +532,12 @@ export default function ManageCoursesPage() {
                 </div>
               </div>
 
-              <div className="field">
-                <label>Автор курса</label>
-                <input
-                  type="text"
-                  value={edit.author_name || 'Не указан'}
-                  disabled
-                  className="disabled-field"
-                />
-                <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                  Автор курса не может быть изменен
-                </small>
-              </div>
-
-              <div className="field">
+              <div className="field" style={{ gridColumn: '1 / -1' }}>
                 <label>Изображение</label>
                 
                 {/* Текущее изображение */}
                 {getImageUrl(edit) && (
-                  <div style={{ marginBottom: '10px' }}>
+                  <div style={{ marginBottom: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <img 
                       src={getImageUrl(edit)} 
                       alt="Текущее изображение" 
@@ -583,13 +557,15 @@ export default function ManageCoursesPage() {
                 />
                 
                 {editPreviewUrl && (
-                  <button 
-                    type="button" 
-                    onClick={() => { setEditImage(null); setEditPreviewUrl(null); }}
-                    style={{ marginTop: '5px', padding: '5px 10px' }}
-                  >
-                    Отменить замену
-                  </button>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: '5px' }}>
+                    <button 
+                      type="button" 
+                      onClick={() => { setEditImage(null); setEditPreviewUrl(null); }}
+                      style={{ padding: '5px 10px' }}
+                    >
+                      Отменить замену
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -601,7 +577,7 @@ export default function ManageCoursesPage() {
                 >
                   {uploading ? 'Сохранение...' : 'Сохранить'}
                 </button>
-                <button className="btn-danger" onClick={() => setShowConfirmDelete(true)}>
+                <button className="btn-primary" style={{backgroundColor: '#e40b0bff'}} onClick={() => setShowConfirmDelete(true)}>
                   Удалить
                 </button>
                 <button 
@@ -633,7 +609,7 @@ export default function ManageCoursesPage() {
               </p>
               <div className="compact-modal-buttons">
                 <button className="btn-primary" onClick={handleCreate} disabled={uploading}>
-                  {uploading ? 'Создание...' : '✨ Создать'}
+                  {uploading ? 'Создание...' : ' Создать'}
                 </button>
                 <button className="btn-primary"
             style={{ backgroundColor: '#e40b0bff'}} onClick={() => setShowConfirmCreate(false)}>

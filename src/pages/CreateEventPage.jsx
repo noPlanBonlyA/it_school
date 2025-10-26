@@ -386,14 +386,7 @@ export default function CreateEventPage() {
               </div>
 
               <div className="form-group">
-                <label className="checkbox-label" style={{ display: 'flex'}}>
-                  <input
-                    type="checkbox"
-                    checked={formData.is_opened}
-                    onChange={(e) => setFormData({...formData, is_opened: e.target.checked})}
-                  />
-                  <span className="checkbox-text">Открытое мероприятие (доступно всем)</span>
-                </label>
+               
               </div>
             </div>
 
@@ -530,8 +523,9 @@ export default function CreateEventPage() {
                       </button>
                     )}
                     <button 
+                    
                       className="btn-clear"
-                      style={{ color: 'black', borderColor: 'black' }}
+                      style={{width:"116px", color: 'black', borderColor: 'black' }}
                       onClick={() => {
                         const students = getFilteredUsers('student');
                         if (selectedUsers.length === students.length) {
@@ -608,6 +602,7 @@ export default function CreateEventPage() {
                       </button>
                     )}
                     <button 
+                    style={{width:"116px"}}
                       className="btn-select-all"
                       onClick={() => {
                         const teachers = getFilteredUsers('teacher');
@@ -753,6 +748,7 @@ export default function CreateEventPage() {
                       </button>
                     )}
                     <button 
+                    style={{width:"116px"}}
                       className="btn-select-all"
                       onClick={() => {
                         if (selectedCourses.length === courses.length) {

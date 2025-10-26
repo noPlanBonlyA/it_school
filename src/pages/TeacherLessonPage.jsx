@@ -201,7 +201,30 @@ export default function TeacherLessonPage() {
             zIndex: 10 
           }}>
             <button
-              onClick={() => window.open(lesson.teacher_material_url, '_blank')}
+              onClick={() => {
+                const url = lesson.teacher_material_url;
+                const newWindow = window.open('', '_blank');
+                if (newWindow) {
+                  newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                      <meta charset="UTF-8">
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                      <title>Материалы для преподавателя</title>
+                      <style>
+                        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+                        iframe { width: 100%; height: 100%; border: none; }
+                      </style>
+                    </head>
+                    <body>
+                      <iframe src="${url}" title="Материалы для преподавателя"></iframe>
+                    </body>
+                    </html>
+                  `);
+                  newWindow.document.close();
+                }
+              }}
               style={{
                 background: 'rgba(0, 177, 143, 0.9)',
                 color: 'white',
@@ -320,7 +343,30 @@ export default function TeacherLessonPage() {
               zIndex: 10 
             }}>
               <button
-                onClick={() => window.open(lesson.homework_material_url, '_blank')}
+                onClick={() => {
+                  const url = lesson.homework_material_url;
+                  const newWindow = window.open('', '_blank');
+                  if (newWindow) {
+                    newWindow.document.write(`
+                      <!DOCTYPE html>
+                      <html>
+                      <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Домашнее задание</title>
+                        <style>
+                          body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+                          iframe { width: 100%; height: 100%; border: none; }
+                        </style>
+                      </head>
+                      <body>
+                        <iframe src="${url}" title="Домашнее задание"></iframe>
+                      </body>
+                      </html>
+                    `);
+                    newWindow.document.close();
+                  }
+                }}
                 style={{
                   background: 'rgba(255, 193, 7, 0.9)',
                   color: 'white',

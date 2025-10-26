@@ -184,11 +184,12 @@ export default function ManageEventsPage() {
         <div className="manage-events-page">
           <div className="page-header">
             <div className="header-info">
-              <h1>Управление мероприятиями</h1>
+              <h1>Мероприятия</h1>
               <p>Создание и управление событиями и мероприятиями</p>
             </div>
             <button 
               className="btn-primary"
+              style={{backgroundColor:"#00B18F"}}
               onClick={() => navigate('/create-event')}
             >
               + Создать мероприятие
@@ -273,13 +274,14 @@ export default function ManageEventsPage() {
 
                   <div className="event-actions">
                     <button 
-                      className="btn-secondary"
+                      className="btn-primary"
                       onClick={() => handleEdit(event)}
                     >
                       Редактировать
                     </button>
                     <button 
-                      className="btn-danger"
+                      className="btn-primary"
+                      style={{backgroundColor:"red"}}
                       onClick={() => handleDelete(event)}
                     >
                       Удалить

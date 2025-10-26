@@ -349,7 +349,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 0px;
 }
 
 .lesson-title {
@@ -452,7 +452,7 @@
 .btn-text.btn-view-content,
 .btn-text.btn-danger1 {
   font-size: 13px;
-  min-width: 80px;
+  width: 120px;
   height: 36px;
   padding: 8px 16px;
 }
@@ -1302,14 +1302,14 @@
   .btn-text {
     font-size: 11px;
     padding: 6px 12px;
-    min-width: 70px;
+    width: 110px;
     height: 32px;
     letter-spacing: 0.3px;
   }
   
-  .btn-text.btn-danger {
+  .btn-text.btn-danger1 {
     font-size: 11px;
-    min-width: 85px;
+    width: 110px;
   }
   
   .lesson-meta {
@@ -1482,7 +1482,7 @@
   .btn-text.btn-view-content,
   .btn-text.btn-danger1 {
     font-size: 13px;
-    min-width: 80px;
+    width: 120px;
     height: 36px;
     padding: 8px 16px;
     letter-spacing: 0.5px;

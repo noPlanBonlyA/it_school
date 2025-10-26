@@ -272,7 +272,7 @@ export default function EventEditModal({ event, onSave, onClose }) {
                       checked={formData.is_opened}
                       onChange={(e) => setFormData({...formData, is_opened: e.target.checked})}
                     />
-                    <span className="checkbox-text">Открытое мероприятие (доступно всем)</span>
+                    
                   </label>
                 </div>
               </div>

@@ -29,7 +29,7 @@ export default function ManagePointsPage() {
           onProfileClick={() => navigate('/profile')}
         />
         
-        <div className="page-content" style={{ padding: '24px' }}>
+        <div className="page-content" style={{ padding: '0px' }}>
           <PointsManagement />
         </div>
       </div>

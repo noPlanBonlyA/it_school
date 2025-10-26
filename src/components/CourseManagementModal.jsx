@@ -20,7 +20,6 @@ const CourseManagementModal = ({
   const [scheduleInfo, setScheduleInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [removalMode, setRemovalMode] = useState('new'); // 'new', 'standard' или 'force'
   
   // Состояние для управления отдельными уроками
   const [courseLessons, setCourseLessons] = useState([]);
@@ -195,139 +194,11 @@ ${error.message}
   const handleRemoveCourse = async () => {
     if (!course) return;
     
-    // Выбираем правильный метод в зависимости от режима
-    if (removalMode === 'new') {
-      return handleRemoveCourseNew();
-    }
-    
-    const modeText = removalMode === 'force' ? 'принудительной отвязки' : 'стандартной отвязки';
-    const modeDescription = removalMode === 'force' 
-      ? '\n\n🔥 ПРИНУДИТЕЛЬНЫЙ РЕЖИМ:\n• Попытка удалить lesson-groups\n• Более агрессивная очистка данных\n• Рекомендуется при проблемах с обычным удалением'
-      : '\n\n🔧 СТАНДАРТНЫЙ РЕЖИМ:\n• Удаление записей студентов\n• Безопасная отвязка курса\n• Рекомендуется для большинства случаев';
-      
-    const confirmMessage = `⚠️ ВНИМАНИЕ! Вы выбрали режим ${modeText} курса "${course.name}" от группы.${modeDescription}
+    const confirmMessage = `⚠️ ВНИМАНИЕ! Вы собираетесь отвязать курс "${course.name}" от группы.
 
-Это действие приведет к:
-• Удалению всех записей студентов с занятий этого курса
-• Отвязке всех lesson-groups курса от группы  
-• Потере данных о посещаемости и оценках по курсу
-• Невозможности восстановить связи автоматически
-
-❗ Данное действие необратимо!
-
-Введите "УДАЛИТЬ" для подтверждения:`;
-
-    const userInput = prompt(confirmMessage);
-    
-    if (userInput !== 'УДАЛИТЬ') {
-      alert('❌ Операция отменена. Для подтверждения нужно было ввести "УДАЛИТЬ"');
-      return;
-    }
-    
-    setLoading(true);
-    setError('');
-    
-    try {
-      // Выбираем метод удаления в зависимости от режима
-      const result = removalMode === 'force' 
-        ? await groupCourseManagementService.forceRemoveCourseFromGroup(groupId, course.id)
-        : await groupCourseManagementService.removeCourseFromGroup(groupId, course.id);
-      
-      console.log('[CourseManagement] Removal result:', result);
-      
-      if (result.success) {
-        // Создаем детальное сообщение об успехе
-        const modeResultText = removalMode === 'force' ? 'принудительно отвязан' : 'успешно отвязан';
-        const successMessage = `✅ Курс "${course.name}" ${modeResultText} от группы!
-
-📊 Статистика операции:
-• Режим: ${modeText.toUpperCase()}
-• Обработано занятий: ${result.removed}/${result.total}
-• Удалено записей студентов: ${result.removedStudents || 0}
-${result.removedLessonGroups ? `• Удалено lesson-groups: ${result.removedLessonGroups}` : ''}
-${result.failed > 0 ? `• Ошибок: ${result.failed}` : ''}
-
-${result.message || ''}
-
-🔄 Страница будет обновлена для отображения актуальных данных.`;
-
-        alert(successMessage);
-        
-        // Закрываем модальное окно
-        onClose();
-        
-        // Принудительно обновляем данные группы через callback
-        if (onCourseUpdated) {
-          onCourseUpdated({
-            type: 'removed',
-            courseId: course.id,
-            courseName: course.name,
-            mode: removalMode,
-            details: result
-          });
-        }
-        
-        // Обновляем страницу после небольшой задержки
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-        
-      } else {
-        throw new Error(result.message || 'Не удалось полностью отвязать курс от группы');
-      }
-      
-    } catch (error) {
-      console.error('[CourseManagement] Error removing course:', error);
-      
-      let errorMessage = `❌ Ошибка при отвязке курса "${course.name}" от группы\n\n`;
-      errorMessage += `🔧 Использованный режим: ${modeText.toUpperCase()}\n\n`;
-      
-      if (error.response?.status === 500) {
-        errorMessage += '🔧 Ошибка сервера (500). Возможные причины:\n';
-        errorMessage += '• Курс уже был удален\n';
-        errorMessage += '• Проблемы с базой данных\n';
-        errorMessage += '• Нарушение целостности данных\n\n';
-        errorMessage += '💡 Попробуйте:\n';
-        errorMessage += removalMode === 'standard' 
-          ? '1. Переключиться на принудительный режим\n2. Обновить страницу\n3. Проверить актуальность данных через диагностику'
-          : '1. Обновить страницу\n2. Проверить актуальность данных через диагностику\n3. Обратиться к администратору';
-      } else if (error.response?.status === 404) {
-        errorMessage += '🔍 Курс или группа не найдены (404)\n';
-        errorMessage += 'Возможно, данные уже были изменены другим пользователем.';
-      } else if (error.message) {
-        errorMessage += `📝 Детали ошибки: ${error.message}`;
-      } else {
-        errorMessage += '🔧 Неизвестная ошибка. Проверьте подключение к интернету.';
-      }
-      
-      setError(errorMessage);
-      
-      // Даже при ошибке попробуем обновить данные
-      if (onCourseUpdated) {
-        onCourseUpdated({
-          type: 'attempted_removal',
-          courseId: course.id,
-          courseName: course.name,
-          mode: removalMode,
-          error: errorMessage
-        });
-      }
-      
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Новая функция для использования нового API удаления курса
-  const handleRemoveCourseNew = async () => {
-    if (!course) return;
-    
-    const confirmMessage = `⚠️ ВНИМАНИЕ! Вы используете НОВЫЙ API для отвязки курса "${course.name}" от группы.
-
-🔧 НОВЫЙ МЕТОД УДАЛЕНИЯ:
+🔧 МЕТОД УДАЛЕНИЯ:
 • Использует эндпоинт DELETE /courses/${course.id}/groups/${groupId}
 • Быстрое и чистое удаление всех связей
-• Рекомендуется для всех операций с API версии 2024+
 
 Это действие приведет к:
 • Полной отвязке курса от группы
@@ -354,7 +225,6 @@ ${result.message || ''}
       
       const successMessage = `✅ Курс "${course.name}" успешно отвязан от группы!
 
-🆕 Использован новый API метод
 📊 Все связи между курсом и группой удалены
 🔄 Страница будет обновлена для отображения актуальных данных.`;
 
@@ -369,7 +239,6 @@ ${result.message || ''}
           type: 'removed',
           courseId: course.id,
           courseName: course.name,
-          mode: 'new',
           method: 'new_api'
         });
       }
@@ -380,10 +249,9 @@ ${result.message || ''}
       }, 1000);
       
     } catch (error) {
-      console.error('[CourseManagement] Error removing course with new API:', error);
+      console.error('[CourseManagement] Error removing course:', error);
       
       let errorMessage = `❌ Ошибка при отвязке курса "${course.name}" от группы\n\n`;
-      errorMessage += `🆕 Использован новый API метод\n\n`;
       
       if (error.response?.status === 404) {
         errorMessage += '🔍 Курс или группа не найдены (404)\n';
@@ -405,7 +273,6 @@ ${result.message || ''}
           type: 'attempted_removal',
           courseId: course.id,
           courseName: course.name,
-          mode: 'new',
           error: errorMessage
         });
       }
@@ -647,9 +514,7 @@ ${result.message}
               <div className="schedule-section">
                 <div className="schedule-header">
                   <h3>📅 Управление расписанием курса</h3>
-                  <p className="schedule-subtitle">
-                    Просмотр текущего расписания и массовое изменение времени всех занятий
-                  </p>
+                  
                 </div>
               
                 <div className="current-schedule-card">
@@ -817,9 +682,7 @@ ${result.message}
               <div className="lessons-section">
                 <div className="lessons-header">
                   <h3>📚 Управление отдельными уроками</h3>
-                  <p className="lessons-subtitle">
-                    Удаляйте отдельные уроки из группы, не затрагивая весь курс
-                  </p>
+                  
                 </div>
 
                 <div className="lessons-stats-card">
@@ -869,7 +732,7 @@ ${result.message}
                           onClick={handleRemoveSelectedLessons}
                           disabled={selectedLessons.size === 0 || loading}
                         >
-                          🗑️ Удалить выбранные ({selectedLessons.size})
+                          🗑️ Удалить ({selectedLessons.size})
                         </button>
                       </div>
                     </div>
@@ -948,39 +811,7 @@ ${result.message}
                       ))}
                     </div>
 
-                    <div className="lessons-info-card">
-                      <h4>💡 Информация об удалении уроков</h4>
-                      <div className="info-list">
-                        <div className="info-item">
-                          <span className="info-icon">🆕</span>
-                          <div className="info-text">
-                            <strong>Новый API метод</strong>
-                            <p>Использует эндпоинт DELETE </p>
-                          </div>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-icon">🎯</span>
-                          <div className="info-text">
-                            <strong>Точечное удаление</strong>
-                            <p>Удаляются только выбранные уроки, остальные остаются в курсе</p>
-                          </div>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-icon">⚠️</span>
-                          <div className="info-text">
-                            <strong>Потеря данных</strong>
-                            <p>Удаляются записи студентов, посещаемость и оценки по урокам</p>
-                          </div>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-icon">🔄</span>
-                          <div className="info-text">
-                            <strong>Необратимость</strong>
-                            <p>Восстановить удаленные уроки автоматически невозможно</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                   
                   </>
                 ) : (
                   <div className="no-lessons-card">
@@ -1031,28 +862,7 @@ ${result.message}
                   </div>
                 </div>
 
-                {scheduleInfo?.hasSchedule && (
-                  <div className="schedule-impact-card">
-                    <h4>📅 Влияние на расписание</h4>
-                    <div className="impact-stats">
-                      <div className="stat-item danger">
-                        <span className="stat-number">{scheduleInfo.totalLessons}</span>
-                        <span className="stat-label">занятий будет удалено</span>
-                      </div>
-                      <div className="stat-item warning">
-                        <span className="stat-number">{scheduleInfo.dayOfWeek}</span>
-                        <span className="stat-label">день недели</span>
-                      </div>
-                      <div className="stat-item info">
-                        <span className="stat-number">{scheduleInfo.duration}мин</span>
-                        <span className="stat-label">продолжительность</span>
-                      </div>
-                    </div>
-                    <div className="schedule-period">
-                      <strong>Период:</strong> {scheduleInfo.firstLessonDate} — {scheduleInfo.lastLessonDate}
-                    </div>
-                  </div>
-                )}
+               
 
                 <div className="consequences-card">
                   <h4>🗑️ Что будет удалено</h4>
@@ -1083,72 +893,6 @@ ${result.message}
                       <div className="text">
                         <strong>Связь курса с группой</strong>
                         <p>Курс больше не будет отображаться в группе</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="removal-mode-card">
-                  <h4>⚙️ Режим удаления курса</h4>
-                  <p className="mode-description">
-                    Выберите способ отвязки всего курса от группы
-                  </p>
-                  
-                  <div className="mode-selector">
-                    <div 
-                      className={`mode-option ${removalMode === 'new' ? 'active' : ''}`}
-                      onClick={() => setRemovalMode('new')}
-                    >
-                      <div className="mode-header">
-                        <span className="mode-icon">🆕</span>
-                        <span className="mode-title">Новый API (рекомендуется)</span>
-                        {removalMode === 'new' && <span className="mode-badge">Выбрано</span>}
-                      </div>
-                      <div className="mode-features">
-                        <ul>
-                          <li>Использует DELETE /courses/[course_id]/groups/[group_id]</li>
-                          <li>Быстрое и чистое удаление всех связей</li>
-                          <li>Современный метод для API 2024+</li>
-                          <li>Рекомендуется для всех новых операций</li>
-                        </ul>
-                      </div>
-                    </div>
-                    
-                    <div 
-                      className={`mode-option ${removalMode === 'standard' ? 'active' : ''}`}
-                      onClick={() => setRemovalMode('standard')}
-                    >
-                      <div className="mode-header">
-                        <span className="mode-icon">🔧</span>
-                        <span className="mode-title">Стандартный режим (legacy)</span>
-                        {removalMode === 'standard' && <span className="mode-badge">Выбрано</span>}
-                      </div>
-                      <div className="mode-features">
-                        <ul>
-                          <li>Удаление записей студентов</li>
-                          <li>Безопасная отвязка курса</li>
-                          <li>Совместимость со старыми версиями</li>
-                          <li>Использовать только при проблемах с новым API</li>
-                        </ul>
-                      </div>
-                    </div>
-                    
-                    <div 
-                      className={`mode-option ${removalMode === 'force' ? 'active' : ''}`}
-                      onClick={() => setRemovalMode('force')}
-                    >
-                      <div className="mode-header">
-                        <span className="mode-icon">🔥</span>
-                        <span className="mode-title">Принудительный режим (legacy)</span>
-                        {removalMode === 'force' && <span className="mode-badge">Выбрано</span>}
-                      </div>
-                      <div className="mode-features">
-                        <ul>
-                          <li>Попытка удалить lesson-groups</li>
-                          <li>Более агрессивная очистка данных</li>
-                          <li>Использовать только в крайних случаях</li>
-                          <li>При серьезных проблемах с данными</li>
-                        </ul>
                       </div>
                     </div>
                   </div>
@@ -1187,16 +931,12 @@ ${result.message}
                     {loading ? (
                       <>
                         <span className="spinner">⏳</span>
-                        {removalMode === 'new' ? 'Отвязываем курс (новый API)...' :
-                         removalMode === 'force' ? 'Принудительно отвязываем...' : 'Отвязываем курс...'}
+                        Отвязываем курс...
                       </>
                     ) : (
                       <>
-                        <span className="icon">
-                          {removalMode === 'new' ? '🆕' : removalMode === 'force' ? '🔥' : '🗑️'}
-                        </span>
-                        {removalMode === 'new' ? 'Отвязать курс (новый API)' :
-                         removalMode === 'force' ? 'Принудительно отвязать курс' : 'Отвязать курс от группы'}
+                        <span className="icon">🗑️</span>
+                        Отвязать курс от группы
                       </>
                     )}
                   </button>

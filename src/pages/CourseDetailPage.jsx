@@ -533,7 +533,7 @@ export default function CourseDetailPage() {
             {/* ───── список уроков ───── */}
             <div className="lessons-section">
               <div className="lessons-header">
-                <h2>Уроки курса</h2>
+                <h2 style={{color:"white"}}>Уроки курса</h2>
                 <div className="lessons-count">
                 {Array.isArray(lessons) ? lessons.length : 0} {(Array.isArray(lessons) ? lessons.length : 0) === 1 ? 'урок' : (Array.isArray(lessons) ? lessons.length : 0) < 5 ? 'урока' : 'уроков'}
               </div>
@@ -575,7 +575,7 @@ export default function CourseDetailPage() {
                         <div className="lesson-meta">
                           {lesson.holding_date && (
                             <div className="lesson-date">
-                              <span className="meta-label">📅</span>
+                              <span className="meta-label"></span>
                               <span className="meta-value">
                                 {new Date(lesson.holding_date).toLocaleString('ru-RU', {
                                   day: '2-digit',

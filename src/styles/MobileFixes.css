@@ -231,7 +231,7 @@
   .main-content {
     margin-left: 0 !important;
     width: 100% !important;
-    padding-top: 80px !important; /* Отступ сверху для бургер-меню */
+    padding-top: 20px !important; /* Отступ сверху для бургер-меню */
   }
 }
 

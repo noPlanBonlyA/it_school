@@ -91,6 +91,11 @@
   width: 100%;
 }
 
+/* Когда пустое состояние - делаем одну колонку */
+.products-grid:has(.empty-state) {
+  grid-template-columns: 1fr;
+}
+
 /* Для больших экранов - показываем больше товаров в ряд */
 @media (min-width: 1600px) {
   .products-grid {
@@ -582,14 +587,48 @@
 
 /* Пустое состояние */
 .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 60px 24px;
   text-align: center;
-  padding: 48px 24px;
-  color: #6b7280;
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+  border-radius: 16px;
+  border: 2px dashed #e5e7eb;
+  margin: 20px 0;
+}
+
+.empty-state-icon {
+  font-size: 72px;
+  margin-bottom: 24px;
+  opacity: 0.8;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.empty-state h3 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 12px 0;
 }
 
 .empty-state p {
-  font-size: 18px;
+  font-size: 16px;
+  color: #6b7280;
   margin: 0;
+  max-width: 400px;
+  line-height: 1.6;
 }
 
 /* Загрузка */
@@ -635,6 +674,28 @@
     gap: 16px;
     padding: 8px 0;
     width: 100%;
+  }
+  
+  /* Пустое состояние на мобильных */
+  .empty-state {
+    min-height: 300px;
+    padding: 40px 20px;
+    margin: 10px 0;
+  }
+  
+  .empty-state-icon {
+    font-size: 56px;
+    margin-bottom: 20px;
+  }
+  
+  .empty-state h3 {
+    font-size: 20px;
+    margin: 0 0 10px 0;
+  }
+  
+  .empty-state p {
+    font-size: 14px;
+    max-width: 300px;
   }
   
   .product-card {

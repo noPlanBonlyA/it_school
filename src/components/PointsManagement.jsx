@@ -309,11 +309,11 @@ const PointsManagement = ({ onClose, selectedStudent = null }) => {
             <label htmlFor="description">Описание *</label>
             <textarea
               id="description"
-              className={`form-control ${errors.description ? 'error' : ''}`}
+              className={`form-control description-textarea ${errors.description ? 'error' : ''}`}
               placeholder="Опишите за что начисляются/списываются монеты"
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
-              rows={3}
+              rows={1}
             />
             {errors.description && <div className="error-text">{errors.description}</div>}
           </div>
@@ -335,7 +335,6 @@ const PointsManagement = ({ onClose, selectedStudent = null }) => {
           >
             {loading ? (
               <>
-                <div className="loading-spinner"></div>
                 Применение...
               </>
             ) : (

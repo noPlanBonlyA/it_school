@@ -54,6 +54,15 @@
   border-radius: 8px;
   font-size: 14px;
   transition: all 0.3s ease;
+  min-height: 44px;
+}
+
+.form-control.description-textarea {
+  min-height: 44px;
+  max-height: 300px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
 }
 
 .form-control:focus {
@@ -181,7 +190,7 @@
   border: 2px solid transparent;
   border-left: 2px solid currentColor;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: none;
 }
 
 @keyframes spin {
@@ -276,6 +285,20 @@
   .points-management {
     padding: 16px;
   }
+  
+  .points-management-header {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .points-management-title {
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+  }
 
   .submit-section {
     flex-direction: column;
@@ -285,5 +308,19 @@
   .cancel-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .points-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .quick-btn {
+    width: 100%;
+    padding: 10px 8px;
+    font-size: 14px;
+    font-weight: 500;
   }
 }

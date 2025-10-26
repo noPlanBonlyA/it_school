@@ -110,7 +110,7 @@
 .radio-option input[type="radio"] {
   appearance: none;
   width: 20px;
-  height: 20px;
+  height: 26px;
   border: 2px solid #CBD5E0;
   border-radius: 50%;
   position: relative;
@@ -207,24 +207,28 @@
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
   margin: 32px 0 0 0;
   font-family: 'Mont', sans-serif;
   font-weight: 700;
   font-size: 24px;
   color: #FFFFFF;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transform: scale(1) !important;
+  transition: none !important;
+  animation: none !important;
 }
 
 .send-button:hover:not(:disabled) {
   background: #00A37E;
-  transform: translateY(-2px);
   box-shadow: 6px 6px 0.5px #03836A;
+  transform: scale(1) !important;
 }
 
 .send-button:active:not(:disabled) {
-  transform: translateY(1px);
-  box-shadow: 2px 2px 0.2px #03836A;
+  box-shadow: 4px 4px 0.35px #03836A;
+  transform: scale(1) !important;
 }
 
 .send-button:disabled {
@@ -246,7 +250,7 @@
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-top: 3px solid #FFFFFF;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: none;
 }
 
 @keyframes spin {
@@ -543,6 +547,24 @@
     height: auto;
     margin: 24px 0 0 0;
     border-radius: 12px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transform: scale(1) !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .send-button:hover {
+    background: #00B18F !important;
+    box-shadow: 4px 4px 0.3px #03836A !important;
+    transform: scale(1) !important;
+  }
+  
+  .send-button:active,
+  .send-button:focus {
+    background: #00B18F !important;
+    box-shadow: 4px 4px 0.3px #03836A !important;
+    transform: scale(1) !important;
   }
   
   .debug-toggle {
@@ -643,7 +665,7 @@
   
   .radio-option input[type="radio"] {
     width: 18px;
-    height: 18px;
+    height: 26px;
   }
   
   .form-select,

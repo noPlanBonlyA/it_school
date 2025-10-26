@@ -578,13 +578,9 @@ useEffect(() => {
           <div className="admin-schedule-controls">
             <div className="filter-info">
               <div className="filter-status">
-                {isFiltered ? (
+                {isFiltered && (
                   <span className="filtered-badge">
                     🔍 Применены фильтры: {formatFiltersText(activeFilters, filterOptions)}
-                  </span>
-                ) : (
-                  <span className="all-items-badge">
-                    📋 Показаны все записи расписания
                   </span>
                 )}
               </div>

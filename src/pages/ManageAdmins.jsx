@@ -222,7 +222,16 @@ export default function ManageAdminsPage() {
               />
             </div>
             <div className="buttons" style={{gridColumn:'1 / -1'}}>
-              <button className="btn-primary" onClick={()=>setShowCreateConfirm(true)}>
+              <button 
+                className="btn-primary" 
+                onClick={()=>setShowCreateConfirm(true)}
+                disabled={!form.first_name.trim() || !form.surname.trim() || !form.password.trim()}
+                style={{
+                  opacity: (!form.first_name.trim() || !form.surname.trim() || !form.password.trim()) ? 0.5 : 1,
+                  cursor: (!form.first_name.trim() || !form.surname.trim() || !form.password.trim()) ? 'not-allowed' : 'pointer',
+                  backgroundColor: (!form.first_name.trim() || !form.surname.trim() || !form.password.trim()) ? '#9ca3af' : ''
+                }}
+              >
                 Создать
               </button>
             </div>

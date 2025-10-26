@@ -702,16 +702,7 @@ body, html, #root, .app-layout, .main-content {
   position: relative;
 }
 
-.event-header::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #00B18F, #03836A);
-  border-radius: 2px;
-}
+
 
 .event-header h2 {
   margin: 0 0 8px 0;

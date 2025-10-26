@@ -339,7 +339,9 @@ export default function ManageProductsPage() {
           <div className="products-grid">
             {displayedProducts.length === 0 ? (
               <div className="empty-state">
-                <p>Товары не найдены</p>
+                <div className="empty-state-icon">🛍️</div>
+                <h3>Здесь будут товары</h3>
+                <p>Пока товаров нет. Нажмите кнопку "Добавить товар" чтобы создать первый товар</p>
               </div>
             ) : (
               displayedProducts.map(product => (

@@ -334,10 +334,7 @@ export default function NotificationPage() {
                 className="send-button"
               >
                 {sending ? (
-                  <span className="button-loading">
-                    <span className="loading-spinner"></span>
-                    Отправляем...
-                  </span>
+                  <span>Отправляем...</span>
                 ) : (
                   <span>🚀 Отправить уведомление</span>
                 )}

@@ -542,6 +542,13 @@
     display: none; /* Скрываем TopBar на мобильных */
   }
   
+  /* Центрируем заголовок страницы на мобильных */
+  .page-title {
+    text-align: center !important;
+    width: 100% !important;
+    display: block !important;
+  }
+  
   /* Показываем только уведомления на мобильных */
   .topbar .notification-wrapper {
     display: block !important;

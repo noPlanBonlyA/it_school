@@ -171,7 +171,7 @@ export default function ManageLessonsPage() {
             <div className="lessons-header">
               <h2>Уроки курса</h2>
               <button className="btn-primary create-lesson-btn" onClick={handleCreateLesson}>
-                ✨ Создать урок
+                 Создать урок
               </button>
             </div>
 

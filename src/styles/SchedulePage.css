@@ -59,10 +59,15 @@
 @media (max-width: 768px) {
   .main-content {
     padding: 0 16px 24px 16px;
-    padding-top: 20px !important; /* Меньший отступ на мобильных */
+    padding-top: 40px !important; /* Меньший отступ на мобильных */
     overflow-y: auto;
     height: 100vh;
     -webkit-overflow-scrolling: touch; /* Нативный скролл iOS */
+  }
+
+  /* Убираем верхний отступ в режиме fullscreen на мобильных */
+  .main-content.schedule-fullscreen-mode {
+    padding-top: 0 !important;
   }
 }
 
@@ -137,14 +142,14 @@
 }
 
 .btn-filter {
-  background: #3b82f6;
+  background: #00B18F;
   color: white;
 }
 
 .btn-filter:hover {
-  background: #2563eb;
+  background: #03836A;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 177, 143, 0.3);
 }
 
 .btn-clear {
@@ -793,10 +798,10 @@
 }
 
 .event-description {
-  padding: 0 24px 24px 24px;
+  padding: 0 0px 0px 0px;
   border-top: 1px solid rgba(0, 177, 143, 0.1);
   margin-top: 16px;
-  padding-top: 16px;
+  padding-top: 0px;
 }
 
 .event-description strong {
@@ -813,7 +818,7 @@
 }
 
 .event-actions {
-  padding: 16px 24px 24px 24px;
+  padding: 16px 16px 16px 16px;
   border-top: 1px solid #e5e7eb;
 }
 
@@ -1080,7 +1085,7 @@
 
   .filter-controls {
     width: 100%;
-    justify-content: flex-start;
+    justify-content: flex-end;
   }
 
   .filtered-badge,

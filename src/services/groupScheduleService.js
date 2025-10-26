@@ -77,12 +77,16 @@ export class GroupScheduleSettings {
   } = {}) {
     const defaults = getDefaultSettings();
     
-    this.dayOfWeek = dayOfWeek !== null ? dayOfWeek : defaults.dayOfWeek;
+    // Убеждаемся что dayOfWeek - это число
+    this.dayOfWeek = dayOfWeek !== null && dayOfWeek !== '' 
+      ? (typeof dayOfWeek === 'string' ? parseInt(dayOfWeek) : dayOfWeek)
+      : defaults.dayOfWeek;
+    
     this.startTime = startTime || defaults.startTime;
     this.endTime = endTime || defaults.endTime;
     this.interval = interval || defaults.interval;
     this.startDate = startDate || new Date().toISOString().split('T')[0];
-    this.auditorium = auditorium;
+    this.auditorium = auditorium || '';
   }
 }
 
@@ -331,7 +335,11 @@ export const loadGroupScheduleSettings = (groupId) => {
 export const validateScheduleSettings = (scheduleSettings) => {
   const errors = {};
 
-  if (!scheduleSettings.dayOfWeek || ![0,1,2,3,4,5,6].includes(scheduleSettings.dayOfWeek)) {
+  const dayOfWeek = typeof scheduleSettings.dayOfWeek === 'string' 
+    ? parseInt(scheduleSettings.dayOfWeek) 
+    : scheduleSettings.dayOfWeek;
+
+  if (!dayOfWeek && dayOfWeek !== 0 || ![0,1,2,3,4,5,6].includes(dayOfWeek)) {
     errors.dayOfWeek = 'Выберите день недели';
   }
 

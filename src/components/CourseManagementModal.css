@@ -43,7 +43,7 @@
 .modal-header {
   padding: 24px;
   border-bottom: 1px solid #e0e0e0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   border-radius: 16px 16px 0 0;
   position: relative;
@@ -115,7 +115,7 @@
 
 .tab-content h3 {
   margin: 0 0 20px 0;
-  color: #333;
+  color: #ffffff;
   font-size: 20px;
   font-weight: 600;
 }
@@ -250,7 +250,7 @@
 }
 
 .removal-mode-card {
-  border-left: 4px solid #805ad5;
+  border-left: 4px solid #16a34a;
 }
 
 .course-info-card h4, .schedule-impact-card h4, .consequences-card h4, .warning-card h4, .error-card h4, .removal-mode-card h4 {
@@ -298,6 +298,9 @@
   padding: 16px;
   border-radius: 8px;
   border: 2px solid;
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #2d3748 !important;
 }
 
 .stat-item.danger {
@@ -323,12 +326,14 @@
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 4px;
+  color: inherit;
 }
 
 .stat-label {
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
+  color: inherit;
 }
 
 .schedule-period {
@@ -465,9 +470,9 @@
 }
 
 .mode-option.active {
-  border-color: #805ad5;
-  background: #faf5ff;
-  box-shadow: 0 0 0 3px rgba(128, 90, 213, 0.1);
+  border-color: #16a34a;
+  background: #f0fdf4;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
 
 .mode-header {
@@ -489,7 +494,7 @@
 }
 
 .mode-badge {
-  background: #805ad5;
+  background: #16a34a;
   color: white;
   padding: 4px 12px;
   border-radius: 12px;
@@ -522,11 +527,11 @@
 }
 
 .mode-option.active .mode-features li {
-  color: #553c9a;
+  color: #15803d;
 }
 
 .mode-option.active .mode-features li:before {
-  color: #805ad5;
+  color: #16a34a;
 }
 
 /* Action Section */
@@ -886,7 +891,7 @@
 }
 
 .schedule-header {
-  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   padding: 20px 24px;
   border-radius: 10px 10px 0 0;
@@ -1071,14 +1076,14 @@
 
 /* Lessons Management Styles */
 .lessons-section {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  background: #ffffff;
   border-radius: 12px;
   padding: 0;
-  border: 2px solid #bbf7d0;
+  border: 2px solid #e5e7eb;
 }
 
 .lessons-header {
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   padding: 20px 24px;
   border-radius: 10px 10px 0 0;
@@ -1123,7 +1128,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
   margin: 16px 24px;
   padding: 16px;
   background: white;
@@ -1135,15 +1141,17 @@
 .selection-controls {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .action-controls {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .btn-secondary {
-  padding: 8px 16px;
+  padding: 10px 16px;
   background: #f1f5f9;
   color: #475569;
   border: 1px solid #cbd5e0;
@@ -1152,6 +1160,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -1391,7 +1400,15 @@
   }
   
   .selection-controls, .action-controls {
-    justify-content: center;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .selection-controls button, .action-controls button {
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    padding: 10px 12px;
   }
   
   .lesson-card {
@@ -1451,6 +1468,22 @@
   
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .lessons-controls {
+    margin: 12px 12px;
+    padding: 12px;
+  }
+  
+  .selection-controls, .action-controls {
+    gap: 8px;
+  }
+  
+  .selection-controls button, .action-controls button {
+    font-size: 11px;
+    padding: 8px 8px;
+    flex: 1;
+    min-width: 0;
   }
   
   .lesson-card {
@@ -1603,14 +1636,17 @@
   
   .stat-item {
     padding: 12px 8px;
+    color: #2d3748 !important;
   }
   
   .stat-number {
     font-size: 20px;
+    color: inherit !important;
   }
   
   .stat-label {
     font-size: 11px;
+    color: inherit !important;
   }
   
   /* Улучшенные детали */
@@ -1789,14 +1825,17 @@
   
   .stat-item {
     padding: 10px 8px;
+    color: #2d3748 !important;
   }
   
   .stat-number {
     font-size: 18px;
+    color: inherit !important;
   }
   
   .stat-label {
     font-size: 10px;
+    color: inherit !important;
   }
   
   /* Детали */
@@ -1873,12 +1912,25 @@
   /* Кнопки */
   .btn-secondary {
     font-size: 12px;
-    padding: 8px 10px;
+    padding: 10px 12px;
+    white-space: nowrap;
   }
   
   .btn-danger-small {
     font-size: 11px;
     padding: 6px 10px;
+  }
+  
+  /* Lessons controls для мобильных */
+  .lessons-controls {
+    margin: 12px 16px;
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .selection-controls button, .action-controls button {
+    font-size: 12px;
+    padding: 10px 10px;
   }
   
   /* Действия */

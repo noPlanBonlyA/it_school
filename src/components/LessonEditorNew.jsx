@@ -145,7 +145,7 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
   return (
     <div className="lesson-editor">
       <div className="editor-header">
-        <h2>{lesson ? '✏️ Редактировать урок' : '✨ Создать новый урок'}</h2>
+        <h2>{lesson ? '✏️ Редактировать урок' : ' Создать новый урок'}</h2>
       </div>
 
       <form onSubmit={handleSubmit} className="lesson-form">
@@ -405,7 +405,7 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
             className="btn-primary btn-save"
             disabled={loading}
           >
-            {loading ? 'Сохранение...' : (lesson ? '💾 Обновить урок' : '✨ Создать урок')}
+            {loading ? 'Сохранение...' : (lesson ? '💾 Обновить урок' : ' Создать урок')}
           </button>
           <button 
             type="button" 

@@ -143,7 +143,7 @@ export default function Sidebar({ activeItem, userRole }) {
         { key: 'schedule',       label: 'Расписание',   icon: calendarIcon },
         { key: 'teacherCourses', label: 'Курсы',        icon: coursesIcon },
         { key: 'homework',       label: 'Дом. задания', icon: homeworkIcon },
-        { key: 'managePoints',   label: 'Управление монетами', icon: coinsIcon }
+        { key: 'managePoints',   label: 'Валюта', icon: coinsIcon }
       ];
       break;
     case 'admin':
@@ -152,7 +152,7 @@ export default function Sidebar({ activeItem, userRole }) {
         { key: 'settings',       label: 'Профиль',      icon: cogIcon },
         { key: 'schedule',       label: 'Расписание',   icon: calendarIcon },
         { key: 'manageStudents', label: 'Студенты',     icon: usersIcon },
-        { key: 'managePoints',   label: 'Управление монетами', icon: coinsIcon },
+        { key: 'managePoints',   label: 'Валюта', icon: coinsIcon },
         { key: 'broadcast',      label: 'Рассылка',     icon: broadcastIcon },
         { key: 'manage-groups',  label: 'Группы',       icon: usersIcon },
         { key: 'manageTeachers', label: 'Преподаватели',icon: usersIcon },
@@ -166,11 +166,11 @@ export default function Sidebar({ activeItem, userRole }) {
         { key: 'settings',        label: 'Профиль',          icon: cogIcon },
         { key: 'schedule',        label: 'Расписание',       icon: calendarIcon },
         { key: 'manageStudents',  label: 'Студенты',         icon: usersIcon },
-        { key: 'managePoints',    label: 'Управление монетами', icon: coinsIcon },
+        { key: 'managePoints',    label: 'Валюта', icon: coinsIcon },
         { key: 'broadcast',       label: 'Рассылка',         icon: broadcastIcon },
         { key: 'manageTeachers',  label: 'Преподаватели',    icon: usersIcon },
         { key: 'manageAdmins',    label: 'Администраторы',   icon: adminIcon },
-        { key: 'manage-courses',  label: 'Модерация курсов', icon: moderationIcon },
+        { key: 'manage-courses',  label: 'Курсы', icon: moderationIcon },
         { key: 'manage-groups',   label: 'Группы',           icon: usersIcon },
         { key: 'manage-events',   label: 'Мероприятия',      icon: calendarIcon },
         { key: 'manageProducts',  label: 'Товары',           icon: shopIcon },

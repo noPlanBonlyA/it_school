@@ -293,7 +293,6 @@
 .lesson-content {
   display: flex;
   flex-direction: column;
-  gap: 40px;
 }
 
 /* Секция материалов */
@@ -755,9 +754,9 @@
   background: linear-gradient(135deg, #00b18f 0%, #00a082 100%);
   color: white;
   border: none;
-  border-radius: 12px;
-  padding: 14px 28px;
-  font-size: 16px;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

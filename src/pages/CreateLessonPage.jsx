@@ -50,7 +50,7 @@ export default function CreateLessonPage() {
               <span className="back-icon">←</span>
               <span className="back-text">Назад</span>
             </button>
-            <h1>✨ Создать урок</h1>
+            <h1> Создать урок</h1>
           </div>
 
           {/* Десктопный заголовок */}

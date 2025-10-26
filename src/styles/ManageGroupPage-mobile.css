@@ -188,7 +188,7 @@
   
   .group-info {
     flex: 1;
-    margin-bottom: 16px !important;
+    margin-bottom: 0px !important;
     padding-bottom: 12px;
     border-bottom: 1px solid #f1f5f9;
     min-height: auto !important;
@@ -266,11 +266,15 @@
     min-height: 44px;
     justify-content: flex-end;
     align-items: flex-end;
+    flex-wrap: wrap;
   }
   
   .btn-primary,
-  .btn-danger {
-    flex: 1;
+  .btn-danger,
+  .group-manage-btn,
+  .group-delete-btn {
+    flex: 1 1 auto;
+    min-width: fit-content;
     padding: 10px 14px !important;
     font-size: 13px !important;
     border-radius: 8px !important;
@@ -282,6 +286,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    white-space: nowrap;
+  }
+  
+  .group-manage-btn {
+    flex: 1 1 auto;
+  }
+  
+  .group-delete-btn {
+    flex: 0 1 auto;
   }
   
   .btn-primary {
@@ -1254,8 +1267,8 @@
   
   .group-info {
     flex: 1;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
     border-bottom: 1px solid #f1f5f9;
     min-height: 90px;
   }
@@ -1278,15 +1291,31 @@
     min-height: 48px;
     justify-content: flex-end;
     align-items: flex-end;
+    flex-wrap: wrap;
   }
   
   .btn-primary,
-  .btn-danger {
-    flex: 1;
+  .btn-danger,
+  .group-manage-btn,
+  .group-delete-btn {
+    flex: 1 1 auto;
+    min-width: fit-content;
     padding: 10px 14px;
     font-size: 13px;
     min-height: 40px;
     border-radius: 10px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .group-manage-btn {
+    flex: 1 1 auto;
+  }
+  
+  .group-delete-btn {
+    flex: 0 1 auto;
   }
   
   .modal-header {
@@ -1400,13 +1429,27 @@
 @media (max-width: 350px) {
   .group-actions {
     gap: 6px;
+    flex-wrap: wrap;
   }
   
   .btn-primary,
-  .btn-danger {
+  .btn-danger,
+  .group-manage-btn,
+  .group-delete-btn {
     padding: 8px 10px;
     font-size: 12px;
     min-height: 36px;
+    white-space: nowrap;
+    flex: 1 1 auto;
+    min-width: fit-content;
+  }
+  
+  .group-manage-btn {
+    flex: 1 1 60%;
+  }
+  
+  .group-delete-btn {
+    flex: 0 1 35%;
   }
   
   .group-card {

@@ -243,7 +243,18 @@ export default function ManageGroupPage() {
                   />
                 </div>
                 <div style={{ marginTop: '20px' }}>
-                  <button className="create-group-btn" onClick={createGrp} style={{ padding: '12px 24px', fontSize: '16px' }}>
+                  <button 
+                    className="create-group-btn" 
+                    onClick={createGrp} 
+                    disabled={!newF.name.trim()}
+                    style={{ 
+                      padding: '12px 24px', 
+                      fontSize: '16px',
+                      opacity: !newF.name.trim() ? 0.5 : 1,
+                      cursor: !newF.name.trim() ? 'not-allowed' : 'pointer',
+                      backgroundColor: !newF.name.trim() ? '#9ca3af' : ''
+                    }}
+                  >
                     Создать группу
                   </button>
                 </div>
@@ -306,18 +317,18 @@ export default function ManageGroupPage() {
                           <GroupScheduleInfo group={g} compact={true} />
                         </div>
                       </div>
-                      <div className="group-actions" style={{ display: 'flex', gap: '12px' }}>
+                      <div className="group-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                         <button 
-                          className="btn-primary" 
+                          className="btn-primary group-manage-btn" 
                           onClick={() => openGroupDetail(g.id)}
-                          style={{ flex: 1, padding: '10px 16px', fontSize: '14px' }}
+                          style={{ flex: '1 1 auto', minWidth: 'fit-content', padding: '10px 16px', fontSize: '14px' }}
                         >
                           Управлять
                         </button>
                         <button 
-                          className="btn-primary" 
+                          className="btn-primary group-delete-btn" 
                           onClick={() => delGrp(g.id)}
-                          style={{ padding: '10px 16px', fontSize: '14px' , backgroundColor:'#e90b0bff'}}
+                          style={{ flex: '0 1 auto', minWidth: 'fit-content', padding: '10px 16px', fontSize: '14px', backgroundColor:'#e90b0bff'}}
                         >
                           Удалить
                         </button>

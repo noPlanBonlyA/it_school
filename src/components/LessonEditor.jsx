@@ -490,7 +490,7 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
             className="btn-primary btn-save"
             disabled={loading}
           >
-            {loading ? 'Сохранение...' : (lesson ? '💾 Обновить урок' : '✨ Создать урок')}
+            {loading ? 'Сохранение...' : (lesson ? '💾 Обновить урок' : ' Создать урок')}
           </button>
         </div>
       </form>

@@ -75,7 +75,7 @@
 }
 
 .schedule-preview h3:before {
-  content: "📅";
+  content: "";
 }
 
 .preview-list {
@@ -192,6 +192,35 @@
 /* Кастомные стили для времени */
 input[type="time"].form-control {
   letter-spacing: 0.5px;
+}
+
+/* Фиксируем размер и поведение поля даты */
+input[type="date"].form-control {
+  position: relative;
+  max-width: 100%;
+  width: 100%;
+  display: block;
+}
+
+/* Убираем растягивание календаря */
+input[type="date"].form-control::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Предотвращаем случайные клики вне поля */
+.form-group {
+  position: relative;
+  contain: layout;
+}
+
+/* Изолируем поле даты */
+.form-group input[type="date"] {
+  pointer-events: auto;
+  contain: layout style;
 }
 
 /* Улучшения для мобильных устройств */
