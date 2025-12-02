@@ -321,7 +321,7 @@
 
 .lesson-number {
   position: absolute;
-  top: 12px;
+  top: 16px;
   left: 20px;
   width: 40px;
   height: 40px;
@@ -343,7 +343,7 @@
 }
 
 .lesson-content {
-  margin-left: 0;
+  margin-left: 70px;
   padding-top: 8px;
 }
 
