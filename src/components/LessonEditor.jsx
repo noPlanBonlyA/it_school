@@ -79,15 +79,15 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
       
       // Данные урока
       const lessonData = {
-        name: formData.name,
-        // Названия материалов
-        ...(teacherMaterialName && { teacher_material_name: teacherMaterialName }),
-        ...(teacherAdditionalMaterialName && { teacher_additional_material_name: teacherAdditionalMaterialName }),
-        ...(studentMaterialName && { student_material_name: studentMaterialName }),
-        ...(studentAdditionalMaterialName && { student_additional_material_name: studentAdditionalMaterialName }),
+        name: formData.name.trim(),
+        // Названия материалов (обрезаем пробелы)
+        ...(teacherMaterialName?.trim() && { teacher_material_name: teacherMaterialName.trim() }),
+        ...(teacherAdditionalMaterialName?.trim() && { teacher_additional_material_name: teacherAdditionalMaterialName.trim() }),
+        ...(studentMaterialName?.trim() && { student_material_name: studentMaterialName.trim() }),
+        ...(studentAdditionalMaterialName?.trim() && { student_additional_material_name: studentAdditionalMaterialName.trim() }),
         // HTML текст для основных материалов
-        ...(teacherMaterialText && { teacher_material_text: teacherMaterialText }),
-        ...(studentMaterialText && { student_material_text: studentMaterialText })
+        ...(teacherMaterialText?.trim() && { teacher_material_text: teacherMaterialText.trim() }),
+        ...(studentMaterialText?.trim() && { student_material_text: studentMaterialText.trim() })
       };
 
       // При редактировании урока добавляем флаги сохранения существующих материалов
@@ -120,14 +120,61 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
         }
       }
       
-      // Добавляем JSON данные
-      submitData.append('data', JSON.stringify(lessonData));
+      // Валидация: проверяем что есть хоть какой-то контент
+      const hasTeacherContent = teacherMaterialText?.trim() || teacherAdditionalMaterialFile;
+      const hasStudentContent = studentMaterialText?.trim() || studentAdditionalMaterialFile;
       
-      // Добавляем файлы для дополнительных материалов
+      // Не обязательно иметь материалы, но хорошо бы предупредить
+      if (!hasTeacherContent && !hasStudentContent && !lesson) {
+        const confirm = window.confirm(
+          'Вы создаёте урок без материалов.\n' +
+          'Рекомендуется добавить хотя бы один материал (для преподавателя или студента).\n\n' +
+          'Продолжить без материалов?'
+        );
+        if (!confirm) {
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // Добавляем JSON данные
+      try {
+        submitData.append('data', JSON.stringify(lessonData));
+      } catch (jsonError) {
+        console.error('[LessonEditor] JSON serialization error:', jsonError);
+        alert('Ошибка при подготовке данных урока. Проверьте правильность заполнения полей.');
+        setLoading(false);
+        return;
+      }
+      
+      // Добавляем файлы для дополнительных материалов с валидацией
       if (teacherAdditionalMaterialFile) {
+        // Проверяем что файл валидный
+        if (teacherAdditionalMaterialFile.size === 0) {
+          alert('Файл материала для преподавателя пустой. Пожалуйста, выберите корректный файл.');
+          setLoading(false);
+          return;
+        }
+        if (teacherAdditionalMaterialFile.size > 100 * 1024 * 1024) { // 100MB
+          alert('Файл материала для преподавателя слишком большой (максимум 100 МБ).');
+          setLoading(false);
+          return;
+        }
         submitData.append('teacher_additional_material_file', teacherAdditionalMaterialFile);
       }
+      
       if (studentAdditionalMaterialFile) {
+        // Проверяем что файл валидный
+        if (studentAdditionalMaterialFile.size === 0) {
+          alert('Файл материала для студента пустой. Пожалуйста, выберите корректный файл.');
+          setLoading(false);
+          return;
+        }
+        if (studentAdditionalMaterialFile.size > 100 * 1024 * 1024) { // 100MB
+          alert('Файл материала для студента слишком большой (максимум 100 МБ).');
+          setLoading(false);
+          return;
+        }
         submitData.append('student_additional_material_file', studentAdditionalMaterialFile);
       }
       
@@ -136,7 +183,9 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
         lessonData,
         files: {
           teacher_additional: teacherAdditionalMaterialFile?.name,
-          student_additional: studentAdditionalMaterialFile?.name
+          teacher_additional_size: teacherAdditionalMaterialFile ? `${(teacherAdditionalMaterialFile.size / 1024).toFixed(2)} KB` : 'N/A',
+          student_additional: studentAdditionalMaterialFile?.name,
+          student_additional_size: studentAdditionalMaterialFile ? `${(studentAdditionalMaterialFile.size / 1024).toFixed(2)} KB` : 'N/A'
         }
       });
       
@@ -180,8 +229,15 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
       
     } catch (error) {
       console.error('[LessonEditor] Error saving lesson:', error);
+      console.error('[LessonEditor] Error details:', {
+        response: error.response?.data,
+        status: error.response?.status,
+        message: error.message
+      });
       
       let errorMessage = 'Неизвестная ошибка';
+      let errorDetails = '';
+      
       if (error.response?.data?.detail) {
         if (Array.isArray(error.response.data.detail)) {
           errorMessage = error.response.data.detail
@@ -190,11 +246,20 @@ export default function LessonEditor({ courseId, lesson = null, onSave, onCancel
         } else {
           errorMessage = error.response.data.detail;
         }
+      } else if (error.response?.status === 413) {
+        errorMessage = 'Файлы слишком большие. Максимальный размер - 100 МБ.';
+      } else if (error.response?.status === 422) {
+        errorMessage = 'Ошибка валидации данных. Проверьте правильность заполнения всех полей.';
+        errorDetails = '\n\nСовет: убедитесь что все имена файлов корректны и не содержат специальных символов.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Ошибка на сервере. Попробуйте снова или обратитесь к администратору.';
+      } else if (error.message === 'Network Error' || !error.response) {
+        errorMessage = 'Ошибка сети. Проверьте подключение к интернету.';
       } else if (error.message) {
         errorMessage = error.message;
       }
       
-      alert('❌ Ошибка сохранения урока:\n' + errorMessage);
+      alert('❌ Ошибка сохранения урока:\n\n' + errorMessage + errorDetails);
     } finally {
       setLoading(false);
     }

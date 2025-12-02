@@ -636,7 +636,7 @@ ${result.message}
                         <h5>👁️ Предварительный просмотр</h5>
                         <div className="preview-content">
                           <p>
-                            <strong>Новое расписание:</strong> {dayNames[scheduleForm.dayOfWeek]}s в {scheduleForm.startTime}, 
+                            <strong>Новое расписание:</strong> {dayNames[scheduleForm.dayOfWeek]} в {scheduleForm.startTime}, 
                             продолжительность {scheduleForm.durationMinutes} минут
                             {scheduleForm.auditorium && `, аудитория: ${scheduleForm.auditorium}`}
                           </p>
@@ -646,7 +646,7 @@ ${result.message}
                         </div>
                       </div>
 
-                      <div className="action-section">
+                      <div className="action-section" style={{width:"60px"}}>
                         <button 
                           className="btn-primary reschedule-btn"
                           onClick={handleReschedule}
@@ -660,14 +660,12 @@ ${result.message}
                           ) : (
                             <>
                               <span className="icon">🔄</span>
-                              Изменить расписание всех занятий
+                              Изменить
                             </>
                           )}
                         </button>
                         
-                        <p className="confirmation-note">
-                          💡 <strong>Внимание:</strong> Это изменит время всех {scheduleInfo.totalLessons} занятий курса
-                        </p>
+                      
                       </div>
                     </div>
                   </div>
@@ -714,14 +712,14 @@ ${result.message}
                           onClick={selectAllLessons}
                           disabled={selectedLessons.size === courseLessons.length}
                         >
-                          Выбрать все
+                          Все
                         </button>
                         <button 
                           className="btn-primary"
                           onClick={clearLessonSelection}
                           disabled={selectedLessons.size === 0}
                         >
-                          Снять выбор
+                          Снять
                         </button>
                       </div>
                       
@@ -936,7 +934,7 @@ ${result.message}
                     ) : (
                       <>
                         <span className="icon">🗑️</span>
-                        Отвязать курс от группы
+                        Отвязать курс
                       </>
                     )}
                   </button>

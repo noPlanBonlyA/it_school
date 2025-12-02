@@ -518,19 +518,27 @@ const getLessonBadge = (ev) => {
     }
   };
 
-  // Обработчик "Открыть урок" для навигации к уроку
-  const handleOpenLessonPage = (event) => {
-    console.log('[Schedule] Opening lesson page for:', event);
+  // Обработчик "Перейти к курсу"
+  const handleGoToCourse = (event) => {
+    console.log('[Schedule] Going to course:', event);
     
-    // Навигация к уроку
-    if (event.course_id && event.lesson_id) {
-      if (user.role === 'teacher' || user.role === 'admin' || user.role === 'superadmin') {
-        navigate(`/courses/${event.course_id}/teacher/lessons/${event.lesson_id}`);
+    if (event.course_id) {
+      if (user.role === 'teacher') {
+        // Преподаватель → страница курса преподавателя
+        navigate(`/courses/${event.course_id}/teacher`);
       } else if (user.role === 'student') {
-        navigate(`/courses/${event.course_id}/lessons/${event.lesson_id}`);
+        // Студент → страница курса студента
+        navigate(`/courses/${event.course_id}/student`);
+      } else if (user.role === 'admin' || user.role === 'superadmin') {
+        // Админы → открываем урок как раньше
+        if (event.lesson_id) {
+          navigate(`/courses/${event.course_id}/teacher/lessons/${event.lesson_id}`);
+        } else {
+          navigate(`/courses/${event.course_id}/teacher`);
+        }
       }
     } else {
-      alert('Не удалось определить курс и урок для перехода');
+      alert('Не удалось определить курс для перехода');
     }
   };
 
@@ -825,8 +833,8 @@ const getLessonBadge = (ev) => {
                               type="number"
                               min="0"
                               max="10"
-                              value={studentGrades[student.id]?.coins_for_visit || 0}
-                              onChange={(e) => handleGradeChange(student.id, 'coins_for_visit', e.target.value)}
+                              value={studentGrades[student.id]?.coins_for_visit ?? ''}
+                              onChange={(e) => handleGradeChange(student.id, 'coins_for_visit', e.target.value === '' ? '' : Number(e.target.value))}
                             />
                           </label>
                           
@@ -836,8 +844,8 @@ const getLessonBadge = (ev) => {
                               type="number"
                               min="0"
                               max="5"
-                              value={studentGrades[student.id]?.grade_for_visit || 0}
-                              onChange={(e) => handleGradeChange(student.id, 'grade_for_visit', e.target.value)}
+                              value={studentGrades[student.id]?.grade_for_visit ?? ''}
+                              onChange={(e) => handleGradeChange(student.id, 'grade_for_visit', e.target.value === '' ? '' : Number(e.target.value))}
                             />
                           </label>
                           
@@ -858,7 +866,7 @@ const getLessonBadge = (ev) => {
                 
                 <div className="modal-actions">
                   <button onClick={handleSaveGrades} className="btn-primary">
-                    Сохранить результаты урока
+                    Сохранить
                   </button>
                   <button onClick={() => setConductingLesson(null)} className="btn-secondary">
                     Отмена
@@ -1118,10 +1126,10 @@ const renderDesktopScheduleItem = (event, index) => {
           {(user.role === 'teacher' || user.role === 'admin' || user.role === 'superadmin') && getEventType(selectedEvent) === 'lesson' && (
             <div className="event-actions">
               <button 
-                onClick={() => handleOpenLessonPage(selectedEvent)}
+                onClick={() => handleGoToCourse(selectedEvent)}
                 className="btn-primary"
               >
-                📖 Перейти к уроку
+                {user.role === 'admin' || user.role === 'superadmin' ? '📖 Перейти к уроку' : '📚 Перейти к курсу'}
               </button>
               <button 
                 onClick={() => handleToggleLessonAccess(selectedEvent)}
@@ -1156,10 +1164,10 @@ const renderDesktopScheduleItem = (event, index) => {
           {user.role === 'student' && selectedEvent.is_opened && getEventType(selectedEvent) === 'lesson' && (
             <div className="event-actions">
               <button 
-                onClick={() => handleOpenLessonPage(selectedEvent)}
+                onClick={() => handleGoToCourse(selectedEvent)}
                 className="btn-primary"
               >
-                📖 Открыть урок
+                📚 Перейти к курсу
               </button>
             </div>
           )}

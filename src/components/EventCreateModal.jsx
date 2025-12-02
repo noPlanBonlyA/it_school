@@ -486,9 +486,10 @@ export default function EventCreateModal({ onSave, onClose }) {
                   {selectedUsers.length > 0 && (
                     <button 
                       className="btn-clear"
+                      style={{width:"116px"}}
                       onClick={() => setSelectedUsers([])}
                     >
-                      Очистить выбор
+                      Очистить 
                     </button>
                   )}
                   <button 
@@ -564,9 +565,10 @@ export default function EventCreateModal({ onSave, onClose }) {
                   {selectedUsers.length > 0 && (
                     <button 
                       className="btn-clear"
+                      style={{width:"116px"}}
                       onClick={() => setSelectedUsers([])}
                     >
-                      Очистить выбор
+                      Очистить
                     </button>
                   )}
                   <button 
@@ -651,9 +653,10 @@ export default function EventCreateModal({ onSave, onClose }) {
                   {selectedGroups.length > 0 && (
                     <button 
                       className="btn-clear"
+                      style={{width:"116px"}}
                       onClick={() => setSelectedGroups([])}
                     >
-                      Очистить выбор
+                      Очистить
                     </button>
                   )}
                 </div>
@@ -710,9 +713,10 @@ export default function EventCreateModal({ onSave, onClose }) {
                   {selectedCourses.length > 0 && (
                     <button 
                       className="btn-clear"
+                      style={{width:"116px"}}
                       onClick={() => setSelectedCourses([])}
                     >
-                      Очистить выбор
+                      Очистить 
                     </button>
                   )}
                   <button 

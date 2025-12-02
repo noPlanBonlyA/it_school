@@ -102,7 +102,7 @@
   /* Кнопка "Назад" */
   .back-btn {
     background: rgba(0, 177, 143, 0.1);
-    color: #d90bf5;
+    color: #ffffff;
     border: 1px solid rgba(215, 9, 219, 0.3);
     padding: 4px 8px;
     border-radius: 6px;
@@ -171,7 +171,7 @@
   .groups-col h2 {
     margin-top: 0;
     font-size: 18px;
-    color: #202224;
+    color: #ffffff;
     margin-bottom: 12px;
   }
   
@@ -255,7 +255,7 @@
   .topics-col h2 {
     margin-top: 0;
     font-size: 18px;
-    color: #202224;
+    color: #ffffff;
     margin-bottom: 12px;
   }
   
@@ -315,7 +315,7 @@
   .submissions-col h2 {
     margin-top: 0;
     font-size: 18px;
-    color: #202224;
+    color: #ffffff;
     margin-bottom: 12px;
   }
   
@@ -725,7 +725,7 @@
   .placeholder {
     padding: 40px 20px;
     text-align: center;
-    color: #999;
+    color: #ffffff;
     font-style: italic;
   }
   
@@ -1336,7 +1336,7 @@
     
     /* Еще больше увеличиваем высоту для колонки с домашками на маленьких экранах */
     .submissions-col {
-      max-height: 70vh !important;
+      max-height: 95% !important;
       min-height: 400px;
       flex: 1;
     }
@@ -1543,6 +1543,7 @@
     .placeholder {
       padding: 30px 15px;
       font-size: 14px;
+      color: #ffffff;
     }
     
     .loading {
@@ -1692,7 +1693,7 @@
 
 .archive-section h3 {
   margin: 0 0 15px 0;
-  color: #03836A;
+  color: #ffffff;
   font-size: 16px;
   display: flex;
   align-items: center;

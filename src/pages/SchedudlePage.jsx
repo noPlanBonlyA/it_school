@@ -615,14 +615,26 @@ useEffect(() => {
   headerToolbar={{
     left: 'prev,next',
     center: 'title',
-    right: isMobile ? 'listWeek,timeGridDay,today' : 'dayGridMonth,timeGridWeek,timeGridDay,today'
+    right: isMobile ? 'listWeek,timeGridDay' : 'dayGridMonth,timeGridWeek,timeGridDay'
   }}
-  buttonText={{ today: 'Сегодня', month: 'Месяц', week: 'Неделя', day: 'День', list: 'Список' }}
+  buttonText={{ month: 'Месяц', week: 'Неделя', day: 'Сегодня', list: 'Список' }}
   locale="ru"
   firstDay={1}
   height="100%"
   events={calendarEvents}
   eventClick={handleEventClick}
+  customButtons={{
+    timeGridDay: {
+      text: 'Сегодня',
+      click: function() {
+        const calendarApi = calendarRef.current?.getApi();
+        if (calendarApi) {
+          calendarApi.changeView('timeGridDay');
+          calendarApi.gotoDate(new Date());
+        }
+      }
+    }
+  }}
   eventDisplay="block"
   dayMaxEvents={3}
   moreLinkText={(n) => `еще +${n}`}

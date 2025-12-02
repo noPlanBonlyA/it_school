@@ -398,7 +398,7 @@ export default function EventCreateModal({ onSave, onClose }) {
                         className="btn-secondary small"
                         onClick={() => setSelectedUsers([])}
                       >
-                        Очистить выбор
+                        Очистить
                       </button>
                     </div>
                     
@@ -471,7 +471,7 @@ export default function EventCreateModal({ onSave, onClose }) {
                         className="btn-secondary small"
                         onClick={() => setSelectedGroups([])}
                       >
-                        Очистить выбор
+                        Очистить
                       </button>
                     </div>
                     
@@ -531,7 +531,7 @@ export default function EventCreateModal({ onSave, onClose }) {
                         className="btn-secondary small"
                         onClick={() => setSelectedCourses([])}
                       >
-                        Очистить выбор
+                        Очистить
                       </button>
                     </div>
                     

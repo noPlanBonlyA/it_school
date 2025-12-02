@@ -307,7 +307,7 @@ export default function LessonsPage() {
                         <div className="lesson-status">
                           {student.grade_for_visit > 0 && (
                             <span className="grade-display">
-                              Оценка: {student.grade_for_visit}
+                             
                             </span>
                           )}
                           <span className={`expand-icon ${expandedStudent === student.id ? 'rotated' : ''}`}>
@@ -355,7 +355,7 @@ export default function LessonsPage() {
                               />
                             </div>
                             <div className="grade-field">
-                              <label>Оценка за урок:</label>
+                              <label> </label>
                               <input
                                 type="number"
                                 min="0"

@@ -57,6 +57,7 @@ h1 {
   border: 1px solid rgba(0, 177, 143, 0.1);
   backdrop-filter: blur(8px);
   transition: all 0.3s ease;
+  overflow: visible; /* Разрешаем отображение выпадающих списков */
 }
 
 .block:hover {
@@ -90,6 +91,7 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 20px;
   align-items: start;
+  overflow: visible; /* Разрешаем отображение выпадающих списков и теней кнопок */
 }
 
 /* Поля формы */
@@ -187,8 +189,14 @@ h1 {
 
 /* Блок поиска */
 .search-block {
-  position: relative;
+  position: static;
   margin-bottom: 20px; /* Уменьшили с 24px до 20px */
+  overflow: visible; /* Разрешаем выход выпадающего списка за границы */
+}
+
+.search-block > div {
+  position: relative;
+  overflow: visible;
 }
 
 .search-block input {
@@ -230,13 +238,12 @@ h1 {
   border: 2px solid rgba(0, 177, 143, 0.15);
   border-radius: 12px;
   box-shadow: 
-    0 12px 32px rgba(0, 177, 143, 0.15),
-    0 4px 16px rgba(0, 0, 0, 0.1);
-  max-height: 240px;
+    0 20px 60px rgba(0, 177, 143, 0.2),
+    0 8px 24px rgba(0, 0, 0, 0.15);
+  max-height: 450px;
   overflow-y: auto;
-  z-index: 100;
-  backdrop-filter: blur(8px);
-  padding-bottom: 20px; /* Добавили отступ снизу */
+  z-index: 99999;
+  backdrop-filter: blur(12px);
 }
 
 /* Кастомный скроллбар для suggestions */
@@ -271,7 +278,6 @@ h1 {
 
 .suggestions li:last-child {
   border-bottom: none;
-  margin-bottom: 8px; /* Дополнительный отступ для последнего элемента */
 }
 
 .suggestions li:hover {
@@ -283,6 +289,7 @@ h1 {
 /* Стили для предложений поиска с кнопкой просмотра */
 .suggestion-item {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   padding: 12px 20px;
@@ -293,6 +300,8 @@ h1 {
   color: #2d3748;
   transition: all 0.2s ease;
   list-style: none;
+  flex-wrap: nowrap;
+  gap: 12px;
 }
 
 .suggestion-item:hover {
@@ -301,18 +310,21 @@ h1 {
 
 .suggestion-item:last-child {
   border-bottom: none;
-  margin-bottom: 8px; /* Дополнительный отступ для последнего элемента */
 }
 
 .suggestion-info {
   flex: 1;
   cursor: pointer;
-  padding: 4px 0;
+  padding: 4px 8px 4px 0;
   color: #2d3748;
   font-size: 14px;
   font-weight: 500;
   transition: color 0.2s ease;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .suggestion-info:hover {
@@ -379,7 +391,7 @@ h1 {
   /* Анимации */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   
   /* Flex настройки */
   flex: none;
@@ -424,6 +436,7 @@ h1 {
   grid-column: 1 \/ -1;
   flex-wrap: wrap;
   justify-content: flex-start;
+  overflow: visible; /* Разрешаем отображение теней */
 }
 
 /* Основная кнопка создания - особый стиль */
@@ -458,7 +471,7 @@ h1 {
   /* Анимации */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   
   /* Flex настройки */
   flex: none;
@@ -547,7 +560,7 @@ h1 {
   /* Анимации */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   
   /* Flex настройки */
   flex: none;
@@ -619,7 +632,7 @@ h1 {
   /* Анимации */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   
   /* Flex настройки */
   flex: none;
@@ -673,6 +686,7 @@ h1 {
 
 /* Кнопка во всю ширину блока для создания */
 .block .buttons .btn-primary:first-child {
+  margin-bottom: 5px;
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
@@ -858,7 +872,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   max-width: 400px !important;
   min-width: 280px !important;
   max-height: 90vh !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   display: flex !important;
   flex-direction: column !important;
   box-shadow: 
@@ -879,7 +893,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   max-width: 400px;
   min-width: 280px;
   max-height: 90vh;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   box-shadow: 
@@ -928,10 +942,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .manage-users .modal-overlay .modal-buttons {
   display: flex !important;
   gap: 16px !important;
-  padding: 20px 28px 28px 28px !important;
+  padding: 20px 28px 32px 28px !important;
   justify-content: center !important;
   flex-wrap: nowrap !important;
   background: rgba(248, 250, 252, 0.6) !important;
+  overflow: visible !important;
 }
 
 .manage-users .modal-overlay .modal-buttons button {
@@ -968,10 +983,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .modal-buttons {
   display: flex;
   gap: 16px;
-  padding: 20px 28px 28px 28px;
+  padding: 20px 28px 32px 28px;
   justify-content: center;
   flex-wrap: nowrap;
   background: rgba(248, 250, 252, 0.6);
+  overflow: visible;
 }
 
 /* КРИТИЧЕСКИ ВАЖНЫЕ стили - максимальный приоритет */

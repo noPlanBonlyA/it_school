@@ -149,23 +149,6 @@ export default function ImpersonatePage() {
     return parts.length > 0 ? parts.join(' ') : userData.username;
   };
 
-  if (loading) {
-    return (
-      <div className="app-layout">
-        <Sidebar activeItem="impersonate" userRole={user?.role} />
-        <div className="main-content">
-          <SmartTopBar pageTitle="Магия" />
-          <div className="impersonate-page">
-            <div className="loading-spinner">
-              <div className="spinner"></div>
-              <p>Загрузка пользователей...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="app-layout">
       <Sidebar activeItem="impersonate" userRole={user?.role} />

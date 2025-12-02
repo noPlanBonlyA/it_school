@@ -1,24 +1,40 @@
 /* Импорт мобильных исправлений для всего приложения */
 @import url('./styles/MobileFixes.css');
 
-body {
-  margin: 0;
-  padding: 0;
- 
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #FFFFFF;
-}
-
 html {
   margin: 0;
   padding: 0;
   background-color: #FFFFFF;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #FFFFFF;
+  overflow-x: hidden;
+  max-width: 100vw;
+  position: relative;
+}
+
+#root {
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 * {
   box-sizing: border-box;
+ 
 }
 
+/* Предотвращение горизонтальной прокрутки для всех элементов
+*:not(iframe) {
+  overflow-x: hidden;
+} */
+
 code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }

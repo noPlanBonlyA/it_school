@@ -18,6 +18,11 @@ button {
   background: none;
 }
 
+/* Ensure buttons can show shadows/overlays and not be clipped by ancestors */
+button {
+  overflow: visible;
+}
+
 .container {
   display: flex;
   height: 100%;

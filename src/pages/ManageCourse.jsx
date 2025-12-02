@@ -574,6 +574,7 @@ export default function ManageCoursesPage() {
                   className="btn-primary" 
                   onClick={() => setShowConfirmUpdate(true)}
                   disabled={uploading}
+                  style={{maxWidth: "140px", height:"48px", marginTop:"10px"}}
                 >
                   {uploading ? 'Сохранение...' : 'Сохранить'}
                 </button>

@@ -326,21 +326,10 @@ export default function ManageStudentsPage() {
                     const u=o.user;
                     const fio=[u.first_name,u.surname,u.patronymic].filter(Boolean).join(' ');
                     return (
-                      <li key={u.id} className="suggestion-item">
-                        <div className="suggestion-info" onClick={()=>select(o)}>
+                      <li key={u.id} className="suggestion-item" onClick={()=>select(o)}>
+                        <div className="suggestion-info">
                           {u.username||'(без логина)'} — {fio||'(ФИО не заполнено)'}
                         </div>
-                        <button 
-                          className="view-details-btn"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            viewDetails(o);
-                          }}
-                          title="Подробная информация"
-                        >
-                          👁️
-                        </button>
                       </li>
                     );
                   })}

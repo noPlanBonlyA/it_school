@@ -808,11 +808,11 @@ export default function HomeworkPage() {
                                 disabled={!student.coins_for_homework && !student.newComment?.trim()}
                               >
                                 {student.coins_for_homework > 0 && student.newComment?.trim() 
-                                  ? `✅ Оценить на ${student.coins_for_homework} 🪙 и отправить уведомление`
+                                  ? `✅ Оценить на ${student.coins_for_homework}`
                                   : student.coins_for_homework > 0 
-                                    ? `✅ Оценить на ${student.coins_for_homework} 🪙`
+                                    ? `✅ Оценить на ${student.coins_for_homework}`
                                     : student.newComment?.trim()
-                                      ? '✅ Оценить и отправить уведомление'
+                                      ? '✅ Оценить'
                                       : 'Введите бесткоины или комментарий'
                                 }
                               </button>

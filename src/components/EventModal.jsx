@@ -184,7 +184,7 @@ export default function EventModal({ event, onClose, userRole }) {
           is_visited: Boolean(grades.is_visited),
           is_excused_absence: Boolean(grades.is_excused_absence),
           is_compensated_skip: Boolean(student.is_compensated_skip || false),
-          coins_for_visit: Number(grades.coins_for_visit) || 0,
+          coins_for_visit: grades.coins_for_visit === '' ? 0 : Number(grades.coins_for_visit) || 0,
           grade_for_visit: 0,
           is_sent_homework: Boolean(student.is_sent_homework),
           is_graded_homework: Boolean(student.is_graded_homework),
@@ -379,12 +379,31 @@ export default function EventModal({ event, onClose, userRole }) {
     }
   };
 
-  const handleGoToLesson = () => {
-    if (event.lesson_id && event.course_id) {
-      navigate(`/courses/${event.course_id}/lessons-with-materials/${event.lesson_id}`);
+  const handleGoToCourse = () => {
+    console.log('[EventModal] Going to course:', {
+      course_id: event.course_id,
+      lesson_id: event.lesson_id,
+      userRole: userRole
+    });
+    
+    if (event.course_id) {
+      if (userRole === 'teacher') {
+        // Преподаватель → страница курса преподавателя
+        navigate(`/courses/${event.course_id}/teacher`);
+      } else if (userRole === 'student') {
+        // Студент → страница курса студента
+        navigate(`/courses/${event.course_id}/student`);
+      } else if (userRole === 'admin' || userRole === 'superadmin') {
+        // Админы → открываем урок как раньше
+        if (event.lesson_id) {
+          navigate(`/courses/${event.course_id}/lessons-with-materials/${event.lesson_id}`);
+        } else {
+          navigate(`/courses/${event.course_id}/teacher`);
+        }
+      }
       onClose();
     } else {
-      alert('Информация об уроке недоступна');
+      alert('Информация о курсе недоступна');
     }
   };
 
@@ -488,8 +507,8 @@ export default function EventModal({ event, onClose, userRole }) {
                               type="number"
                               min="0"
                               max="10"
-                              value={studentGrades[student.id]?.coins_for_visit || 0}
-                              onChange={(e) => handleGradeChange(student.id, 'coins_for_visit', e.target.value)}
+                              value={studentGrades[student.id]?.coins_for_visit ?? ''}
+                              onChange={(e) => handleGradeChange(student.id, 'coins_for_visit', e.target.value === '' ? '' : Number(e.target.value))}
                             />
                           </label>
                           
@@ -510,7 +529,7 @@ export default function EventModal({ event, onClose, userRole }) {
                 
                 <div className="modal-actions">
                   <button onClick={handleSaveGrades} className="btn-primary">
-                    Сохранить результаты урока
+                    Сохранить
                   </button>
                   <button onClick={() => setConductingLesson(null)} className="btn-primary"
             style={{ backgroundColor: '#e40b0bff'}}>
@@ -615,9 +634,9 @@ export default function EventModal({ event, onClose, userRole }) {
             <div className="event-modal-actions">
               <button 
                 className="event-btn-primary"
-                onClick={handleGoToLesson}
+                onClick={handleGoToCourse}
               >
-                📖 Перейти к уроку
+                {userRole === 'admin' || userRole === 'superadmin' ? '📖 Перейти к уроку' : '📚 Перейти к курсу'}
               </button>
               
               <button 
@@ -642,9 +661,9 @@ export default function EventModal({ event, onClose, userRole }) {
             <div className="event-modal-actions">
               <button 
                 className="event-btn-primary"
-                onClick={handleGoToLesson}
+                onClick={handleGoToCourse}
               >
-                🚀 Перейти к уроку
+                📚 Перейти к курсу
               </button>
             </div>
           )}

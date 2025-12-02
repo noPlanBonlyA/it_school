@@ -285,6 +285,7 @@
   background: linear-gradient(180deg, rgba(248, 250, 252, 0.5) 0%, rgba(255, 255, 255, 0.8) 100%);
   border-top: 1px solid rgba(148, 163, 184, 0.1);
   text-align: center;
+  overflow: visible; /* Разрешаем отображение теней */
 }
 
 .event-btn-primary {
@@ -311,7 +312,7 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   text-align: center;
@@ -372,7 +373,7 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   text-align: center;

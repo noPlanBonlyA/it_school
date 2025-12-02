@@ -339,16 +339,16 @@ export default function StudentLessonPage() {
   }
 
   return (
-    <div className="app-layout">
+    <div className="app-layout" style={{ overflowX: 'hidden', maxWidth: '100vw' }}>
       <Sidebar activeItem="courses" userRole={user?.role} />
       
-      <div className="main-content">
+      <div className="main-content" style={{ overflowX: 'hidden', maxWidth: '100%' }}>
         <Topbar 
           userName={fullName}
           userRole={user?.role}
         />
         
-        <div className="content-area student-lesson-page">
+        <div className="content-area student-lesson-page" style={{ overflowX: 'hidden', maxWidth: '100%' }}>
           {/* Кнопка назад */}
           <div className="back-button-container">
             <button 
@@ -487,7 +487,8 @@ export default function StudentLessonPage() {
                     right: '0',
                     bottom: '0',
                     zIndex: 5,
-                    cursor: 'default'
+                    cursor: 'default',
+                    pointerEvents: 'none'
                   }}
                 />
               )}
@@ -530,7 +531,8 @@ export default function StudentLessonPage() {
                     right: '0',
                     bottom: lesson?.homework_additional_material_url ? '80px' : '0',
                     zIndex: 5,
-                    cursor: 'default'
+                    cursor: 'default',
+                    pointerEvents: 'none'
                   }}
                 />
               )}
@@ -684,7 +686,7 @@ export default function StudentLessonPage() {
                   {/* Показываем статус проверки если есть */}
                   {homeworkStatus && homeworkStatus.graded && (
                     <div className="homework-grade-info">
-                      <p><strong>Оценка:</strong> {homeworkStatus.grade}/5</p>
+                     
                       {homeworkStatus.coins > 0 && (
                         <p><strong>Получено монет:</strong> {homeworkStatus.coins}</p>
                       )}
@@ -770,22 +772,27 @@ export default function StudentLessonPage() {
                   </div>
                   
                   {/* Поле для комментария студента */}
-                  <div className="student-comment-section" style={{ marginTop: '20px' }}>
+                  <div className="student-comment-section" style={{ marginTop: '20px', maxWidth: '100%', boxSizing: 'border-box' }}>
                     <h3>Комментарий к домашнему заданию (необязательно)</h3>
                     <textarea
                       value={studentComment}
                       onChange={(e) => setStudentComment(e.target.value)}
                       placeholder="Напишите комментарий к вашему домашнему заданию (например, вопросы, пояснения или что хотели бы подчеркнуть)..."
                       disabled={submitting}
-                      rows={3}
                       style={{
                         width: '100%',
+                        minHeight: '80px',
+                        maxHeight: '200px',
+                        height: '80px',
                         padding: '10px',
                         border: '1px solid #ddd',
                         borderRadius: '4px',
                         fontSize: '14px',
                         resize: 'vertical',
-                        boxSizing: 'border-box'
+                        boxSizing: 'border-box',
+                        fontFamily: 'inherit',
+                        lineHeight: '1.5',
+                        maxWidth: '100%'
                       }}
                       maxLength={500}
                     />
@@ -793,7 +800,8 @@ export default function StudentLessonPage() {
                       fontSize: '12px', 
                       color: '#666', 
                       marginTop: '5px',
-                      textAlign: 'right'
+                      textAlign: 'right',
+                      wordWrap: 'break-word'
                     }}>
                       {studentComment.length}/500 символов
                     </div>
@@ -804,10 +812,22 @@ export default function StudentLessonPage() {
                         backgroundColor: '#f8f9fa', 
                         border: '1px solid #dee2e6',
                         borderRadius: '4px',
-                        fontSize: '12px'
+                        fontSize: '12px',
+                        maxHeight: '120px',
+                        overflowY: 'auto',
+                        overflowX: 'hidden',
+                        wordWrap: 'break-word',
+                        wordBreak: 'break-word',
+                        textAlign: 'left',
+                        maxWidth: '100%',
+                        boxSizing: 'border-box'
                       }}>
-                        <strong>Ваш комментарий будет виден преподавателю:</strong><br/>
-                        "{studentComment.trim()}"
+                        <strong style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
+                          Ваш комментарий будет виден преподавателю:
+                        </strong><br/>
+                        <span style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
+                          "{studentComment.trim()}"
+                        </span>
                       </div>
                     )}
                   </div>

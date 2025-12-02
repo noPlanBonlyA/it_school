@@ -198,7 +198,7 @@ export default function TeacherLessonPage() {
             position: 'absolute', 
             top: '10px', 
             right: '10px', 
-            zIndex: 10 
+            zIndex: 1000 
           }}>
             <button
               onClick={() => {
@@ -314,7 +314,8 @@ export default function TeacherLessonPage() {
                   right: '0',
                   bottom: lesson?.teacher_additional_material_url ? '80px' : '0',
                   zIndex: 5,
-                  cursor: 'default'
+                  cursor: 'default',
+                  pointerEvents: 'none'
                 }}
               />
             )}
@@ -340,7 +341,7 @@ export default function TeacherLessonPage() {
               position: 'absolute', 
               top: '10px', 
               right: '10px', 
-              zIndex: 10 
+              zIndex: 1000 
             }}>
               <button
                 onClick={() => {
@@ -472,7 +473,8 @@ export default function TeacherLessonPage() {
         right: '0',
         bottom: lesson?.homework_additional_material_url ? '80px' : '0',
         zIndex: 5,
-        cursor: 'default'
+        cursor: 'default',
+        pointerEvents: 'none'
       }}
     />
   )}

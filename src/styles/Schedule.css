@@ -77,7 +77,6 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   padding: 0;
   z-index: 10000;
-  animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   backdrop-filter: blur(10px);
 }
 
@@ -92,17 +91,6 @@
   background: linear-gradient(135deg, #00B18F 0%, #03836A 100%);
   border-radius: 20px 20px 0 0;
   z-index: -1;
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateY(-50%) translateX(40px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(-50%) translateX(0) scale(1);
-  }
 }
 
 /* Заголовок события на зеленом фоне */
@@ -633,7 +621,6 @@
     max-height: 100vh;
     border-radius: 0;
     transform: none;
-    animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     z-index: 1001;
   }
   
@@ -1642,24 +1629,12 @@
   position: relative;
   z-index: 10000000 !important; /* Еще выше чем overlay */
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-  animation: modalSlideIn 0.3s ease;
 }
 
 .modal-content.large {
   max-width: 650px; /* Еще больше уменьшена для узких экранов */
   width: 80%; /* Уменьшена с 85% */
   max-height: 85vh;
-}
-
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-30px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }
 
 .modal-header {
@@ -2321,7 +2296,7 @@
   .modal-overlay.conduct-lesson-modal {
     padding: 0 !important;
     padding-left: 0 !important;
-    background: rgba(0, 0, 0, 0.85) !important;
+    background: rgba(184, 183, 183, 0.85) !important;
     backdrop-filter: blur(8px) !important;
   }
   
@@ -2393,9 +2368,11 @@
   
   .modal-overlay.conduct-lesson-modal .modal-body {
     padding: 16px !important;
+    padding-bottom: 160px !important; /* Добавляем отступ для кнопок */
     background: #f8f9fa !important;
     overflow-y: auto !important;
     max-height: calc(100vh - 70px) !important;
+    -webkit-overflow-scrolling: touch !important; /* Плавный скролл на iOS */
   }
   
   .modal-overlay.conduct-lesson-modal .conduct-lesson-content {
@@ -2607,7 +2584,7 @@
   .modal-overlay.conduct-lesson-modal .grade-controls input[type="checkbox"] {
     width: auto !important;
     margin: 0 auto !important;
-    transform: scale(1.5) !important;
+    
     accent-color: #00B18F !important;
   }
   

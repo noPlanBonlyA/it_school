@@ -7,6 +7,7 @@
 }
 
 .fc {
+  padding: 5px;
   --fc-more-link-bg-color: #00B18F !important;
   --fc-more-link-text-color: white !important;
 }
@@ -16,6 +17,7 @@
 /* Скрываем стандартный popover FullCalendar чтобы избежать ошибок getBoundingClientRect */
 .fc-popover,
 .fc-more-popover {
+
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -539,38 +541,15 @@
 }
 
 .fc .fc-button:disabled {
-  background-color: #9ca3af !important;
+  background-color: #00A081!important;
   cursor: not-allowed !important;
   transform: none !important;
   box-shadow: none !important;
 }
 
-/* Отступы между группами кнопок в навигации */
-.fc .fc-button-group {
-  margin: 0 8px !important;
-}
-
-/* Специальные отступы для кнопок навигации (стрелочки) */
-.fc .fc-prev-button,
-.fc .fc-next-button {
-  margin: 0 6px !important;
-}
-
-.fc-event {
-  border: none !important;
-  border-radius: 12px !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  padding: 6px 10px !important;
-  cursor: pointer !important;
-  font-family: 'Mont', sans-serif !important;
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  position: relative !important;
-  overflow: hidden !important;
+/* Группа кнопок (Месяц/Неделя/День/Сегодня) */
+.fc-button-group {
+  padding: 5px !important;
 }
 
 /* Десктопные эффекты */
@@ -954,6 +933,7 @@
   }
 
   .fc-button-group {
+    padding:5px;
     margin: 0 6px !important; /* Небольшие отступы между группами на мобильных */
     gap: 8px !important;
     display: flex !important;
@@ -1470,6 +1450,11 @@
   }
   
   .fc-listcard-dot { opacity: .6; }
+
+  /* Скрываем точки FullCalendar в списке событий */
+  .fc-list-event-dot {
+    display: none !important;
+  }
 }
 
 /* ===== Стилизация "еще N" и popover для накладывающихся событий ===== */

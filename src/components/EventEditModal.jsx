@@ -395,7 +395,7 @@ export default function EventEditModal({ event, onSave, onClose }) {
                           className="btn-clear"
                           onClick={() => setSelectedGroups([])}
                         >
-                          Очистить выбор
+                          Очистить
                         </button>
                       )}
                     </div>
@@ -449,7 +449,7 @@ export default function EventEditModal({ event, onSave, onClose }) {
                           className="btn-clear"
                           onClick={() => setSelectedUsers([])}
                         >
-                          Очистить выбор
+                          Очистить
                         </button>
                       )}
                       <p>Выбрано: <strong>{selectedUsers.length}</strong></p>

@@ -517,9 +517,10 @@ export default function CreateEventPage() {
                     {selectedUsers.length > 0 && (
                       <button 
                         className="btn-clear"
+                        style={{width:"116px"}}
                         onClick={() => setSelectedUsers([])}
                       >
-                        Очистить выбор
+                        Очистить
                       </button>
                     )}
                     <button 
@@ -596,9 +597,10 @@ export default function CreateEventPage() {
                     {selectedUsers.length > 0 && (
                       <button 
                         className="btn-clear"
+                        style={{width:"116px"}}
                         onClick={() => setSelectedUsers([])}
                       >
-                        Очистить выбор
+                        Очистить
                       </button>
                     )}
                     <button 
@@ -683,9 +685,10 @@ export default function CreateEventPage() {
                     {selectedGroups.length > 0 && (
                       <button 
                         className="btn-clear"
+                        style={{width:"116px"}}
                         onClick={() => setSelectedGroups([])}
                       >
-                        Очистить выбор
+                        Очистить
                       </button>
                     )}
                   </div>
@@ -742,9 +745,10 @@ export default function CreateEventPage() {
                     {selectedCourses.length > 0 && (
                       <button 
                         className="btn-clear"
+                        style={{width:"116px"}}
                         onClick={() => setSelectedCourses([])}
                       >
-                        Очистить выбор
+                        Очистить
                       </button>
                     )}
                     <button 

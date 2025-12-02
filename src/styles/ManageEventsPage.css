@@ -338,7 +338,7 @@
   width: 100%;
   max-width: 720px;
   max-height: 95vh;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   animation: modalSlideIn 0.3s ease-out;

@@ -825,6 +825,7 @@
 }
 
 .btn-primary {
+  margin-right: 5px;
   /* Используем фирменный зеленый стиль из ManageUserPage.css */
   background: #00B18F;
   color: white;
@@ -1061,7 +1062,7 @@
 .student-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 3px;
   width: 100%;
   min-width: 0; /* Важно для flex-элементов */
   overflow: visible; /* Позволяем badge быть видимым */

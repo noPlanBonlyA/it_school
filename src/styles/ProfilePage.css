@@ -210,6 +210,18 @@
   position: relative;
 }
 
+/* Fix: allow button shadows/decoration to be visible (prevent clipping) */
+.avatar-upload,
+.avatar-container {
+  overflow: visible !important;
+}
+
+.upload-button {
+  position: relative;
+  z-index: 5;
+  overflow: visible;
+}
+
 .upload-button {
   display: inline-flex;
   align-items: center;

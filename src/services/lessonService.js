@@ -32,18 +32,53 @@ export const createLessonWithMaterials = async (courseId, formData) => {
       throw new Error('Expected FormData object for file upload');
     }
     
+    // Валидация FormData перед отправкой
+    let hasData = false;
+    let hasFiles = false;
+    let totalFileSize = 0;
+    
     // Логируем содержимое FormData для отладки
     for (let [key, value] of formData.entries()) {
+      hasData = true;
       if (value instanceof File) {
-        console.log(`[LessonService] FormData[${key}]:`, value.name, value.size, 'bytes');
+        hasFiles = true;
+        totalFileSize += value.size;
+        console.log(`[LessonService] FormData[${key}]:`, value.name, value.size, 'bytes', `(${(value.size / 1024).toFixed(2)} KB)`);
+        
+        // Проверка на пустые файлы
+        if (value.size === 0) {
+          throw new Error(`Файл "${value.name}" пустой (0 байт). Пожалуйста, выберите корректный файл.`);
+        }
+        
+        // Проверка на слишком большие файлы
+        if (value.size > 100 * 1024 * 1024) {
+          throw new Error(`Файл "${value.name}" слишком большой (${(value.size / (1024 * 1024)).toFixed(2)} МБ). Максимальный размер - 100 МБ.`);
+        }
       } else {
-        console.log(`[LessonService] FormData[${key}]:`, value);
+        console.log(`[LessonService] FormData[${key}]:`, typeof value === 'string' ? value.substring(0, 100) : value);
       }
     }
+    
+    if (!hasData) {
+      throw new Error('FormData пустой. Невозможно создать урок без данных.');
+    }
+    
+    console.log('[LessonService] FormData validation passed:', {
+      hasData,
+      hasFiles,
+      totalFileSize: `${(totalFileSize / 1024).toFixed(2)} KB`
+    });
     
     const response = await api.post(`/courses/${courseId}/lessons-with-materials`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
+      },
+      // Увеличиваем таймаут для больших файлов
+      timeout: 60000, // 60 секунд
+      // Отслеживаем прогресс загрузки
+      onUploadProgress: (progressEvent) => {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        console.log(`[LessonService] Upload progress: ${percentCompleted}%`);
       }
     });
     
@@ -52,6 +87,14 @@ export const createLessonWithMaterials = async (courseId, formData) => {
   } catch (error) {
     console.error('[LessonService] Error creating lesson:', error);
     console.error('[LessonService] Error response:', error.response?.data);
+    console.error('[LessonService] Error status:', error.response?.status);
+    
+    // Улучшаем сообщения об ошибках
+    if (error.message && !error.response) {
+      // Это наша кастомная ошибка валидации
+      throw error;
+    }
+    
     throw error;
   }
 };
@@ -91,18 +134,53 @@ export const updateLessonWithMaterials = async (courseId, lessonId, formData) =>
       throw new Error('Expected FormData object for file upload');
     }
     
+    // Валидация FormData перед отправкой
+    let hasData = false;
+    let hasFiles = false;
+    let totalFileSize = 0;
+    
     // Логируем содержимое FormData для отладки
     for (let [key, value] of formData.entries()) {
+      hasData = true;
       if (value instanceof File) {
-        console.log(`[LessonService] FormData[${key}]:`, value.name, value.size, 'bytes');
+        hasFiles = true;
+        totalFileSize += value.size;
+        console.log(`[LessonService] FormData[${key}]:`, value.name, value.size, 'bytes', `(${(value.size / 1024).toFixed(2)} KB)`);
+        
+        // Проверка на пустые файлы
+        if (value.size === 0) {
+          throw new Error(`Файл "${value.name}" пустой (0 байт). Пожалуйста, выберите корректный файл.`);
+        }
+        
+        // Проверка на слишком большие файлы
+        if (value.size > 100 * 1024 * 1024) {
+          throw new Error(`Файл "${value.name}" слишком большой (${(value.size / (1024 * 1024)).toFixed(2)} МБ). Максимальный размер - 100 МБ.`);
+        }
       } else {
-        console.log(`[LessonService] FormData[${key}]:`, value);
+        console.log(`[LessonService] FormData[${key}]:`, typeof value === 'string' ? value.substring(0, 100) : value);
       }
     }
+    
+    if (!hasData) {
+      throw new Error('FormData пустой. Невозможно обновить урок без данных.');
+    }
+    
+    console.log('[LessonService] FormData validation passed:', {
+      hasData,
+      hasFiles,
+      totalFileSize: `${(totalFileSize / 1024).toFixed(2)} KB`
+    });
     
     const response = await api.put(`/courses/${courseId}/lessons-with-materials/${lessonId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
+      },
+      // Увеличиваем таймаут для больших файлов
+      timeout: 60000, // 60 секунд
+      // Отслеживаем прогресс загрузки
+      onUploadProgress: (progressEvent) => {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        console.log(`[LessonService] Upload progress: ${percentCompleted}%`);
       }
     });
     
@@ -111,6 +189,14 @@ export const updateLessonWithMaterials = async (courseId, lessonId, formData) =>
   } catch (error) {
     console.error('[LessonService] Error updating lesson:', error);
     console.error('[LessonService] Error response:', error.response?.data);
+    console.error('[LessonService] Error status:', error.response?.status);
+    
+    // Улучшаем сообщения об ошибках
+    if (error.message && !error.response) {
+      // Это наша кастомная ошибка валидации
+      throw error;
+    }
+    
     throw error;
   }
 };

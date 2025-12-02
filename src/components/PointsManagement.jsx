@@ -310,7 +310,7 @@ const PointsManagement = ({ onClose, selectedStudent = null }) => {
             <textarea
               id="description"
               className={`form-control description-textarea ${errors.description ? 'error' : ''}`}
-              placeholder="Опишите за что начисляются/списываются монеты"
+              placeholder="Опишите за что начисляются монеты"
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               rows={1}

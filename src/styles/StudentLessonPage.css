@@ -3,11 +3,15 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* Кнопка назад */
 .back-button-container {
   margin-bottom: 20px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .back-button {
@@ -636,6 +640,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .submission-title {
@@ -647,6 +654,8 @@
   position: relative;
   display: inline-block;
   width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .submission-title::after {
@@ -688,19 +697,25 @@
 /* Форма загрузки */
 .hw-form {
   max-width: 600px;
+  width: 100%;
   margin: 0 auto;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .hw-form > p {
   font-size: 1.1rem;
   color: #374151;
   margin-bottom: 24px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .submission-options {
   margin: 24px auto;
   max-width: 500px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .submission-option h3 {
@@ -709,12 +724,16 @@
   color: #03836A;
   text-align: center;
   font-weight: 600;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .file-upload {
   position: relative;
   display: inline-block;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .file-upload input[type="file"] {
@@ -737,6 +756,10 @@
   font-size: 1rem;
   color: #475569;
   font-weight: 500;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  text-align: center;
 }
 
 .file-upload label:hover {
@@ -978,35 +1001,65 @@
 /* Адаптивность */
 @media (max-width: 768px) {
   .student-lesson-page {
-    padding: 16px;
+    padding: 12px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  .lesson-title-section {
+    padding: 20px 15px;
+    margin-bottom: 20px;
   }
   
   .lesson-title {
-    font-size: 2rem;
-  }
-  
-  .materials-title {
     font-size: 1.5rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
   
+  .materials-title,
   .homework-title {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   
   .materials-section,
   .homework-section {
-    padding: 20px;
+    padding: 15px;
+    margin-bottom: 20px;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  .main-material-container,
+  .homework-material-container {
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  .material-iframe-wrapper,
+  .homework-iframe-wrapper {
+    max-width: 100%;
+    overflow: hidden;
   }
   
   .main-material-iframe,
   .homework-material-iframe {
-    height: 350px;
+    height: 300px;
+    max-width: 100%;
   }
   
   .download-additional-btn,
   .download-homework-additional-btn {
-    padding: 14px 24px;
-    font-size: 16px;
+    padding: 12px 20px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    justify-content: center;
   }
   
   .back-button {
@@ -1015,11 +1068,183 @@
   }
   
   .homework-submission-section {
-    padding: 20px;
+    padding: 15px;
+    max-width: 100%;
+    overflow: hidden;
   }
   
   .submission-title {
+    font-size: 1.2rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .hw-form {
+    max-width: 100%;
+    padding: 0;
+  }
+  
+  .submission-options {
+    max-width: 100%;
+    margin: 15px 0;
+  }
+  
+  .file-upload label {
+    font-size: 14px;
+    padding: 12px;
+    min-height: 50px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Стили для комментария на мобильных */
+  .student-comment-section {
+    padding: 15px;
+    margin: 0 0 15px 0;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .student-comment-section h3 {
+    font-size: 16px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .student-comment-section textarea {
+    font-size: 14px;
+    padding: 10px;
+    min-height: 70px;
+    max-height: 150px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .student-comment-section .comment-preview {
+    font-size: 12px;
+    padding: 8px;
+    max-height: 100px;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  
+  .btn-primary,
+  .btn-secondary {
+    font-size: 14px;
+    padding: 12px 20px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .hw-submitted {
+    padding: 20px 15px;
+  }
+  
+  .hw-submitted h3 {
+    font-size: 1.2rem;
+    word-wrap: break-word;
+  }
+  
+  .hw-submitted p {
+    font-size: 1rem;
+  }
+  
+  .material-name {
+    font-size: 18px !important;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    padding: 0 10px;
+  }
+  
+  .additional-materials-container,
+  .homework-additional-container {
+    padding: 15px 10px;
+    max-width: 100%;
+  }
+  
+  .no-materials-message,
+  .no-homework-message {
+    padding: 40px 15px;
+  }
+  
+  .no-materials-message h3,
+  .no-homework-message h3 {
+    font-size: 1.2rem;
+    word-wrap: break-word;
+  }
+  
+  .no-materials-message p,
+  .no-homework-message p {
+    font-size: 1rem;
+  }
+}
+
+/* Дополнительные правила для очень маленьких экранов */
+@media (max-width: 480px) {
+  .student-lesson-page {
+    padding: 10px;
+  }
+  
+  .lesson-title {
     font-size: 1.3rem;
+  }
+  
+  .materials-title,
+  .homework-title {
+    font-size: 1.1rem;
+  }
+  
+  .materials-section,
+  .homework-section {
+    padding: 12px;
+    border-radius: 12px;
+  }
+  
+  .main-material-iframe,
+  .homework-material-iframe {
+    height: 250px;
+  }
+  
+  .download-additional-btn,
+  .download-homework-additional-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  
+  .homework-submission-section {
+    padding: 12px;
+  }
+  
+  .submission-title {
+    font-size: 1.1rem;
+  }
+  
+  .student-comment-section {
+    padding: 12px;
+  }
+  
+  .student-comment-section h3 {
+    font-size: 14px;
+  }
+  
+  .student-comment-section textarea {
+    font-size: 13px;
+    padding: 8px;
+  }
+  
+  .btn-primary,
+  .btn-secondary {
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+  
+  .material-name {
+    font-size: 16px !important;
   }
 }
 
@@ -1070,8 +1295,10 @@
   border-radius: 12px;
   padding: 20px;
   margin: 0 auto;
-  max-width: 500px;
+  max-width: 600px;
+  width: 100%;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .student-comment-section h3 {
@@ -1079,10 +1306,15 @@
   color: #03836A;
   font-size: 18px;
   font-weight: 600;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .student-comment-section textarea {
   width: 100%;
+  min-height: 80px;
+  max-height: 200px;
+  height: 80px;
   padding: 12px;
   border: 2px solid #cbd5e1;
   border-radius: 8px;
@@ -1091,6 +1323,9 @@
   resize: vertical;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   box-sizing: border-box;
+  overflow-y: auto;
+  line-height: 1.5;
+  max-width: 100%;
 }
 
 .student-comment-section textarea:focus {
@@ -1112,10 +1347,19 @@
   border: 1px solid #e9ecef;
   border-radius: 6px;
   font-size: 13px;
+  max-height: 120px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .student-comment-section .comment-preview strong {
   color: #495057;
   margin-bottom: 5px;
   display: block;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
